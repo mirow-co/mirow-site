@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Andreas Mirow",
+    "role": { "en": "Managing Partner", "pt": "Managing Partner" },
+    "bio": {
+      "en": "Leads strategy, sales and performance improvement projects in several B2B and B2C industries. Previously partner at McKinsey & Company, responsible for the Rio de Janeiro office, and senior executive at Aracruz Celulose. Master in Production Engineering (Technical University of Berlin) and Master's in Technology Management (USA) — Fulbright Scholar.",
+      "pt": "Lidera projetos de estratégia, vendas e melhoria de performance em diversas indústrias B2B e B2C. Ex-sócio da McKinsey & Company, responsável pelo escritório do Rio de Janeiro, e executivo sênior na Aracruz Celulose. Mestre em Engenharia de Produção (Universidade Técnica de Berlim) e mestre em Gestão de Tecnologia (EUA) — Fulbright Scholar."
+    }
+  },
+  {
+    "name": "Elmar Gans",
+    "role": { "en": "Managing Partner", "pt": "Managing Partner" },
+    "bio": {
+      "en": "Focuses on business strategy, commercial excellence and S&OP, with large experience in industrial clients, automotive, food & beverage and fuel distribution. Worked for 7 years at McKinsey & Company (Munich, New Delhi and Rio de Janeiro). PhD in Business Administration (WHU, Germany) and MBA.",
+      "pt": "Foco em estratégia de negócios, excelência comercial e S&OP, com longa experiência em clientes industriais, automotivo, alimentos & bebidas e distribuição de combustíveis. Trabalhou 7 anos na McKinsey & Company (Munique, Nova Délhi e Rio de Janeiro). PhD em Administração (WHU, Alemanha) e MBA."
+    }
+  },
+  {
+    "name": "Felipe Diniz",
+    "role": { "en": "Partner", "pt": "Partner" },
+    "bio": {
+      "en": "Extensive experience in strategy, innovation, market analysis, organizational restructuring and governance. 15 years of experience in capital-intensive sectors, especially energy. Previously at Monitor Deloitte, Schlumberger Business Consulting and McKinsey & Company. PhD in Economics (University of Chicago).",
+      "pt": "Longa experiência em estratégia, inovação, análise de mercado, reestruturação organizacional e governança. 15 anos de atuação em setores intensivos em capital, especialmente energia. Passagens por Monitor Deloitte, Schlumberger Business Consulting e McKinsey & Company. PhD em Economia (Universidade de Chicago)."
+    }
+  },
+  {
+    "name": "Prof. Dr. Stephan Friedrich",
+    "role": { "en": "Partner", "pt": "Partner" },
+    "bio": {
+      "en": "Extensive experience in strategic consulting and innovation, focusing on corporate strategy, innovation management and disruptive business logics. CEO and Managing Partner of IMP Consulting and Professor of Business Model Innovation at the University of Bremen (Germany).",
+      "pt": "Longa experiência em consultoria estratégica e inovação, com foco em estratégia corporativa, gestão da inovação e lógicas de negócio disruptivas. CEO e Managing Partner da IMP Consulting e professor de Inovação em Modelos de Negócio na Universidade de Bremen (Alemanha)."
+    }
+  },
+  {
+    "name": "Michael Munch",
+    "role": { "en": "Associate Partner", "pt": "Associate Partner" },
+    "bio": {
+      "en": "Expertise in strategy, finance, pricing, advanced analytics and digitalization projects. More than 12 years of experience in finance at Dell and Stanley Black & Decker.",
+      "pt": "Especialista em projetos de estratégia, finanças, pricing, advanced analytics e digitalização. Mais de 12 anos de experiência em finanças na Dell e na Stanley Black & Decker."
+    }
+  }
+]

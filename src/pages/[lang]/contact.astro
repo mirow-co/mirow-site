@@ -1,0 +1,44 @@
+---
+import Base from '../../layouts/Base.astro';
+import { LANGS, t, type Lang } from '../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+---
+
+<Base lang={lang} title={_('contact.title')} description={_('contact.sub')} altPath="/contact/">
+  <div class="hero" style="padding:64px 0">
+    <div class="wrap">
+      <div class="kicker">{_('nav.contact')}</div>
+      <h1 style="font-size:40px">{_('contact.title')}</h1>
+      <div class="rule"></div>
+      <p>{_('contact.sub')}</p>
+    </div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <form class="mirow" id="contact-form">
+        <input required name="name" placeholder={_('form.name') + ' *'} />
+        <input required type="email" name="email" placeholder={_('form.email') + ' *'} />
+        <input name="phone" placeholder={_('form.phone')} />
+        <input name="company" placeholder={_('form.company')} />
+        <textarea required name="message" placeholder={_('form.message') + ' *'}></textarea>
+        <button class="btn" type="submit">{_('form.send')}</button>
+        <p class="demo-note" id="demo-note" hidden>{_('form.demo')}</p>
+      </form>
+      <p style="margin-top:40px;color:var(--gray)">
+        Rio de Janeiro — Rua Lauro Müller, 116, 15º andar, cj 1504, Botafogo · São Paulo
+      </p>
+    </div>
+  </section>
+  <script>
+    document.getElementById('contact-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const note = document.getElementById('demo-note');
+      if (note) note.hidden = false;
+    });
+  </script>
+</Base>

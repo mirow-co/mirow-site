@@ -1,0 +1,84 @@
+---
+import Base from '../../layouts/Base.astro';
+import { LANGS, t, type Lang } from '../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+
+const steps =
+  lang === 'en'
+    ? [
+        ['Business Analyst', 'Carry out analyses, actively participate in problem solving, interact with clients'],
+        ['Associate', 'Lead complex work fronts, coordinate and develop junior consultants'],
+        ['Engagement Manager', 'Mediate interactions with client leaders, coordinate the team'],
+        ['Associate Partner', 'Lead complex projects, reference on relevant topics, generate followership'],
+        ['Partner', 'Nurture deep client relationships, lead strategic themes, train new leaders'],
+      ]
+    : [
+        ['Business Analyst', 'Conduz análises, participa ativamente da resolução de problemas, interage com clientes'],
+        ['Associate', 'Lidera frentes complexas de trabalho, coordena e desenvolve consultores juniores'],
+        ['Engagement Manager', 'Media interações com líderes do cliente, coordena o time'],
+        ['Associate Partner', 'Lidera projetos complexos, é referência em temas relevantes, gera followership'],
+        ['Partner', 'Cultiva relações profundas com clientes, lidera temas estratégicos, forma novos líderes'],
+      ];
+---
+
+<Base lang={lang} title={_('careers.title')} description={_('careers.sub')} altPath="/careers/">
+  <div class="hero" style="padding:64px 0">
+    <div class="kicker wrap" style="margin-bottom:0"></div>
+    <div class="wrap">
+      <div class="kicker">{_('nav.careers')}</div>
+      <h1 style="font-size:44px">{_('careers.title')}</h1>
+      <div class="rule"></div>
+      <p>{_('careers.sub')}</p>
+    </div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <h2 class="sec">{lang === 'en' ? 'Our career plan' : 'Nosso plano de carreira'}</h2>
+      <p class="sec-sub"></p>
+      <div class="grid c3">
+        {
+          steps.map(([title, desc], i) => (
+            <div class="card">
+              <h3>
+                <span style="color:var(--cyan)">{String(i + 1).padStart(2, '0')}</span> {title}
+              </h3>
+              <p>{desc}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <h2 class="sec">{_('careers.apply')}</h2>
+      <p class="sec-sub"></p>
+      <form class="mirow" id="careers-form">
+        <input required name="name" placeholder={_('form.name') + ' *'} />
+        <input required type="email" name="email" placeholder={_('form.email') + ' *'} />
+        <input name="phone" placeholder={_('form.phone')} />
+        <label style="font-size:14px;color:var(--gray)">
+          {_('form.cv')}
+          <input type="file" accept=".pdf" style="margin-top:6px" />
+        </label>
+        <textarea name="message" placeholder={_('form.message')}></textarea>
+        <button class="btn" type="submit">{_('careers.apply')}</button>
+        <p class="demo-note" id="demo-note" hidden>{_('careers.demo')}</p>
+      </form>
+    </div>
+  </section>
+  <script>
+    document.getElementById('careers-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const note = document.getElementById('demo-note');
+      if (note) note.hidden = false;
+    });
+  </script>
+</Base>

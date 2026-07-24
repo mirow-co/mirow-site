@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+import leaders from '../../data/leaders.json';
+import { LANGS, t, type Lang } from '../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+---
+
+<Base lang={lang} title={_('leaders.title')} description={_('leaders.sub')} altPath="/leaders/">
+  <div class="hero" style="padding:64px 0">
+    <div class="wrap">
+      <div class="kicker">{_('nav.leaders')}</div>
+      <h1 style="font-size:40px">{_('leaders.title')}</h1>
+      <div class="rule"></div>
+      <p>{_('leaders.sub')}</p>
+    </div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <div class="grid c3">
+        {
+          leaders.map((l) => (
+            <div class="card">
+              <h3>{l.name}</h3>
+              <p style="color:var(--cyan);font-weight:bold;margin-bottom:10px">{l.role[lang]}</p>
+              <p>{l.bio[lang]}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>

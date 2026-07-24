@@ -1,0 +1,43 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { LANGS, t, type Lang } from '../../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const insights = (await getCollection('insights', (e) => e.id.startsWith(`${lang}/`))).sort(
+  (a, b) => (a.data.date < b.data.date ? 1 : -1),
+);
+const slug = (id: string) => id.split('/')[1];
+---
+
+<Base lang={lang} title={_('insights.title')} description={_('insights.sub')} altPath="/insights/">
+  <div class="hero" style="padding:64px 0">
+    <div class="wrap">
+      <div class="kicker">{_('insights.title')}</div>
+      <h1 style="font-size:40px">{_('insights.sub')}</h1>
+    </div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <div class="grid c3">
+        {
+          insights.map((a) => (
+            <div class="card">
+              <h3>{a.data.title}</h3>
+              <p>{a.data.description}</p>
+              <a class="more" href={`${base}/${lang}/insights/${slug(a.id)}/`}>
+                {lang === 'en' ? 'Read' : 'Ler'} →
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,100 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { LANGS, t, type Lang } from '../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const L = (p: string) => `${base}/${lang}${p}`;
+
+const practices = (await getCollection('practices', (e) => e.id.startsWith(`${lang}/`))).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const insights = (await getCollection('insights', (e) => e.id.startsWith(`${lang}/`))).sort(
+  (a, b) => (a.data.date < b.data.date ? 1 : -1),
+);
+const slug = (id: string) => id.split('/')[1];
+---
+
+<Base lang={lang} title={_('hero.title')} description={_('hero.sub')} altPath="/">
+  <div class="hero">
+    <div class="wrap">
+      <div class="kicker">{_('hero.kicker')}</div>
+      <h1>{_('hero.title')}</h1>
+      <div class="rule"></div>
+      <p>{_('hero.sub')}</p>
+    </div>
+  </div>
+
+  <section class="block" id="practices">
+    <div class="wrap">
+      <h2 class="sec">{_('home.practices')}</h2>
+      <p class="sec-sub"></p>
+      <div class="grid c3">
+        {
+          practices.map((p) => (
+            <div class="card">
+              <h3>{p.data.title}</h3>
+              <p>{p.data.tagline}</p>
+              <a class="more" href={L(`/practices/${slug(p.id)}/`)}>
+                {lang === 'en' ? 'Learn more' : 'Saiba mais'} →
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <h2 class="sec">{_('home.figures')}</h2>
+      <p class="sec-sub"></p>
+      <div class="figures">
+        <div class="fig"><div class="n">50+</div><div class="d">{_('fig.clients')}</div></div>
+        <div class="fig"><div class="n">90%</div><div class="d">{_('fig.reengage')}</div></div>
+        <div class="fig"><div class="n">80%</div><div class="d">{_('fig.revenue')}</div></div>
+        <div class="fig"><div class="n">10+</div><div class="d">{_('fig.years')}</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2 class="sec">{_('home.insights')}</h2>
+      <p class="sec-sub"></p>
+      <div class="grid c3">
+        {
+          insights.slice(0, 3).map((a) => (
+            <div class="card">
+              <h3>{a.data.title}</h3>
+              <p>{a.data.description}</p>
+              <a class="more" href={L(`/insights/${slug(a.id)}/`)}>
+                {lang === 'en' ? 'Read' : 'Ler'} →
+              </a>
+            </div>
+          ))
+        }
+      </div>
+      <p style="margin-top:24px">
+        <a class="more" style="color:var(--cyan);font-weight:bold" href={L('/insights/')}>
+          {_('home.insights.all')} →
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap" style="display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between;align-items:center">
+      <h2 class="sec" style="margin:0">{_('cta.contact')}</h2>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <a class="btn" href={L('/contact/')}>{_('nav.contact')}</a>
+        <a class="btn" style="background:var(--navy)" href={L('/careers/')}>{_('cta.careers')}</a>
+      </div>
+    </div>
+  </section>
+</Base>
