@@ -1,0 +1,93 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { t, LANGS, type Lang } from '../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const L = (p: string) => `${base}/${lang}${p}`;
+
+const practices = (await getCollection('practices'))
+  .filter((p) => p.id.startsWith(`${lang}/`))
+  .sort((a, b) => a.data.order - b.data.order);
+const insights = (await getCollection('insights'))
+  .filter((p) => p.id.startsWith(`${lang}/`))
+  .sort((a, b) => b.data.date.localeCompare(a.data.date));
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Mirow & Co.',
+  url: 'https://mirow.com.br',
+  inLanguage: lang === 'pt' ? 'pt-BR' : 'en',
+};
+---
+
+<Base lang={lang} title={_('hero.title')} description={_('hero.sub')} schema={[websiteSchema]}>
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker">{_('hero.kicker')}</div>
+      <h1>{_('hero.title')}</h1>
+      <div class="rule"></div>
+      <p>{_('hero.sub')}</p>
+    </div>
+  </section>
+
+  <section class="block" id="practices">
+    <div class="wrap">
+      <h2 class="sec">{_('home.practices')}</h2>
+      <div class="grid c3">
+        {
+          practices.map((p) => (
+            <a class="card" href={L(`/practices/${p.id.split('/')[1]}/`)}>
+              <h3>{p.data.title}</h3>
+              <p>{p.data.tagline}</p>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <h2 class="sec">{_('home.figures')}</h2>
+      <div class="figures">
+        <div class="fig"><div class="n">90%</div><div class="d">{_('fig.reengage')}</div></div>
+        <div class="fig"><div class="n">80%</div><div class="d">{_('fig.revenue')}</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2 class="sec">{_('home.insights')}</h2>
+      <div class="grid c3">
+        {
+          insights.map((p) => (
+            <a class="card" href={L(`/insights/${p.id.split('/')[1]}/`)}>
+              <h3>{p.data.title}</h3>
+              <p>{p.data.description}</p>
+              <span class="more">{_('insights.title')}</span>
+            </a>
+          ))
+        }
+      </div>
+      <p style="margin-top:28px"><a class="btn" href={L('/insights/')}>{_('home.insights.all')}</a></p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <h2 class="sec">{_('cta.contact')}</h2>
+      <p style="margin-top:20px">
+        <a class="btn" href={L('/contact/')}>{_('nav.contact')}</a>
+        <a class="btn" href={L('/careers/')} style="margin-left:12px">{_('cta.careers')}</a>
+      </p>
+    </div>
+  </section>
+</Base>
