@@ -6,13 +6,40 @@ interface Props {
   title: string;
   description?: string;
   altPath?: string; // caminho da mesma pagina no outro idioma (sem base, sem lang)
+  image?: string; // og:image (caminho com base, ex: `${base}/foo.png`); default = logo
+  schema?: object[]; // blocos JSON-LD adicionais (Article, Person, etc.)
 }
-const { lang, title, description = '', altPath = '' } = Astro.props;
+const { lang, title, description = '', altPath = '', image, schema = [] } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const L = (p: string) => `${base}/${lang}${p}`;
 const oLang = other(lang);
 const altHref = `${base}/${oLang}${altPath}`;
 const _ = (k: string) => t[lang][k];
+
+// URLs absolutas via Astro.site: corretas hoje (github.io/mirow-site) e
+// se ajustam sozinhas quando site/base mudarem para mirow.com.br (Onda 3).
+const abs = (p: string) => new URL(p, Astro.site).href;
+const canonical = abs(Astro.url.pathname);
+const altAbs = abs(altHref);
+const enHref = lang === 'en' ? canonical : altAbs; // x-default aponta para o EN
+const ogImage = abs(image ?? `${base}/mirow-logo-branco.png`);
+const ogLocale = lang === 'pt' ? 'pt_BR' : 'en_US';
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['Organization', 'ProfessionalService'],
+  name: 'Mirow & Co.',
+  url: 'https://mirow.com.br',
+  logo: abs(`${base}/mirow-logo-branco.png`),
+  address: [
+    { '@type': 'PostalAddress', addressLocality: 'Rio de Janeiro', addressCountry: 'BR' },
+    { '@type': 'PostalAddress', addressLocality: 'São Paulo', addressCountry: 'BR' },
+  ],
+  // TODO(#46): confirmar o slug real do LinkedIn da empresa antes de merge (o valor abaixo tem '&' invalido).
+  sameAs: ['https://www.linkedin.com/company/mirow-&-co./'],
+  description:
+    'Strategic management consulting firm — strategy, pricing, sourcing and innovation.',
+};
 ---
 
 <!doctype html>
@@ -22,19 +49,26 @@ const _ = (k: string) => t[lang][k];
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title} — Mirow & Co.</title>
     {description && <meta name="description" content={description} />}
-    <link rel="alternate" hreflang={oLang} href={altHref} />
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Organization',
-        name: 'Mirow & Co.',
-        url: 'https://mirow.com.br',
-        sameAs: ['https://www.linkedin.com/company/mirow-&-co./'],
-        description:
-          'Strategic management consulting firm — strategy, pricing, sourcing and innovation.',
-      })}
-    />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mirow & Co." />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={ogLocale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="alternate" hreflang={lang} href={canonical} />
+    <link rel="alternate" hreflang={oLang} href={altAbs} />
+    <link rel="alternate" hreflang="x-default" href={enHref} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
+    {schema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
     <style is:global>
       :root {
         --navy: #020e66;
