@@ -1,0 +1,33 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { sectors } from '../../../data/sectors';
+import { t, LANGS, type Lang } from '../../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const L = (p: string) => `${base}/${lang}${p}`;
+---
+
+<Base lang={lang} title={_('sectors.title')} description={_('sectors.sub')} altPath={'/sectors/'}>
+  <div class="hero" style="padding:64px 0">
+    <div class="wrap"><h1 style="font-size:38px">{_('sectors.title')}</h1></div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <p class="sec-sub">{_('sectors.sub')}</p>
+      <div class="grid c3">
+        {
+          sectors.map((s) => (
+            <a class="card" href={L(`/sectors/${s.slug}/`)}>
+              <h3>{s.name[lang]}</h3>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
