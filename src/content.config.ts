@@ -8,6 +8,7 @@ const insights = defineCollection({
     description: z.string(),
     date: z.string(),
     original: z.string().optional(),
+    image: z.string().optional(),
   }),
 });
 
