@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { t, LANGS, type Lang } from '../../i18n';
+import ContactRail from '../../components/ContactRail.astro';
 
 export function getStaticPaths() {
   return LANGS.map((lang) => ({ params: { lang } }));
@@ -31,9 +32,13 @@ const websiteSchema = {
   <section class="hero">
     <div class="wrap">
       <div class="kicker">{_('hero.kicker')}</div>
+      <!-- PENDENTE C04: posicionamento definitivo em 3 palavras (Estrategia. Impacto. [pendente])
+           ainda nao foi fechado pelo Andreas — usando tagline neutra ate a decisao (ver i18n.ts). -->
       <h1>{_('hero.title')}</h1>
       <div class="rule"></div>
       <p>{_('hero.sub')}</p>
+      <!-- C19: copia dos canais de contato logo abaixo do slogan/texto curto (modelo Batten) -->
+      <ContactRail lang={lang} variant="inline" />
     </div>
   </section>
 

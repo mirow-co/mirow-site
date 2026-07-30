@@ -12,7 +12,12 @@ export const t: Record<Lang, Record<string, string>> = {
     'sectors.title': 'Perspectives by sector',
     'sectors.sub': 'Our insights organized by the industries we serve',
     'hero.kicker': 'Strategic management consulting',
-    'hero.title': 'Embrace to Enhance',
+    // PENDENTE C04 — 'Embrace to Enhance' foi descontinuado por decisao do Andreas (C01).
+    // O novo posicionamento em 3 palavras (Estrategia. Impacto. [pendente]) ainda nao foi
+    // fechado — falta a 3a palavra (ver MMK-CONV006-C02/C04). Ate a decisao, usar apenas
+    // uma tagline neutra e descritiva; NAO promover "Proximidade" nem "resultados garantidos"
+    // (rejeitados/alertados em C04/C05).
+    'hero.title': 'Strategy consulting',
     'hero.sub':
       'We are a strategic management consulting firm that uses innovative approaches and works in close collaboration with our clients to solve their key challenges and deliver sustainable results',
     'home.practices': 'Our areas of expertise',
@@ -50,6 +55,11 @@ export const t: Record<Lang, Record<string, string>> = {
       'Prototype: in production this application goes by email to our HR team, with the CV attached.',
     'footer.offices': 'Rio de Janeiro · São Paulo',
     'footer.rights': 'All rights reserved',
+    'contact.rail.whatsapp': 'Chat on WhatsApp',
+    'contact.rail.email': 'Send an email',
+    'contact.rail.form': 'Contact form',
+    'contact.rail.linkedin': 'LinkedIn',
+    'contact.rail.instagram': 'Instagram',
   },
   pt: {
     'nav.practices': 'Práticas',
@@ -61,7 +71,8 @@ export const t: Record<Lang, Record<string, string>> = {
     'sectors.title': 'Perspectivas por setor',
     'sectors.sub': 'Nossos insights organizados pelos setores em que atuamos',
     'hero.kicker': 'Consultoria estratégica',
-    'hero.title': 'Envolver para desenvolver',
+    // PENDENTE C04 — ver nota equivalente no bloco EN acima.
+    'hero.title': 'Consultoria de estratégia',
     'hero.sub':
       'Somos uma consultoria estratégica que usa abordagens inovadoras e que trabalha lado a lado com nossos clientes para solucionar seus principais desafios e entregar resultados duradouros',
     'home.practices': 'Nossas áreas de atuação',
@@ -99,6 +110,11 @@ export const t: Record<Lang, Record<string, string>> = {
       'Protótipo: em produção esta candidatura vai por e-mail para o RH, com o CV anexado.',
     'footer.offices': 'Rio de Janeiro · São Paulo',
     'footer.rights': 'Todos os direitos reservados',
+    'contact.rail.whatsapp': 'Falar no WhatsApp',
+    'contact.rail.email': 'Enviar e-mail',
+    'contact.rail.form': 'Formulário de contato',
+    'contact.rail.linkedin': 'LinkedIn',
+    'contact.rail.instagram': 'Instagram',
   },
 };
 

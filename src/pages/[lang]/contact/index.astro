@@ -1,6 +1,7 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import { t, LANGS, type Lang } from '../../../i18n';
+import ContactRail from '../../../components/ContactRail.astro';
 
 export function getStaticPaths() {
   return LANGS.map((lang) => ({ params: { lang } }));
@@ -16,6 +17,10 @@ const _ = (k: string) => t[lang][k];
   <section class="block">
     <div class="wrap">
       <p class="sec-sub">{_('contact.sub')}</p>
+      <!-- C19/C20/C21: canais oficiais sempre clicaveis diretamente na pagina de contato -->
+      <div style="margin-bottom:28px">
+        <ContactRail lang={lang} variant="inline" />
+      </div>
       <p class="demo-note" style="margin-bottom:24px">{_('form.demo')}</p>
       <form class="mirow" onsubmit="return false">
         <input type="text" placeholder={_('form.name')} required />
