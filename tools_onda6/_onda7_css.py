@@ -49,16 +49,20 @@ def garantir_link_css(html, prefix):
     return html.replace("</head>", link + "</head>", 1)
 
 
-def escrever_bloco_css(pub, chave, css):
-    """Grava/atualiza um bloco marcado no onda6.css. Devolve True se mudou."""
+def escrever_bloco_css(pub, chave, css, onda="onda7"):
+    """Grava/atualiza um bloco marcado no onda6.css. Devolve True se mudou.
+
+    `onda` so nomeia os marcadores (/* <onda>:<chave>:ini */); o arquivo de
+    destino continua sendo o onda6.css, para nao multiplicar <link>.
+    """
     path = os.path.join(pub, CSS_REL.replace("/", os.sep))
     os.makedirs(os.path.dirname(path), exist_ok=True)
     atual = ""
     if os.path.exists(path):
         with io.open(path, encoding="utf-8") as f:
             atual = f.read()
-    ini = "/* onda7:%s:ini */" % chave
-    fim = "/* onda7:%s:fim */" % chave
+    ini = "/* %s:%s:ini */" % (onda, chave)
+    fim = "/* %s:%s:fim */" % (onda, chave)
     bloco = "%s\n%s\n%s\n" % (ini, css.strip(), fim)
     if ini in atual:
         novo = re.sub(re.escape(ini) + r".*?" + re.escape(fim) + r"\n?",
