@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 """Screenshot de pagina inteira via CDP (Chrome headless), sem dependencias externas.
 
-Uso: python shot.py <url> <saida.png> [largura] [aos-off]
+Uso: python shot.py <url> <saida.png> [largura] [aos-off] [viewport]
+
+- sem "viewport": captura a pagina inteira (altura total do documento)
+- com "viewport": captura so a primeira dobra (largura x 900), para provar o que
+  aparece sem rolar
 """
 import base64
 import json
@@ -85,6 +89,7 @@ def main():
     url, out = sys.argv[1], sys.argv[2]
     width = int(sys.argv[3]) if len(sys.argv) > 3 else 1400
     aos_off = "aos-off" in sys.argv[4:]
+    so_viewport = "viewport" in sys.argv[4:]
     profile = tempfile.mkdtemp(prefix="cdpshot")
     proc = subprocess.Popen([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
                              "--remote-debugging-port=9333", "--user-data-dir=" + profile,
@@ -126,7 +131,7 @@ def main():
                           "document.documentElement.scrollHeight)",
             "returnByValue": True})
         h = int(ev["result"]["result"]["value"])
-        h = max(900, min(h, 20000))
+        h = 900 if so_viewport else max(900, min(h, 20000))
         print("altura da pagina: %d" % h)
         r = ws.call(5, "Page.captureScreenshot", {
             "format": "png", "captureBeyondViewport": True,
