@@ -1,14 +1,14 @@
 ---
-// IndustryOrbit — as industrias da Mirow como planetas em orbita (C15, MMK-CONV006).
+// IndustryOrbit — as industrias da Mirow como planetas em orbita.
 //
 // Autocontido de proposito: CSS e JS inline, zero dependencia externa, nenhuma
-// lib nova no package.json. Pode ser inserido na home (onda4/home) ou em
-// qualquer pagina, sem tocar no Base.astro.
+// lib nova no package.json. Pode ser inserido na home ou em qualquer pagina,
+// sem tocar no Base.astro.
 //
 // Orbita 1 = territorios fortes (Papel & Celulose, Energia, Automotivo).
 // Clicar numa industria abre o drill-down com os clientes daquela industria —
-// apenas os de `clearance: "partner-listed"` (C08: logo/nome de cliente exige
-// autorizacao; quem esta em "needs-confirmation" nao aparece).
+// o clients.json publico contem apenas clientes aprovados para exibicao
+// (so renderiza clearance aprovado).
 import { industries, type IndustryLang } from '../data/industries';
 import clientsRaw from '../data/clients.json';
 
