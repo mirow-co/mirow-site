@@ -20,11 +20,11 @@ A partir daqui todo asset proprio das ondas carrega ?v=<VERSAO>. Nas proximas
 ondas basta INCREMENTAR a constante abaixo e rodar este script — todas as
 paginas passam a pedir o arquivo novo.
 
-    VERSAO = 8   ->  onda6.css?v=8
+    VERSAO = 9   ->  onda6.css?v=9
 
-Cobre os tres assets proprios: onda6/onda6.css, onda6/onda8-dobra.js e
-clientes/clientes-logos.css. O tema nao e tocado (os assets dele tem a versao que
-o WordPress ja carimbou).
+Cobre os quatro assets proprios: onda6/onda6.css, onda6/onda8-dobra.js,
+onda6/onda9-rede.js (mapa da pagina "Nossa rede") e clientes/clientes-logos.css.
+O tema nao e tocado (os assets dele tem a versao que o WordPress ja carimbou).
 
 Idempotente: se a versao ja e a atual, nao mexe.
 """
@@ -36,11 +36,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
 # >>> proximas ondas: incrementar aqui e rodar o script <<<
-VERSAO = 8
+VERSAO = 9
 
 ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda6.css",
     "wp-content/uploads/2026/07/onda6/onda8-dobra.js",
+    "wp-content/uploads/2026/07/onda6/onda9-rede.js",
     "wp-content/uploads/2026/07/clientes/clientes-logos.css",
 ]
 
