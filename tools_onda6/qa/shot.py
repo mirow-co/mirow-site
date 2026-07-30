@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Screenshot de pagina inteira via CDP (Chrome headless), sem dependencias externas.
 
-Uso: python shot.py <url> <saida.png> [largura] [aos-off] [viewport]
+Uso: python shot.py <url> <saida.png> [largura] [aos-off] [viewport] [h=900]
 
 - sem "viewport": captura a pagina inteira (altura total do documento)
 - com "viewport": captura so a primeira dobra (largura x 900), para provar o que
@@ -90,10 +90,15 @@ def main():
     width = int(sys.argv[3]) if len(sys.argv) > 3 else 1400
     aos_off = "aos-off" in sys.argv[4:]
     so_viewport = "viewport" in sys.argv[4:]
+    # altura da janela/dobra: "h=768" muda de 900 para outra altura (ex.: 1366x768)
+    altura = 900
+    for a in sys.argv[4:]:
+        if a.startswith("h="):
+            altura = int(a[2:])
     profile = tempfile.mkdtemp(prefix="cdpshot")
     proc = subprocess.Popen([CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
                              "--remote-debugging-port=9333", "--user-data-dir=" + profile,
-                             "--window-size=%d,900" % width, "about:blank"],
+                             "--window-size=%d,%d" % (width, altura), "about:blank"],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         ws_url = None
@@ -113,6 +118,11 @@ def main():
             raise SystemExit("nao consegui falar com o Chrome")
         ws = WS(ws_url)
         ws.call(1, "Page.enable")
+        # trava o viewport no tamanho pedido: sem isso a barra de titulo do
+        # Chrome come ~98px e o "1400x900" vira 1378x802 — o que falseia
+        # qualquer teste de primeira dobra.
+        ws.call(10, "Emulation.setDeviceMetricsOverride", {
+            "width": width, "height": altura, "deviceScaleFactor": 1, "mobile": False})
         ws.call(2, "Page.navigate", {"url": url})
         time.sleep(7)
         if aos_off:
@@ -131,7 +141,7 @@ def main():
                           "document.documentElement.scrollHeight)",
             "returnByValue": True})
         h = int(ev["result"]["result"]["value"])
-        h = 900 if so_viewport else max(900, min(h, 20000))
+        h = altura if so_viewport else max(altura, min(h, 20000))
         print("altura da pagina: %d" % h)
         r = ws.call(5, "Page.captureScreenshot", {
             "format": "png", "captureBeyondViewport": True,
