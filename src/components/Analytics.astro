@@ -1,0 +1,39 @@
+---
+// GA4 (gtag.js). Só é injetado quando PUBLIC_GA_ID estiver definido no build.
+// Sem o ID, nada é carregado e nenhum cookie é criado — seguro por padrão.
+// O Measurement ID (G-XXXXXXX) é público por natureza; entra via env var para
+// permitir ligar/desligar por ambiente (ex.: só em produção).
+//
+// LGPD: usa Google Consent Mode v2 com default 'denied' (abaixo), então roda
+// cookieless ate o consentimento. Mesmo assim, o banner de cookies para dar
+// 'granted' segue como decisao pendente na #3 (banner vs. Cloudflare sem cookie).
+// process.env (não import.meta.env) para pegar a var tanto de .env local quanto
+// do ambiente de build do CI (GitHub Actions). O frontmatter roda em Node no build.
+const GA_ID = process.env.PUBLIC_GA_ID;
+---
+
+{
+  GA_ID && (
+    <Fragment>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+      <script is:inline define:vars={{ GA_ID }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        // Consent Mode v2 — default 'denied' ANTES de qualquer config: o GA4 roda
+        // cookieless (pings sem armazenamento) ate haver consentimento. Quando o
+        // banner de cookies existir, ele chama gtag('consent','update',{...:'granted'}).
+        gtag('consent', 'default', {
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          analytics_storage: 'denied',
+          wait_for_update: 500,
+        });
+        gtag('js', new Date());
+        gtag('config', GA_ID);
+      </script>
+    </Fragment>
+  )
+}

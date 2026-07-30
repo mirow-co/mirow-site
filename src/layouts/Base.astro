@@ -1,5 +1,6 @@
 ---
 import { t, other, type Lang } from '../i18n';
+import Analytics from '../components/Analytics.astro';
 
 interface Props {
   lang: Lang;
@@ -46,6 +47,7 @@ const orgSchema = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Analytics />
     <title>{title} — Mirow & Co.</title>
     {description && <meta name="description" content={description} />}
     <link rel="canonical" href={canonical} />
