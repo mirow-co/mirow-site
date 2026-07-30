@@ -1,0 +1,22 @@
+/* onda5 — barra de logomarcas de clientes. CSS proprio, nao toca no tema. */
+.clientes-logos{display:block;background:#ffffff;padding:46px 0 42px}
+.clientes-logos__title{display:block;text-align:center;margin:0 0 30px;
+  font-family:var(--secondaryFontFamily,"Libre Franklin",sans-serif);
+  font-size:12px;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:400;color:#7a7f8c}
+.clientes-logos__list{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
+  gap:26px 40px;margin:0;padding:0;list-style:none}
+.clientes-logos__item{display:flex;align-items:center;justify-content:center;
+  height:44px;flex:0 0 auto}
+.clientes-logos__item img{display:block;width:auto;height:auto;
+  max-height:30px;max-width:132px;object-fit:contain;
+  filter:grayscale(1) opacity(.65);transition:filter 300ms ease-in-out}
+.clientes-logos__item--alto img{max-height:44px;max-width:96px}
+.clientes-logos__item:hover img{filter:grayscale(1) opacity(1)}
+@media only screen and (max-width: 991px){
+  .clientes-logos{padding:34px 0 30px}
+  .clientes-logos__list{gap:20px 28px}
+  .clientes-logos__item{height:36px}
+  .clientes-logos__item img{max-height:24px;max-width:104px}
+  .clientes-logos__item--alto img{max-height:36px;max-width:78px}
+}
