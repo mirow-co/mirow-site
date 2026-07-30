@@ -31,6 +31,23 @@ export const t: Record<Lang, Record<string, string>> = {
     'leaders.title': 'Meet our leadership team',
     'leaders.sub':
       'Our leadership includes professionals with extensive experience, both in management consulting and in executive positions across various sectors',
+    'leaders.tier.socio-principal': 'Main Partners',
+    'leaders.tier.socio': 'Partner',
+    'leaders.tier.senior-expert': 'Senior Experts',
+    'leaders.tier.engagement-manager': 'Engagement Manager',
+    'network.title': 'Our network',
+    'network.sub':
+      'A global network of independent consulting partners that extends our reach and expertise across markets',
+    'history.title': 'Our history',
+    'history.sub': 'Milestones since our founding in Rio de Janeiro, in 2012',
+    'history.pending':
+      'Our history keeps being written — the 2023–2026 milestones are being finalized and will be added here soon',
+    'values.title': 'Our values',
+    'values.sub':
+      'What drives us, how we work, and why clients choose Mirow & Co.',
+    'values.culture': 'Our Culture',
+    'values.ethos': "Mirow's Ethos",
+    'values.why': 'Why Mirow?',
     'contact.title': 'Contact us',
     'contact.sub': 'Get in touch with our team — your message goes directly to our partners',
     'form.name': 'Name',
@@ -80,6 +97,23 @@ export const t: Record<Lang, Record<string, string>> = {
     'leaders.title': 'Conheça a nossa liderança',
     'leaders.sub':
       'Nossa liderança reúne profissionais com longa experiência em consultoria estratégica e em posições executivas de diversos setores',
+    'leaders.tier.socio-principal': 'Sócios principais',
+    'leaders.tier.socio': 'Sócio',
+    'leaders.tier.senior-expert': 'Senior Experts',
+    'leaders.tier.engagement-manager': 'Engagement Manager',
+    'network.title': 'Nossa rede',
+    'network.sub':
+      'Uma rede global de consultorias parceiras independentes que amplia nosso alcance e nossa expertise em diferentes mercados',
+    'history.title': 'Nossa história',
+    'history.sub': 'Marcos desde a nossa fundação no Rio de Janeiro, em 2012',
+    'history.pending':
+      'Nossa história continua sendo escrita — os marcos de 2023–2026 estão sendo finalizados e entram aqui em breve',
+    'values.title': 'Nossos valores',
+    'values.sub':
+      'O que nos move, como trabalhamos e por que os clientes escolhem a Mirow & Co.',
+    'values.culture': 'Nossa Cultura',
+    'values.ethos': 'Ethos Mirow',
+    'values.why': 'Por que a Mirow?',
     'contact.title': 'Fale conosco',
     'contact.sub': 'Entre em contato com o nosso time — sua mensagem vai direto aos sócios',
     'form.name': 'Nome',

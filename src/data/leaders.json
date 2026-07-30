@@ -1,6 +1,7 @@
 [
   {
     "name": "Andreas Mirow",
+    "tier": "socio-principal",
     "role": { "en": "Managing Partner", "pt": "Managing Partner" },
     "bio": {
       "en": "Leads strategy, sales and performance improvement projects in several B2B and B2C industries. Previously partner at McKinsey & Company, responsible for the Rio de Janeiro office, and senior executive at Aracruz Celulose. Master in Production Engineering (Technical University of Berlin) and Master's in Technology Management (USA) — Fulbright Scholar.",
@@ -8,15 +9,8 @@
     }
   },
   {
-    "name": "Elmar Gans",
-    "role": { "en": "Managing Partner", "pt": "Managing Partner" },
-    "bio": {
-      "en": "Focuses on business strategy, commercial excellence and S&OP, with large experience in industrial clients, automotive, food & beverage and fuel distribution. Worked for 7 years at McKinsey & Company (Munich, New Delhi and Rio de Janeiro). PhD in Business Administration (WHU, Germany) and MBA.",
-      "pt": "Foco em estratégia de negócios, excelência comercial e S&OP, com longa experiência em clientes industriais, automotivo, alimentos & bebidas e distribuição de combustíveis. Trabalhou 7 anos na McKinsey & Company (Munique, Nova Délhi e Rio de Janeiro). PhD em Administração (WHU, Alemanha) e MBA."
-    }
-  },
-  {
     "name": "Felipe Diniz",
+    "tier": "socio-principal",
     "role": { "en": "Partner", "pt": "Partner" },
     "bio": {
       "en": "Extensive experience in strategy, innovation, market analysis, organizational restructuring and governance. 15 years of experience in capital-intensive sectors, especially energy. Previously at Monitor Deloitte, Schlumberger Business Consulting and McKinsey & Company. PhD in Economics (University of Chicago).",
@@ -25,6 +19,7 @@
   },
   {
     "name": "Prof. Dr. Stephan Friedrich",
+    "tier": "socio",
     "role": { "en": "Partner", "pt": "Partner" },
     "bio": {
       "en": "Extensive experience in strategic consulting and innovation, focusing on corporate strategy, innovation management and disruptive business logics. CEO and Managing Partner of IMP Consulting and Professor of Business Model Innovation at the University of Bremen (Germany).",
@@ -32,11 +27,49 @@
     }
   },
   {
+    "name": "Elmar Gans",
+    "tier": "senior-expert",
+    "role": { "en": "Senior Expert", "pt": "Senior Expert" },
+    "bio": {
+      "en": "Focuses on business strategy, commercial excellence and S&OP, with large experience in industrial clients, automotive, food & beverage and fuel distribution. Worked for 7 years at McKinsey & Company (Munich, New Delhi and Rio de Janeiro). PhD in Business Administration (WHU, Germany) and MBA.",
+      "pt": "Foco em estratégia de negócios, excelência comercial e S&OP, com longa experiência em clientes industriais, automotivo, alimentos & bebidas e distribuição de combustíveis. Trabalhou 7 anos na McKinsey & Company (Munique, Nova Délhi e Rio de Janeiro). PhD em Administração (WHU, Alemanha) e MBA."
+    }
+  },
+  {
+    "name": "Raoni Morais",
+    "tier": "senior-expert",
+    "role": { "en": "Senior Expert", "pt": "Senior Expert" },
+    "bio": {
+      "en": "Senior Expert at Mirow & Co.",
+      "pt": "Senior Expert na Mirow & Co."
+    }
+  },
+  {
     "name": "Michael Munch",
-    "role": { "en": "Associate Partner", "pt": "Associate Partner" },
+    "tier": "senior-expert",
+    "role": { "en": "Senior Expert", "pt": "Senior Expert" },
     "bio": {
       "en": "Expertise in strategy, finance, pricing, advanced analytics and digitalization projects. More than 12 years of experience in finance at Dell and Stanley Black & Decker.",
       "pt": "Especialista em projetos de estratégia, finanças, pricing, advanced analytics e digitalização. Mais de 12 anos de experiência em finanças na Dell e na Stanley Black & Decker."
     }
+  },
+  {
+    "name": "Renato Alvarenga",
+    "tier": "senior-expert",
+    "role": { "en": "Senior Expert", "pt": "Senior Expert" },
+    "bio": {
+      "en": "Senior Expert at Mirow & Co.",
+      "pt": "Senior Expert na Mirow & Co."
+    }
+  },
+  {
+    "name": "João Daniel Ramos",
+    "tier": "engagement-manager",
+    "role": { "en": "Engagement Manager", "pt": "Engagement Manager" },
+    "bio": {
+      "en": "Engagement Manager at Mirow & Co.",
+      "pt": "Engagement Manager na Mirow & Co."
+    },
+    "linkedin": "https://www.linkedin.com/in/joao-daniel-palma-ramos/"
   }
 ]
