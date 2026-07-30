@@ -1,0 +1,531 @@
+---
+// IndustryOrbit — as industrias da Mirow como planetas em orbita (C15, MMK-CONV006).
+//
+// Autocontido de proposito: CSS e JS inline, zero dependencia externa, nenhuma
+// lib nova no package.json. Pode ser inserido na home (onda4/home) ou em
+// qualquer pagina, sem tocar no Base.astro.
+//
+// Orbita 1 = territorios fortes (Papel & Celulose, Energia, Automotivo).
+// Clicar numa industria abre o drill-down com os clientes daquela industria —
+// apenas os de `clearance: "partner-listed"` (C08: logo/nome de cliente exige
+// autorizacao; quem esta em "needs-confirmation" nao aparece).
+import { industries, type IndustryLang } from '../data/industries';
+import clientsRaw from '../data/clients.json';
+
+interface Props {
+  lang: string;
+  /** Titulo da secao. Se omitido, usa o texto padrao do idioma. */
+  heading?: string;
+}
+const { lang, heading } = Astro.props;
+const L: IndustryLang = lang === 'pt' || lang === 'de' ? (lang as IndustryLang) : 'en';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const href = (p: string) => `${base}/${lang}${p}`;
+
+const copy = {
+  en: {
+    heading: 'Industries we work in',
+    sub: 'Every industry is a planet in orbit around the firm. Click one to see the clients we have delivered projects for.',
+    core: 'Mirow & Co.',
+    coreSub: `${industries.length} industries`,
+    strong: 'Core territories',
+    hint: 'Select an industry',
+    clients: 'Clients with delivered projects',
+    none: 'No clients disclosed for this industry yet.',
+    talk: 'Talk to our partners',
+    sector: 'Read our perspectives on this sector',
+  },
+  pt: {
+    heading: 'As indústrias em que atuamos',
+    sub: 'Cada indústria é um planeta em órbita ao redor da firma. Clique em uma delas para ver os clientes com quem já entregamos projetos.',
+    core: 'Mirow & Co.',
+    coreSub: `${industries.length} indústrias`,
+    strong: 'Territórios de destaque',
+    hint: 'Selecione uma indústria',
+    clients: 'Clientes com projetos realizados',
+    none: 'Ainda não há clientes divulgados para esta indústria.',
+    talk: 'Fale com nossos sócios',
+    sector: 'Veja nossas perspectivas sobre este setor',
+  },
+  de: {
+    heading: 'Branchen, in denen wir arbeiten',
+    sub: 'Jede Branche ist ein Planet in der Umlaufbahn der Firma. Klicken Sie auf eine Branche, um die Kunden zu sehen, für die wir Projekte umgesetzt haben.',
+    core: 'Mirow & Co.',
+    coreSub: `${industries.length} Branchen`,
+    strong: 'Kernbranchen',
+    hint: 'Wählen Sie eine Branche',
+    clients: 'Kunden mit umgesetzten Projekten',
+    none: 'Für diese Branche sind noch keine Kunden veröffentlicht.',
+    talk: 'Sprechen Sie mit unseren Partnern',
+    sector: 'Unsere Perspektiven zu dieser Branche',
+  },
+}[L];
+
+// Clientes autorizados (C08), agrupados por industria.
+type ClientRow = {
+  name: string;
+  wordmark: string;
+  sector: Record<string, string>;
+  clearance: string;
+};
+const authorized = (clientsRaw as ClientRow[]).filter((c) => c.clearance === 'partner-listed');
+
+const detail = Object.fromEntries(
+  industries.map((ind) => [
+    ind.slug,
+    {
+      name: ind.name[L],
+      clients: authorized
+        .filter((c) => ind.clientSectors.includes(c.sector.en))
+        .map((c) => c.wordmark),
+      sectorHref: ind.sectorPage ? href(`/sectors/${ind.sectorPage}/`) : null,
+    },
+  ])
+);
+
+// Geometria: raio em % da largura do palco, para o layout escalar sozinho.
+//
+// Sao apenas DUAS orbitas de proposito. Com tres, o vao radial entre aneis
+// vizinhos fica menor que a largura de um rotulo e, como os aneis giram em
+// velocidades diferentes, em algum instante da animacao dois rotulos de aneis
+// diferentes se sobrepoem. Com duas orbitas o vao (19% do palco, ~163px) e
+// maior que o rotulo mais largo (130px), entao nenhuma colisao e possivel em
+// qualquer instante — e as velocidades podem ser diferentes (a interna mais
+// rapida, como numa orbita real).
+const RINGS: Record<number, { r: number; dur: number }> = {
+  1: { r: 22, dur: 110 },
+  2: { r: 41, dur: 190 },
+};
+
+const rings = [1, 2].map((n) => {
+  const items = industries.filter((i) => i.ring === n);
+  const { r, dur } = RINGS[n];
+  return {
+    n,
+    r,
+    dur,
+    items: items.map((ind, idx) => {
+      // -90deg para o primeiro planeta nascer no topo da orbita.
+      const a = ((idx / items.length) * 360 - 90) * (Math.PI / 180);
+      return {
+        ...ind,
+        x: +(50 + r * Math.cos(a)).toFixed(3),
+        y: +(50 + r * Math.sin(a)).toFixed(3),
+      };
+    }),
+  };
+});
+---
+
+<section class="orbit-block">
+  <div class="orbit-wrap">
+    <h2>{heading ?? copy.heading}</h2>
+    <p class="orbit-sub">{copy.sub}</p>
+
+    <div class="orbit-layout">
+      <div class="orbit-stage" role="group" aria-label={heading ?? copy.heading}>
+        <div class="orbit-core">
+          <span class="orbit-core-n">{copy.core}</span>
+          <span class="orbit-core-s">{copy.coreSub}</span>
+        </div>
+        {
+          rings.map((ring) => (
+            <div class={`orbit-ring r${ring.n}`} style={`--r:${ring.r}%`}>
+              <div class="orbit-track" style={`--dur:${ring.dur}s`}>
+                {ring.items.map((ind) => (
+                  <button
+                    class="orbit-planet"
+                    type="button"
+                    data-slug={ind.slug}
+                    aria-pressed="false"
+                    style={`--x:${ind.x}%;--y:${ind.y}%`}
+                  >
+                    <span class="orbit-pill" style={`--dur:${ring.dur}s`}>{ind.name[L]}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      <aside class="orbit-detail" aria-live="polite">
+        <p class="orbit-detail-hint" data-hint>{copy.hint}</p>
+        <div data-panel hidden>
+          <h3 data-name></h3>
+          <p class="orbit-detail-label" data-label></p>
+          <ul class="orbit-clients" data-clients></ul>
+          <a class="orbit-more" data-sector hidden>{copy.sector} &rarr;</a>
+          <a class="orbit-more" href={href('/contact/')}>{copy.talk} &rarr;</a>
+        </div>
+        <p class="orbit-strong"><span class="dot"></span>{copy.strong}</p>
+      </aside>
+    </div>
+  </div>
+
+  <script type="application/json" data-orbit-detail set:html={JSON.stringify(detail)} />
+  <script
+    type="application/json"
+    data-orbit-copy
+    set:html={JSON.stringify({ clients: copy.clients, none: copy.none })}
+  />
+</section>
+
+<style>
+  .orbit-block {
+    background: linear-gradient(180deg, #071c25 0%, #041545 55%, #020e66 100%);
+    color: #fff;
+    padding: 76px 0 84px;
+  }
+  .orbit-wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .orbit-block h2 {
+    font-size: 32px;
+    margin: 0 0 8px;
+  }
+  .orbit-sub {
+    color: #aad5e8;
+    max-width: 720px;
+    margin: 0 0 40px;
+  }
+  .orbit-layout {
+    display: grid;
+    gap: 8px;
+  }
+
+  /* --- palco da orbita --- */
+  .orbit-stage {
+    position: relative;
+    width: 100%;
+    max-width: 860px;
+    aspect-ratio: 1;
+    margin: 0 auto;
+  }
+  .orbit-core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #0d3a86 0%, #020e66 70%);
+    border: 1px solid rgba(0, 173, 236, 0.55);
+    box-shadow: 0 0 42px rgba(0, 173, 236, 0.28);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 3;
+  }
+  .orbit-core-n {
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 0.4px;
+  }
+  .orbit-core-s {
+    font-size: 12px;
+    color: #aad5e8;
+    margin-top: 2px;
+  }
+  .orbit-ring {
+    position: absolute;
+    inset: 0;
+  }
+  /* anel visual (circunferencia tenue) */
+  .orbit-ring::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: calc(var(--r) * 2);
+    height: calc(var(--r) * 2);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid rgba(170, 213, 232, 0.16);
+  }
+  .orbit-ring.r1::before {
+    border-color: rgba(0, 173, 236, 0.4);
+  }
+  .orbit-track {
+    position: absolute;
+    inset: 0;
+    animation: orbit-spin var(--dur) linear infinite;
+  }
+  .orbit-planet {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    transform: translate(-50%, -50%);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .orbit-pill {
+    display: block;
+    animation: orbit-spin-rev var(--dur) linear infinite;
+    background: rgba(4, 21, 69, 0.92);
+    border: 1px solid rgba(170, 213, 232, 0.35);
+    color: #fff;
+    font-size: 12.5px;
+    line-height: 1.25;
+    padding: 7px 10px;
+    width: 116px;
+    text-align: center;
+    transition:
+      border-color 0.18s,
+      background 0.18s,
+      color 0.18s;
+  }
+  .orbit-ring.r1 .orbit-pill {
+    border-color: #00adec;
+    background: rgba(0, 173, 236, 0.16);
+    font-weight: bold;
+    width: 130px;
+  }
+  .orbit-planet:hover .orbit-pill,
+  .orbit-planet:focus-visible .orbit-pill {
+    background: #00adec;
+    border-color: #00adec;
+    color: #071c25;
+  }
+  .orbit-planet:focus-visible {
+    outline: none;
+  }
+  .orbit-planet:focus-visible .orbit-pill {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  .orbit-planet[aria-pressed='true'] .orbit-pill {
+    background: #00adec;
+    border-color: #00adec;
+    color: #071c25;
+    font-weight: bold;
+  }
+  @keyframes orbit-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes orbit-spin-rev {
+    to {
+      transform: rotate(-360deg);
+    }
+  }
+
+  /* --- painel de drill-down --- */
+  .orbit-detail {
+    border-left: 3px solid #00adec;
+    padding: 6px 0 6px 22px;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    min-height: 120px;
+  }
+  .orbit-detail-hint {
+    color: #aad5e8;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+  .orbit-detail h3 {
+    font-size: 21px;
+    margin: 0 0 10px;
+  }
+  .orbit-detail-label {
+    color: #aad5e8;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 10px;
+  }
+  .orbit-clients {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .orbit-clients li {
+    border: 1px solid rgba(170, 213, 232, 0.6);
+    padding: 6px 10px;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+  }
+  .orbit-clients li.empty {
+    border: 0;
+    padding: 0;
+    color: #fff;
+    font-size: 15px;
+    letter-spacing: 0;
+  }
+  .orbit-more {
+    display: inline-block;
+    margin-right: 26px;
+    color: #00adec;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+  }
+  .orbit-more:hover {
+    color: #fff;
+  }
+  .orbit-strong {
+    margin-top: 14px;
+    color: #7f7f7f;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .orbit-strong .dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    background: #00adec;
+    margin-right: 8px;
+  }
+
+  /* --- mobile / tablet: a orbita degrada para grade elegante --- */
+  @media (max-width: 940px) {
+    .orbit-layout {
+      gap: 28px;
+    }
+    .orbit-stage {
+      max-width: none;
+      aspect-ratio: auto;
+      display: grid;
+      gap: 18px;
+    }
+    .orbit-core {
+      position: static;
+      transform: none;
+      width: auto;
+      aspect-ratio: auto;
+      border-radius: 0;
+      border: 0;
+      border-left: 3px solid #00adec;
+      box-shadow: none;
+      background: none;
+      align-items: flex-start;
+      text-align: left;
+      padding-left: 14px;
+    }
+    .orbit-ring {
+      position: static;
+      inset: auto;
+    }
+    .orbit-ring::before {
+      display: none;
+    }
+    .orbit-track {
+      position: static;
+      inset: auto;
+      animation: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .orbit-planet {
+      position: static;
+      transform: none;
+    }
+    .orbit-pill {
+      animation: none;
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+    }
+    .orbit-ring.r1 .orbit-pill {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orbit-track,
+    .orbit-pill {
+      animation-play-state: paused;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    document.querySelectorAll<HTMLElement>('.orbit-block').forEach((block) => {
+      const dataEl = block.querySelector('[data-orbit-detail]');
+      const copyEl = block.querySelector('[data-orbit-copy]');
+      if (!dataEl || !copyEl) return;
+      const data = JSON.parse(dataEl.textContent || '{}') as Record<
+        string,
+        { name: string; clients: string[]; sectorHref: string | null }
+      >;
+      const copy = JSON.parse(copyEl.textContent || '{}') as { clients: string; none: string };
+
+      const hint = block.querySelector<HTMLElement>('[data-hint]');
+      const panel = block.querySelector<HTMLElement>('[data-panel]');
+      const nameEl = block.querySelector<HTMLElement>('[data-name]');
+      const labelEl = block.querySelector<HTMLElement>('[data-label]');
+      const listEl = block.querySelector<HTMLElement>('[data-clients]');
+      const sectorEl = block.querySelector<HTMLAnchorElement>('[data-sector]');
+      const planets = block.querySelectorAll<HTMLButtonElement>('.orbit-planet');
+      if (!panel || !nameEl || !labelEl || !listEl || !sectorEl) return;
+
+      const select = (slug: string) => {
+        const d = data[slug];
+        if (!d) return;
+        planets.forEach((p) =>
+          p.setAttribute('aria-pressed', String(p.dataset.slug === slug))
+        );
+        if (hint) hint.hidden = true;
+        panel.hidden = false;
+        nameEl.textContent = d.name;
+        listEl.textContent = '';
+        if (d.clients.length) {
+          labelEl.hidden = false;
+          labelEl.textContent = copy.clients;
+          d.clients.forEach((c) => {
+            const li = document.createElement('li');
+            li.textContent = c;
+            listEl.appendChild(li);
+          });
+        } else {
+          labelEl.hidden = true;
+          const li = document.createElement('li');
+          li.className = 'empty';
+          li.textContent = copy.none;
+          listEl.appendChild(li);
+        }
+        if (d.sectorHref) {
+          sectorEl.hidden = false;
+          sectorEl.href = d.sectorHref;
+        } else {
+          sectorEl.hidden = true;
+        }
+      };
+
+      planets.forEach((p) => {
+        p.addEventListener('click', () => {
+          const slug = p.dataset.slug;
+          if (slug) select(slug);
+        });
+      });
+
+      // Deep link: /sectors/#industry=electric-energy abre ja no drill-down.
+      const fromHash = () => {
+        const m = /industry=([a-z0-9-]+)/.exec(location.hash);
+        if (m && data[m[1]]) select(m[1]);
+      };
+      fromHash();
+      window.addEventListener('hashchange', fromHash);
+    });
+  })();
+</script>
