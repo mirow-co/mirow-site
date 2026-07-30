@@ -1,0 +1,17 @@
+[
+  { "name": "Daimler / Mercedes-Benz", "wordmark": "MERCEDES-BENZ", "clearance": "partner-listed", "sector": { "en": "Automotive", "pt": "Automotivo", "de": "Automobil" } },
+  { "name": "Ipiranga", "wordmark": "IPIRANGA", "clearance": "partner-listed", "sector": { "en": "Fuel Distribution", "pt": "Distribuição de combustíveis", "de": "Kraftstoffvertrieb" } },
+  { "name": "Wilson Sons", "wordmark": "WILSON SONS", "clearance": "partner-listed", "sector": { "en": "Ports & Logistics", "pt": "Portos e logística", "de": "Häfen und Logistik" } },
+  { "name": "Taesa", "wordmark": "TAESA", "clearance": "partner-listed", "sector": { "en": "Energy (Transmission)", "pt": "Energia (transmissão)", "de": "Energie (Übertragung)" } },
+  { "name": "Dexco", "wordmark": "DEXCO", "clearance": "partner-listed", "sector": { "en": "Wood Products & Coverings", "pt": "Madeira e revestimentos", "de": "Holzprodukte und Verkleidungen" } },
+  { "name": "Eneva", "wordmark": "ENEVA", "clearance": "partner-listed", "sector": { "en": "Energy", "pt": "Energia", "de": "Energie" } },
+  { "name": "Klabin", "wordmark": "KLABIN", "clearance": "partner-listed", "sector": { "en": "Pulp & Paper", "pt": "Papel e celulose", "de": "Zellstoff und Papier" } },
+  { "name": "EDP", "wordmark": "EDP", "clearance": "partner-listed", "sector": { "en": "Energy", "pt": "Energia", "de": "Energie" } },
+  { "name": "Energisa", "wordmark": "ENERGISA", "clearance": "partner-listed", "sector": { "en": "Energy", "pt": "Energia", "de": "Energie" } },
+  { "name": "Suzano", "wordmark": "SUZANO", "clearance": "partner-listed", "sector": { "en": "Pulp & Paper", "pt": "Papel e celulose", "de": "Zellstoff und Papier" } },
+  { "name": "XP", "wordmark": "XP", "clearance": "partner-listed", "sector": { "en": "Financial Services", "pt": "Serviços financeiros", "de": "Finanzdienstleistungen" } },
+  { "name": "Yara", "wordmark": "YARA", "clearance": "partner-listed", "sector": { "en": "Fertilizers / Chemicals", "pt": "Fertilizantes / química", "de": "Düngemittel / Chemie" } },
+  { "name": "Santos Brasil", "wordmark": "SANTOS BRASIL", "clearance": "partner-listed", "sector": { "en": "Ports", "pt": "Portos", "de": "Häfen" } },
+  { "name": "SulAmérica", "wordmark": "SULAMÉRICA", "clearance": "partner-listed", "sector": { "en": "Insurance", "pt": "Seguros", "de": "Versicherung" } },
+  { "name": "Volkswagen", "wordmark": "VOLKSWAGEN", "clearance": "partner-listed", "sector": { "en": "Automotive", "pt": "Automotivo", "de": "Automobil" } }
+]

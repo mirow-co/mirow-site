@@ -3,6 +3,9 @@ import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { t, LANGS, type Lang } from '../../i18n';
 import ContactRail from '../../components/ContactRail.astro';
+import { cardinals } from '../../data/cardinals';
+import clients from '../../data/clients.json';
+import leaders from '../../data/leaders.json';
 
 export function getStaticPaths() {
   return LANGS.map((lang) => ({ params: { lang } }));
@@ -12,12 +15,21 @@ const _ = (k: string) => t[lang][k];
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const L = (p: string) => `${base}/${lang}${p}`;
 
-const practices = (await getCollection('practices'))
-  .filter((p) => p.id.startsWith(`${lang}/`))
-  .sort((a, b) => a.data.order - b.data.order);
 const insights = (await getCollection('insights'))
   .filter((p) => p.id.startsWith(`${lang}/`))
   .sort((a, b) => b.data.date.localeCompare(a.data.date));
+
+// Barra rolante de clientes: o clients.json deste repositorio contem apenas os
+// clientes ja aprovados para exibicao publica (a curadoria e a checagem de
+// autorizacao acontecem fora deste repositorio). So renderiza clearance aprovado.
+// Nao ha PNG de logo no repo ainda, entao a barra roda com wordmark tipografico.
+const barClients = clients.filter((c) => c.clearance === 'partner-listed');
+const barLoop = [...barClients, ...barClients]; // duplicado para o loop continuo
+
+// Contato do hero (C09). E-mail: andreas.mirow@mirow.com.br ja e publicado hoje
+// na propria pagina inicial do mirow.com.br — fonte rastreavel (R1).
+const EMAIL = 'andreas.mirow@mirow.com.br';
+const LINKEDIN = 'https://www.linkedin.com/company/mirow-co-';
 
 const websiteSchema = {
   '@context': 'https://schema.org',
@@ -29,49 +41,153 @@ const websiteSchema = {
 ---
 
 <Base lang={lang} title={_('hero.title')} description={_('hero.sub')} schema={[websiteSchema]}>
+  {/*
+    C09 — hero no modelo Batten & Company: slogan, texto curto embaixo e canais
+    de contato na primeira dobra. O estilo visual (cores, fundo) e preservado de
+    proposito. O slogan em si (hero.title) NAO e alterado aqui: a substituicao de
+    "Embrace to Enhance" e decisao de posicionamento (C01), tratada a parte.
+  */}
   <section class="hero">
     <div class="wrap">
       <div class="kicker">{_('hero.kicker')}</div>
-      <!-- PENDENTE C04: posicionamento definitivo em 3 palavras (Estrategia. Impacto. [pendente])
-           ainda nao foi fechado pelo Andreas — usando tagline neutra ate a decisao (ver i18n.ts). -->
+      {/* PENDENTE: tagline definitiva de posicionamento ainda em aberto —
+          usando tagline neutra ate a decisao (ver i18n.ts). */}
       <h1>{_('hero.title')}</h1>
       <div class="rule"></div>
-      <p>{_('hero.sub')}</p>
-      <!-- C19: copia dos canais de contato logo abaixo do slogan/texto curto (modelo Batten) -->
+      <p>{_('hero.lead')}</p>
+      {/* Canais de contato na primeira dobra, centralizados no ContactRail
+          (WhatsApp, formulario, LinkedIn; e-mail entra quando definido). */}
       <ContactRail lang={lang} variant="inline" />
     </div>
   </section>
 
-  <section class="block" id="practices">
+  {/*
+    C07 + C08 + C14 — prova social de relacao vem antes de qualquer premio.
+    Barra rolante de clientes autorizados, no topo, logo abaixo do hero.
+  */}
+  <section class="clientbar">
     <div class="wrap">
-      <h2 class="sec">{_('home.practices')}</h2>
-      <div class="grid c3">
+      <div class="cb-label">{_('home.clients.label')}</div>
+    </div>
+    <div class="cb-track" aria-hidden="false">
+      <div class="cb-row">
         {
-          practices.map((p) => (
-            <a class="card" href={L(`/practices/${p.id.split('/')[1]}/`)}>
-              <h3>{p.data.title}</h3>
-              <p>{p.data.tagline}</p>
-            </a>
+          barLoop.map((c) => (
+            <span class="cb-item" title={c.name}>
+              {c.wordmark}
+            </span>
           ))
         }
       </div>
     </div>
-  </section>
-
-  <section class="block alt">
     <div class="wrap">
-      <h2 class="sec">{_('home.figures')}</h2>
-      <div class="figures">
-        <div class="fig"><div class="n">90%</div><div class="d">{_('fig.reengage')}</div></div>
-        <div class="fig"><div class="n">80%</div><div class="d">{_('fig.revenue')}</div></div>
-      </div>
+      <p class="cb-note">{_('home.clients.note')}</p>
     </div>
   </section>
 
-  <section class="block">
+  {/*
+    C12 + C13 — a roda de 8 pontos cardinais vira 3 (Estrategia, Pricing,
+    Compras), com os cards SEMPRE visiveis, e o testemunho do cliente daquele
+    tema acoplado abaixo de cada card (o card branco grande solto sai).
+  */}
+  <section class="block" id="cardinals">
+    <div class="wrap">
+      <h2 class="sec">{_('home.cardinals')}</h2>
+      <p class="sec-sub">{_('home.cardinals.sub')}</p>
+      <div class="grid c3">
+        {
+          cardinals.map((c) => (
+            <article class="card cardinal">
+              <h3>{c.title[lang]}</h3>
+              <p>{c.tagline[lang]}</p>
+              <ul class="cd-examples">
+                {c.examples[lang].map((e) => (
+                  <li>{e}</li>
+                ))}
+              </ul>
+              {c.href && (
+                <a class="cd-more" href={L(c.href)}>
+                  {_('home.cardinals.more')}
+                </a>
+              )}
+              <figure class="cd-quote">
+                <figcaption class="cd-quote-src">
+                  {c.testimonial.project[lang]} · {c.testimonial.industry[lang]}
+                </figcaption>
+                <blockquote>{c.testimonial.quote[lang]}</blockquote>
+              </figure>
+            </article>
+          ))
+        }
+      </div>
+      <p class="fine-src">{_('testimonial.label')} — mirow.com.br</p>
+    </div>
+  </section>
+
+  {/*
+    C11 — "Our figures" fica (o Andreas disse que esta ok), mas so com os numeros
+    que temos base para afirmar. Os dois numeros abaixo vem da base de projetos
+    da firma e ja eram publicados. Os outros dois ficam de fora ate a verificacao.
+  */}
+  <section class="block alt">
+    <div class="wrap">
+      <h2 class="sec">{_('home.figures')}</h2>
+      <div class="figures" style="margin-top:28px">
+        <div class="fig"><div class="n">90%</div><div class="d">{_('fig.reengage')}</div></div>
+        <div class="fig"><div class="n">80%</div><div class="d">{_('fig.revenue')}</div></div>
+        {/*
+          PENDENTE C11: "50+ clientes atendidos" e "10+ anos de mercado" saem do ar
+          ate serem verificados e redefinidos. O que se sabe hoje: a planilha de
+          mapeamento de projetos de fev/2023 ja lista 50 clientes distintos com
+          projeto entregue, sem contar 2023-2026 — ou seja, o "50+" nao esta errado,
+          esta defasado por baixo. Falta (a) fechar a definicao de "cliente"
+          (cliente != projeto) e (b) recontar com o acervo (mirow-rag) ate 2026,
+          antes de publicar numero novo. Idem "anos de mercado": o Andreas afirma
+          "com certeza mais de 10", o que nao basta para virar numero em pagina
+          publica. Chaves de traducao fig.clients e fig.years seguem no i18n.ts,
+          prontas para quando o numero voltar.
+        */}
+      </div>
+      <p class="fine-src">{_('fig.source')}</p>
+    </div>
+  </section>
+
+  {/*
+    C13 + C14 — "Recognitions" desce na ordem e vem com enfase no Great Place to
+    Work, precedido do principio do socio: com quem trabalhamos importa mais que
+    os premios que temos.
+  */}
+  <section class="block" id="recognitions">
+    <div class="wrap">
+      <h2 class="sec">{_('home.recognitions')}</h2>
+      <p class="sec-sub">{_('home.principle')}</p>
+      <div class="grid c3">
+        <article class="card rec rec-lead">
+          <h3>{_('rec.gptw.title')}</h3>
+          <p>{_('rec.gptw.desc')}</p>
+        </article>
+        <article class="card rec">
+          <h3>{_('rec.seven.title')}</h3>
+          <p>{_('rec.seven.desc')}</p>
+        </article>
+        <article class="card rec">
+          <h3>{_('rec.growth.title')}</h3>
+          <p>{_('rec.growth.desc')}</p>
+        </article>
+      </div>
+      <p class="fine-src">{_('rec.source')}</p>
+    </div>
+  </section>
+
+  {/*
+    C06 — os estudos (insights) saem da posicao proeminente no topo e passam a
+    aparecer aqui, depois da prova social e do posicionamento. O funil site-first
+    continua valendo: a secao fica na home, so nao abre a pagina.
+  */}
+  <section class="block alt" id="insights">
     <div class="wrap">
       <h2 class="sec">{_('home.insights')}</h2>
-      <div class="grid c3">
+      <div class="grid c3" style="margin-top:28px">
         {
           insights.map((p) => (
             <a class="card" href={L(`/insights/${p.id.split('/')[1]}/`)}>
@@ -86,6 +202,25 @@ const websiteSchema = {
     </div>
   </section>
 
+  {/* C13 — "Our Leaders" por ultimo. */}
+  <section class="block" id="leaders">
+    <div class="wrap">
+      <h2 class="sec">{_('home.leaders')}</h2>
+      <div class="grid c3" style="margin-top:28px">
+        {
+          leaders.map((p) => (
+            <div class="card">
+              <h3>{p.name}</h3>
+              <p class="lead-role">{p.role[lang]}</p>
+              <p>{p.bio[lang]}</p>
+            </div>
+          ))
+        }
+      </div>
+      <p style="margin-top:28px"><a class="btn" href={L('/leaders/')}>{_('home.leaders.all')}</a></p>
+    </div>
+  </section>
+
   <section class="block alt">
     <div class="wrap">
       <h2 class="sec">{_('cta.contact')}</h2>
@@ -95,4 +230,177 @@ const websiteSchema = {
       </p>
     </div>
   </section>
+
+  <style>
+    /* Estilos exclusivos da pagina inicial. Paleta e tipografia herdadas do
+       Base.astro (navy #020E66, ciano #00ADEC, azul-claro #AAD5E8, Arial). */
+
+    /* hero: canais de contato (C09) */
+    .hero-contact {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      flex-wrap: wrap;
+      margin-top: 34px;
+    }
+    .hero-contact .hc-label {
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      width: 100%;
+    }
+    .hero-contact .hc-link {
+      color: var(--lightblue);
+      font-size: 15px;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(170, 213, 232, 0.5);
+      padding-bottom: 2px;
+    }
+    .hero-contact .hc-link:hover {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+    }
+
+    /* barra rolante de clientes (C07) */
+    .clientbar {
+      background: #f4f7fa;
+      border-bottom: 1px solid #e3e9ee;
+      padding: 30px 0 26px;
+      overflow: hidden;
+    }
+    .clientbar .cb-label {
+      color: var(--navy);
+      font-weight: bold;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 18px;
+    }
+    .cb-track {
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    }
+    .cb-row {
+      display: flex;
+      gap: 56px;
+      width: max-content;
+      align-items: center;
+      animation: cb-scroll 46s linear infinite;
+    }
+    .cb-track:hover .cb-row {
+      animation-play-state: paused;
+    }
+    .cb-item {
+      color: var(--gray);
+      font-weight: bold;
+      font-size: 19px;
+      letter-spacing: 1.5px;
+      white-space: nowrap;
+    }
+    @keyframes cb-scroll {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-50%);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cb-row {
+        animation: none;
+        flex-wrap: wrap;
+        width: auto;
+        gap: 32px;
+      }
+      .cb-track {
+        mask-image: none;
+        -webkit-mask-image: none;
+      }
+    }
+    .cb-note {
+      color: var(--gray);
+      font-size: 13px;
+      margin-top: 18px;
+    }
+
+    /* pontos cardinais (C12) + testemunho acoplado (C13) */
+    .card.cardinal {
+      display: flex;
+      flex-direction: column;
+    }
+    .cd-examples {
+      list-style: none;
+      margin: 18px 0 0;
+      padding: 0;
+    }
+    .cd-examples li {
+      position: relative;
+      padding-left: 16px;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+    .cd-examples li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 7px;
+      height: 7px;
+      background: var(--navy);
+    }
+    .cd-more {
+      display: inline-block;
+      margin-top: 8px;
+      color: var(--cyan);
+      font-weight: bold;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cd-quote {
+      margin: 24px 0 0;
+      padding: 20px 0 0;
+      border-top: 1px solid #e3e9ee;
+      margin-top: auto;
+    }
+    .cd-quote-src {
+      color: var(--cyan);
+      font-weight: bold;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 10px;
+    }
+    .cd-quote blockquote {
+      margin: 0;
+      color: var(--dark);
+      font-size: 15px;
+      font-style: italic;
+      border-left: 3px solid var(--lightblue);
+      padding-left: 14px;
+    }
+
+    /* reconhecimentos (C13) */
+    .card.rec-lead {
+      border-top-color: var(--navy);
+      background: #f4f7fa;
+    }
+
+    .lead-role {
+      color: var(--cyan);
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .fine-src {
+      color: var(--gray);
+      font-size: 12px;
+      font-style: italic;
+      margin-top: 24px;
+    }
+  </style>
 </Base>

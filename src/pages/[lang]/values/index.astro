@@ -1,0 +1,60 @@
+---
+// C25 (MMK-CONV006-C25): "Our work" (antiga pagina de portfolio) vira "Our values"
+// (pagina de cultura). Nova ordem: Our Culture (com o subitem Mirow's Ethos) primeiro,
+// depois Why Mirow — o inverso da ordem antiga. "Industries" sai desta pagina e migra
+// para a home como a orbita de planetas (C15, fora do escopo desta onda). URL antiga
+// era /about-us/our-work — precisa de redirect 301 quando o dump WordPress for podado
+// (F2.5, fora do escopo desta onda: nao editamos public/ aqui).
+//
+// Textos abaixo sao os mesmos do site atual (real, nao inventado — extraidos de
+// public/en/about-us/our-work e public/pt/sobre-nos/nosso-trabalho).
+import Base from '../../../layouts/Base.astro';
+import values from '../../../data/values.json';
+import { t, LANGS, type Lang } from '../../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+---
+
+<Base lang={lang} title={_('values.title')} description={_('values.sub')} altPath={'/values/'}>
+  <div class="hero" style="padding:64px 0">
+    <div class="wrap"><h1 style="font-size:38px;max-width:900px">{_('values.title')}</h1></div>
+  </div>
+
+  <section class="block">
+    <div class="wrap">
+      <p class="sec-sub">{_('values.sub')}</p>
+      <h2 class="sec" style="font-size:24px">{_('values.culture')}</h2>
+      <p style="color:var(--gray);margin-bottom:28px">{_('values.ethos')}</p>
+      <div class="grid c3">
+        {
+          values.ethos.map((e: any) => (
+            <div class="card">
+              <h3>{e[lang].title}</h3>
+              <p>{e[lang].text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <h2 class="sec" style="font-size:24px">{_('values.why')}</h2>
+      <div class="grid c3" style="margin-top:24px">
+        {
+          values.why.map((w: any) => (
+            <div class="card">
+              <h3>{w[lang].title}</h3>
+              <p>{w.text[lang]}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>

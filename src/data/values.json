@@ -1,0 +1,50 @@
+{
+  "why": [
+    {
+      "en": { "title": "Highly qualified team linked to a global network" },
+      "pt": { "title": "Equipe altamente qualificada e inserida em uma rede global" },
+      "text": {
+        "en": "We have a highly qualified and experienced team of consultants, leveraging partnerships with award-winning consultancies worldwide to complement our in-house expertise. Furthermore, we carefully select for each project a group of top-tier national and international experts to collaborate with us.",
+        "pt": "Contamos com um time altamente capacitado e experiente de consultores, e trabalhamos em rede com consultorias premiadas ao redor do mundo para complementar nossa expertise interna. Além disso, selecionamos cuidadosamente para cada projeto o melhor grupo de especialistas nacionais e internacionais para trabalhar conosco."
+      }
+    },
+    {
+      "en": { "title": "Unique, pragmatic solutions with extensive value generation" },
+      "pt": { "title": "Soluções únicas, pragmáticas com ampla geração de valor" },
+      "text": {
+        "en": "We are dedicated to delivering substantial value to our clients through recommending practical, customized actions that address their specific needs and challenges. Renowned for excellence, we have a proven track record of developing high-quality projects with a significant impact.",
+        "pt": "Nosso compromisso é gerar valor significativo para nossos clientes, recomendando ações práticas e customizadas para suas necessidades e desafios. Temos uma forte reputação de excelência em nosso trabalho, e nos destacamos por desenvolver projetos de alta qualidade e impacto expressivo."
+      }
+    },
+    {
+      "en": { "title": "Innovative approaches with an exceptional experience" },
+      "pt": { "title": "Abordagens inovadoras com uma experiência excepcional" },
+      "text": {
+        "en": "We embrace innovative, collaborative, and hands-on methodologies, fostering deep engagement with our clients' teams. This approach cultivates enduring relationships built on mutual trust, ensuring success throughout every project we undertake.",
+        "pt": "Adotamos abordagens inovadoras, participativas e mão na massa, interagindo de forma intensa e colaborativa com a equipe de nossos clientes. Dessa maneira, estabelecemos relações duradouras e baseadas em confiança mútua ao longo dos projetos que realizamos."
+      }
+    }
+  ],
+  "ethos": [
+    {
+      "en": { "title": "Best of the world", "text": "We deliver the best of the world to our clients." },
+      "pt": { "title": "Melhor do mundo", "text": "Entregamos o melhor do mundo para nossos clientes." }
+    },
+    {
+      "en": { "title": "Trusting relationships", "text": "We foster enduring, trusting relationships." },
+      "pt": { "title": "Relacionamentos de confiança", "text": "Cultivamos relacionamentos de confiança que se sustentam no longo prazo." }
+    },
+    {
+      "en": { "title": "Agents of change", "text": "We are agents of change, transforming the reality around us." },
+      "pt": { "title": "Agentes de mudanças", "text": "Somos agentes de mudanças e transformamos a realidade ao nosso redor." }
+    },
+    {
+      "en": { "title": "Art of service", "text": "We are masters of the art of service and offer a unique customer experience." },
+      "pt": { "title": "Arte de servir", "text": "Somos mestres na arte de servir e oferecemos uma experiência única para clientes." }
+    },
+    {
+      "en": { "title": "Together we are unbeatable", "text": "We care about everyone's development and appreciate the uniqueness in each person because together we are unbeatable." },
+      "pt": { "title": "Juntos somos imbatíveis", "text": "Prezamos pelo desenvolvimento de todos e valorizamos o que há de único em cada um, pois juntos somos imbatíveis." }
+    }
+  ]
+}

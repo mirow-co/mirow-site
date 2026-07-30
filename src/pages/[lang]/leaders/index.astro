@@ -17,6 +17,15 @@ const personSchema = leaders.map((p) => ({
   worksFor: { '@type': 'Organization', name: 'Mirow & Co.' },
   description: p.bio[lang],
 }));
+
+// Composicao confirmada pelo Andreas em 29/07/2026 (MMK-CONV006-C24):
+// socios principais > socio > senior experts > engagement manager (unico)
+const TIERS = ['socio-principal', 'socio', 'senior-expert', 'engagement-manager'] as const;
+const groups = TIERS.map((tier) => ({
+  tier,
+  label: _(`leaders.tier.${tier}`),
+  people: leaders.filter((p) => p.tier === tier),
+})).filter((g) => g.people.length > 0);
 ---
 
 <Base lang={lang} title={_('leaders.title')} description={_('leaders.sub')} altPath={'/leaders/'} schema={personSchema}>
@@ -26,17 +35,31 @@ const personSchema = leaders.map((p) => ({
   <section class="block">
     <div class="wrap">
       <p class="sec-sub">{_('leaders.sub')}</p>
-      <div class="grid c3">
-        {
-          leaders.map((p) => (
-            <div class="card">
-              <h3>{p.name}</h3>
-              <p style="color:var(--cyan);font-weight:bold;font-size:14px;margin-bottom:10px">{p.role[lang]}</p>
-              <p>{p.bio[lang]}</p>
+      {
+        groups.map((g) => (
+          <div style="margin-bottom:48px">
+            <h2 style="color:var(--navy);font-size:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:20px;border-bottom:2px solid var(--lightblue);padding-bottom:8px">
+              {g.label}
+            </h2>
+            <div class="grid c3">
+              {g.people.map((p) => (
+                <div class="card">
+                  <h3>{p.name}</h3>
+                  <p style="color:var(--cyan);font-weight:bold;font-size:14px;margin-bottom:10px">
+                    {p.role[lang]}
+                  </p>
+                  <p>{p.bio[lang]}</p>
+                  {p.linkedin && (
+                    <a class="more" href={p.linkedin} target="_blank" rel="noopener">
+                      LinkedIn
+                    </a>
+                  )}
+                </div>
+              ))}
             </div>
-          ))
-        }
-      </div>
+          </div>
+        ))
+      }
     </div>
   </section>
 </Base>

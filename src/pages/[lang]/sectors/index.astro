@@ -1,6 +1,7 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import { sectors } from '../../../data/sectors';
+import IndustryOrbit from '../../../components/IndustryOrbit.astro';
 import { t, LANGS, type Lang } from '../../../i18n';
 
 export function getStaticPaths() {
@@ -30,4 +31,6 @@ const L = (p: string) => `${base}/${lang}${p}`;
       </div>
     </div>
   </section>
+
+  <IndustryOrbit lang={lang} />
 </Base>
