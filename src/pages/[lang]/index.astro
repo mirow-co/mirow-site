@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import { t, LANGS, type Lang } from '../../i18n';
 import ContactRail from '../../components/ContactRail.astro';
 import { cardinals } from '../../data/cardinals';
+import IndustryOrbit from '../../components/IndustryOrbit.astro';
 import clients from '../../data/clients.json';
 import leaders from '../../data/leaders.json';
 
@@ -151,6 +152,10 @@ const websiteSchema = {
       <p class="fine-src">{_('fig.source')}</p>
     </div>
   </section>
+
+  {/* Industrias em orbita — territorios de destaque na orbita interna,
+      drill-down por industria com os clientes aprovados. */}
+  <IndustryOrbit lang={lang} />
 
   {/*
     C13 + C14 — "Recognitions" desce na ordem e vem com enfase no Great Place to
