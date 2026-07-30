@@ -110,3 +110,48 @@
   .rede-lista__item{flex:1 1 100%}
 }
 /* onda7:rede:fim */
+
+/* onda8:hero-contatos:ini */
+/* onda8 — linha de contatos no hero das homes */
+.hero-contatos{list-style:none;margin:22px 0 0;padding:0;display:flex;flex-wrap:wrap;
+  gap:10px;position:relative;z-index:5}
+.hero-contatos__link{display:inline-flex;align-items:center;gap:8px;
+  padding:8px 16px;border:1px solid rgba(255,255,255,.55);border-radius:999px;
+  color:#fff;font-family:var(--secondaryFontFamily);font-size:15px;font-weight:400;
+  line-height:1.2;text-decoration:none;background:rgba(2,14,102,.28);
+  transition:all 300ms ease-in-out}
+.hero-contatos__link svg{flex:none}
+.hero-contatos__link svg path{fill:currentColor;stroke:none}
+.hero-contatos__link:hover,.hero-contatos__link:focus-visible{
+  color:#020e66;background:#00adec;border-color:#00adec;text-decoration:none}
+.hero-contatos__link:hover svg path,.hero-contatos__link:focus-visible svg path{
+  fill:currentColor}
+.hero-contatos__link--wa:hover,.hero-contatos__link--wa:focus-visible{
+  color:#fff;background:#25d366;border-color:#25d366}
+@media only screen and (max-width: 767px){
+  .hero-contatos{gap:8px;margin-top:18px}
+  .hero-contatos__link{padding:7px 13px;font-size:14px}
+}
+/* onda8:hero-contatos:fim */
+
+/* onda8:dobra:ini */
+/* onda8 — primeira dobra exata: hero + faixa de logos = 1 tela */
+:root{--onda8-logos-h:250px}
+@media only screen and (min-width: 992px){
+  .homepage .banner{
+    height:calc(100vh - var(--onda8-logos-h));
+    height:calc(100svh - var(--onda8-logos-h));
+    min-height:430px;
+    padding:118px 0 20px;
+    align-items:center;
+  }
+  /* a lampada preenche o hero, qualquer que seja a altura calculada */
+  .homepage .banner .banner__background video{object-fit:cover;height:100% !important}
+  /* a faixa de logos nao pode crescer alem do que entrou na conta */
+  .homepage .clientes-logos{padding-top:40px;padding-bottom:36px}
+}
+/* telas baixas (ex.: 1366x768): aperta o respiro para o subtitulo nao ser cortado */
+@media only screen and (min-width: 992px) and (max-height: 820px){
+  .homepage .banner{padding:106px 0 12px;min-height:360px}
+}
+/* onda8:dobra:fim */
