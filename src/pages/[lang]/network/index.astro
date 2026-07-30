@@ -1,0 +1,50 @@
+---
+// C22 (MMK-CONV006-C22): "Our Network" deixa de ser um mapinha no topo do menu
+// e vira pagina propria, so com logos/labels/paises-cidades dos parceiros — sem mapa.
+//
+// Fonte dos parceiros: dropdown "Our network" do mirow.com.br atual
+// (public/en/about-us/index.html, tab_ournetwork). Cidade/pais de cada parceiro
+// verificados nos respectivos sites institucionais em 30/07/2026 (nao inventados).
+//
+// PENDENTE C22: logos em PNG dos parceiros ainda nao foram baixados/autorizados
+// (mesma cautela de uso de marca de terceiro do pedido de logos de clientes, C08)
+// — por ora a pagina exibe nome + local + link, sem imagem.
+//
+// PENDENTE C22: "Virtus" (somosvirtus.com) constava no menu antigo, mas o dominio
+// hoje redireciona para deloitte.com/.../monitor-deloitte (Chile) — indicio de que
+// a Virtus foi incorporada pela Deloitte Monitor e a parceria pode nao estar mais
+// ativa. Removido desta lista ate confirmacao do Andreas/Felipe.
+import Base from '../../../layouts/Base.astro';
+import network from '../../../data/network.json';
+import { t, LANGS, type Lang } from '../../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+---
+
+<Base lang={lang} title={_('network.title')} description={_('network.sub')} altPath={'/network/'}>
+  <div class="hero" style="padding:64px 0">
+    <div class="wrap"><h1 style="font-size:38px;max-width:900px">{_('network.title')}</h1></div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <p class="sec-sub">{_('network.sub')}</p>
+      <div class="grid c3">
+        {
+          network.map((p: any) => (
+            <div class="card">
+              <h3>{p.name}</h3>
+              <p style="color:var(--gray);font-size:14px;margin-bottom:14px">{p.location[lang]}</p>
+              <a class="more" href={p.url} target="_blank" rel="noopener">
+                {p.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>

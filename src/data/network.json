@@ -1,0 +1,35 @@
+[
+  {
+    "name": "Akya",
+    "url": "https://akya.com.mx/",
+    "location": { "en": "Mexico City, Mexico", "pt": "Cidade do México, México" }
+  },
+  {
+    "name": "Batten & Company",
+    "url": "https://www.batten-company.com/en/",
+    "location": { "en": "Düsseldorf, Germany", "pt": "Düsseldorf, Alemanha" }
+  },
+  {
+    "name": "IMP Consulting",
+    "url": "https://www.impconsulting.com",
+    "location": {
+      "en": "Austria · Germany · Switzerland · Brazil",
+      "pt": "Áustria · Alemanha · Suíça · Brasil"
+    }
+  },
+  {
+    "name": "Portas Consulting",
+    "url": "https://portasconsulting.com/",
+    "location": { "en": "London, United Kingdom", "pt": "Londres, Reino Unido" }
+  },
+  {
+    "name": "PSE Consulting",
+    "url": "https://pseconsulting.com/",
+    "location": { "en": "London, United Kingdom", "pt": "Londres, Reino Unido" }
+  },
+  {
+    "name": "Undconsorten",
+    "url": "https://undconsorten.de/",
+    "location": { "en": "Berlin, Germany", "pt": "Berlim, Alemanha" }
+  }
+]
