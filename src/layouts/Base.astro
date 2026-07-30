@@ -1,6 +1,7 @@
 ---
 import { t, other, type Lang } from '../i18n';
 import Analytics from '../components/Analytics.astro';
+import ContactRail from '../components/ContactRail.astro';
 
 interface Props {
   lang: Lang;
@@ -99,7 +100,8 @@ const orgSchema = {
         margin: 0 auto;
         padding: 0 24px;
       }
-      /* header */
+      /* header — C18: barra mais espessa (mais presenca visual) + C27: aplicado em toda
+         pagina via este layout unico (nenhuma pagina monta header proprio). */
       header.site {
         background: linear-gradient(180deg, #071c25 0%, #041545 100%);
         position: sticky;
@@ -111,13 +113,24 @@ const orgSchema = {
         align-items: center;
         justify-content: space-between;
         gap: 24px;
-        padding: 18px 24px;
+        padding: 26px 24px;
         max-width: 1120px;
         margin: 0 auto;
       }
+      /* C17: bug relatado pelo Andreas era a barra do WordPress ficando branca no hover e
+         escondendo o logo branco. Nesta camada Astro o fundo do header e sempre a mesma
+         gradiente navy/dark (nunca branco) e o logo nunca troca de cor — travado aqui de
+         proposito para o bug nao poder reaparecer por CSS futuro. */
+      header.site,
+      header.site .bar,
+      header.site:hover,
+      header.site .bar:hover {
+        background: linear-gradient(180deg, #071c25 0%, #041545 100%);
+      }
       header.site img.logo {
-        height: 26px;
+        height: 28px;
         display: block;
+        opacity: 1;
       }
       header.site nav {
         display: flex;
@@ -138,6 +151,19 @@ const orgSchema = {
         border-radius: 3px;
         padding: 3px 10px;
         font-size: 13px;
+      }
+      /* C18: "Contact us" ganha forma ovalada azul (referencia: site da Batten & Company) */
+      header.site nav a.contact-oval {
+        background: var(--cyan);
+        color: #fff;
+        font-weight: bold;
+        padding: 10px 22px;
+        border-radius: 999px;
+        transition: filter 0.15s ease;
+      }
+      header.site nav a.contact-oval:hover {
+        color: #fff;
+        filter: brightness(1.1);
       }
       /* hero */
       .hero {
@@ -307,7 +333,7 @@ const orgSchema = {
           <a href={L('/sectors/')}>{_('nav.sectors')}</a>
           <a href={L('/leaders/')}>{_('nav.leaders')}</a>
           <a href={L('/careers/')}>{_('nav.careers')}</a>
-          <a href={L('/contact/')}>{_('nav.contact')}</a>
+          <a class="contact-oval" href={L('/contact/')}>{_('nav.contact')}</a>
           <a class="lang" href={altHref}>{oLang === 'pt' ? 'Português' : 'English'}</a>
         </nav>
       </div>
@@ -322,5 +348,10 @@ const orgSchema = {
         <div class="fine">© {new Date().getFullYear()} Mirow & Co. — {_('footer.rights')}</div>
       </div>
     </footer>
+
+    <!-- C19/C27: rail de contato fixo, disponivel o tempo todo, em toda pagina (unico ponto
+         de montagem — este layout Base — entao cobre home, practices, sectors, leaders,
+         contact, careers e insights automaticamente). -->
+    <ContactRail lang={lang} variant="float" />
   </body>
 </html>

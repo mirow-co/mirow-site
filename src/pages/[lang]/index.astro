@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { t, LANGS, type Lang } from '../../i18n';
+import ContactRail from '../../components/ContactRail.astro';
 import { cardinals } from '../../data/cardinals';
 import clients from '../../data/clients.json';
 import leaders from '../../data/leaders.json';
@@ -49,23 +50,14 @@ const websiteSchema = {
   <section class="hero">
     <div class="wrap">
       <div class="kicker">{_('hero.kicker')}</div>
+      {/* PENDENTE: tagline definitiva de posicionamento ainda em aberto —
+          usando tagline neutra ate a decisao (ver i18n.ts). */}
       <h1>{_('hero.title')}</h1>
       <div class="rule"></div>
       <p>{_('hero.lead')}</p>
-
-      <div class="hero-contact">
-        <span class="hc-label">{_('hero.contact.label')}</span>
-        <a class="btn" href={L('/contact/')}>{_('hero.contact.form')}</a>
-        <a class="hc-link" href={`mailto:${EMAIL}`}>{_('hero.contact.email')}</a>
-        <a class="hc-link" href={LINKEDIN} target="_blank" rel="noopener">LinkedIn</a>
-        {/*
-          PENDENTE C09: falta o numero de WhatsApp direto do Andreas (link
-          https://wa.me/55DDDNUMERO) e o handle do Instagram da Mirow & Co.
-          Nenhum dos dois esta publicado no site atual nem foi confirmado por
-          ele — nao inventamos link de contato (R1). Assim que vierem, entram
-          aqui como dois <a class="hc-link">.
-        */}
-      </div>
+      {/* Canais de contato na primeira dobra, centralizados no ContactRail
+          (WhatsApp, formulario, LinkedIn; e-mail entra quando definido). */}
+      <ContactRail lang={lang} variant="inline" />
     </div>
   </section>
 

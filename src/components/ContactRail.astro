@@ -1,0 +1,173 @@
+---
+// Rail de contato — MMK-CONV006-C19: WhatsApp, LinkedIn, Instagram, e-mail (se decidido) e
+// formulario de contato ficam clicaveis o tempo todo, em toda pagina. Usado em duas variantes:
+// - "float": barra fixa lateral, injetada uma vez pelo layout Base (aparece em toda pagina — C27).
+// - "inline": copia dos mesmos links, usada logo abaixo do hero da home (C19).
+import { t, type Lang } from '../i18n';
+import { CONTACTS } from '../data/contacts';
+
+interface Props {
+  lang: Lang;
+  variant?: 'float' | 'inline';
+}
+const { lang, variant = 'float' } = Astro.props;
+const _ = (k: string) => t[lang][k];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const L = (p: string) => `${base}/${lang}${p}`;
+const waUrl = CONTACTS.whatsapp.urlFor(lang);
+---
+
+<div class={`contact-rail contact-rail--${variant}`}>
+  <a
+    class="contact-rail__item wa"
+    href={waUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={_('contact.rail.whatsapp')}
+    title={_('contact.rail.whatsapp')}
+  >
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+      <path
+        d="M12.04 2c-5.5 0-9.96 4.46-9.96 9.96 0 1.76.46 3.48 1.34 5L2 22l5.2-1.36a9.94 9.94 0 0 0 4.84 1.23h.01c5.5 0 9.96-4.46 9.96-9.96S17.54 2 12.04 2Zm5.8 14.14c-.24.68-1.4 1.3-1.93 1.35-.5.05-1 .25-3.4-.71-2.87-1.14-4.71-4.06-4.85-4.25-.14-.19-1.16-1.54-1.16-2.94s.73-2.08 1-2.36c.26-.29.57-.36.76-.36h.55c.18 0 .42-.07.65.5.24.58.82 2 .89 2.15.07.14.11.31.02.5-.09.19-.14.31-.28.48-.14.16-.29.36-.42.48-.14.14-.28.29-.12.57.16.29.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.45.12.62-.07.16-.19.7-.82.89-1.1.19-.29.38-.24.63-.14.26.09 1.65.78 1.93.92.28.14.47.21.53.33.07.12.07.66-.17 1.34Z"
+      ></path>
+    </svg>
+    <span>{_('contact.rail.whatsapp')}</span>
+  </a>
+
+  {
+    CONTACTS.email && (
+      <a
+        class="contact-rail__item"
+        href={`mailto:${CONTACTS.email}`}
+        aria-label={_('contact.rail.email')}
+        title={_('contact.rail.email')}
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="2.5" y="4.5" width="19" height="15" rx="2" />
+          <path d="m3 6 9 7 9-7" />
+        </svg>
+        <span>{_('contact.rail.email')}</span>
+      </a>
+    )
+  }
+  <!-- PENDENTE C21: o Andreas marcou "verificar e-mail de contato para projetos" sem decisao.
+       Enquanto CONTACTS.email for null, o icone de e-mail nao aparece (evita mailto inventado). -->
+
+  <a
+    class="contact-rail__item"
+    href={L('/contact/')}
+    aria-label={_('contact.rail.form')}
+    title={_('contact.rail.form')}
+  >
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+    <span>{_('contact.rail.form')}</span>
+  </a>
+
+  <a
+    class="contact-rail__item"
+    href={CONTACTS.linkedin}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={_('contact.rail.linkedin')}
+    title={_('contact.rail.linkedin')}
+  >
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+      <path
+        d="M6.94 5a2 2 0 1 1-4-.02 2 2 0 0 1 4 .02ZM3.2 8.6h3.5V21H3.2V8.6Zm6.2 0h3.36v1.7h.05c.47-.88 1.6-1.8 3.3-1.8 3.53 0 4.18 2.3 4.18 5.3V21h-3.5v-6.1c0-1.46-.03-3.33-2.03-3.33-2.04 0-2.35 1.6-2.35 3.23V21H9.4V8.6Z"
+      ></path>
+    </svg>
+    <span>{_('contact.rail.linkedin')}</span>
+  </a>
+
+  <a
+    class="contact-rail__item"
+    href={CONTACTS.instagram}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={_('contact.rail.instagram')}
+    title={_('contact.rail.instagram')}
+  >
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none" />
+    </svg>
+    <span>{_('contact.rail.instagram')}</span>
+  </a>
+</div>
+
+<style>
+  .contact-rail {
+    display: flex;
+    gap: 10px;
+  }
+  .contact-rail__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+  }
+
+  /* Variante float: barra fixa, sempre visivel, em toda pagina (C19 + C27) */
+  .contact-rail--float {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 60;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .contact-rail--float .contact-rail__item {
+    background: var(--navy);
+    border: 1px solid rgba(170, 213, 232, 0.35);
+    border-radius: 999px;
+    padding: 10px 12px;
+    box-shadow: 0 4px 14px rgba(2, 14, 102, 0.35);
+  }
+  .contact-rail--float .contact-rail__item.wa {
+    background: #1fa855;
+    border-color: #1fa855;
+  }
+  .contact-rail--float .contact-rail__item span {
+    display: none;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .contact-rail--float .contact-rail__item:hover {
+    filter: brightness(1.12);
+  }
+  .contact-rail--float .contact-rail__item:hover span {
+    display: inline;
+  }
+
+  /* Variante inline: copia dos links logo abaixo do hero da home (C19) */
+  .contact-rail--inline {
+    flex-wrap: wrap;
+    margin-top: 30px;
+  }
+  .contact-rail--inline .contact-rail__item {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(170, 213, 232, 0.4);
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .contact-rail--inline .contact-rail__item.wa {
+    background: #1fa855;
+    border-color: #1fa855;
+  }
+  .contact-rail--inline .contact-rail__item:hover {
+    filter: brightness(1.12);
+  }
+
+  @media (max-width: 720px) {
+    .contact-rail--float {
+      right: 12px;
+      bottom: 12px;
+    }
+  }
+</style>
