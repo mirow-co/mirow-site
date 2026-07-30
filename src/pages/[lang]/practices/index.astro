@@ -1,0 +1,37 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { t, LANGS, type Lang } from '../../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const L = (p: string) => `${base}/${lang}${p}`;
+
+const practices = (await getCollection('practices'))
+  .filter((p) => p.id.startsWith(`${lang}/`))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base lang={lang} title={_('home.practices')} altPath={'/practices/'}>
+  <div class="hero" style="padding:64px 0">
+    <div class="wrap"><h1 style="font-size:38px">{_('home.practices')}</h1></div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <div class="grid c3">
+        {
+          practices.map((p) => (
+            <a class="card" href={L(`/practices/${p.id.split('/')[1]}/`)}>
+              <h3>{p.data.title}</h3>
+              <p>{p.data.tagline}</p>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>

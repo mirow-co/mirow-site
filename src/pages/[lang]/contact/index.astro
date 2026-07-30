@@ -1,0 +1,30 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { t, LANGS, type Lang } from '../../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+---
+
+<Base lang={lang} title={_('contact.title')} description={_('contact.sub')} altPath={'/contact/'}>
+  <div class="hero" style="padding:64px 0">
+    <div class="wrap"><h1 style="font-size:38px">{_('contact.title')}</h1></div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <p class="sec-sub">{_('contact.sub')}</p>
+      <p class="demo-note" style="margin-bottom:24px">{_('form.demo')}</p>
+      <form class="mirow" onsubmit="return false">
+        <input type="text" placeholder={_('form.name')} required />
+        <input type="email" placeholder={_('form.email')} required />
+        <input type="tel" placeholder={_('form.phone')} />
+        <input type="text" placeholder={_('form.company')} />
+        <textarea placeholder={_('form.message')} required></textarea>
+        <button class="btn" type="submit">{_('form.send')}</button>
+      </form>
+    </div>
+  </section>
+</Base>

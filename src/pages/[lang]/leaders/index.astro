@@ -1,0 +1,42 @@
+---
+import Base from '../../../layouts/Base.astro';
+import leaders from '../../../data/leaders.json';
+import { t, LANGS, type Lang } from '../../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+const lang = Astro.params.lang as Lang;
+const _ = (k: string) => t[lang][k];
+
+const personSchema = leaders.map((p) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: p.name,
+  jobTitle: p.role[lang],
+  worksFor: { '@type': 'Organization', name: 'Mirow & Co.' },
+  description: p.bio[lang],
+}));
+---
+
+<Base lang={lang} title={_('leaders.title')} description={_('leaders.sub')} altPath={'/leaders/'} schema={personSchema}>
+  <div class="hero" style="padding:64px 0">
+    <div class="wrap"><h1 style="font-size:38px;max-width:900px">{_('leaders.title')}</h1></div>
+  </div>
+  <section class="block">
+    <div class="wrap">
+      <p class="sec-sub">{_('leaders.sub')}</p>
+      <div class="grid c3">
+        {
+          leaders.map((p) => (
+            <div class="card">
+              <h3>{p.name}</h3>
+              <p style="color:var(--cyan);font-weight:bold;font-size:14px;margin-bottom:10px">{p.role[lang]}</p>
+              <p>{p.bio[lang]}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
