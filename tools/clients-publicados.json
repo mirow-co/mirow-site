@@ -1,0 +1,77 @@
+[
+  {
+    "wordmark": "MERCEDES-BENZ",
+    "slug": "mercedes-benz",
+    "arquivo": "mercedes-benz.svg"
+  },
+  {
+    "wordmark": "VOLKSWAGEN",
+    "slug": "volkswagen",
+    "arquivo": "volkswagen.svg"
+  },
+  {
+    "wordmark": "IPIRANGA",
+    "slug": "ipiranga",
+    "arquivo": "ipiranga.svg"
+  },
+  {
+    "wordmark": "SUZANO",
+    "slug": "suzano",
+    "arquivo": "suzano.svg"
+  },
+  {
+    "wordmark": "KLABIN",
+    "slug": "klabin",
+    "arquivo": "klabin.svg"
+  },
+  {
+    "wordmark": "DEXCO",
+    "slug": "dexco",
+    "arquivo": "dexco.svg"
+  },
+  {
+    "wordmark": "EDP",
+    "slug": "edp",
+    "arquivo": "edp.svg"
+  },
+  {
+    "wordmark": "ENERGISA",
+    "slug": "energisa",
+    "arquivo": "energisa.svg"
+  },
+  {
+    "wordmark": "ENEVA",
+    "slug": "eneva",
+    "arquivo": "eneva.svg"
+  },
+  {
+    "wordmark": "TAESA",
+    "slug": "taesa",
+    "arquivo": "taesa.png"
+  },
+  {
+    "wordmark": "YARA",
+    "slug": "yara",
+    "arquivo": "yara.svg"
+  },
+  {
+    "wordmark": "WILSON SONS",
+    "slug": "wilson-sons",
+    "arquivo": "wilson-sons.svg"
+  },
+  {
+    "wordmark": "SANTOS BRASIL",
+    "slug": "santos-brasil",
+    "arquivo": "santos-brasil.jpg"
+  },
+  {
+    "wordmark": "XP",
+    "slug": "xp",
+    "arquivo": "xp.svg"
+  },
+  {
+    "wordmark": "SULAMÉRICA",
+    "slug": "sulamerica",
+    "arquivo": "sulamerica.svg"
+  }
+]

@@ -1,4 +1,7 @@
 node_modules/
-dist/
+# ancorado na raiz: sem a barra inicial isto casava public/wp-includes/js/dist/
+# e deixava 4 arquivos do tema fora do git (o site quebraria num clone novo).
+/dist/
 .astro/
 .github/workflows/
+__pycache__/
