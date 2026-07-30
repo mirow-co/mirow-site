@@ -9,6 +9,7 @@ const insights = defineCollection({
     date: z.string(),
     original: z.string().optional(),
     image: z.string().optional(),
+    sector: z.string().optional(),
   }),
 });
 

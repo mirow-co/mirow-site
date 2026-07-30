@@ -3,6 +3,7 @@ title: "Tendências do mercado de caminhões no Brasil: as forças que remodelam
 description: Transição energética, novas tecnologias, concorrentes chineses e novos modelos de propriedade estão mudando estruturalmente o mercado de caminhões no Brasil.
 date: "2025-06-01"
 original: https://mirow.com.br/en/brazil-truck-market-trends-the-future-of-the-truck-market-in-brazil-forces-that-are-reshaping-the-sector/
+sector: automotive
 ---
 
 O mercado brasileiro de caminhões está prestes a entrar em um novo ciclo de transformação. Mudanças na matriz energética, o avanço de novas tecnologias, a entrada de concorrentes chineses e a evolução dos modelos de propriedade estão mudando estruturalmente a forma como caminhões são projetados, adquiridos, operados e financiados no país.

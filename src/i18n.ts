@@ -8,6 +8,9 @@ export const t: Record<Lang, Record<string, string>> = {
     'nav.leaders': 'Leaders',
     'nav.careers': 'Careers',
     'nav.contact': 'Contact Us',
+    'nav.sectors': 'Sectors',
+    'sectors.title': 'Perspectives by sector',
+    'sectors.sub': 'Our insights organized by the industries we serve',
     'hero.kicker': 'Strategic management consulting',
     'hero.title': 'Embrace to Enhance',
     'hero.sub':
@@ -54,6 +57,9 @@ export const t: Record<Lang, Record<string, string>> = {
     'nav.leaders': 'Líderes',
     'nav.careers': 'Carreiras',
     'nav.contact': 'Contato',
+    'nav.sectors': 'Setores',
+    'sectors.title': 'Perspectivas por setor',
+    'sectors.sub': 'Nossos insights organizados pelos setores em que atuamos',
     'hero.kicker': 'Consultoria estratégica',
     'hero.title': 'Envolver para desenvolver',
     'hero.sub':
