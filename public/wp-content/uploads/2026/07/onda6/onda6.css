@@ -155,3 +155,56 @@
   .homepage .banner{padding:106px 0 12px;min-height:360px}
 }
 /* onda8:dobra:fim */
+
+/* onda8:hero-contatos-v2:ini */
+/* onda8.1 — pills do hero maiores, texto branco travado e clique garantido */
+.hero-contatos{gap:12px;margin-top:26px;position:relative;z-index:6}
+.hero-contatos__link{
+  padding:11px 20px;
+  font-size:17px;
+  gap:10px;
+  color:#fff !important;
+  text-decoration:none !important;
+  border:1.5px solid rgba(255,255,255,.78);
+  background:rgba(2,14,102,.45);
+  position:relative;
+  z-index:6;
+}
+.hero-contatos__link svg{width:24px;height:24px}
+.hero-contatos__link svg path{fill:currentColor !important;stroke:none}
+.hero-contatos__link:hover,.hero-contatos__link:focus-visible{
+  color:#020e66 !important;background:#00adec;border-color:#00adec}
+.hero-contatos__link--wa:hover,.hero-contatos__link--wa:focus-visible{
+  color:#fff !important;background:#25d366;border-color:#25d366}
+@media only screen and (max-width: 767px){
+  .hero-contatos{gap:9px;margin-top:20px}
+  .hero-contatos__link{padding:9px 15px;font-size:15px}
+  .hero-contatos__link svg{width:20px;height:20px}
+}
+/* onda8:hero-contatos-v2:fim */
+
+/* onda8:menu-contatos:ini */
+/* onda8.1 — contatos como icones na barra superior (todas as paginas) */
+.menu__contatos{display:none}
+@media only screen and (min-width: 992px){
+  /* o header era um space-between de 3 itens (logo | nav | idioma); com o 4o
+     item a distribuicao mudaria de lugar, entao o nav fica centrado por margem
+     automatica e o par contatos+idioma encosta na direita */
+  .menu .container>.menu__nav{margin-left:auto;margin-right:auto}
+  .menu__contatos{
+    display:flex;align-items:center;gap:16px;order:3;
+    margin-left:auto;padding-right:14px}
+  .menu__contatos-link{
+    display:inline-flex;align-items:center;justify-content:center;
+    color:#fff;line-height:0;opacity:.85;
+    transition:all 300ms ease-in-out}
+  .menu__contatos-link svg{width:19px;height:19px}
+  .menu__contatos-link svg path{fill:currentColor !important;stroke:none}
+  .menu__contatos-link:hover,.menu__contatos-link:focus-visible{
+    color:#00adec;opacity:1}
+  .menu__contatos-link--wa:hover,.menu__contatos-link--wa:focus-visible{
+    color:#25d366}
+  /* nos posts o header do tema e branco — icone navy para nao sumir */
+  .single:not(.single-experience) .menu__contatos-link{color:#020e66;opacity:.75}
+}
+/* onda8:menu-contatos:fim */

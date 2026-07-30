@@ -18,7 +18,6 @@ e o CSS vai para um bloco marcado em wp-content/uploads/2026/07/onda6/onda6.css.
 
 Idempotente: remove o bloco antigo antes de inserir o novo.
 """
-import io
 import os
 import re
 import sys
@@ -26,32 +25,13 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import (base_prefix, escrever_bloco_css, garantir_link_css,  # noqa: E402
                         gravar, idioma_da_pagina, ler, resolve_public)
+from _onda8_contatos import (ARIA, EMAIL, INSTAGRAM, LINKEDIN, ROTULOS,  # noqa: E402
+                             SVG_IG, SVG_LI, SVG_MAIL, SVG_WA, url_whatsapp)
 
 HOMES = ["pt/index.html", "en/index.html", "en/homepage/index.html", "de/index.html"]
 
-WA_NUM = "5521999947429"
-EMAIL = "andreas.mirow@mirow.com.br"
-LINKEDIN = "https://www.linkedin.com/company/mirow-co-/"
-INSTAGRAM = "https://www.instagram.com/mirowandco"
-
-MSG = {
-    "pt": u"Olá! Vim pelo site da Mirow & Co. e gostaria de conversar.",
-    "en": u"Hello, I found Mirow & Co. through the website and would like to talk.",
-    "de": u"Hallo! Ich bin über die Website von Mirow & Co. auf Sie aufmerksam "
-          u"geworden und würde gerne sprechen.",
-}
-
-ROTULOS = {
-    "pt": (u"Falar no WhatsApp", u"E-mail", u"LinkedIn", u"Instagram"),
-    "en": (u"WhatsApp us", u"E-mail", u"LinkedIn", u"Instagram"),
-    "de": (u"Per WhatsApp schreiben", u"E-Mail", u"LinkedIn", u"Instagram"),
-}
-
-ARIA = {
-    "pt": u"Contatos diretos",
-    "en": u"Direct contacts",
-    "de": u"Direkter Kontakt",
-}
+# Dados dos contatos (numero, e-mail, perfis, mensagens e icones) vivem em
+# _onda8_contatos.py — o mesmo modulo que o 26 usa na barra superior.
 
 INI = u"<!-- onda8:hero-contatos -->"
 FIM = u"<!-- /onda8:hero-contatos -->"
@@ -111,7 +91,7 @@ CSS = u"""/* onda8 — linha de contatos no hero das homes */
 
 def bloco(idioma):
     lab_wa, lab_mail, lab_li, lab_ig = ROTULOS[idioma]
-    wa = u"https://wa.me/%s?text=%s" % (WA_NUM, _quote(MSG[idioma]))
+    wa = url_whatsapp(idioma)
     itens = [
         (u"hero-contatos__link hero-contatos__link--wa", wa, SVG_WA, lab_wa, True),
         (u"hero-contatos__link", u"mailto:%s" % EMAIL, SVG_MAIL, lab_mail, False),
@@ -125,19 +105,6 @@ def bloco(idioma):
                    % (cls, href, extra, svg, rotulo))
     return (u'%s\n                <ul class="hero-contatos" aria-label="%s">%s</ul>\n%s'
             % (INI, ARIA[idioma], u"".join(lis), FIM))
-
-
-def _quote(texto):
-    """percent-encode do texto da mensagem do WhatsApp (RFC 3986, sem depender de locale)."""
-    seguro = u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~"
-    out = []
-    for ch in texto:
-        if ch in seguro:
-            out.append(ch)
-        else:
-            for b in ch.encode("utf-8"):
-                out.append(u"%%%02X" % (b if isinstance(b, int) else ord(b)))
-    return u"".join(out)
 
 
 def aplicar(html, idioma):
