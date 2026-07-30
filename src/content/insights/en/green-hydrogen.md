@@ -3,6 +3,7 @@ title: "Green Hydrogen: Unlocking Brazil's Potential"
 description: The global green hydrogen landscape and the specific opportunities for the Brazilian market.
 date: "2024-05-01"
 original: https://mirow.com.br/en/green-hydrogen-unlocking-brazils-potential/
+sector: energy
 ---
 
 Low-carbon hydrogen plays a crucial role in achieving global decarbonization goals. This sector is experiencing rapid growth, presenting extraordinary development potential. Now is the opportune time for companies to establish themselves as frontrunners in this emerging industry.
