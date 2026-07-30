@@ -24,3 +24,89 @@
   .clientes-logos__item svg{max-height:24px;max-width:104px}
   .clientes-logos__item--alto svg{max-height:36px;max-width:78px}
 }
+
+/* onda7:home-hero:ini */
+/* onda7 — home: hero compacto + menos vazio antes das praticas */
+.homepage .banner{min-height:0;padding:150px 0 60px}
+.homepage .banner h2{line-height:116%}
+@media only screen and (min-width: 992px){
+  .homepage .banner{height:auto;min-height:0;padding:170px 0 80px;align-items:flex-start}
+  .homepage .banner h2{line-height:116%;margin-bottom:26px}
+}
+.homepage .wrap-gradient-1{padding:0}
+.homepage .home-experience{padding-top:90px}
+@media only screen and (max-width: 991px){
+  .homepage .home-experience{padding-top:70px}
+}
+/* onda7:home-hero:fim */
+
+/* onda7:lideres-link:ini */
+/* onda7 — "Nossos Lideres" da home vira caminho para a pagina de lideres */
+.home-leaders__subtitle .onda7-titulo-link{color:inherit;text-decoration:none;
+  transition:color 300ms ease-in-out}
+.home-leaders__subtitle .onda7-titulo-link:hover{color:#00ADEC}
+.onda7-vertodos{display:inline-flex;align-items:center;gap:10px;
+  color:var(--whiteColor,#fff);font-family:var(--fontFamily);font-size:16px;
+  font-weight:700;text-decoration:none;margin-top:6px;
+  transition:color 300ms ease-in-out}
+.onda7-vertodos:hover{color:#00ADEC}
+.onda7-vertodos svg{flex:none}
+/* onda7:lideres-link:fim */
+
+/* onda7:rede:ini */
+/* onda7 — pagina "Nossa rede": mapa unico + lista de parceiros */
+/* fundo navy proprio: o wrap-gradient do tema clareia ate #A2BAE4 embaixo, e a
+   pagina e longa o suficiente para o texto claro sumir na parte de baixo */
+.rede{background:#020E66;padding:80px 0 100px}
+.rede__titulo{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:30px;font-weight:700;line-height:130%;margin:0 0 24px}
+.rede__eyebrow{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;font-weight:800;letter-spacing:.5em;text-transform:uppercase;
+  margin:0 0 12px}
+.rede-mapa{margin:0 0 70px}
+.rede-mapa__box{background:rgba(255,255,255,.05);border:1px solid rgba(170,213,232,.35);
+  padding:20px}
+.rede-mapa__svg{display:block;width:100%;height:auto}
+.rede-mapa__grade{stroke:rgba(170,213,232,.14);stroke-width:1}
+.rede-mapa__terra{fill:#0E41A7;stroke:#AAD5E8;stroke-width:1.2;stroke-linejoin:round;
+  fill-opacity:.6}
+.rede-mapa__mirow{fill:#fff;stroke:#00ADEC;stroke-width:3}
+.rede-mapa__halo{fill:#00ADEC;fill-opacity:.22}
+.rede-mapa__ponto{fill:#00ADEC}
+.rede-mapa__num{fill:#020E66;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:12px;font-weight:800}
+.rede-mapa__janela{fill:none;stroke:#00ADEC;stroke-width:1.5;stroke-dasharray:5 4}
+.rede-mapa__conector{stroke:#00ADEC;stroke-width:1;stroke-dasharray:5 4;opacity:.6}
+.rede-mapa__inset-bg{fill:#020E66;fill-opacity:.92}
+.rede-mapa__inset-borda{fill:none;stroke:#00ADEC;stroke-width:1.5}
+.rede-mapa__inset-rotulo{fill:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;font-weight:800;letter-spacing:.3em;text-transform:uppercase}
+.rede-mapa__legenda{display:flex;flex-wrap:wrap;gap:24px;margin:18px 0 0;padding:0;
+  list-style:none;color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:15px}
+.rede-mapa__legenda li{display:flex;align-items:center;gap:10px}
+.rede-mapa__chave{width:16px;height:16px;border-radius:50%;flex:none;display:inline-block}
+.rede-mapa__chave--mirow{background:#fff;box-shadow:0 0 0 3px #00ADEC inset}
+.rede-mapa__chave--parceiro{background:#00ADEC}
+.rede-mapa__nota{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;margin:12px 0 0}
+
+.rede-lista{display:flex;flex-wrap:wrap;gap:16px;margin:0;padding:0;list-style:none}
+.rede-lista__item{flex:1 1 300px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(170,213,232,.3);padding:24px;display:flex;
+  flex-direction:column;gap:8px}
+.rede-lista__num{display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:50%;background:#00ADEC;color:#020E66;
+  font-family:var(--fontFamily),Arial,sans-serif;font-weight:800;font-size:14px}
+.rede-lista__nome{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:22px;font-weight:700;margin:0}
+.rede-lista__local{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:15px;margin:0}
+.rede-lista__link{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:15px;font-weight:700;text-decoration:none;margin-top:auto}
+.rede-lista__link:hover{color:#fff}
+@media only screen and (max-width: 991px){
+  .rede-mapa__box{padding:10px}
+  .rede-lista__item{flex:1 1 100%}
+}
+/* onda7:rede:fim */
