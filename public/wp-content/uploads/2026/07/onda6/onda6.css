@@ -1,0 +1,26 @@
+/* onda6 — CSS proprio da onda 6, nao toca no tema. */
+
+/* 3 cards estaticos de praticas na home */
+.praticas-3{display:flex;flex-wrap:wrap;gap:20px;margin:0;padding:0;list-style:none}
+.praticas-3__card{flex:1 1 300px;display:flex;flex-direction:column;margin-bottom:0}
+.praticas-3__card .home-experience__list-item-content{display:block;flex:1 0 auto;
+  margin-bottom:20px}
+.praticas-3__card .home-experience__list-item-more{display:inline-block;margin-top:auto}
+@media only screen and (max-width: 991px){
+  .praticas-3{gap:10px}
+  .praticas-3__card{flex:1 1 100%}
+}
+
+/* Barra de logos de clientes: com o jQuery reposto (13_baixar_jquery.py) o tema volta a
+   trocar cada <img> de .svg por um <svg> inline (classe .replaced-svg). As regras da
+   onda 5 miravam so `img`, e os logos vetoriais passavam a renderizar no tamanho
+   intrinseco. Estas regras repetem os mesmos limites para o <svg> inline. */
+.clientes-logos__item svg{display:block;width:auto;height:auto;
+  max-height:30px;max-width:132px;
+  filter:grayscale(1) opacity(.65);transition:filter 300ms ease-in-out}
+.clientes-logos__item--alto svg{max-height:44px;max-width:96px}
+.clientes-logos__item:hover svg{filter:grayscale(1) opacity(1)}
+@media only screen and (max-width: 991px){
+  .clientes-logos__item svg{max-height:24px;max-width:104px}
+  .clientes-logos__item--alto svg{max-height:36px;max-width:78px}
+}
