@@ -53,63 +53,6 @@
 .onda7-vertodos svg{flex:none}
 /* onda7:lideres-link:fim */
 
-/* onda7:rede:ini */
-/* onda7 — pagina "Nossa rede": mapa unico + lista de parceiros */
-/* fundo navy proprio: o wrap-gradient do tema clareia ate #A2BAE4 embaixo, e a
-   pagina e longa o suficiente para o texto claro sumir na parte de baixo */
-.rede{background:#020E66;padding:80px 0 100px}
-.rede__titulo{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:30px;font-weight:700;line-height:130%;margin:0 0 24px}
-.rede__eyebrow{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:14px;font-weight:800;letter-spacing:.5em;text-transform:uppercase;
-  margin:0 0 12px}
-.rede-mapa{margin:0 0 70px}
-.rede-mapa__box{background:rgba(255,255,255,.05);border:1px solid rgba(170,213,232,.35);
-  padding:20px}
-.rede-mapa__svg{display:block;width:100%;height:auto}
-.rede-mapa__grade{stroke:rgba(170,213,232,.14);stroke-width:1}
-.rede-mapa__terra{fill:#0E41A7;stroke:#AAD5E8;stroke-width:1.2;stroke-linejoin:round;
-  fill-opacity:.6}
-.rede-mapa__mirow{fill:#fff;stroke:#00ADEC;stroke-width:3}
-.rede-mapa__halo{fill:#00ADEC;fill-opacity:.22}
-.rede-mapa__ponto{fill:#00ADEC}
-.rede-mapa__num{fill:#020E66;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:12px;font-weight:800}
-.rede-mapa__janela{fill:none;stroke:#00ADEC;stroke-width:1.5;stroke-dasharray:5 4}
-.rede-mapa__conector{stroke:#00ADEC;stroke-width:1;stroke-dasharray:5 4;opacity:.6}
-.rede-mapa__inset-bg{fill:#020E66;fill-opacity:.92}
-.rede-mapa__inset-borda{fill:none;stroke:#00ADEC;stroke-width:1.5}
-.rede-mapa__inset-rotulo{fill:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:14px;font-weight:800;letter-spacing:.3em;text-transform:uppercase}
-.rede-mapa__legenda{display:flex;flex-wrap:wrap;gap:24px;margin:18px 0 0;padding:0;
-  list-style:none;color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:15px}
-.rede-mapa__legenda li{display:flex;align-items:center;gap:10px}
-.rede-mapa__chave{width:16px;height:16px;border-radius:50%;flex:none;display:inline-block}
-.rede-mapa__chave--mirow{background:#fff;box-shadow:0 0 0 3px #00ADEC inset}
-.rede-mapa__chave--parceiro{background:#00ADEC}
-.rede-mapa__nota{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:14px;margin:12px 0 0}
-
-.rede-lista{display:flex;flex-wrap:wrap;gap:16px;margin:0;padding:0;list-style:none}
-.rede-lista__item{flex:1 1 300px;background:rgba(255,255,255,.06);
-  border:1px solid rgba(170,213,232,.3);padding:24px;display:flex;
-  flex-direction:column;gap:8px}
-.rede-lista__num{display:inline-flex;align-items:center;justify-content:center;
-  width:30px;height:30px;border-radius:50%;background:#00ADEC;color:#020E66;
-  font-family:var(--fontFamily),Arial,sans-serif;font-weight:800;font-size:14px}
-.rede-lista__nome{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:22px;font-weight:700;margin:0}
-.rede-lista__local{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:15px;margin:0}
-.rede-lista__link{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:15px;font-weight:700;text-decoration:none;margin-top:auto}
-.rede-lista__link:hover{color:#fff}
-@media only screen and (max-width: 991px){
-  .rede-mapa__box{padding:10px}
-  .rede-lista__item{flex:1 1 100%}
-}
-/* onda7:rede:fim */
 
 /* onda8:hero-contatos:ini */
 /* onda8 — linha de contatos no hero das homes */
@@ -228,3 +171,95 @@
   }
 }
 /* onda8:hero-slogan-alto:fim */
+
+/* onda9:rede:ini */
+/* onda9 — pagina "Nossa rede": UM mapa-mundi + pins com cartao no hover */
+/* fundo navy proprio: o wrap-gradient do tema clareia ate #A2BAE4 embaixo, e a
+   pagina e longa o suficiente para o texto claro sumir na parte de baixo */
+.rede{background:#020E66;padding:80px 0 100px}
+.rede__titulo{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:30px;font-weight:700;line-height:130%;margin:0 0 24px}
+.rede__eyebrow{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;font-weight:800;letter-spacing:.5em;text-transform:uppercase;
+  margin:0 0 12px}
+.rede-mapa{margin:0 0 70px}
+.rede-mapa__box{background:rgba(255,255,255,.05);border:1px solid rgba(170,213,232,.35);
+  padding:20px}
+/* o palco tem a MESMA proporcao do viewBox (1000x460), entao os pins podem ser
+   posicionados em % e acompanham o mapa em qualquer largura de tela */
+.rede-mapa__palco{position:relative}
+.rede-mapa__svg{display:block;width:100%;height:auto}
+.rede-mapa__grade{stroke:rgba(170,213,232,.14);stroke-width:1}
+.rede-mapa__terra{fill:#0E41A7;stroke:#AAD5E8;stroke-width:1.2;stroke-linejoin:round;
+  fill-opacity:.6}
+
+/* --- pins (HTML por cima do SVG) --- */
+.rede-pin{position:absolute;width:0;height:0;z-index:10}
+.rede-pin__botao{position:absolute;left:-12px;top:-12px;width:24px;height:24px;
+  padding:0;border:1px solid #020E66;border-radius:50%;background:#00ADEC;color:#020E66;
+  cursor:pointer;font-family:var(--fontFamily),Arial,sans-serif;font-size:12px;
+  font-weight:800;line-height:22px;text-align:center;
+  box-shadow:0 0 0 4px rgba(0,173,236,.25);
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
+.rede-pin__botao:hover,.rede-pin__botao:focus-visible{outline:0;background:#fff;
+  box-shadow:0 0 0 7px rgba(0,173,236,.4)}
+.rede-pin.is-realce .rede-pin__botao{background:#fff;transform:scale(1.2);
+  box-shadow:0 0 0 8px rgba(0,173,236,.45)}
+/* o cartao encosta na borda de baixo do botao (top:15px = raio do botao): sem
+   vao, o mouse vai do pin ate o link sem o cartao sumir */
+.rede-pin__card{position:absolute;left:50%;top:12px;width:270px;
+  transform:translateX(-50%);padding:14px 0 0;opacity:0;visibility:hidden;
+  pointer-events:none;transition:opacity .15s ease}
+.rede-pin__card-corpo{background:#020E66;border:1px solid #00ADEC;
+  box-shadow:0 12px 30px rgba(0,0,0,.45);padding:16px 18px}
+.rede-pin:hover,.rede-pin:focus-within,.rede-pin.is-aberto{z-index:40}
+.rede-pin:hover .rede-pin__card,.rede-pin:focus-within .rede-pin__card,
+.rede-pin.is-aberto .rede-pin__card{opacity:1;visibility:visible;pointer-events:auto}
+.rede-pin__nome{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:18px;font-weight:700;line-height:130%;margin:0 0 6px}
+.rede-pin__local{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;line-height:140%;margin:0 0 10px}
+.rede-pin__desc{color:rgba(255,255,255,.85);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;line-height:140%;margin:0 0 10px}
+.rede-pin__link{display:inline-block;color:#00ADEC;
+  font-family:var(--fontFamily),Arial,sans-serif;font-size:14px;font-weight:700;
+  text-decoration:none}
+.rede-pin__link:hover,.rede-pin__link:focus{color:#fff;text-decoration:underline}
+/* pins colados na borda direita do mapa jogariam o cartao para fora */
+.rede-pin--esq .rede-pin__card{left:0;transform:none}
+.rede-pin--dir .rede-pin__card{left:auto;right:0;transform:none}
+
+.rede-mapa__legenda{display:flex;flex-wrap:wrap;gap:24px;margin:18px 0 0;padding:0;
+  list-style:none;color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:15px}
+.rede-mapa__legenda li{display:flex;align-items:center;gap:10px}
+.rede-mapa__chave{width:16px;height:16px;border-radius:50%;flex:none;display:inline-block;
+  background:#00ADEC}
+.rede-mapa__nota{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;margin:12px 0 0}
+
+.rede-lista{display:flex;flex-wrap:wrap;gap:16px;margin:0;padding:0;list-style:none}
+.rede-lista__item{flex:1 1 300px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(170,213,232,.3);padding:24px;display:flex;
+  flex-direction:column;gap:8px;transition:border-color .15s ease,background .15s ease}
+.rede-lista__item:hover{background:rgba(255,255,255,.1);border-color:#00ADEC}
+.rede-lista__num{display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:50%;background:#00ADEC;color:#020E66;
+  font-family:var(--fontFamily),Arial,sans-serif;font-weight:800;font-size:14px}
+.rede-lista__nome{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:22px;font-weight:700;margin:0}
+.rede-lista__local{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:15px;margin:0}
+.rede-lista__link{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:15px;font-weight:700;text-decoration:none;margin-top:auto}
+.rede-lista__link:hover{color:#fff}
+@media only screen and (max-width: 991px){
+  .rede-mapa__box{padding:10px}
+  /* no celular o mapa fica com ~340px de largura: os pins da Europa encostam
+     mesmo assim. A lista abaixo do mapa e que cumpre o papel de leitura la. */
+  .rede-pin__botao{left:-11px;top:-11px;width:22px;height:22px;line-height:20px;
+    font-size:11px;box-shadow:0 0 0 3px rgba(0,173,236,.25)}
+  .rede-pin__card{width:230px;top:11px}
+  .rede-lista__item{flex:1 1 100%}
+}
+/* onda9:rede:fim */
