@@ -19,19 +19,19 @@ import sys
 
 TEXTOS = {
     "pt": (
-        u"Estratégia<br>Resultados<br>Parceria",
+        u"Estratégia<br>Confiança<br>Resultado",
         u"Trabalhamos lado a lado com a alta gestão, combinando profundidade "
         u"analítica e abordagens inovadoras para resolver os desafios que mais "
         u"importam — e entregar resultados que permanecem",
     ),
     "en": (
-        u"Strategy<br>Results<br>Partnership",
+        u"Strategy<br>Trust<br>Results",
         u"We work side by side with senior leadership, combining analytical depth "
         u"and innovative approaches to solve the challenges that matter most — and "
         u"deliver results that last",
     ),
     "de": (
-        u"Strategie<br>Ergebnisse<br>Partnerschaft",
+        u"Strategie<br>Vertrauen<br>Ergebnisse",
         u"Wir arbeiten Seite an Seite mit dem Top-Management und verbinden "
         u"analytische Tiefe mit innovativen Ansätzen, um die entscheidenden "
         u"Herausforderungen zu lösen – und Ergebnisse zu liefern, die Bestand haben",
