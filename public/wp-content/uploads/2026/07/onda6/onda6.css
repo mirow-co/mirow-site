@@ -208,3 +208,23 @@
   .single:not(.single-experience) .menu__contatos-link{color:#020e66;opacity:.75}
 }
 /* onda8:menu-contatos:fim */
+
+/* onda8:hero-slogan-alto:ini */
+/* onda8.2 — slogan mais alto e mais espacado, com "Resultado" parado */
+@media only screen and (min-width: 992px){
+  /* 3 x 99,2 = 297,6; -68,6 + 297,6 + 12,8 = 241,8 = altura de margem de hoje */
+  .homepage .banner h2{
+    line-height:160%;
+    margin-top:-68.6px;
+    margin-bottom:12.8px;
+  }
+}
+@media only screen and (min-width: 992px) and (max-height: 839px){
+  /* pouca folga sob o header: aumento menor, mesma conta */
+  .homepage .banner h2{
+    line-height:126%;
+    margin-top:-15.8px;
+    margin-bottom:23.4px;
+  }
+}
+/* onda8:hero-slogan-alto:fim */
