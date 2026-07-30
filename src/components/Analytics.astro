@@ -4,9 +4,9 @@
 // O Measurement ID (G-XXXXXXX) é público por natureza; entra via env var para
 // permitir ligar/desligar por ambiente (ex.: só em produção).
 //
-// IMPORTANTE (LGPD): GA4 usa cookie. Só definir PUBLIC_GA_ID em produção depois
-// de resolver o aviso de consentimento (decisão pendente na #3 do mirow-marketing:
-// banner de cookies vs. Cloudflare Web Analytics sem cookie).
+// LGPD: usa Google Consent Mode v2 com default 'denied' (abaixo), então roda
+// cookieless ate o consentimento. Mesmo assim, o banner de cookies para dar
+// 'granted' segue como decisao pendente na #3 (banner vs. Cloudflare sem cookie).
 // process.env (não import.meta.env) para pegar a var tanto de .env local quanto
 // do ambiente de build do CI (GitHub Actions). O frontmatter roda em Node no build.
 const GA_ID = process.env.PUBLIC_GA_ID;
@@ -21,6 +21,16 @@ const GA_ID = process.env.PUBLIC_GA_ID;
         function gtag() {
           dataLayer.push(arguments);
         }
+        // Consent Mode v2 — default 'denied' ANTES de qualquer config: o GA4 roda
+        // cookieless (pings sem armazenamento) ate haver consentimento. Quando o
+        // banner de cookies existir, ele chama gtag('consent','update',{...:'granted'}).
+        gtag('consent', 'default', {
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          analytics_storage: 'denied',
+          wait_for_update: 500,
+        });
         gtag('js', new Date());
         gtag('config', GA_ID);
       </script>
