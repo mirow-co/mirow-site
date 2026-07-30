@@ -18,12 +18,10 @@ const insights = (await getCollection('insights'))
   .filter((p) => p.id.startsWith(`${lang}/`))
   .sort((a, b) => b.data.date.localeCompare(a.data.date));
 
-// Barra rolante de logos (C07): entram SO os clientes que o socio listou como
-// autorizados (clearance === 'partner-listed'). Sotreq esta no clients.json como
-// 'needs-confirmation' e por isso NAO aparece — a trava de C08 (logo de cliente
-// e uso de marca de terceiro) vale mesmo quando o nome veio do socio.
-// Nao ha PNG de logo no repo ainda (logo: null em todos), entao a barra roda com
-// wordmark tipografico — honesto e sem baixar marca de terceiro antes da checagem.
+// Barra rolante de clientes: o clients.json deste repositorio contem apenas os
+// clientes ja aprovados para exibicao publica (a curadoria e a checagem de
+// autorizacao acontecem fora deste repositorio). So renderiza clearance aprovado.
+// Nao ha PNG de logo no repo ainda, entao a barra roda com wordmark tipografico.
 const barClients = clients.filter((c) => c.clearance === 'partner-listed');
 const barLoop = [...barClients, ...barClients]; // duplicado para o loop continuo
 
