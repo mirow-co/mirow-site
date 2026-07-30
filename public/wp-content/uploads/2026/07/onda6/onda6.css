@@ -1,0 +1,10 @@
+/* onda6 — 3 cards estaticos de praticas na home. CSS proprio, nao toca no tema. */
+.praticas-3{display:flex;flex-wrap:wrap;gap:20px;margin:0;padding:0;list-style:none}
+.praticas-3__card{flex:1 1 300px;display:flex;flex-direction:column;margin-bottom:0}
+.praticas-3__card .home-experience__list-item-content{display:block;flex:1 0 auto;
+  margin-bottom:20px}
+.praticas-3__card .home-experience__list-item-more{display:inline-block;margin-top:auto}
+@media only screen and (max-width: 991px){
+  .praticas-3{gap:10px}
+  .praticas-3__card{flex:1 1 100%}
+}
