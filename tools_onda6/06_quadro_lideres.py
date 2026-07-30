@@ -4,12 +4,15 @@
 
 Uso:  python tools_onda6/06_quadro_lideres.py <raiz-da-arvore>
 
-Composicao decidida pelo Mario (30/07), valendo para a home e para as paginas de
-lideres, em todas as linguas:
+Composicao decidida pelo Mario (30/07), em todas as linguas:
 
+  PAGINAS DE LIDERES (quadro completo, 8 pessoas):
   1 Andreas Mirow  2 Felipe Diniz  3 Prof. Dr Stephan Friedrich
   4 Elmar Gans (Senior Expert)  5 Renato Alvarenga  6 Michael Munch
   7 Raoni Morais  8 Joao Daniel Ramos (Gerente de projetos / Engagement manager)
+
+  HOME (capa) — revisao do Mario no mesmo dia: so os 4 primeiros
+  (Andreas, Felipe, Stephan, Elmar). Os 8 completos ficam nas paginas de lideres.
 
 - Saem: Giulia Turcato, Lucas Duarte, Mariana Nakagawa, Matheus Strapasson.
 - Cargos dos demais ficam como o site ja usa; so o Elmar muda (-> Senior Expert).
@@ -150,7 +153,9 @@ def processa(path, pub):
 
     partes = []
     novos = []
-    for chave, nome, cargo, cargo_novo, foto in ORDEM:
+    # a home mostra so os 4 primeiros; o quadro completo fica nas paginas de lideres
+    composicao = ORDEM[:4] if tipo == "home" else ORDEM
+    for chave, nome, cargo, cargo_novo, foto in composicao:
         cargo_alvo = cargo
         if chave == "joao":
             cargo_alvo = CARGO_JOAO[idioma]

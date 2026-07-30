@@ -4,12 +4,13 @@
 
 Uso:  python tools_onda6/07_verificar_ordem_secoes.py <raiz-da-arvore>
 
-Ordem esperada apos a onda 6 (lista do Mario, itens 3 a 7):
+Ordem esperada apos a onda 6 + a revisao do Mario (itens 2 e 7 da revisao):
 
-  banner (titulo + subtitulo) -> clientes-logos -> our-jobs -> home-experience
-  -> our-numbers (numeros) -> certificates (reconhecimentos) -> home-leaders -> links
+  banner (titulo + subtitulo) -> clientes-logos -> home-experience
+  -> our-numbers (numeros) -> home-leaders (lideres)
+  -> certificates (reconhecimentos) -> links
 
-- Nao ha mais testimonial nem posts no hero.
+- Nao ha mais testimonial, nem posts no hero, nem o bloco our-jobs.
 - Script de leitura: reporta a ordem encontrada e falha (exit 1) se divergir, para
   a divergencia aparecer no QA em vez de passar batido. Nao edita nada.
 """
@@ -18,10 +19,10 @@ import os
 import re
 import sys
 
-ESPERADA = ["banner", "clientes-logos", "our-jobs", "home-experience",
-            "our-numbers", "certificates", "home-leaders", "links"]
+ESPERADA = ["banner", "clientes-logos", "home-experience",
+            "our-numbers", "home-leaders", "certificates", "links"]
 
-PROIBIDAS = ["testimonial"]
+PROIBIDAS = ["testimonial", "our-jobs"]
 
 HOMES = ["pt/index.html", "en/index.html", "en/homepage/index.html", "de/index.html"]
 
