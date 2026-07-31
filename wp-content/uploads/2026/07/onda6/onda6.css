@@ -442,3 +442,35 @@
    azul-claro do gradiente entre o CTA e o footer — a "sobra" da home. */
 .home .wrap-gradient-2{padding-bottom:0}
 /* onda14:fundo-sem-sobras:fim */
+
+/* onda15:hero-scrims:ini */
+/* S-34: legibilidade do hero sobre a foto da lampada. Vidro fosco branco
+   translucido — pedido explicito de "fundo com um branco transparente". */
+.hero-texto{
+  display:inline-block;max-width:780px;
+  background:rgba(255,255,255,.10);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border-radius:14px;padding:26px 30px;margin-left:-30px}
+.banner--malha .hero-numeros{
+  background:rgba(255,255,255,.10);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border-radius:14px;padding:20px 24px}
+/* onda15:hero-scrims:fim */
+
+/* onda15:barras-gemeas:ini */
+/* S-36: as duas barras gemeas. A superior adota a fonte da inferior
+   (peso 400, 15px); os canais de comunicacao ganham tamanho nas duas. */
+.menu__nav-link{font-weight:400 !important;font-size:15px !important}
+.rodape-menu a{font-size:15px}
+.menu__contatos svg{width:22px !important;height:22px !important}
+.rodape-contatos{display:flex;justify-content:center;gap:22px;
+  margin:14px 0 0;padding:0;list-style:none}
+/* o tema esconde .menu__contatos no mobile e empurra para a direita no
+   desktop (margin-left:auto) — no rodape ele fica visivel e centrado */
+.rodape-contatos .menu__contatos{display:flex;gap:26px;align-items:center;
+  margin-left:0 !important;padding-right:0 !important}
+.rodape-contatos .menu__contatos-link{color:#fff;opacity:.9}
+.rodape-contatos .menu__contatos-link:hover{color:#00ADEC;opacity:1}
+.rodape-contatos .menu__contatos-link svg{width:22px !important;
+  height:22px !important}
+/* onda15:barras-gemeas:fim */
