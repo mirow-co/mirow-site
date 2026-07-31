@@ -125,9 +125,7 @@ FALTAS_CONHECIDAS = {
 
 # Pedidos aceitos e ainda não implementados: entram como PENDENTE com a issue.
 # Ao implementar, MOVER para uma asserção de verdade (e tirar daqui).
-PENDENTES = [
-    ("P-S03", "SOTREQ na barra de clientes das 4 homes", "S-03"),
-]
+PENDENTES = []
 
 # Título da barra de clientes por idioma (S-02): gerado por tools/gen_clients.py
 # a partir do arquivo mestre — os textos aqui têm que bater com os de lá.
@@ -594,6 +592,14 @@ def estaticas(s):
             det.append(u"Elmar como Managing Partner em: %s" % ", ".join(elmar[:3]))
         return (not ruins and not elmar, u"; ".join(det))
     s.check("S28", u'0 "Private:" no site; Elmar sempre Senior Expert', s28)
+
+    def s03():
+        # S-03 (#53): a Sotreq — o caso que originou o P3 — na barra das 4
+        # homes. H03/H04 já cobrem contagem e paridade com o mestre; esta
+        # asserção grava o pedido nominal que ficou 2 ondas bloqueado.
+        ruins = [rel for rel in HOMES if "/clientes/sotreq.svg" not in s.ler(rel)]
+        return (not ruins, u"Sotreq ausente de: %s" % ", ".join(ruins))
+    s.check("S03", u"Sotreq na barra de clientes das 4 homes", s03)
 
 
 # ------------------------------------------------------- asserções ao vivo
