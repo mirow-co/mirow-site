@@ -70,6 +70,7 @@ BLOCOS_CSS = [
     "onda10:header-contraste", "onda10:hero-escadinha", "onda10:numeros",
     "onda10:hero-numeros", "onda10:clientes-barra",
     "onda11:s13-form-topo", "onda12:praticas-nav", "onda13:hero-malha",
+    "onda14:hero-malha-cheia", "onda14:menu-executivo", "onda14:fundo-sem-sobras",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -82,7 +83,7 @@ MARCADORES = [
     ("onda7:menu-sobre", 275), ("onda7:menu-praticas", 275), ("onda7:menu-carreiras", 200),
     ("onda8:menu-contatos", 275), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
     ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 5),
-    ("onda13:hero-malha", 4),
+    ("onda13:hero-malha", 4), ("onda14:rodape-menu", 275),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -513,25 +514,20 @@ def estaticas(s):
     s.check("S04", u"contraste dos ícones cobre o estado hover do header", s04)
 
     def s06():
-        # S-06: (a) textos da seção de números sem ponto FINAL; (b) escada com
-        # seta ↗ no CSS. Abreviação interna (o "Mrd." alemão) não conta.
+        # S-06 (reescrita na onda 14): a seção "nossos números" saiu da home
+        # (S-31) — os números vivem no hero (S-27). Sem ponto FINAL nos textos.
+        # Abreviação interna (o "Mrd." alemão) não conta.
         ruins = []
         for rel in HOMES:
             h = s.ler(rel)
-            m = re.search(r'our-numbers__list">(.*?)</div>\s*</div>\s*</section>', h, re.S)
-            if not m:
-                ruins.append("%s sem seção de números" % rel)
-                continue
-            for txt in re.findall(r'<span>([^<]*)</span>', m.group(1)):
+            txts = re.findall(r'hero-numeros__texto">([^<]*)</span>', h)
+            if not txts:
+                ruins.append("%s sem números no hero" % rel)
+            for txt in txts:
                 if txt.rstrip().endswith("."):
                     ruins.append("%s: %r" % (rel, txt[-30:]))
-        css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
-        ini = css.find("/* onda10:numeros:ini */")
-        fim = css.find("/* onda10:numeros:fim */")
-        if ini < 0 or u"↗" not in css[ini:fim]:
-            ruins.append(u"bloco onda10:numeros sem a seta ↗")
         return (not ruins, u"; ".join(ruins))
-    s.check("S06", u"números da home sem ponto final, escada com seta", s06)
+    s.check("S06", u"números do hero sem ponto final", s06)
 
     def s07():
         # S-07 (onda 9): a <section class="offices"> — escritórios, endereços,
@@ -622,6 +618,48 @@ def estaticas(s):
             det.append(u"; ".join(ruins))
         return (not mp4 and not ruins, u"; ".join(det))
     s.check("S23", u"hero com malha animada; 0 referência ao MP4 de 22,8 MB", s23)
+
+    def s30():
+        # S-30 (#82): a malha preenche o quadro — a classe que desliga a
+        # máscara vertical do tema tem que estar no div do hero das 4 homes.
+        ruins = [rel for rel in HOMES
+                 if 'banner__background banner__background--malha' not in s.ler(rel)]
+        return (not ruins, u"classe da malha cheia ausente de: %s" % ", ".join(ruins))
+    s.check("S30", u"malha do hero sem a máscara do tema (borda esmaecida)", s30)
+
+    def s31():
+        # S-31 (#83): a seção "nossos números" saiu da home (números no hero).
+        ruins = [rel for rel in HOMES if "our-numbers" in s.ler(rel)]
+        return (not ruins, u'seção "nossos números" ainda em: %s' % ", ".join(ruins))
+    s.check("S31", u'0 seções "nossos números" nas 4 homes', s31)
+
+    def s05():
+        # S-05 (#54): cards de expertise curtos e executivos — o corpo de cada
+        # card cabe em 1 frase (~140 chars). Antes tinham 300-400.
+        ruins = []
+        for rel in HOMES:
+            h = s.ler(rel)
+            for m in re.finditer(
+                    r'home-experience__list-item-content"><p>(.*?)</p>', h, re.S):
+                txt = re.sub(r"<[^>]+>", "", m.group(1)).strip()
+                if len(txt) > 160:
+                    ruins.append("%s: %d chars (%r...)" % (rel, len(txt), txt[:40]))
+        return (not ruins, u"; ".join(ruins))
+    s.check("S05", u"cards de expertise com texto curto (1 frase executiva)", s05)
+
+    def s32():
+        # S-32 (#84): dropdown do menu com a altura do conteúdo (o min-height
+        # de tela inteira do tema anulado no bloco) + nav no rodapé (marcador
+        # coberto pela M-assertion onda14:rodape-menu).
+        css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
+        ini = css.find("/* onda14:menu-executivo:ini */")
+        fim = css.find("/* onda14:menu-executivo:fim */")
+        if ini < 0 or fim < 0:
+            return (False, u"bloco onda14:menu-executivo ausente")
+        bloco = css[ini:fim]
+        faltam = [ag for ag in ("min-height:0", ".rodape-menu") if ag not in bloco]
+        return (not faltam, u"bloco sem: %s" % ", ".join(faltam))
+    s.check("S32", u"dropdown do menu ajustado ao conteúdo; nav do rodapé estilizada", s32)
 
 
 # ------------------------------------------------------- asserções ao vivo
