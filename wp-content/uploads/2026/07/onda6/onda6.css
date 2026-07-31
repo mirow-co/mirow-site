@@ -393,3 +393,15 @@
   .job-contact--topo{padding:40px 0 60px !important}
 }
 /* onda11:s13-form-topo:fim */
+
+/* onda13:hero-malha:ini */
+/* S-23 (#73): a regra do tema so cobre `.banner__background video`; a malha
+   estatica + canvas precisam do proprio posicionamento. opacity .5 na imagem =
+   o mesmo que o tema aplicava no video (sem isso o slogan branco briga com a
+   malha acesa do canto inferior esquerdo — verificado no prototipo). */
+.banner__background .hero-malha__img{
+  position:absolute;top:0;left:0;width:100% !important;height:100% !important;
+  object-fit:cover;opacity:.5;backface-visibility:hidden}
+.banner__background .hero-malha__canvas{
+  position:absolute;top:0;left:0;width:100%;height:100%}
+/* onda13:hero-malha:fim */
