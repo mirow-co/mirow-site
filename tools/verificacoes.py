@@ -63,7 +63,7 @@ ASSETS_PROPRIOS = [
 
 # Blocos de CSS marcados que precisam existir no onda6.css (um por entrega).
 BLOCOS_CSS = [
-    "onda7:home-hero", "onda7:lideres-link", "onda7:rede",
+    "onda7:home-hero", "onda7:lideres-link", "onda9:rede",
     "onda8:hero-contatos", "onda8:dobra", "onda8:hero-contatos-v2",
     "onda8:menu-contatos", "onda8:hero-slogan-alto",
 ]
