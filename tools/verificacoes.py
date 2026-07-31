@@ -71,7 +71,7 @@ BLOCOS_CSS = [
     "onda10:hero-numeros", "onda10:clientes-barra",
     "onda11:s13-form-topo", "onda12:praticas-nav", "onda13:hero-malha",
     "onda14:hero-malha-cheia", "onda14:menu-executivo", "onda14:fundo-sem-sobras",
-    "onda15:hero-scrims", "onda15:barras-gemeas",
+    "onda15:hero-scrims", "onda15:barras-gemeas", "onda15:rodape-barra",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -84,8 +84,11 @@ MARCADORES = [
     ("onda7:menu-sobre", 275), ("onda7:menu-praticas", 275), ("onda7:menu-carreiras", 200),
     ("onda8:menu-contatos", 275), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
     ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 5),
-    ("onda13:hero-malha", 4), ("onda14:rodape-menu", 275),
-    ("onda15:hero-texto", 4), ("onda15:rodape-contatos", 275),
+    ("onda13:hero-malha", 4),
+    # onda14:rodape-menu e onda15:rodape-contatos saíram em 31/07 (decisão
+    # explícita do Mario na #91: "IDENTICAS" — a nav recriada virou o clone
+    # literal onda15:rodape-barra).
+    ("onda15:hero-texto", 4), ("onda15:rodape-barra", 275),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -679,47 +682,35 @@ def estaticas(s):
     s.check("S34", u"hero com a foto da lâmpada + painéis de leitura", s34)
 
     def s36():
-        # S-36: as barras superior e inferior são gêmeas — os links da nav do
-        # rodapé têm que bater com os do header (práticas expandidas), e os 4
-        # canais de comunicação existem nas duas. Página a página.
-        rex_top = re.compile(
-            r'<(a|button)[^>]*class="[^"]*menu__nav-link[^"]*"[^>]*>(.*?)</\1>', re.S)
-        rex_sub = re.compile(r'<a class="menu__nav-sublink" href="([^"]*)">')
-        rex_rod = re.compile(r'rodape-menu">(.*?)</ul>', re.S)
+        # S-36 v2 ("IDENTICAS", Mario 31/07): a barra do rodapé é um CLONE
+        # literal do <nav class="menu"> do header — igual byte a byte, modulo
+        # os únicos ajustes permitidos (id do seletor de idioma renomeado e
+        # data-scroll-header removido). Página a página.
         ruins = []
         for rel, h in s.conteudo():
-            if "onda14:rodape-menu" not in h:
+            if '<footer class="footer">' not in h:
                 continue
-            esperados = []
-            m = re.search(r'<!-- onda7:menu-praticas -->(.*?)<!-- /onda7:menu-praticas -->',
-                          h, re.S)
-            praticas = rex_sub.findall(m.group(1)) if m else []
-            for t in rex_top.finditer(h):
-                href = re.search(r'href="([^"]*)"', t.group(0))
-                if not href or href.group(1) in ("#", ""):
-                    esperados.extend(praticas)
-                else:
-                    esperados.append(href.group(1))
-                if len(esperados) > 12:
-                    break
-            mr = rex_rod.search(h)
-            achados = re.findall(r'href="([^"]*)"', mr.group(1)) if mr else []
-            # dedup preservando ordem (mesma regra do gerador)
-            vistos, unicos = set(), []
-            for u in esperados:
-                if u not in vistos:
-                    vistos.add(u)
-                    unicos.append(u)
-            if achados != unicos:
-                ruins.append(rel)
-            i = h.find("onda15:rodape-contatos")
-            trecho = h[i:i + 6000] if i >= 0 else ""
-            faltam = [nome for nome, agulha in CANAIS if agulha not in trecho]
-            if i < 0 or faltam:
-                ruins.append("%s sem canais (%s)" % (rel, "/".join(faltam) or "bloco"))
-        return (not ruins, u"%d página(s) com as barras fora de paralelo: %s"
-                % (len(ruins), "; ".join(str(r) for r in ruins[:3])))
-    s.check("S36", u"barras superior e inferior paralelas (links e canais)", s36)
+            i = h.find('<nav class="menu"')
+            j = h.find('</nav>', i)
+            if i < 0 or j < 0:
+                continue
+            header = h[i:j + 6]
+            ini = h.find("<!-- onda15:rodape-barra -->")
+            fim = h.find("<!-- /onda15:rodape-barra -->")
+            if ini < 0 or fim < 0:
+                ruins.append("%s sem a barra clonada" % rel)
+                continue
+            bloco = h[ini:fim]
+            k = bloco.find('<nav class="menu"')
+            clone = bloco[k:bloco.rfind('</nav>') + 6] if k >= 0 else ""
+            # desfaz os ajustes de contexto e compara
+            desfeito = (clone.replace('check-rodape', 'check'))
+            original = (header.replace(' data-scroll-header=""', '')
+                        .replace(' data-scroll-header', ''))
+            if desfeito != original:
+                ruins.append("%s com clone divergente do header" % rel)
+        return (not ruins, u"%d página(s): %s" % (len(ruins), "; ".join(ruins[:3])))
+    s.check("S36", u"barra do rodapé IDÊNTICA à superior (clone literal, por página)", s36)
 
 
 # ------------------------------------------------------- asserções ao vivo

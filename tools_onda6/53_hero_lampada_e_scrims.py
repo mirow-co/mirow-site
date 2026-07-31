@@ -46,6 +46,10 @@ CSS = """/* S-34: legibilidade do hero sobre a foto da lampada. Vidro fosco bran
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
   border-radius:14px;padding:26px 30px;margin-left:-30px}
+/* a onda 8.2 subia o slogan com margin-top negativa — dentro do painel isso
+   jogava o "Estratégia" para FORA da caixinha (achado do Mario, 31/07). O
+   painel contem o h2; a dobra exata e re-medida pelo onda8-dobra.js. */
+.hero-texto h2{margin-top:0 !important}
 .banner--malha .hero-numeros{
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
