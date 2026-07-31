@@ -58,6 +58,7 @@ HOMES = ["pt/index.html", "en/index.html", "de/index.html", "en/homepage/index.h
 ASSETS_PROPRIOS = [
     "wp-content/uploads/2026/07/onda6/onda6.css",
     "wp-content/uploads/2026/07/onda6/onda8-dobra.js",
+    "wp-content/uploads/2026/07/onda6/onda13-hero-plexus.js",
     "wp-content/uploads/2026/07/clientes/clientes-logos.css",
 ]
 
@@ -68,7 +69,7 @@ BLOCOS_CSS = [
     "onda8:menu-contatos", "onda8:hero-slogan-alto",
     "onda10:header-contraste", "onda10:hero-escadinha", "onda10:numeros",
     "onda10:hero-numeros", "onda10:clientes-barra",
-    "onda11:s13-form-topo", "onda12:praticas-nav",
+    "onda11:s13-form-topo", "onda12:praticas-nav", "onda13:hero-malha",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -81,6 +82,7 @@ MARCADORES = [
     ("onda7:menu-sobre", 275), ("onda7:menu-praticas", 275), ("onda7:menu-carreiras", 200),
     ("onda8:menu-contatos", 275), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
     ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 5),
+    ("onda13:hero-malha", 4),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -600,6 +602,26 @@ def estaticas(s):
         ruins = [rel for rel in HOMES if "/clientes/sotreq.svg" not in s.ler(rel)]
         return (not ruins, u"Sotreq ausente de: %s" % ", ".join(ruins))
     s.check("S03", u"Sotreq na barra de clientes das 4 homes", s03)
+
+    def s23():
+        # S-23 (#73): o hero e a malha animada (Variante B) — o MP4 de 22,8 MB
+        # nao pode voltar em NENHUMA pagina, e as 4 homes precisam da img +
+        # canvas + JS da camada viva.
+        mp4 = [rel for rel, h in s.todas() if "video-bg-home-1.mp4" in h]
+        ruins = []
+        for rel in HOMES:
+            h = s.ler(rel)
+            faltam = [ag for ag in ("hero-malha__img", "hero-malha__canvas",
+                                    "onda13-hero-plexus.js") if ag not in h]
+            if faltam:
+                ruins.append("%s sem %s" % (rel, "/".join(faltam)))
+        det = []
+        if mp4:
+            det.append(u"MP4 do hero ainda em %d página(s): %s" % (len(mp4), ", ".join(mp4[:3])))
+        if ruins:
+            det.append(u"; ".join(ruins))
+        return (not mp4 and not ruins, u"; ".join(det))
+    s.check("S23", u"hero com malha animada; 0 referência ao MP4 de 22,8 MB", s23)
 
 
 # ------------------------------------------------------- asserções ao vivo
