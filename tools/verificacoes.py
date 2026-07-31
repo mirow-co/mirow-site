@@ -580,6 +580,21 @@ def estaticas(s):
         return (not ruins, u"; ".join(ruins))
     s.check("S13", u"formulário de carreiras na 1ª dobra (antes das outras seções)", s13)
 
+    def s28():
+        # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
+        # privado) e não pode aparecer em página nenhuma; o Elmar é Senior
+        # Expert (decisão da onda 6) — nunca mais Managing Partner.
+        ruins = [rel for rel, h in s.todas() if "Private:" in h]
+        elmar = [rel for rel, h in s.todas()
+                 if re.search(r'Elmar Gans</(?:strong|h4)>(?:<[^>]*>)?Managing Partner', h)]
+        det = []
+        if ruins:
+            det.append(u'"Private:" em %d página(s): %s' % (len(ruins), ", ".join(ruins[:3])))
+        if elmar:
+            det.append(u"Elmar como Managing Partner em: %s" % ", ".join(elmar[:3]))
+        return (not ruins and not elmar, u"; ".join(det))
+    s.check("S28", u'0 "Private:" no site; Elmar sempre Senior Expert', s28)
+
 
 # ------------------------------------------------------- asserções ao vivo
 
