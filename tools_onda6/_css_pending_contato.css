@@ -1,0 +1,39 @@
+/* ============================================================================
+   PROPOSTA DE CSS — onda 11 (issues S-08, S-12, S-13)
+   ----------------------------------------------------------------------------
+   Este arquivo NAO e carregado pelo site (nao ha <link> apontando pra ele).
+   E so a PROPOSTA de bloco a ser colado em
+   public/wp-content/uploads/2026/07/onda6/onda6.css (marcadores
+   /* onda11:<chave>:ini */ /* onda11:<chave>:fim */) depois que o Mario
+   aprovar visualmente — a instrucao desta onda foi explicitamente NAO editar
+   o onda6.css nem subir HTML/CSS ao vivo sem esse OK.
+   ============================================================================ */
+
+/* onda11:s13-form-topo:ini */
+/* Issue S-13 — o script 43_form_carreiras_topo.py moveu <section
+   class="job-contact"> (form de candidatura) para ser a 1a secao depois do
+   hero, na pagina de carreiras (pt/en/de + copia legada carreiras/).
+
+   O tema estiliza .job-contact com um hack de posicionamento:
+     .job-contact{margin-top:-500px;padding:800px 0 100px;position:relative;z-index:0}
+   Esse -500px/800px pressupunha ~500-800px de conteudo ANTES da secao — no
+   lugar antigo ela vinha logo apos o video de fundo de `.career-path`
+   (min-height:800px). Movida para o topo (logo apos o hero), sem esse
+   colchao de conteudo acima, o valor negativo estoura por cima do proprio
+   hero.
+
+   O script ja adiciona a classe extra `job-contact--topo` na secao movida
+   (visivel em <section class="job-contact job-contact--topo">) — so falta
+   esta regra para neutralizar o hack nesta posicao. Valores calibrados pelos
+   vizinhos de espacamento ja usados no restante da pagina de carreiras
+   (.value-offer{margin:150px 0;padding:50px 0}, .career-path{margin:50px 0
+   100px}) — ~60px de respiro no topo, 100px embaixo, iguais aos das outras
+   secoes da mesma pagina. */
+.job-contact--topo{
+  margin-top:0 !important;
+  padding:60px 0 100px !important;
+}
+@media only screen and (max-width: 767px){
+  .job-contact--topo{padding:40px 0 60px !important}
+}
+/* onda11:s13-form-topo:fim */

@@ -66,6 +66,9 @@ BLOCOS_CSS = [
     "onda7:home-hero", "onda7:lideres-link", "onda9:rede",
     "onda8:hero-contatos", "onda8:dobra", "onda8:hero-contatos-v2",
     "onda8:menu-contatos", "onda8:hero-slogan-alto",
+    "onda10:header-contraste", "onda10:hero-escadinha", "onda10:numeros",
+    "onda10:hero-numeros", "onda10:clientes-barra",
+    "onda11:s13-form-topo", "onda12:praticas-nav",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -77,6 +80,7 @@ MARCADORES = [
     ("onda5:clientes-logos", 4), ("onda6:praticas", 4), ("onda7:lideres-link", 4),
     ("onda7:menu-sobre", 275), ("onda7:menu-praticas", 275), ("onda7:menu-carreiras", 200),
     ("onda8:menu-contatos", 275), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
+    ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 5),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -122,16 +126,24 @@ FALTAS_CONHECIDAS = {
 # Pedidos aceitos e ainda não implementados: entram como PENDENTE com a issue.
 # Ao implementar, MOVER para uma asserção de verdade (e tirar daqui).
 PENDENTES = [
-    ("P-S01", "slogan em escadinha (recuos crescentes)", "S-01"),
-    ("P-S02", 'título da barra = "Exemplos de Empresas que confiam na Mirow & Co."', "S-02"),
     ("P-S03", "SOTREQ na barra de clientes das 4 homes", "S-03"),
-    ("P-S04", "ícones de contato legíveis com o header branco (contraste medido)", "S-04"),
-    ("P-S06", "números do hero sem ponto final, com setas de progresso", "S-06"),
-    ("P-S07", "0 menções a escritórios/endereços nas páginas de contato", "S-07"),
-    ("P-S08", "4 canais de contato clicáveis no hero da página de contato", "S-08"),
-    ("P-S09", "0 rodas de 8 práticas nas páginas de prática", "S-09"),
-    ("P-S13", "formulário de carreiras na 1ª dobra", "S-13"),
 ]
+
+# Título da barra de clientes por idioma (S-02): gerado por tools/gen_clients.py
+# a partir do arquivo mestre — os textos aqui têm que bater com os de lá.
+TITULO_BARRA = {
+    "pt": u"Exemplos de Empresas que confiam na Mirow &amp; Co.",
+    "en": u"Examples of companies that trust Mirow &amp; Co.",
+    "de": u"Beispiele für Unternehmen, die Mirow &amp; Co. vertrauen",
+}
+
+# Páginas de contato (todas as variantes do espelho) — S-07 e S-08.
+CONTATOS = ["contato/index.html", "pt/contato/index.html", "en/contact-us/index.html",
+            "de/kontakt/index.html", "novo/contato/index.html"]
+
+# Páginas de carreiras — S-13.
+CARREIRAS = ["carreiras/index.html", "pt/carreiras/index.html",
+             "en/careers/index.html", "de/karrieren/index.html"]
 
 # ------------------------------------------------------------------ mecânica
 
@@ -457,6 +469,116 @@ def estaticas(s):
                     ruins.append("%s contém %s" % (rel, nome))
         return (not ruins, u"; ".join(ruins))
     s.check("L01", u"quem saiu não aparece nas homes/líderes", l01)
+
+    # S — pedidos das ondas 10-12 (promovidos de PENDENTE em 31/07/2026)
+    def s01():
+        # S-01: a APRESENTAÇÃO vira escadinha (3 spans .onda10-degrau); as
+        # PALAVRAS continuam protegidas pela H01 (a tripla nova é a issue #79).
+        ruins = []
+        for rel in HOMES:
+            h = s.ler(rel)
+            m = re.search(r'<h2 data-aos="fade-right">(.*?)</h2>', h, re.S)
+            bloco = m.group(1) if m else ""
+            degraus = re.findall(r'onda10-degrau--([123])', bloco)
+            if sorted(degraus) != ["1", "2", "3"]:
+                ruins.append("%s tem degraus %s" % (rel, degraus))
+        return (not ruins, u"; ".join(ruins))
+    s.check("S01", u"slogan em escadinha (3 degraus) nas 4 homes", s01)
+
+    def s02():
+        from _onda7_css import idioma_da_pagina
+        ruins = []
+        for rel in HOMES:
+            h = s.ler(rel)
+            esperado = TITULO_BARRA[idioma_da_pagina(h)]
+            m = re.search(r'clientes-logos__title[^>]*>([^<]*)<', h)
+            achado = m.group(1).strip() if m else ""
+            if achado != esperado:
+                ruins.append("%s: %r" % (rel, achado[:60]))
+        return (not ruins, u"título fora do mestre em: %s" % "; ".join(ruins))
+    s.check("S02", u"título da barra igual ao gerado do arquivo mestre (3 línguas)", s02)
+
+    def s04():
+        # S-04: o bug era o estado .menu:hover (barra fica branca em TODAS as
+        # páginas) sem cor de ícone tratada. O bloco tem que cobrir o hover e
+        # usar o navy medido (16.5:1 contra branco).
+        css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
+        ini = css.find("/* onda10:header-contraste:ini */")
+        fim = css.find("/* onda10:header-contraste:fim */")
+        if ini < 0 or fim < 0:
+            return (False, u"bloco onda10:header-contraste ausente do onda6.css")
+        bloco = css[ini:fim]
+        faltam = [ag for ag in (".menu:hover", "#020e66") if ag not in bloco]
+        return (not faltam, u"bloco sem: %s" % ", ".join(faltam))
+    s.check("S04", u"contraste dos ícones cobre o estado hover do header", s04)
+
+    def s06():
+        # S-06: (a) textos da seção de números sem ponto FINAL; (b) escada com
+        # seta ↗ no CSS. Abreviação interna (o "Mrd." alemão) não conta.
+        ruins = []
+        for rel in HOMES:
+            h = s.ler(rel)
+            m = re.search(r'our-numbers__list">(.*?)</div>\s*</div>\s*</section>', h, re.S)
+            if not m:
+                ruins.append("%s sem seção de números" % rel)
+                continue
+            for txt in re.findall(r'<span>([^<]*)</span>', m.group(1)):
+                if txt.rstrip().endswith("."):
+                    ruins.append("%s: %r" % (rel, txt[-30:]))
+        css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
+        ini = css.find("/* onda10:numeros:ini */")
+        fim = css.find("/* onda10:numeros:fim */")
+        if ini < 0 or u"↗" not in css[ini:fim]:
+            ruins.append(u"bloco onda10:numeros sem a seta ↗")
+        return (not ruins, u"; ".join(ruins))
+    s.check("S06", u"números da home sem ponto final, escada com seta", s06)
+
+    def s07():
+        # S-07 (onda 9): a <section class="offices"> — escritórios, endereços,
+        # mapa — saiu de todas as variantes da página de contato.
+        ruins = [rel for rel in CONTATOS
+                 if 'section class="offices"' in s.ler(rel)]
+        return (not ruins, u"bloco de escritórios ainda em: %s" % ", ".join(ruins))
+    s.check("S07", u"0 blocos de escritórios nas páginas de contato", s07)
+
+    def s08():
+        ruins = []
+        for rel in CONTATOS:
+            h = s.ler(rel)
+            i = h.find("<!-- onda11:s08-hero-contatos -->")
+            trecho = h[i:i + 8000] if i >= 0 else ""
+            faltam = [nome for nome, agulha in CANAIS if agulha not in trecho]
+            if i < 0:
+                ruins.append("%s sem o bloco" % rel)
+            elif faltam:
+                ruins.append("%s sem %s" % (rel, "/".join(faltam)))
+        return (not ruins, u"; ".join(ruins))
+    s.check("S08", u"4 canais de contato no hero das páginas de contato", s08)
+
+    def s09():
+        # S-09/S-20: a mandala de 8 práticas sumiu; no lugar, a navegação
+        # simples .praticas-nav (3 práticas atuais) nas ~97 páginas de prática.
+        sobrou = [rel for rel, h in s.todas() if "mandala-wrap" in h]
+        n_nav = sum(1 for _rel, h in s.todas() if "<!-- onda12:praticas-nav -->" in h)
+        ok = not sobrou and n_nav >= 90
+        return (ok, u"mandala em %d página(s) %s; praticas-nav em %d (esperado >= 90)"
+                % (len(sobrou), ", ".join(sobrou[:3]), n_nav))
+    s.check("S09", u"0 rodas de 8 práticas; navegação simples no lugar", s09)
+
+    def s13():
+        # S-13: o form de candidatura (.job-contact--topo) é a 1ª seção depois
+        # do hero em carreiras — tem que vir ANTES de .career-path no fonte.
+        ruins = []
+        for rel in CARREIRAS:
+            h = s.ler(rel)
+            i = h.find("job-contact--topo")
+            j = h.find("career-path")
+            if i < 0:
+                ruins.append("%s sem o form no topo" % rel)
+            elif j >= 0 and j < i:
+                ruins.append("%s com o form depois de career-path" % rel)
+        return (not ruins, u"; ".join(ruins))
+    s.check("S13", u"formulário de carreiras na 1ª dobra (antes das outras seções)", s13)
 
 
 # ------------------------------------------------------- asserções ao vivo

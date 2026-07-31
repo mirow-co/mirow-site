@@ -1,0 +1,26 @@
+/* CSS PROPOSTO -- NAO aplicado em onda6.css nesta sessao (instrucao explicita:
+   nao editar public/wp-content/uploads/2026/07/onda6/onda6.css nem rodar o
+   cache-busting nesta sessao, para nao conflitar com outro agente).
+
+   Cobre a navegacao simples que substitui a roda de 8 praticas (issue S-09 /
+   #58, script tools_onda6/37_remover_roda_praticas.py). Sem este bloco, os
+   3 links (classe .praticas-nav) ja funcionam -- herdam a cor/tipografia
+   padrao de link do tema -- mas ficam empilhados sem espacamento proprio.
+
+   Para aplicar: o orquestrador cola este bloco dentro de
+   public/wp-content/uploads/2026/07/onda6/onda6.css usando o helper
+   tools_onda6/_onda7_css.py:escrever_bloco_css(pub, "praticas-nav", CSS,
+   onda="onda12") -- ou manualmente, entre marcadores
+   /* onda12:praticas-nav:ini */ ... /* onda12:praticas-nav:fim */ -- e depois
+   roda 27_cache_busting.py por ultimo, como sempre.
+*/
+
+.praticas-nav{display:flex;flex-wrap:wrap;gap:12px 28px;margin:12px 0 0;padding:0;
+  list-style:none}
+.praticas-nav__item{margin:0}
+.praticas-nav__link{font-weight:600;text-decoration:underline;
+  text-underline-offset:3px}
+.praticas-nav__link:hover{text-decoration:none}
+@media only screen and (max-width: 991px){
+  .praticas-nav{gap:8px 20px}
+}

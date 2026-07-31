@@ -1,0 +1,42 @@
+/* _css_pending_imprensa.css — PROPOSTA, NÃO APLICADA.
+ *
+ * Issue: mirow-co/mirow-marketing#60 (S-11) — "melhorar a formatação dos pontos" da Imprensa.
+ *
+ * O script tools_onda6/45_imprensa-formatacao-pontos.py já resolveu o pedido por CONTEÚDO
+ * (estilo inline em cada <mark>/<hr> de public/imprensa/index.html e public/pt/imprensa/index.html),
+ * porque esta sessão está proibida de editar
+ * public/wp-content/uploads/2026/07/onda6/onda6.css diretamente.
+ *
+ * Este arquivo é só a versão "classe CSS" da mesma regra, para o caso de o Mario/dev preferir
+ * mover a formatação para uma classe reutilizável em vez de estilo inline repetido em 30 itens.
+ * Se aprovado, um próximo script deve:
+ *   1. adicionar este bloco (dentro dos marcadores onda12:imprensa-lista, ini e fim) no
+ *      onda6.css via tools_onda6/_onda7_css.py:escrever_bloco_css;
+ *   2. trocar o estilo inline de cada <mark>/<hr> pela classe correspondente
+ *      (ex.: <mark class="imprensa-data">, <hr class="imprensa-separador">);
+ *   3. adicionar a entrada correspondente em ASSETS_PROPRIOS/BLOCOS_CSS de tools/verificacoes.py
+ *      se quiser proteger o bloco contra regressão (fora do escopo desta sessão, que não edita
+ *      tools/verificacoes.py).
+ *
+ * Cores usadas já existem no projeto: rgba(170,213,232,.35) é a mesma borda sutil de
+ * .rede-mapa__box (onda6.css linha ~186); nenhuma cor nova introduzida.
+ */
+
+.imprensa-data {
+  background-color: #ffffff;
+  color: #091ae4;
+  padding: 3px 12px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.imprensa-item-titulo {
+  margin-top: 32px;
+}
+
+.imprensa-separador {
+  border: none;
+  border-top: 1px solid rgba(170, 213, 232, .35);
+  opacity: 1;
+  margin: 28px 0;
+}
