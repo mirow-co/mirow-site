@@ -2,6 +2,14 @@
 """
 21_pagina_nossa_rede.py — item 7 da lista do Mario (onda 7).
 
+SUPERSEDIDO NA ONDA 9 (2026-07-30): o Mario rejeitou o desenho de dois mapas
+(mundi + inset da Europa) descrito abaixo. Quem gera a pagina agora e o
+30_rede_mapa_unico.py — um mapa-mundi so, com cartao no hover de cada pin e sem
+nenhuma mencao a escritorio da propria Mirow. Este script NAO grava mais nada
+(sai logo no inicio do main); continua no repositorio porque o 30 importa daqui
+os contornos dos continentes (CONTINENTES), os parceiros de reserva e as
+localizacoes em alemao — e porque o historico do desenho antigo tem valor.
+
 Uso:  python tools_onda6/21_pagina_nossa_rede.py <raiz-que-contem-public>
 
 Cria a pagina "Nossa rede" nas 3 linguas, com UM MAPA UNICO mostrando onde estao
@@ -26,15 +34,13 @@ Reconhecimentos do MESMO idioma, para herdar exatamente o tema antigo; so o
 
 Idempotente: regera as 3 paginas por completo a cada execucao.
 """
+# Depois da onda 9 este modulo so guarda DADOS e funcoes de desenho (o
+# 30_rede_mapa_unico.py importa CONTINENTES, PARCEIROS_FALLBACK, LOC_DE e
+# BANNER daqui). Por isso nao ha mais import de _onda7_css nem de re: nada
+# aqui grava arquivo.
 import io
 import json
 import os
-import re
-import sys
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _onda7_css import (base_prefix, escrever_bloco_css, garantir_link_css,  # noqa: E402
-                        gravar, ler, resolve_public)
 
 # ---------------------------------------------------------------- parceiros
 
@@ -443,76 +449,13 @@ def monta_main(idioma, txt, parceiros, prefix):
 
 
 def main():
-    if len(sys.argv) < 2:
-        raise SystemExit(__doc__)
-    raiz = os.path.abspath(sys.argv[1])
-    pub = resolve_public(raiz)
-    if os.path.basename(raiz) == "public":
-        raiz = os.path.dirname(raiz)
-
-    parceiros, origem = carregar_parceiros(raiz)
-    print("parceiros: %d (fonte: %s)" % (len(parceiros), origem))
-    faltando = [p["name"] for p in parceiros if p["name"] not in COORD]
-    if faltando:
-        print("AVISO: sem coordenada, plotados em (0,0): %s" % faltando)
-
-    if escrever_bloco_css(pub, "rede", CSS):
-        print("css onda7:rede gravado")
-    else:
-        print("css onda7:rede ja atualizado")
-
-    escritos = 0
-    for idioma, txt in IDIOMAS.items():
-        shell_path = os.path.join(pub, txt["shell"].replace("/", os.sep))
-        if not os.path.exists(shell_path):
-            print("AVISO: casco ausente (%s)" % txt["shell"])
-            continue
-        html = ler(shell_path)
-        prefix = base_prefix(html)
-
-        # <main> novo
-        i = html.find("<main")
-        j = html.find("</main>") + len("</main>")
-        html = html[:i] + monta_main(idioma, txt, parceiros, prefix) + html[j:]
-
-        # metadados
-        html = re.sub(r"<title>.*?</title>", "<title>%s</title>" % txt["title"],
-                      html, flags=re.S)
-        html = re.sub(r'(<meta property="og:title" content=")[^"]*(")',
-                      lambda m: m.group(1) + txt["title"] + m.group(2), html)
-        url_pt = prefix + IDIOMAS["pt"]["slug"]
-        url_en = prefix + IDIOMAS["en"]["slug"]
-        url_de = prefix + IDIOMAS["de"]["slug"]
-        minha = prefix + txt["slug"]
-        html = re.sub(r'<link rel="canonical"[^>]*>',
-                      '<link rel="canonical" href="%s" />' % minha, html)
-        html = re.sub(r'(<meta property="og:url" content=")[^"]*(")',
-                      lambda m: m.group(1) + minha + m.group(2), html)
-        html = re.sub(r'<link rel="alternate" href="[^"]*" hreflang="pt" />',
-                      '<link rel="alternate" href="%s" hreflang="pt" />' % url_pt, html)
-        html = re.sub(r'<link rel="alternate" href="[^"]*" hreflang="en" />',
-                      '<link rel="alternate" href="%s" hreflang="en" />' % url_en, html)
-        html = re.sub(r'<link rel="alternate" href="[^"]*" hreflang="de" />',
-                      '<link rel="alternate" href="%s" hreflang="de" />' % url_de, html)
-        # oEmbed/JSON da pagina de origem nao valem para esta pagina
-        html = re.sub(r'<link rel="alternate" title="(?:oEmbed \((?:JSON|XML)\)|JSON)"[^>]*>',
-                      "", html)
-        html = re.sub(r'(<body[^>]*class=")[^"]*(")',
-                      lambda m: m.group(1) + "wp-singular page page-our-network wp-theme-mirow"
-                      + m.group(2), html)
-        html = garantir_link_css(html, prefix)
-
-        destino = os.path.join(pub, txt["slug"].replace("/", os.sep), "index.html")
-        os.makedirs(os.path.dirname(destino), exist_ok=True)
-        antigo = ler(destino) if os.path.exists(destino) else None
-        if antigo != html:
-            gravar(destino, html)
-            escritos += 1
-            print("pagina gravada: %s" % (txt["slug"] + "index.html"))
-        else:
-            print("sem mudanca: %s" % (txt["slug"] + "index.html"))
-
-    print("\nresumo: %d arquivo(s) alterado(s)" % escritos)
+    # Onda 9: a pagina passou a ser gerada pelo 30_rede_mapa_unico.py. Rodar os
+    # dois em sequencia faria um sobrescrever o outro a cada execucao — a
+    # sequencia da onda nunca convergiria. O corpo antigo (montagem do <main>
+    # com o inset da Europa e o marcador dos escritorios) saiu daqui; esta no
+    # historico do git, no commit anterior a este.
+    print("21_pagina_nossa_rede.py: SUPERSEDIDO pelo 30_rede_mapa_unico.py "
+          "(onda 9) - nada a fazer")
 
 
 if __name__ == "__main__":
