@@ -693,6 +693,29 @@ def estaticas(s):
         return (not ruins and not sem, u"; ".join(det))
     s.check("S38", u"linha legal do rodapé enxuta (só o link da política)", s38)
 
+    def s40():
+        # S-40: preview de link (WhatsApp/OG). og:image/og:url absolutas em
+        # toda página; as homes usam o cartão com o logo. ATENÇÃO: o host é o
+        # do Pages — na migração de DNS, rodar o script 60 com o host novo e
+        # atualizar aqui.
+        rex = re.compile(r'<meta (?:property|name)="(?:og:image|og:url|twitter:image)" '
+                         r'content="([^"]*)"')
+        relativas = []
+        for rel, h in s.conteudo():
+            for v in rex.findall(h):
+                if v.startswith("/"):
+                    relativas.append("%s -> %s" % (rel, v[:40]))
+                    break
+        sem_cartao = [rel for rel in HOMES
+                      if "onda6/og-mirow.png" not in s.ler(rel)]
+        det = []
+        if relativas:
+            det.append(u"%d página(s) com OG relativa: %s" % (len(relativas), "; ".join(relativas[:3])))
+        if sem_cartao:
+            det.append(u"homes sem o cartão do logo: %s" % ", ".join(sem_cartao))
+        return (not relativas and not sem_cartao, u"; ".join(det))
+    s.check("S40", u"preview de link: OG absoluto; cartão do logo nas homes", s40)
+
     def s36():
         # S-36 v2 ("IDENTICAS", Mario 31/07): a barra do rodapé é um CLONE
         # literal do <nav class="menu"> do header — igual byte a byte, modulo
