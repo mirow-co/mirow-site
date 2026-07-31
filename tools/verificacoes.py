@@ -605,24 +605,22 @@ def estaticas(s):
     s.check("S03", u"Sotreq na barra de clientes das 4 homes", s03)
 
     def s23():
-        # S-23 (#73): o hero e a malha animada (Variante B) — o MP4 de 22,8 MB
-        # nao pode voltar em NENHUMA pagina, e as 4 homes precisam da img +
-        # canvas + JS da camada viva.
-        mp4 = [rel for rel, h in s.todas() if "video-bg-home-1.mp4" in h]
+        # S-23/S-37 (#73 -> #92): depois de testar malha animada e foto
+        # estática, o Mario decidiu (31/07, 3ª rodada) voltar ao VÍDEO
+        # original do tema ("tem que ficar como era no mirow.com.br") —
+        # decisão explícita do dono, custo do MP4 aceito e registrado.
+        # A malha/canvas não podem voltar.
         ruins = []
         for rel in HOMES:
             h = s.ler(rel)
-            faltam = [ag for ag in ("hero-malha__img", "hero-malha__canvas",
-                                    "onda13-hero-plexus.js") if ag not in h]
-            if faltam:
-                ruins.append("%s sem %s" % (rel, "/".join(faltam)))
-        det = []
-        if mp4:
-            det.append(u"MP4 do hero ainda em %d página(s): %s" % (len(mp4), ", ".join(mp4[:3])))
-        if ruins:
-            det.append(u"; ".join(ruins))
-        return (not mp4 and not ruins, u"; ".join(det))
-    s.check("S23", u"hero com malha animada; 0 referência ao MP4 de 22,8 MB", s23)
+            if "video-bg-home-1.mp4" not in h:
+                ruins.append("%s sem o vídeo original" % rel)
+            for morto in ("hero-malha__img", "hero-malha__canvas",
+                          "onda13-hero-plexus.js"):
+                if morto in h:
+                    ruins.append("%s ainda tem %s" % (rel, morto))
+        return (not ruins, u"; ".join(ruins))
+    s.check("S23", u"hero com o vídeo original da lâmpada (decisão 31/07)", s23)
 
     def s30():
         # S-30 (#82): a malha preenche o quadro — a classe que desliga a
@@ -667,19 +665,33 @@ def estaticas(s):
     s.check("S32", u"dropdown do menu ajustado ao conteúdo; nav do rodapé estilizada", s32)
 
     def s34():
-        # S-34: o hero usa a foto da lâmpada (frame do vídeo original),
-        # esticada — a malha (que o Mario rejeitou) não pode voltar.
+        # S-34: os painéis de vidro de leitura ficam (texto + números), o
+        # fundo é o vídeo (S23) — imagens da fase de teste não voltam.
         ruins = []
         for rel in HOMES:
             h = s.ler(rel)
-            if "onda6/lampada-hero.jpg" not in h:
-                ruins.append("%s sem a lâmpada" % rel)
-            if "onda6/malha-hero.jpg" in h:
-                ruins.append("%s ainda referencia a malha" % rel)
             if "hero-texto" not in h:
                 ruins.append("%s sem o painel de leitura do texto" % rel)
+            for morto in ("onda6/malha-hero.jpg", "onda6/lampada-hero.jpg"):
+                if morto in h:
+                    ruins.append("%s ainda referencia %s" % (rel, morto))
         return (not ruins, u"; ".join(ruins))
-    s.check("S34", u"hero com a foto da lâmpada + painéis de leitura", s34)
+    s.check("S34", u"painéis de leitura no hero; 0 imagem da fase de teste", s34)
+
+    def s38():
+        # S-38: linha legal enxuta — o logo grande e o LinkedIn saíram (já
+        # moram na barra clonada); sobra só o link pequeno da política.
+        ruins = [rel for rel, h in s.conteudo()
+                 if '<footer class="footer">' in h and "footer__brand" in h]
+        sem = [rel for rel, h in s.conteudo()
+               if '<footer class="footer">' in h and "onda15:rodape-legal" not in h]
+        det = []
+        if ruins:
+            det.append(u"logo antigo ainda em %d página(s): %s" % (len(ruins), ", ".join(ruins[:3])))
+        if sem:
+            det.append(u"%d página(s) sem a linha enxuta" % len(sem))
+        return (not ruins and not sem, u"; ".join(det))
+    s.check("S38", u"linha legal do rodapé enxuta (só o link da política)", s38)
 
     def s36():
         # S-36 v2 ("IDENTICAS", Mario 31/07): a barra do rodapé é um CLONE
