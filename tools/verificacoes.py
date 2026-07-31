@@ -71,6 +71,7 @@ BLOCOS_CSS = [
     "onda10:hero-numeros", "onda10:clientes-barra",
     "onda11:s13-form-topo", "onda12:praticas-nav", "onda13:hero-malha",
     "onda14:hero-malha-cheia", "onda14:menu-executivo", "onda14:fundo-sem-sobras",
+    "onda15:hero-scrims", "onda15:barras-gemeas",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -84,6 +85,7 @@ MARCADORES = [
     ("onda8:menu-contatos", 275), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
     ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 5),
     ("onda13:hero-malha", 4), ("onda14:rodape-menu", 275),
+    ("onda15:hero-texto", 4), ("onda15:rodape-contatos", 275),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -100,7 +102,7 @@ LOGOS_ESPERADOS = _logos_esperados()
 
 # Slogan do hero, por idioma (S-01 muda a APRESENTAÇÃO — escadinha —, não as palavras).
 SLOGAN = {
-    "pt": ["Estratégia", "Confiança", "Resultado"],
+    "pt": ["Estratégia", "Confiança", "Resultados"],
     "en": ["Strategy", "Trust", "Results"],
     "de": ["Strategie", "Vertrauen", "Ergebnisse"],
 }
@@ -660,6 +662,64 @@ def estaticas(s):
         faltam = [ag for ag in ("min-height:0", ".rodape-menu") if ag not in bloco]
         return (not faltam, u"bloco sem: %s" % ", ".join(faltam))
     s.check("S32", u"dropdown do menu ajustado ao conteúdo; nav do rodapé estilizada", s32)
+
+    def s34():
+        # S-34: o hero usa a foto da lâmpada (frame do vídeo original),
+        # esticada — a malha (que o Mario rejeitou) não pode voltar.
+        ruins = []
+        for rel in HOMES:
+            h = s.ler(rel)
+            if "onda6/lampada-hero.jpg" not in h:
+                ruins.append("%s sem a lâmpada" % rel)
+            if "onda6/malha-hero.jpg" in h:
+                ruins.append("%s ainda referencia a malha" % rel)
+            if "hero-texto" not in h:
+                ruins.append("%s sem o painel de leitura do texto" % rel)
+        return (not ruins, u"; ".join(ruins))
+    s.check("S34", u"hero com a foto da lâmpada + painéis de leitura", s34)
+
+    def s36():
+        # S-36: as barras superior e inferior são gêmeas — os links da nav do
+        # rodapé têm que bater com os do header (práticas expandidas), e os 4
+        # canais de comunicação existem nas duas. Página a página.
+        rex_top = re.compile(
+            r'<(a|button)[^>]*class="[^"]*menu__nav-link[^"]*"[^>]*>(.*?)</\1>', re.S)
+        rex_sub = re.compile(r'<a class="menu__nav-sublink" href="([^"]*)">')
+        rex_rod = re.compile(r'rodape-menu">(.*?)</ul>', re.S)
+        ruins = []
+        for rel, h in s.conteudo():
+            if "onda14:rodape-menu" not in h:
+                continue
+            esperados = []
+            m = re.search(r'<!-- onda7:menu-praticas -->(.*?)<!-- /onda7:menu-praticas -->',
+                          h, re.S)
+            praticas = rex_sub.findall(m.group(1)) if m else []
+            for t in rex_top.finditer(h):
+                href = re.search(r'href="([^"]*)"', t.group(0))
+                if not href or href.group(1) in ("#", ""):
+                    esperados.extend(praticas)
+                else:
+                    esperados.append(href.group(1))
+                if len(esperados) > 12:
+                    break
+            mr = rex_rod.search(h)
+            achados = re.findall(r'href="([^"]*)"', mr.group(1)) if mr else []
+            # dedup preservando ordem (mesma regra do gerador)
+            vistos, unicos = set(), []
+            for u in esperados:
+                if u not in vistos:
+                    vistos.add(u)
+                    unicos.append(u)
+            if achados != unicos:
+                ruins.append(rel)
+            i = h.find("onda15:rodape-contatos")
+            trecho = h[i:i + 6000] if i >= 0 else ""
+            faltam = [nome for nome, agulha in CANAIS if agulha not in trecho]
+            if i < 0 or faltam:
+                ruins.append("%s sem canais (%s)" % (rel, "/".join(faltam) or "bloco"))
+        return (not ruins, u"%d página(s) com as barras fora de paralelo: %s"
+                % (len(ruins), "; ".join(str(r) for r in ruins[:3])))
+    s.check("S36", u"barras superior e inferior paralelas (links e canais)", s36)
 
 
 # ------------------------------------------------------- asserções ao vivo
