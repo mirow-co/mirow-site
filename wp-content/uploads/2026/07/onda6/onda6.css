@@ -53,63 +53,6 @@
 .onda7-vertodos svg{flex:none}
 /* onda7:lideres-link:fim */
 
-/* onda7:rede:ini */
-/* onda7 — pagina "Nossa rede": mapa unico + lista de parceiros */
-/* fundo navy proprio: o wrap-gradient do tema clareia ate #A2BAE4 embaixo, e a
-   pagina e longa o suficiente para o texto claro sumir na parte de baixo */
-.rede{background:#020E66;padding:80px 0 100px}
-.rede__titulo{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:30px;font-weight:700;line-height:130%;margin:0 0 24px}
-.rede__eyebrow{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:14px;font-weight:800;letter-spacing:.5em;text-transform:uppercase;
-  margin:0 0 12px}
-.rede-mapa{margin:0 0 70px}
-.rede-mapa__box{background:rgba(255,255,255,.05);border:1px solid rgba(170,213,232,.35);
-  padding:20px}
-.rede-mapa__svg{display:block;width:100%;height:auto}
-.rede-mapa__grade{stroke:rgba(170,213,232,.14);stroke-width:1}
-.rede-mapa__terra{fill:#0E41A7;stroke:#AAD5E8;stroke-width:1.2;stroke-linejoin:round;
-  fill-opacity:.6}
-.rede-mapa__mirow{fill:#fff;stroke:#00ADEC;stroke-width:3}
-.rede-mapa__halo{fill:#00ADEC;fill-opacity:.22}
-.rede-mapa__ponto{fill:#00ADEC}
-.rede-mapa__num{fill:#020E66;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:12px;font-weight:800}
-.rede-mapa__janela{fill:none;stroke:#00ADEC;stroke-width:1.5;stroke-dasharray:5 4}
-.rede-mapa__conector{stroke:#00ADEC;stroke-width:1;stroke-dasharray:5 4;opacity:.6}
-.rede-mapa__inset-bg{fill:#020E66;fill-opacity:.92}
-.rede-mapa__inset-borda{fill:none;stroke:#00ADEC;stroke-width:1.5}
-.rede-mapa__inset-rotulo{fill:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:14px;font-weight:800;letter-spacing:.3em;text-transform:uppercase}
-.rede-mapa__legenda{display:flex;flex-wrap:wrap;gap:24px;margin:18px 0 0;padding:0;
-  list-style:none;color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:15px}
-.rede-mapa__legenda li{display:flex;align-items:center;gap:10px}
-.rede-mapa__chave{width:16px;height:16px;border-radius:50%;flex:none;display:inline-block}
-.rede-mapa__chave--mirow{background:#fff;box-shadow:0 0 0 3px #00ADEC inset}
-.rede-mapa__chave--parceiro{background:#00ADEC}
-.rede-mapa__nota{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:14px;margin:12px 0 0}
-
-.rede-lista{display:flex;flex-wrap:wrap;gap:16px;margin:0;padding:0;list-style:none}
-.rede-lista__item{flex:1 1 300px;background:rgba(255,255,255,.06);
-  border:1px solid rgba(170,213,232,.3);padding:24px;display:flex;
-  flex-direction:column;gap:8px}
-.rede-lista__num{display:inline-flex;align-items:center;justify-content:center;
-  width:30px;height:30px;border-radius:50%;background:#00ADEC;color:#020E66;
-  font-family:var(--fontFamily),Arial,sans-serif;font-weight:800;font-size:14px}
-.rede-lista__nome{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:22px;font-weight:700;margin:0}
-.rede-lista__local{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:15px;margin:0}
-.rede-lista__link{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:15px;font-weight:700;text-decoration:none;margin-top:auto}
-.rede-lista__link:hover{color:#fff}
-@media only screen and (max-width: 991px){
-  .rede-mapa__box{padding:10px}
-  .rede-lista__item{flex:1 1 100%}
-}
-/* onda7:rede:fim */
 
 /* onda8:hero-contatos:ini */
 /* onda8 — linha de contatos no hero das homes */
@@ -228,3 +171,225 @@
   }
 }
 /* onda8:hero-slogan-alto:fim */
+
+/* onda9:rede:ini */
+/* onda9 — pagina "Nossa rede": UM mapa-mundi + pins com cartao no hover */
+/* fundo navy proprio: o wrap-gradient do tema clareia ate #A2BAE4 embaixo, e a
+   pagina e longa o suficiente para o texto claro sumir na parte de baixo */
+.rede{background:#020E66;padding:80px 0 100px}
+.rede__titulo{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:30px;font-weight:700;line-height:130%;margin:0 0 24px}
+.rede__eyebrow{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;font-weight:800;letter-spacing:.5em;text-transform:uppercase;
+  margin:0 0 12px}
+.rede-mapa{margin:0 0 70px}
+.rede-mapa__box{background:rgba(255,255,255,.05);border:1px solid rgba(170,213,232,.35);
+  padding:20px}
+/* o palco tem a MESMA proporcao do viewBox (1000x460), entao os pins podem ser
+   posicionados em % e acompanham o mapa em qualquer largura de tela */
+.rede-mapa__palco{position:relative}
+.rede-mapa__svg{display:block;width:100%;height:auto}
+.rede-mapa__grade{stroke:rgba(170,213,232,.14);stroke-width:1}
+.rede-mapa__terra{fill:#0E41A7;stroke:#AAD5E8;stroke-width:1.2;stroke-linejoin:round;
+  fill-opacity:.6}
+
+/* --- pins (HTML por cima do SVG) --- */
+.rede-pin{position:absolute;width:0;height:0;z-index:10}
+.rede-pin__botao{position:absolute;left:-12px;top:-12px;width:24px;height:24px;
+  padding:0;border:1px solid #020E66;border-radius:50%;background:#00ADEC;color:#020E66;
+  cursor:pointer;font-family:var(--fontFamily),Arial,sans-serif;font-size:12px;
+  font-weight:800;line-height:22px;text-align:center;
+  box-shadow:0 0 0 4px rgba(0,173,236,.25);
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
+.rede-pin__botao:hover,.rede-pin__botao:focus-visible{outline:0;background:#fff;
+  box-shadow:0 0 0 7px rgba(0,173,236,.4)}
+.rede-pin.is-realce .rede-pin__botao{background:#fff;transform:scale(1.2);
+  box-shadow:0 0 0 8px rgba(0,173,236,.45)}
+/* o cartao encosta na borda de baixo do botao (top:15px = raio do botao): sem
+   vao, o mouse vai do pin ate o link sem o cartao sumir */
+.rede-pin__card{position:absolute;left:50%;top:12px;width:270px;
+  transform:translateX(-50%);padding:14px 0 0;opacity:0;visibility:hidden;
+  pointer-events:none;transition:opacity .15s ease}
+.rede-pin__card-corpo{background:#020E66;border:1px solid #00ADEC;
+  box-shadow:0 12px 30px rgba(0,0,0,.45);padding:16px 18px}
+.rede-pin:hover,.rede-pin:focus-within,.rede-pin.is-aberto{z-index:40}
+.rede-pin:hover .rede-pin__card,.rede-pin:focus-within .rede-pin__card,
+.rede-pin.is-aberto .rede-pin__card{opacity:1;visibility:visible;pointer-events:auto}
+.rede-pin__nome{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:18px;font-weight:700;line-height:130%;margin:0 0 6px}
+.rede-pin__local{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;line-height:140%;margin:0 0 10px}
+.rede-pin__desc{color:rgba(255,255,255,.85);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;line-height:140%;margin:0 0 10px}
+.rede-pin__link{display:inline-block;color:#00ADEC;
+  font-family:var(--fontFamily),Arial,sans-serif;font-size:14px;font-weight:700;
+  text-decoration:none}
+.rede-pin__link:hover,.rede-pin__link:focus{color:#fff;text-decoration:underline}
+/* pins colados na borda direita do mapa jogariam o cartao para fora */
+.rede-pin--esq .rede-pin__card{left:0;transform:none}
+.rede-pin--dir .rede-pin__card{left:auto;right:0;transform:none}
+
+.rede-mapa__legenda{display:flex;flex-wrap:wrap;gap:24px;margin:18px 0 0;padding:0;
+  list-style:none;color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:15px}
+.rede-mapa__legenda li{display:flex;align-items:center;gap:10px}
+.rede-mapa__chave{width:16px;height:16px;border-radius:50%;flex:none;display:inline-block;
+  background:#00ADEC}
+.rede-mapa__nota{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:14px;margin:12px 0 0}
+
+.rede-lista{display:flex;flex-wrap:wrap;gap:16px;margin:0;padding:0;list-style:none}
+.rede-lista__item{flex:1 1 300px;background:rgba(255,255,255,.06);
+  border:1px solid rgba(170,213,232,.3);padding:24px;display:flex;
+  flex-direction:column;gap:8px;transition:border-color .15s ease,background .15s ease}
+.rede-lista__item:hover{background:rgba(255,255,255,.1);border-color:#00ADEC}
+.rede-lista__num{display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;border-radius:50%;background:#00ADEC;color:#020E66;
+  font-family:var(--fontFamily),Arial,sans-serif;font-weight:800;font-size:14px}
+.rede-lista__nome{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:22px;font-weight:700;margin:0}
+.rede-lista__local{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:15px;margin:0}
+.rede-lista__link{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
+  font-size:15px;font-weight:700;text-decoration:none;margin-top:auto}
+.rede-lista__link:hover{color:#fff}
+@media only screen and (max-width: 991px){
+  .rede-mapa__box{padding:10px}
+  /* no celular o mapa fica com ~340px de largura: os pins da Europa encostam
+     mesmo assim. A lista abaixo do mapa e que cumpre o papel de leitura la. */
+  .rede-pin__botao{left:-11px;top:-11px;width:22px;height:22px;line-height:20px;
+    font-size:11px;box-shadow:0 0 0 3px rgba(0,173,236,.25)}
+  .rede-pin__card{width:230px;top:11px}
+  .rede-lista__item{flex:1 1 100%}
+}
+/* onda9:rede:fim */
+
+/* onda10:header-contraste:ini */
+/* onda10 (S-04 / #72) — icones de contato legiveis nos 2 estados da barra */
+@media only screen and (min-width: 992px){
+  /* estado 1 — barra transparente sobre o hero: branco (como na onda 8.1) */
+  .menu__contatos-link{color:#ffffff;opacity:.85}
+  .menu__contatos-link:hover,.menu__contatos-link:focus-visible{color:#00adec;opacity:1}
+  .menu__contatos-link--wa:hover,.menu__contatos-link--wa:focus-visible{color:#25d366}
+
+  /* estado 2 — barra BRANCA: hover do header (todas as paginas) e paginas de
+     post. Navy sobre branco = 16.5:1. */
+  .menu:hover .menu__contatos-link,
+  .single:not(.single-experience) .menu .menu__contatos-link{color:#020e66;opacity:1}
+  .menu:hover .menu__contatos-link svg path,
+  .single:not(.single-experience) .menu .menu__contatos-link svg path{
+    fill:currentColor !important;stroke:none}
+  .menu:hover .menu__contatos-link:hover,
+  .menu:hover .menu__contatos-link:focus-visible,
+  .single:not(.single-experience) .menu .menu__contatos-link:hover,
+  .single:not(.single-experience) .menu .menu__contatos-link:focus-visible{color:#0e41a7}
+  .menu:hover .menu__contatos-link--wa:hover,
+  .menu:hover .menu__contatos-link--wa:focus-visible,
+  .single:not(.single-experience) .menu .menu__contatos-link--wa:hover,
+  .single:not(.single-experience) .menu .menu__contatos-link--wa:focus-visible{color:#128c7e}
+}
+/* onda10:header-contraste:fim */
+
+/* onda10:hero-escadinha:ini */
+/* onda10 (S-01 / #51) — slogan do hero em escadinha */
+.homepage .banner h2 .onda10-degrau{display:inline}
+.homepage .banner h2 .onda10-degrau--2{margin-left:.55em}
+.homepage .banner h2 .onda10-degrau--3{margin-left:1.1em}
+@media only screen and (min-width: 992px){
+  .homepage .banner h2 .onda10-degrau--2{margin-left:.9em}
+  .homepage .banner h2 .onda10-degrau--3{margin-left:1.8em}
+}
+/* onda10:hero-escadinha:fim */
+
+/* onda10:numeros:ini */
+/* onda10 (S-06 / #55) — numeros da home: escada de progressao, numero menor,
+   texto maior. O ponto final saiu do HTML (nao da para tirar por CSS). */
+.our-numbers__list>[class^=col]{position:relative}
+@media only screen and (min-width: 992px){
+  /* escada: cada numero um degrau acima do anterior (o tema escalonava sem ordem) */
+  .our-numbers__list>[class^=col]:nth-child(1){margin-top:120px}
+  .our-numbers__list>[class^=col]:nth-child(2){margin-top:80px}
+  .our-numbers__list>[class^=col]:nth-child(3){margin-top:40px}
+  .our-numbers__list>[class^=col]:nth-child(4){margin-top:0}
+  /* seta de progressao entre colunas vizinhas */
+  .our-numbers__list>[class^=col]+[class^=col]::before{
+    content:"↗";
+    position:absolute;left:-16px;top:-44px;
+    color:#00adec;font-size:34px;line-height:1;font-weight:700;
+    pointer-events:none}
+  .our-numbers__list strong{font-size:72px;font-size:4.5rem;padding-bottom:12px}
+  .our-numbers__list span{font-size:26px;font-size:1.625rem}
+}
+@media only screen and (max-width: 991px){
+  .our-numbers__list strong{font-size:52px;font-size:3.25rem}
+  .our-numbers__list span{font-size:19px;font-size:1.1875rem}
+}
+/* onda10:numeros:fim */
+
+/* onda10:hero-numeros:ini */
+/* onda10 (S-27 / #77) — big numbers empilhados a direita da capa */
+.hero-numeros{display:none}
+@media only screen and (min-width: 1200px){
+  .homepage .banner .container{position:relative}
+  /* o texto do hero para antes da pilha, para nao passar por baixo dela */
+  .homepage .banner .row>[class^=col]>h2,
+  .homepage .banner .row>[class^=col]>p,
+  .homepage .banner .row>[class^=col]>.hero-contatos{max-width:62%}
+  .hero-numeros{
+    display:flex;flex-direction:column;justify-content:center;gap:20px;
+    list-style:none;margin:0;padding:0;
+    position:absolute;right:calc(var(--bs-gutter-x, 1.5rem) * .5);top:50%;
+    transform:translateY(-50%);
+    width:300px;text-align:right;z-index:4}
+  .hero-numeros__item{display:block;border-right:2px solid rgba(0,173,236,.85);
+    padding-right:14px}
+  .hero-numeros__valor{display:block;
+    font-family:var(--fontFamily);font-weight:800;
+    font-size:40px;line-height:1;color:#00adec}
+  .hero-numeros__texto{display:block;margin-top:5px;
+    font-family:var(--secondaryFontFamily);font-weight:400;
+    font-size:14px;line-height:1.3;color:rgba(255,255,255,.92)}
+}
+@media only screen and (min-width: 1200px) and (max-height: 820px){
+  .hero-numeros{gap:13px;width:270px}
+  .hero-numeros__valor{font-size:33px}
+  .hero-numeros__texto{font-size:13px}
+}
+/* onda10:hero-numeros:fim */
+
+/* onda10:clientes-barra:ini */
+/* onda10 (S-25 / #75) — barra de clientes sem fundo branco */
+.clientes-logos{background:#020e66;isolation:isolate}
+.clientes-logos__title{color:rgba(255,255,255,.72)}
+.clientes-logos__item img{
+  filter:grayscale(1) invert(1) contrast(1.05);
+  mix-blend-mode:screen;
+  opacity:.88;
+  transition:opacity 300ms ease-in-out}
+.clientes-logos__item:hover img{
+  filter:grayscale(1) invert(1) contrast(1.05);
+  opacity:1}
+/* onda10:clientes-barra:fim */
+
+/* onda12:praticas-nav:ini */
+.praticas-nav{display:flex;flex-wrap:wrap;gap:12px 28px;margin:12px 0 24px;padding:0;
+  list-style:none}
+.praticas-nav__item{margin:0}
+.praticas-nav__link{color:#fff;font-weight:600;text-decoration:underline;
+  text-underline-offset:3px}
+.praticas-nav__link:hover{color:#fff;text-decoration:none}
+.experience-single__others .col-12 > h5{color:#fff}
+@media only screen and (max-width: 991px){
+  .praticas-nav{gap:8px 20px}
+}
+/* onda12:praticas-nav:fim */
+
+/* onda11:s13-form-topo:ini */
+.job-contact--topo{
+  margin-top:0 !important;
+  padding:60px 0 100px !important;
+}
+@media only screen and (max-width: 767px){
+  .job-contact--topo{padding:40px 0 60px !important}
+}
+/* onda11:s13-form-topo:fim */
