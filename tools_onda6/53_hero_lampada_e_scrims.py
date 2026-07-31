@@ -50,6 +50,9 @@ CSS = """/* S-34: legibilidade do hero sobre a foto da lampada. Vidro fosco bran
    jogava o "Estratégia" para FORA da caixinha (achado do Mario, 31/07). O
    painel contem o h2; a dobra exata e re-medida pelo onda8-dobra.js. */
 .hero-texto h2{margin-top:0 !important}
+/* o tema limita o <p> a 70% — dentro do painel isso quebrava o subtitulo em
+   3 linhas; com a largura toda ele cabe em 2 (pedido do Mario, 31/07). */
+.hero-texto p{max-width:100%}
 .banner--malha .hero-numeros{
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);

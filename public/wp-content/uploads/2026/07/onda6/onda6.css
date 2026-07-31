@@ -291,14 +291,10 @@
 /* onda10:header-contraste:fim */
 
 /* onda10:hero-escadinha:ini */
-/* onda10 (S-01 / #51) — slogan do hero em escadinha */
-.homepage .banner h2 .onda10-degrau{display:inline}
-.homepage .banner h2 .onda10-degrau--2{margin-left:.55em}
-.homepage .banner h2 .onda10-degrau--3{margin-left:1.1em}
-@media only screen and (min-width: 992px){
-  .homepage .banner h2 .onda10-degrau--2{margin-left:.9em}
-  .homepage .banner h2 .onda10-degrau--3{margin-left:1.8em}
-}
+/* onda10 (S-01/#51) virou S-39 (31/07): os recuos de escadinha SAIRAM por
+   decisao do Mario — as 3 palavras alinhadas a esquerda. Os spans .onda10-degrau
+   ficam (estrutura de 3 linhas protegida pela S01). */
+.homepage .banner h2 .onda10-degrau{display:inline;margin-left:0 !important}
 /* onda10:hero-escadinha:fim */
 
 /* onda10:numeros:ini */
@@ -455,6 +451,9 @@
    jogava o "Estratégia" para FORA da caixinha (achado do Mario, 31/07). O
    painel contem o h2; a dobra exata e re-medida pelo onda8-dobra.js. */
 .hero-texto h2{margin-top:0 !important}
+/* o tema limita o <p> a 70% — dentro do painel isso quebrava o subtitulo em
+   3 linhas; com a largura toda ele cabe em 2 (pedido do Mario, 31/07). */
+.hero-texto p{max-width:100%}
 .banner--malha .hero-numeros{
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);

@@ -39,13 +39,15 @@ TEXTOS = {
     # V1 incrementada a pedido do Mario (31/07, issue #74): mantém o
     # "garantidos" do verbatim do Andreas e ganha o "lado a lado" da V2.
     # Decisão explícita do Mario sobre a recomendação V2 — registrada na #74.
+    # 2ª rodada (31/07, fim do dia): sai o "e" depois do travessão — "…pricing
+    # — entregamos resultados garantidos…" — e a frase cabe em 2 linhas.
     "V1": {
         "pt": u"Focamos em estratégia, compras e go-to-market/pricing "
-              u"— e entregamos resultados garantidos, lado a lado com a sua equipe",
+              u"— entregamos resultados garantidos, lado a lado com a sua equipe",
         "en": u"We focus on strategy, procurement and go-to-market/pricing "
-              u"— and we deliver guaranteed results, side by side with your team",
+              u"— we deliver guaranteed results, side by side with your team",
         "de": u"Wir fokussieren uns auf Strategie, Einkauf und Go-to-Market/Pricing "
-              u"— und liefern garantierte Ergebnisse, Seite an Seite mit Ihrem Team",
+              u"— wir liefern garantierte Ergebnisse, Seite an Seite mit Ihrem Team",
     },
     "V2": {
         "pt": u"Focamos em estratégia, compras e go-to-market/pricing "
