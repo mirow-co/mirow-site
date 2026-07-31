@@ -488,3 +488,11 @@
 .rodape-barra .menu{position:static !important;transform:none !important}
 .rodape-barra .menu__nav-submenu{top:auto !important;bottom:100%}
 /* onda15:rodape-barra:fim */
+
+/* onda15:rodape-legal:ini */
+/* S-38: linha legal enxuta — o logo e o LinkedIn ja moram na barra clonada
+   (S-36 v2); sobra so o link pequeno da politica, discreto e centrado. */
+.rodape-legal{text-align:center;padding:2px 0 0}
+.rodape-legal .footer__contacts-link{font-size:12px;opacity:.65}
+.rodape-legal .footer__contacts-link:hover{opacity:1}
+/* onda15:rodape-legal:fim */
