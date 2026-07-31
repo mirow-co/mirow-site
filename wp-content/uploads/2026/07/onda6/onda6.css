@@ -405,3 +405,40 @@
 .banner__background .hero-malha__canvas{
   position:absolute;top:0;left:0;width:100%;height:100%}
 /* onda13:hero-malha:fim */
+
+/* onda14:hero-malha-cheia:ini */
+/* S-30 (#82): a malha preenche o hero inteiro. (a) sem a mascara vertical do
+   tema (virava moldura esmaecida na imagem clara); (b) o div do fundo agora e
+   filho direto da section.banner — top/bottom prendem ao hero, nao ao box do
+   .container; (c) conteudo acima do fundo. */
+.banner__background--malha{
+  -webkit-mask-image:none !important;
+  mask-image:none !important;
+  top:0;left:0;right:0;bottom:0;width:100%}
+.banner--malha>.container{position:relative;z-index:5}
+/* onda14:hero-malha-cheia:fim */
+
+/* onda14:menu-executivo:ini */
+/* (a) dropdown com a altura do conteudo — sai o painel preto de tela inteira
+   (o tema usa min-height:calc(100vh - 68px) + gradiente preto). */
+.menu__nav-submenu{min-height:0 !important;background:none !important;
+  padding-top:0 !important}
+.menu__nav-submenu>div{padding:22px 0 26px}
+.menu__nav-sublink{font-size:17px !important;padding:6px 0 !important;
+  font-weight:300}
+.menu__nav-submenu h5{margin:12px 0}
+/* (b) navegacao do rodape — espelho compacto da barra superior */
+.rodape-menu{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 26px;
+  margin:0 0 26px;padding:0 0 20px;list-style:none;
+  border-bottom:1px solid rgba(170,213,232,.25)}
+.rodape-menu li{margin:0}
+.rodape-menu a{color:#fff;font-size:14px;text-decoration:none;
+  transition:color 200ms ease}
+.rodape-menu a:hover{color:#00ADEC}
+/* onda14:menu-executivo:fim */
+
+/* onda14:fundo-sem-sobras:ini */
+/* S-33 (#85): o padding-bottom de 100px do wrap-gradient-2 expunha o fim
+   azul-claro do gradiente entre o CTA e o footer — a "sobra" da home. */
+.home .wrap-gradient-2{padding-bottom:0}
+/* onda14:fundo-sem-sobras:fim */

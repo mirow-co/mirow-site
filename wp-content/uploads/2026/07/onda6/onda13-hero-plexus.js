@@ -151,7 +151,20 @@
     var canvas = document.querySelector('.hero-malha__canvas');
     if (!canvas) return;
     var inst = criar(canvas);
-    inst.tocar();
+    // S-30 (#82): toca quando o hero esta VISIVEL, e re-toca a cada volta a
+    // viewport — cada toque continua curto (~10s) e termina em quadro parado.
+    // Sem IntersectionObserver (navegador antigo), toca 1x no load.
+    if ('IntersectionObserver' in window) {
+      var visto = false;
+      new IntersectionObserver(function (entradas) {
+        entradas.forEach(function (e) {
+          if (e.isIntersecting && !visto) { visto = true; inst.tocar(); }
+          else if (!e.isIntersecting) { visto = false; }
+        });
+      }, { threshold: 0.35 }).observe(canvas);
+    } else {
+      inst.tocar();
+    }
     var deb;
     window.addEventListener('resize', function () {
       clearTimeout(deb); deb = setTimeout(inst.tocar, 220);
