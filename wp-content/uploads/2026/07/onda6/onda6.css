@@ -451,6 +451,10 @@
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
   border-radius:14px;padding:26px 30px;margin-left:-30px}
+/* a onda 8.2 subia o slogan com margin-top negativa — dentro do painel isso
+   jogava o "Estratégia" para FORA da caixinha (achado do Mario, 31/07). O
+   painel contem o h2; a dobra exata e re-medida pelo onda8-dobra.js. */
+.hero-texto h2{margin-top:0 !important}
 .banner--malha .hero-numeros{
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
@@ -474,3 +478,13 @@
 .rodape-contatos .menu__contatos-link svg{width:22px !important;
   height:22px !important}
 /* onda15:barras-gemeas:fim */
+
+/* onda15:rodape-barra:ini */
+/* S-36 v2: a barra do rodape e um CLONE literal da superior (mesmo HTML e
+   CSS do tema). Aqui so o que muda de contexto: estatica (a original e fixa
+   no topo), submenus abrindo para cima, respiro antes da linha legal. */
+.rodape-barra{position:relative;margin:0 0 24px;padding:6px 0 10px;
+  border-bottom:1px solid rgba(170,213,232,.25)}
+.rodape-barra .menu{position:static !important;transform:none !important}
+.rodape-barra .menu__nav-submenu{top:auto !important;bottom:100%}
+/* onda15:rodape-barra:fim */
