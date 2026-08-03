@@ -72,6 +72,8 @@ BLOCOS_CSS = [
     "onda11:s13-form-topo", "onda12:praticas-nav", "onda13:hero-malha",
     "onda14:hero-malha-cheia", "onda14:menu-executivo", "onda14:fundo-sem-sobras",
     "onda15:hero-scrims", "onda15:barras-gemeas", "onda15:rodape-barra",
+    "onda16:hero-layout-s41", "onda16:hover-marcas-s42",
+    "onda17:hero-horizonte-s49",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -84,7 +86,9 @@ MARCADORES = [
     ("onda7:menu-sobre", 275), ("onda7:menu-praticas", 275), ("onda7:menu-carreiras", 200),
     ("onda8:menu-contatos", 275), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
     ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 5),
-    ("onda13:hero-malha", 4),
+    # onda13:hero-malha saiu em 03/08 (S-49/#107): o bloco do video virou os
+    # canvases do Horizonte 2050.
+    ("onda17:hero-horizonte", 4),
     # onda14:rodape-menu e onda15:rodape-contatos saíram em 31/07 (decisão
     # explícita do Mario na #91: "IDENTICAS" — a nav recriada virou o clone
     # literal onda15:rodape-barra).
@@ -605,22 +609,25 @@ def estaticas(s):
     s.check("S03", u"Sotreq na barra de clientes das 4 homes", s03)
 
     def s23():
-        # S-23/S-37 (#73 -> #92): depois de testar malha animada e foto
-        # estática, o Mario decidiu (31/07, 3ª rodada) voltar ao VÍDEO
-        # original do tema ("tem que ficar como era no mirow.com.br") —
-        # decisão explícita do dono, custo do MP4 aceito e registrado.
-        # A malha/canvas não podem voltar.
+        # Historico: #73 (malha animada) -> S-37/#92 (31/07: volta do video)
+        # -> S-49/#107 (03/08: o Mario pediu fundo dinamico futurista, viu 3
+        # sugestoes prototipadas e ESCOLHEU o "Horizonte 2050" com convite ao
+        # scroll — decisao do dono, reverte a S-37). O hero das 4 homes usa os
+        # 2 canvases da onda17 + JS; o MP4 de 22,8 MB NAO pode voltar, nem os
+        # restos da malha antiga.
         ruins = []
         for rel in HOMES:
             h = s.ler(rel)
-            if "video-bg-home-1.mp4" not in h:
-                ruins.append("%s sem o vídeo original" % rel)
-            for morto in ("hero-malha__img", "hero-malha__canvas",
-                          "onda13-hero-plexus.js"):
+            for vivo in ("hero-horizonte__cena", "hero-horizonte__convite",
+                         "onda17-horizonte.js"):
+                if vivo not in h:
+                    ruins.append("%s sem %s" % (rel, vivo))
+            for morto in ("video-bg-home-1.mp4", "hero-malha__img",
+                          "hero-malha__canvas", "onda13-hero-plexus.js"):
                 if morto in h:
                     ruins.append("%s ainda tem %s" % (rel, morto))
-        return (not ruins, u"; ".join(ruins))
-    s.check("S23", u"hero com o vídeo original da lâmpada (decisão 31/07)", s23)
+        return (not ruins, u"; ".join(ruins[:4]))
+    s.check("S23", u"hero Horizonte 2050 (canvas, S-49); 0 vídeo de 22,8 MB", s23)
 
     def s30():
         # S-30 (#82): a malha preenche o quadro — a classe que desliga a
