@@ -43,6 +43,7 @@ ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda8-dobra.js",
     "wp-content/uploads/2026/07/onda6/onda9-rede.js",
     "wp-content/uploads/2026/07/onda6/onda13-hero-plexus.js",
+    "wp-content/uploads/2026/07/onda6/onda17-medicao.js",
     "wp-content/uploads/2026/07/clientes/clientes-logos.css",
 ]
 
