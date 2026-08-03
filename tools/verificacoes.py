@@ -747,6 +747,58 @@ def estaticas(s):
         return (not ruins, u"%d página(s): %s" % (len(ruins), "; ".join(ruins[:3])))
     s.check("S36", u"barra do rodapé IDÊNTICA à superior (clone literal, por página)", s36)
 
+    def s41():
+        # S-41 (#97): big numbers perto da borda direita do viewport (calc
+        # com 100vw no CSS) e painel do hero puxado para a esquerda (min()).
+        css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
+        det = []
+        if "onda16:hero-layout-s41:ini" not in css:
+            det.append(u"bloco onda16:hero-layout-s41 ausente do onda6.css")
+        else:
+            bloco = css.split("onda16:hero-layout-s41:ini")[1].split(
+                "onda16:hero-layout-s41:fim")[0]
+            if "100vw" not in bloco or ".hero-numeros" not in bloco:
+                det.append(u"pilha de números sem o calc de viewport")
+            if "min(-30px" not in bloco or ".hero-texto" not in bloco:
+                det.append(u"painel do hero sem o deslocamento à esquerda")
+        return (not det, u"; ".join(det))
+    s.check("S41", u"hero: números na borda direita; painel à esquerda (CSS)", s41)
+
+    def s42():
+        # S-42 (#98): hover com a cor da marca. Classes --in/--ig/--mail nos
+        # links de contato (hero das homes + barras de toda página) e regras
+        # de cor no onda6.css.
+        css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
+        det = []
+        bloco = ""
+        if "onda16:hover-marcas-s42:ini" in css:
+            bloco = css.split("onda16:hover-marcas-s42:ini")[1].split(
+                "onda16:hover-marcas-s42:fim")[0]
+        for cor, quem in (("#0A66C2", "LinkedIn"), ("#E1306C", "Instagram"),
+                          ("#00ADEC", "e-mail")):
+            if cor not in bloco:
+                det.append(u"cor de %s ausente do bloco S-42" % quem)
+        for rel in HOMES:
+            h = s.ler(rel)
+            for cls in ("hero-contatos__link--in", "hero-contatos__link--ig",
+                        "hero-contatos__link--mail"):
+                if cls not in h:
+                    det.append(u"%s sem %s" % (rel, cls))
+        sem_mod = []
+        for rel, h in s.conteudo():
+            for m in re.finditer(r'<a\b[^>]*menu__contatos-link[^>]*>', h):
+                tag = m.group(0)
+                if "menu__contatos-link--" in tag:
+                    continue
+                if "mailto:" in tag or "linkedin.com" in tag or "instagram.com" in tag:
+                    sem_mod.append(rel)
+                    break
+        if sem_mod:
+            det.append(u"%d página(s) com ícone de barra sem modificador: %s"
+                       % (len(sem_mod), ", ".join(sem_mod[:3])))
+        return (not det, u"; ".join(det[:5]))
+    s.check("S42", u"hover na cor da marca (classes + cores no CSS)", s42)
+
 
 # ------------------------------------------------------- asserções ao vivo
 
@@ -912,6 +964,23 @@ def ao_vivo(s):
                 return (True, u"%s links clicáveis" % v[3:])
             return (False, u"link(s) do hero com clique bloqueado: %s" % v)
         s.check("V06", u"os 4 contatos do hero recebem clique", v06)
+
+        # V07 — S-41 (#97): nenhum bloquinho da pilha de números com mais de
+        # 2 linhas de texto (medido: altura do span / line-height) em desktop.
+        def v07():
+            nav.abrir("%s/pt/" % base, 1920, 1080)
+            v = nav.js(
+                "(function(){var ts=document.querySelectorAll('.hero-numeros__texto');"
+                "if(!ts.length)return 'pilha de números não encontrada';var ruins=[];"
+                "for(var i=0;i<ts.length;i++){var cs=getComputedStyle(ts[i]);"
+                "var lh=parseFloat(cs.lineHeight);"
+                "var linhas=Math.round(ts[i].getBoundingClientRect().height/lh);"
+                "if(linhas>2)ruins.push(i+':'+linhas+'linhas');}"
+                "return ruins.length?ruins.join(' '):'ok:'+ts.length;})()")
+            if isinstance(v, str) and v.startswith("ok:"):
+                return (True, u"%s blocos, todos com ≤2 linhas (1920x1080)" % v[3:])
+            return (False, u"bloco(s) com mais de 2 linhas: %s" % v)
+        s.check("V07", u"números do hero com no máximo 2 linhas por bloco", v07)
 
 
 # ------------------------------------------------------------------- main

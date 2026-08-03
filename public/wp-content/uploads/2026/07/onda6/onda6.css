@@ -495,3 +495,42 @@
 .rodape-legal .footer__contacts-link{font-size:12px;opacity:.65}
 .rodape-legal .footer__contacts-link:hover{opacity:1}
 /* onda15:rodape-legal:fim */
+
+/* onda16:hero-layout-s41:ini */
+/* S-41 (#97): a pilha de numeros vai ate perto da borda direita do viewport
+   ((100% - 100vw)/2 = margem do container ate a borda; +40px de respiro) e
+   alarga para os textos nao passarem de 2 linhas. O painel do slogan faz o
+   movimento espelhado para a esquerda — min() garante que em viewport
+   estreito ele nunca fique PIOR que os -30px que ja tinha (onda15). */
+@media only screen and (min-width: 1200px){
+  .hero-numeros{
+    right:calc((100% - 100vw)/2 + 40px);
+    width:330px;
+  }
+  .hero-texto{
+    margin-left:min(-30px, calc((100% - 100vw)/2 + 40px));
+  }
+}
+@media only screen and (min-width: 1440px){
+  .hero-numeros{width:380px}
+}
+/* onda16:hero-layout-s41:fim */
+
+/* onda16:hover-marcas-s42:ini */
+/* S-42 (#98): hover com a cor da marca de cada app. WhatsApp verde ja vinha
+   da onda8; aqui entram LinkedIn, Instagram e e-mail (ciano Mirow — escolha
+   para manter coerencia com o site). Pills do hero: fundo na cor da marca;
+   icones das barras: so a cor do icone. */
+.hero-contatos__link--in:hover,.hero-contatos__link--in:focus-visible{
+  color:#fff !important;background:#0A66C2;border-color:#0A66C2}
+.hero-contatos__link--ig:hover,.hero-contatos__link--ig:focus-visible{
+  color:#fff !important;background:#E1306C;border-color:#E1306C}
+.hero-contatos__link--mail:hover,.hero-contatos__link--mail:focus-visible{
+  color:#020e66 !important;background:#00ADEC;border-color:#00ADEC}
+.menu__contatos-link--in:hover,.menu__contatos-link--in:focus-visible{
+  color:#378FE9}
+.menu__contatos-link--ig:hover,.menu__contatos-link--ig:focus-visible{
+  color:#E1306C}
+.menu__contatos-link--mail:hover,.menu__contatos-link--mail:focus-visible{
+  color:#00ADEC}
+/* onda16:hover-marcas-s42:fim */
