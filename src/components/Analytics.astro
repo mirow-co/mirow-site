@@ -1,29 +1,26 @@
 ---
-// GA4 (gtag.js). Só é injetado quando PUBLIC_GA_ID estiver definido no build.
-// Sem o ID, nada é carregado e nenhum cookie é criado — seguro por padrão.
-// O Measurement ID (G-XXXXXXX) é público por natureza; entra via env var para
-// permitir ligar/desligar por ambiente (ex.: só em produção).
+// Medicao GA4 (issue mirow-marketing#3).
 //
-// LGPD: usa Google Consent Mode v2 com default 'denied' (abaixo), então roda
-// cookieless ate o consentimento. Mesmo assim, o banner de cookies para dar
-// 'granted' segue como decisao pendente na #3 (banner vs. Cloudflare sem cookie).
-// process.env (não import.meta.env) para pegar a var tanto de .env local quanto
-// do ambiente de build do CI (GitHub Actions). O frontmatter roda em Node no build.
-const GA_ID = process.env.PUBLIC_GA_ID;
+// Carrega o MESMO arquivo que as paginas publicadas em public/ usam
+// (public/assets/mirow-analytics.js). Uma implementacao so: config das duas
+// propriedades, Consent Mode v2 e os eventos de contato/formulario/leitura vivem
+// la. Antes deste ajuste havia duas implementacoes, e a daqui nunca chegava ao ar
+// porque o GitHub Pages publica public/ e nao o dist/ do Astro.
+//
+// Measurement ID e publico por natureza e mora no codigo (nao e segredo, R11).
+// PUBLIC_GA_ID segue aceito como override para apontar um build a uma propriedade
+// de teste, sem mexer no arquivo compartilhado.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const OVERRIDE = process.env.PUBLIC_GA_ID;
 ---
 
 {
-  GA_ID && (
+  OVERRIDE ? (
     <Fragment>
-      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
-      <script is:inline define:vars={{ GA_ID }}>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${OVERRIDE}`} />
+      <script is:inline define:vars={{ OVERRIDE }}>
         window.dataLayer = window.dataLayer || [];
-        function gtag() {
-          dataLayer.push(arguments);
-        }
-        // Consent Mode v2 — default 'denied' ANTES de qualquer config: o GA4 roda
-        // cookieless (pings sem armazenamento) ate haver consentimento. Quando o
-        // banner de cookies existir, ele chama gtag('consent','update',{...:'granted'}).
+        function gtag() { dataLayer.push(arguments); }
         gtag('consent', 'default', {
           ad_storage: 'denied',
           ad_user_data: 'denied',
@@ -32,8 +29,13 @@ const GA_ID = process.env.PUBLIC_GA_ID;
           wait_for_update: 500,
         });
         gtag('js', new Date());
-        gtag('config', GA_ID);
+        gtag('config', OVERRIDE);
       </script>
+    </Fragment>
+  ) : (
+    <Fragment>
+      <script is:inline src={`${base}/assets/mirow-analytics.js`} />
+      <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-VK4QHHHS5X" />
     </Fragment>
   )
 }
