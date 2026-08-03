@@ -107,6 +107,15 @@ Ferramentas em `tools_onda6/qa/` (Chrome via CDP, screenshot real):
 | `click_test.py` | clique real | — |
 | `shot_hover.py` | estado de hover real | — |
 | `shot_modal.py`, `shot_menu.py` | modais e menus | — |
+| `breakpoints.py` | contact sheet multi-breakpoint (320/390/768/1024/1366/1920) num HTML único com métricas (overflow-x + culpados, telas de dobra, elementos zerados) | `aos-off`, `bp=…`, saída em `_qa_breakpoints/` (gitignored) |
+
+**Regra P4 ampliada (03/08):** nenhuma onda vira "PRONTO, aguardando OK" sem o **contact sheet**
+(`breakpoints.py`) da(s) página(s)-alvo anexado junto dos screenshots. Culpado de overflow achado
+no contact sheet é candidato natural a asserção V-nova na suíte.
+
+**Design system:** ler `docs/DESIGN-SYSTEM.md` **antes de escrever qualquer CSS novo** — tokens
+reais do tema (cores, fontes Archivo/Libre Franklin, breakpoints 992/1200), componentes canônicos
+e o passo a passo de capturar referência visual de outro site via CDP (sem playwright).
 
 ## Histórico das ondas (o que já está NO AR)
 

@@ -5,3 +5,4 @@ node_modules/
 .astro/
 .github/workflows/
 __pycache__/
+_qa_breakpoints/
