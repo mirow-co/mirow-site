@@ -534,3 +534,16 @@
 .menu__contatos-link--mail:hover,.menu__contatos-link--mail:focus-visible{
   color:#00ADEC}
 /* onda16:hover-marcas-s42:fim */
+
+/* onda17:hero-horizonte-s49:ini */
+/* S-49 (#107): hero Horizonte 2050 — cena no tamanho do fundo do banner
+   (que a onda14 ja prende a section inteira, sem mascara) e o convite ao
+   scroll como canvas pequeno no centro-base, acima do conteudo. As zonas
+   do tema: conteudo z-5 (onda14); o convite fica z-4 para nunca roubar
+   clique das pills. */
+.banner__background .hero-horizonte__cena{
+  position:absolute;top:0;left:0;width:100%;height:100%;display:block}
+.hero-horizonte__convite{
+  position:absolute;left:50%;bottom:18px;transform:translateX(-50%);
+  width:48px;height:72px;z-index:4;pointer-events:none}
+/* onda17:hero-horizonte-s49:fim */
