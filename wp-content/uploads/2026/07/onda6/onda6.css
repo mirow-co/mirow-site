@@ -734,10 +734,10 @@ html{scroll-behavior:smooth}
    branco, itens claros. Sobre o fundo claro do gradiente, navy tem contraste de
    sobra (o problema anterior era texto navy SOBRE o azul medio, nao a caixa). */
 .onda18-orbe{position:relative;z-index:6;margin:56px 0 0}
-.onda18-orbe__titulo{color:#020E66;font-size:34px;font-weight:700;margin:0 0 6px;
-  text-align:center}
-.onda18-orbe__sub{color:#071C25;font-size:17px;margin:0 0 28px;text-align:center;
-  opacity:.78}
+/* titulo no mesmo tratamento do "Nossos Lideres" da propria home:
+   branco-azulado #e9f0ff, display grande, alinhado a esquerda */
+.onda18-orbe__titulo{color:#e9f0ff;font-size:64px;font-weight:700;line-height:1.05;
+  margin:0 0 30px;text-align:left}
 .onda18-orbe__cards{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;
   list-style:none;margin:0;padding:0}
 .onda18-const{background:#020E66;border-top:3px solid #00ADEC;
@@ -746,9 +746,8 @@ html{scroll-behavior:smooth}
 .onda18-const:hover{transform:translateY(-4px);
   box-shadow:0 14px 30px rgba(2,14,102,.28)}
 .onda18-const__nome{display:block;color:#fff;font-size:17px;font-weight:700;
-  line-height:1.25;margin:0 0 4px}
-.onda18-const__conta{display:block;color:#00ADEC;font-size:13px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;margin:0 0 14px}
+  line-height:1.25;margin:0 0 14px;padding:0 0 12px;
+  border-bottom:1px solid rgba(0,173,236,.45)}
 .onda18-const__lista{list-style:none;margin:0;padding:0}
 .onda18-const__item{position:relative;padding-left:16px;margin:0 0 8px;
   color:#fff;font-size:14px;font-weight:400;line-height:1.35}
@@ -758,9 +757,11 @@ html{scroll-behavior:smooth}
 @media only screen and (max-width: 1200px){
   .onda18-orbe__cards{grid-template-columns:repeat(3,1fr)}
 }
+@media only screen and (max-width: 991px){
+  .onda18-orbe__titulo{font-size:44px}
+}
 @media only screen and (max-width: 767px){
-  .onda18-orbe__titulo{font-size:26px}
-  .onda18-orbe__sub{font-size:15px;margin-bottom:20px}
+  .onda18-orbe__titulo{font-size:32px;margin-bottom:20px}
   .onda18-orbe__cards{grid-template-columns:1fr;gap:12px}
 }
 /* onda18:planeta-setores:fim */
