@@ -2068,6 +2068,46 @@ def estaticas(s):
         return (not det, u"; ".join(det))
     s.check("S122", u"0 referência morta a /feed/ e 0 markup do ChatGPT (#106)", s122)
 
+    def s123():
+        # Achado da própria onda 33: 143 páginas referenciavam o asset de medição como
+        # "/wp-content/..." — sem o prefixo /mirow-site/ — e portanto 404avam no Pages.
+        # A M01 não pegava porque ela procura o NOME do arquivo, não o caminho.
+        # Aqui o caminho de TODA referência a asset próprio tem de resolver no disco.
+        det = []
+        for rel, h in s.todas():
+            for m in re.finditer(r'(?:src|href)="([^"]*(?:onda\d+[\w-]*|onda6)\.(?:js|css))(?:\?[^"]*)?"', h):
+                caminho = m.group(1)
+                if not caminho.startswith("/"):
+                    continue
+                if not caminho.startswith("/mirow-site/"):
+                    det.append(u"%s: %s sem o prefixo /mirow-site/" % (rel, caminho))
+                    continue
+                fp = os.path.join(pub, caminho[len("/mirow-site/"):].replace("/", os.sep))
+                if not os.path.exists(fp):
+                    det.append(u"%s: %s não existe no disco" % (rel, caminho))
+        return (not det, u"%d referência(s) quebrada(s): %s"
+                % (len(det), "; ".join(det[:3])))
+    s.check("S123", u"asset próprio sempre com o prefixo do espelho e existente", s123)
+
+    def s124():
+        # Achado da própria onda 33: a S-106 criou en/press e de/presse a partir de
+        # outro molde e o hreflang veio com ele — as duas declaravam a POLÍTICA DE
+        # PRIVACIDADE como sua versão nos outros idiomas, e pt/imprensa não tinha
+        # nenhum. As três têm de apontar umas para as outras.
+        esperado = {"pt": "/mirow-site/pt/imprensa/",
+                    "en": "/mirow-site/en/press/",
+                    "de": "/mirow-site/de/presse/"}
+        det = []
+        for rel in IMPRENSA:
+            h = s.ler(rel)
+            achado = dict((lg, hf) for hf, lg in re.findall(
+                r'<link rel="alternate" href="([^"]*)" hreflang="([^"]*)"', h))
+            if achado != esperado:
+                det.append(u"%s: hreflang %s" % (rel, sorted(achado.items())))
+        return (not det, u"%d página(s) de imprensa com hreflang errado: %s"
+                % (len(det), "; ".join(det[:3])))
+    s.check("S124", u"as 3 páginas de imprensa se apontam por hreflang", s124)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
