@@ -96,12 +96,15 @@ MARCADORES = [
     ("onda5:clientes-logos", 4), ("onda6:praticas", 4), ("onda7:lideres-link", 4),
     # ATENCAO (onda 29 / S-107): as 275 paginas viraram 125 de CONTEUDO + 160
     # stubs de redirect (uma URL por pagina). Os marcadores de barra/rodape agora
-    # se contam sobre as 125 — o numero 120 e o piso, nao a meta.
-    ("onda7:menu-sobre", 120), ("onda7:menu-praticas", 120),
+    # se contam sobre as de conteudo — o numero e o piso, nao a meta.
+    # ONDA 33 (S-118): as 12 paginas de perfil de quem saiu viraram stub, entao as
+    # de conteudo cairam de 125 para 113 e os pisos abaixo desceram junto (120->110,
+    # carreiras 80->74). Nao e regressao: e a mesma cobertura sobre menos paginas.
+    ("onda7:menu-sobre", 110), ("onda7:menu-praticas", 110),
     # o marcador de carreiras nunca existiu nas paginas DE (medido: 44 pt + 41 en,
     # 0 de) — o item esta lá, o comentario e que nao. Piso = pt+en.
-    ("onda7:menu-carreiras", 80),
-    ("onda8:menu-contatos", 120), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
+    ("onda7:menu-carreiras", 74),
+    ("onda8:menu-contatos", 110), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
     ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 3),
     # onda13:hero-malha saiu em 03/08 (S-49/#107): o bloco do video virou os
     # canvases do Horizonte 2050.
@@ -109,9 +112,9 @@ MARCADORES = [
     # onda14:rodape-menu e onda15:rodape-contatos saíram em 31/07 (decisão
     # explícita do Mario na #91: "IDENTICAS" — a nav recriada virou o clone
     # literal onda15:rodape-barra).
-    ("onda15:hero-texto", 4), ("onda15:rodape-barra", 120),
+    ("onda15:hero-texto", 4), ("onda15:rodape-barra", 110),
     # onda 18: botao de voltar ao topo em todas; planeta so nas homes
-    ("onda18:voltar-topo", 120), ("onda18:planeta-setores", 4),
+    ("onda18:voltar-topo", 110), ("onda18:planeta-setores", 4),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -144,14 +147,10 @@ CANAIS = [("WhatsApp", "wa.me/"), ("e-mail", "mailto:"),
 FALTAS_CONHECIDAS = {
     # link RSD que o WP deixa em toda página; não é usado por nada.
     "xmlrpc.php": "herança do WordPress, link morto e inofensivo",
-    # imagens da roda de 8 práticas, em 6 páginas — quebradas no site original.
-    # Rastreado na issue S-20.
-    "novo/wp-content/uploads/2023/04/strategic_ideation_formulation_execution-1.png": "S-20",
-    "novo/wp-content/uploads/2023/05/2-inovacao-modelo-de-negocio-radar-de-tendencias-workshop-ecossistema-1024x503.png": "S-20",
-    "novo/wp-content/uploads/2023/05/3-marketing-vendas-pricing-go-to-market-CX-forca-de-vendas-digital-1024x545.png": "S-20",
-    "novo/wp-content/uploads/2023/05/4-operacoes-supply-chain-SOP-CSC-procurement-estoques-1024x435.png": "S-20",
-    "novo/wp-content/uploads/2023/05/7-transformacao-metodologia-agil-gestao-da-mudanca-governanca-quick-wins-1024x521.png": "S-20",
-    "novo/wp-content/uploads/2023/05/8-adaptacao-climatica-sustentabilidade-net-zero-ESG-descarbonizacao-carbono-1024x552.png": "S-20",
+    # As 6 imagens da roda de práticas SAÍRAM desta lista na onda 33 (S-119/#69):
+    # foram recuperadas do WordPress vivo por tools_onda6/89_recupera_imagens_praticas.py
+    # e agora existem no disco. A E05 volta a cobrá-las de verdade, e a S119 garante
+    # que continuem lá. Não recolocar como exceção: se faltarem, é falha.
 }
 
 # Pedidos aceitos e ainda não implementados: entram como PENDENTE com a issue.
@@ -508,7 +507,12 @@ def estaticas(s):
 
     # L — quadro de líderes sem quem saiu (onda 6)
     def l01():
-        saiu = ["Giulia", "Mariana Sim", "Matheus"]
+        # Onda 33 (#81): a lista ganhou os 4 nomes que estavam em modal escondido na
+        # en/homepage. A cobertura mais ampla — nenhuma página do site inteiro citando
+        # quem saiu — é a S118; esta segue guardando as homes e o quadro de líderes.
+        saiu = ["Giulia", "Mariana Sim", "Matheus",
+                "Marcelo Soares", "Marcelo Massarente", "Lucas Santiago",
+                "Fernando Fabbris"]
         ruins = []
         for rel in HOMES + ["pt/lider/index.html"]:
             p = os.path.join(pub, rel.replace("/", os.sep))
@@ -1910,6 +1914,160 @@ def estaticas(s):
                         break
         return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
     s.check("S116", u"pin de cada parceiro na projeção da sua lat/lon (#174)", s116)
+
+    # ---------------------------------------------------------------- onda 33
+    # Lote de limpeza: cinco pedidos antigos, todos verificáveis. Cada um deixa uma
+    # asserção para trás, para o problema não voltar em silêncio.
+
+    # Quem saiu da firma e tinha página de perfil no espelho.
+    SAIRAM_SLUGS = ["giulia-turcato", "lucas-duarte",
+                    "mariana-nakagawa", "matheus-strapasson"]
+    # Nomes que não podem aparecer como AUTORIA nem como perfil. Fernando Fabbris
+    # não entra: ele é coautor real do artigo da transição climática (evento de
+    # out/2024), e apagar o crédito de quem escreveu seria falsear o registro — o
+    # que a onda 33 corrigiu ali foi o tempo verbal da bio (era "é", virou "foi").
+    EX_AUTORES = [u"Giulia Turcato"]
+
+    def s118():
+        # #66 + #81: quem saiu sai do site. Três coisas de uma vez:
+        #   a) nenhuma das 28 URLs de perfil serve conteúdo — todas redirecionam
+        #      para a página de líderes do idioma, num salto só;
+        #   b) nenhuma página de CONTEÚDO traz um ex-autor;
+        #   c) os 4 modais órfãos saíram da en/homepage.
+        det = []
+        alvos = [(rel, h) for rel, h in s.todas()
+                 if any(sl in rel.lower() for sl in SAIRAM_SLUGS)]
+        if len(alvos) != 28:
+            det.append(u"esperava 28 URLs de ex-líder, achei %d" % len(alvos))
+        lideres = ("/sobre-nos/lideres/", "/about-us/leaders/",
+                   "/ueber-uns/fuehrungskraefte/")
+        for rel, h in alvos:
+            if not s.eh_stub(rel, h):
+                det.append(u"%s ainda serve conteúdo" % rel)
+                continue
+            m = re.search(r'content="0;url=([^"]+)"', h)
+            if not m:
+                det.append(u"%s sem destino de redirect" % rel)
+            elif not any(a in m.group(1) for a in lideres):
+                # dois saltos: o stub mandaria para outro stub
+                det.append(u"%s redireciona para %s, não para os líderes"
+                           % (rel, m.group(1)))
+        for rel, h in s.conteudo():
+            for nome in EX_AUTORES:
+                if nome in h:
+                    det.append(u"%s ainda cita %s" % (rel, nome))
+        home_en = s.ler("en/homepage/index.html")
+        for nome in ("Marcelo Soares", "Marcelo Massarente",
+                     "Lucas Santiago", "Fernando Fabbris"):
+            if nome in home_en:
+                det.append(u"modal de %s de volta na en/homepage" % nome)
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:4])))
+    s.check("S118", u"quem saiu não tem página nem autoria no site (#66/#81)", s118)
+
+    def s119():
+        # #69: as 6 imagens das práticas existem no disco de verdade. Antes eram
+        # exceção declarada em FALTAS_CONHECIDAS ("S-20"); foram recuperadas do
+        # WordPress vivo. A E05 já cobra "todo asset existe" — esta garante que
+        # ninguém as devolva para a lista de exceções, e que não sejam placeholder.
+        det = []
+        for rel, _h in s.conteudo():
+            pass
+        esperadas = [
+            "novo/wp-content/uploads/2023/04/strategic_ideation_formulation_execution-1.png",
+            "novo/wp-content/uploads/2023/05/2-inovacao-modelo-de-negocio-radar-de-tendencias-workshop-ecossistema-1024x503.png",
+            "novo/wp-content/uploads/2023/05/3-marketing-vendas-pricing-go-to-market-CX-forca-de-vendas-digital-1024x545.png",
+            "novo/wp-content/uploads/2023/05/4-operacoes-supply-chain-SOP-CSC-procurement-estoques-1024x435.png",
+            "novo/wp-content/uploads/2023/05/7-transformacao-metodologia-agil-gestao-da-mudanca-governanca-quick-wins-1024x521.png",
+            "novo/wp-content/uploads/2023/05/8-adaptacao-climatica-sustentabilidade-net-zero-ESG-descarbonizacao-carbono-1024x552.png",
+        ]
+        for rel in esperadas:
+            p = os.path.join(pub, rel.replace("/", os.sep))
+            if not os.path.exists(p):
+                det.append(u"ausente: %s" % rel.split("/")[-1])
+                continue
+            if os.path.getsize(p) < 10 * 1024:
+                det.append(u"%s tem só %d bytes — não é a imagem"
+                           % (rel.split("/")[-1], os.path.getsize(p)))
+            with io.open(p, "rb") as f:
+                if f.read(4) != b"\x89PNG":
+                    det.append(u"%s não é PNG" % rel.split("/")[-1])
+        for rel in esperadas:
+            if rel in FALTAS_CONHECIDAS:
+                det.append(u"%s voltou para FALTAS_CONHECIDAS" % rel.split("/")[-1])
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S119", u"as 6 imagens das práticas existem de verdade (#69)", s119)
+
+    def s120():
+        # #70: o sitemap existe, e é EXATAMENTE o que o gerador produz das páginas de
+        # conteúdo. A suíte RECALCULA a lista e compara — sitemap editado à mão, ou
+        # página nova que ninguém regerou, quebra aqui (mesmo padrão da S116).
+        import importlib.util
+        p_sitemap = os.path.join(pub, "sitemap.xml")
+        if not os.path.exists(p_sitemap):
+            return (False, u"public/sitemap.xml ausente — o robots.txt aponta para o vazio")
+        p_gen = os.path.join(os.path.dirname(pub), "tools_onda6",
+                             "90_sitemap_e_raiz.py")
+        spec = importlib.util.spec_from_file_location("gen90", p_gen)
+        gen = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(gen)
+
+        itens = gen.urls_do_sitemap(pub)
+        esperado = gen.xml_do_sitemap(itens)
+        atual = s.ler("sitemap.xml")
+        det = []
+        if atual != esperado:
+            det.append(u"sitemap.xml diverge do gerador (%d URLs esperadas)"
+                       % len(itens))
+        # nenhuma URL do sitemap pode ser noindex nem faltar no disco
+        for loc, _lastmod in itens:
+            caminho = loc.split(gen.PREFIXO, 1)[1] if gen.PREFIXO in loc else None
+            if caminho is None:
+                det.append(u"URL fora do espelho: %s" % loc)
+                continue
+            rel = caminho.rstrip("/") + "/index.html"
+            fp = os.path.join(pub, rel.replace("/", os.sep))
+            if not os.path.exists(fp):
+                det.append(u"URL sem arquivo: %s" % loc)
+            elif "noindex" in s.ler(rel).lower():
+                det.append(u"URL noindex no sitemap: %s" % loc)
+        # e o robots tem de apontar para ele
+        robots = s.ler("robots.txt")
+        url = gen.BASE + gen.PREFIXO + "sitemap.xml"
+        if ("Sitemap: %s" % url) not in robots:
+            det.append(u"robots.txt não aponta para %s" % url)
+        return (not det, u"%d problema(s) (%d URLs): %s"
+                % (len(det), len(itens), "; ".join(det[:3])))
+    s.check("S120", u"sitemap.xml existe, bate com o gerador e o robots aponta (#70)",
+            s120)
+
+    def s121():
+        # #71: a raiz do Pages vai para /pt/, não para /en/. Firma brasileira,
+        # conteúdo principal em PT — decisão do Mario.
+        h = s.ler("index.html")
+        m = re.search(r'content="0;url=([^"]+)"', h)
+        if not m:
+            return (False, u"public/index.html não é redirect: %r" % h[:80])
+        destino = m.group(1)
+        return (destino.rstrip("/").endswith("/pt"),
+                u"a raiz manda para %s (esperado terminar em /pt/)" % destino)
+    s.check("S121", u"raiz do Pages redireciona para /pt/ (#71)", s121)
+
+    def s122():
+        # #106: 0 referência a /feed/ (não existe feed num site estático: eram 37
+        # <link rel=alternate rss>, todos 404) e 0 resquício de UI do ChatGPT
+        # colada nas páginas alemãs de digital.
+        det = []
+        comfeed = [rel for rel, h in s.todas() if "/feed/" in h]
+        if comfeed:
+            det.append(u"%d página(s) com /feed/: %s"
+                       % (len(comfeed), ", ".join(comfeed[:3])))
+        chat = [rel for rel, h in s.todas() if "ChatGPT" in h]
+        if chat:
+            det.append(u"%d página(s) com markup do ChatGPT: %s"
+                       % (len(chat), ", ".join(chat[:3])))
+        return (not det, u"; ".join(det))
+    s.check("S122", u"0 referência morta a /feed/ e 0 markup do ChatGPT (#106)", s122)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
