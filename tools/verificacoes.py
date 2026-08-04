@@ -2108,6 +2108,37 @@ def estaticas(s):
                 % (len(det), "; ".join(det[:3])))
     s.check("S124", u"as 3 páginas de imprensa se apontam por hreflang", s124)
 
+    def s125():
+        # #178: o "m" da marca no centro do hero. O path desenhado no canvas tem de
+        # ser EXATAMENTE o primeiro <path> de marca-mirow-co.svg — fonte única do
+        # glifo (P3). Se a marca oficial mudar, a suíte acusa em vez de o hero
+        # divergir do resto do site em silêncio.
+        js_rel = "wp-content/uploads/2026/07/onda6/onda17-horizonte.js"
+        svg_rel = "wp-content/uploads/2024/04/marca-mirow-co.svg"
+        for rel in (js_rel, svg_rel):
+            if not os.path.exists(os.path.join(pub, rel.replace("/", os.sep))):
+                return (False, u"arquivo ausente: %s" % rel)
+        js = s.ler(js_rel)
+        svg = s.ler(svg_rel)
+        oficial = re.findall(r'<path d="([^"]+)"', svg)
+        if not oficial:
+            return (False, u"nenhum <path> em %s" % svg_rel)
+        m = re.search(r"var M_PATH = '([^']+)'", js)
+        if not m:
+            return (False, u"M_PATH não encontrado em %s" % js_rel)
+        if m.group(1) != oficial[0]:
+            return (False, u"o M_PATH do canvas divergiu do 1º path de %s "
+                           u"(marca %d chars, canvas %d chars)"
+                    % (svg_rel, len(oficial[0]), len(m.group(1))))
+        # e o logo tem de ser efetivamente desenhado na cena
+        falta = [t for t in ("desenharLogo(", "new Path2D(M_PATH)", "medirCentro(")
+                 if t not in js]
+        if falta:
+            return (False, u"o canvas não desenha o logo: falta %s" % ", ".join(falta))
+        return (True, u"M_PATH idêntico ao da marca (%d chars)" % len(oficial[0]))
+    s.check("S125", u'o "m" do hero vem da marca oficial, sem cópia divergente (#178)',
+            s125)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.

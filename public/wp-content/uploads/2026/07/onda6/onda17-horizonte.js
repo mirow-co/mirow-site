@@ -10,6 +10,16 @@
  *    pedido pelo Mario (03/08); custo ~zero por ser minusculo.
  * prefers-reduced-motion: cena e convite desenhados estaticos, nenhum loop.
  */
+/* onda34 (S-125 / #178): o "m" da Mirow no ponto de fuga, como fonte das linhas.
+ * O pedido do Mario: "um logo do M da mirow no meio do campo central, como algo
+ * grandioso da onde saem essas linhas dinamicas apontando para fora, o centro de
+ * tudo, da inteligencia". As linhas ja convergiam para o centro do horizonte —
+ * o logo vai exatamente nesse ponto, e a origem delas foi APERTADA (v*38 -> v*10)
+ * para elas lerem como se saissem de dentro dele.
+ * O path vem do PRIMEIRO <path> de wp-content/uploads/2024/04/marca-mirow-co.svg
+ * (o mesmo glifo do badge do LinkedIn, em vetor). A assercao S125 recompara os
+ * dois: se o arquivo da marca mudar, a suite acusa em vez de divergir calada.
+ */
 (function () {
   var cena = document.querySelector('.hero-horizonte__cena');
   var conv = document.querySelector('.hero-horizonte__convite');
@@ -18,8 +28,57 @@
   var reduz = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function rgba(a) { return 'rgba(0,173,236,' + a + ')'; }
 
+  /* o "m" da marca, viewBox 0 0 101 102 */
+  var M_PATH = 'M50.3453 11.9887C55.1412 4.19839 62.635 0.000167847 72.8282 0.000167847C81.213 0.000167847 87.9597 3.15018 92.6023 8.24178C99.8011 16.1861 99.8011 26.2261 99.8011 38.3632V100.702H88.7083V38.3632C88.7083 26.9723 88.7083 20.6801 84.5155 15.5869C81.8169 12.2906 77.3183 10.4907 72.0734 10.4907C66.8278 10.4907 62.3385 12.2906 59.639 15.5869C55.4431 20.6801 55.4431 26.9723 55.4431 38.3632V100.702H44.3542V38.3632C44.3542 26.9723 44.3542 20.6801 40.1575 15.5869C37.4635 12.2906 32.9641 10.4907 27.7177 10.4907C22.4744 10.4907 17.9804 12.2906 15.2856 15.5869C11.0843 20.6801 11.0843 26.9723 11.0843 38.3632V100.702H0V38.3632C0 26.2261 -7.38287e-07 15.8834 7.49068 8.24178C12.4352 3.15018 19.4784 0.000167847 28.4663 0.000167847C38.0557 0.000167847 46.1525 4.04433 50.3453 11.9887Z';
+  var M_VB = 102;                       /* lado do viewBox usado para escalar */
+  var mPath = (typeof Path2D === 'function') ? new Path2D(M_PATH) : null;
+
+  /* Tamanho do logo por faixa de largura. Nao e so estetica: em <=992px o slogan
+   * e os 4 contatos ocupam a largura inteira do palco, e a folga vertical em volta
+   * do horizonte cai para ~100px — logo grande ali ATROPELA o texto. Por isso ele
+   * e grandioso no desktop (onde existe um vao central real entre o slogan e os
+   * big numbers) e vira marca d'agua discreta no estreito. Medido na S125b. */
+  function tamanhoLogo() {
+    if (W >= 1400) return 300;
+    if (W >= 1200) return 260;
+    if (W >= 992) return 200;
+    if (W >= 768) return 120;
+    return 92;
+  }
+  /* O logo mora no canvas do FUNDO (.banner__background), atras dos dois cards do
+   * hero (slogan a esquerda, big numbers a direita). No desktop o vao livre entre
+   * eles tem so ~140px, entao um logo grandioso necessariamente passa por tras dos
+   * cards — e por isso entra como marca d'agua luminosa, calibrada para NAO comer a
+   * legibilidade do subtitulo. Variante alternativa (nitido, dentro do vao de
+   * 140px) esta na #178 para o Mario escolher. */
+  function alphaLogo() { return W >= 992 ? 0.68 : 0.40; }
+
   /* ------------------------------- cena ------------------------------- */
-  var ctx = cena.getContext('2d'), W, H, cometas = [];
+  var ctx = cena.getContext('2d'), W, H, cometas = [], centroX = 0;
+
+  /* onda34: onde fica o "centro de tudo".
+   * O canvas mora no fundo, atras dos dois cards do hero (.hero-texto a esquerda,
+   * .hero-numeros a direita). O centro geometrico do palco cai DENTRO do card da
+   * esquerda: medido em 1400px, um logo de 300px centrado em W/2 fica com 270px
+   * atras do card e 30px no azul aberto — sai torto, com cara de acidente.
+   * Entao o centro passa a ser o meio do VAO entre os cards (medido do DOM, para
+   * valer nos 3 idiomas e em toda largura). Quando os cards empilham (<992px) nao
+   * existe vao horizontal e o centro volta a ser o do palco. */
+  function medirCentro() {
+    var a = document.querySelector('.hero-texto');
+    var b = document.querySelector('.hero-numeros');
+    var meio = W * .5;
+    if (!a || !b) return meio;
+    var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    if (!ra.width || !rb.width) return meio;
+    var esq = Math.max(ra.right, rb.right), dir = Math.min(ra.left, rb.left);
+    if (rb.left < ra.left) { esq = rb.right; dir = ra.left; }
+    else { esq = ra.right; dir = rb.left; }
+    var vao = dir - esq;
+    if (vao < 60) return meio;          /* cards empilhados ou colados */
+    var pal = cena.parentNode.getBoundingClientRect();
+    return (esq + dir) / 2 - pal.left;
+  }
   function semear() {
     cometas = [];
     for (var i = 0; i < 7; i++) {
@@ -33,11 +92,36 @@
     W = r.width; H = r.height;
     cena.width = W * d; cena.height = H * d;
     ctx.setTransform(d, 0, 0, d, 0, 0);
+    centroX = medirCentro();
     semear();
   }
   function vLinha(v, hor) {
-    var cx = W * .5;
-    return { x0: cx + v * 38, y0: hor, x1: cx + v * W * .12, y1: H };
+    var cx = centroX || W * .5;
+    /* onda34: era v*38 (origens espalhadas por ~1060px no horizonte, o que nao
+     * lia como ponto de origem). Com v*10 as 29 origens caem DENTRO do logo, e as
+     * linhas saem de dentro dele abrindo para fora — o efeito que o Mario pediu. */
+    return { x0: cx + v * 10, y0: hor, x1: cx + v * W * .12, y1: H };
+  }
+
+  /* onda34: o "m" no ponto de fuga, com halo. Desenhado DEPOIS da grade e das
+   * linhas (para nao ficar riscado por elas) e ANTES dos cometas (que passam por
+   * cima, reforcando que saem de tras dele). */
+  function desenharLogo(alpha, hor) {
+    if (!mPath) return;                 /* navegador sem Path2D: cena sem logo */
+    var t = tamanhoLogo(), cx = centroX || W * .5, cy = hor, esc = t / M_VB, g;
+    g = ctx.createRadialGradient(cx, cy, 0, cx, cy, t * 1.25);
+    g.addColorStop(0, rgba(alpha * .30));
+    g.addColorStop(.55, rgba(alpha * .10));
+    g.addColorStop(1, rgba(0));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(cx, cy, t * 1.25, 0, 7); ctx.fill();
+    ctx.save();
+    ctx.translate(cx - t / 2, cy - t / 2);
+    ctx.scale(esc, esc);
+    ctx.shadowColor = rgba(.5); ctx.shadowBlur = 12 / esc;
+    ctx.fillStyle = 'rgba(255,255,255,' + (alpha * alphaLogo()) + ')';
+    ctx.fill(mPath);
+    ctx.restore();
   }
   function desenhar(t, alpha, vel) {
     var hor = H * .62, f, x, y, g, i, v, c, co, L, p;
@@ -69,6 +153,7 @@
       ctx.strokeStyle = rgba(alpha * .14);
       ctx.beginPath(); ctx.moveTo(L.x0, L.y0); ctx.lineTo(L.x1, L.y1); ctx.stroke();
     }
+    desenharLogo(alpha, hor);            /* onda34: o centro de tudo */
     for (c = 0; c < cometas.length; c++) { /* cometas descendo */
       co = cometas[c];
       co.p += co.vel * .011 * vel;
