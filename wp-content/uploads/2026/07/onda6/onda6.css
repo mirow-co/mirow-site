@@ -838,28 +838,52 @@ html{scroll-behavior:smooth}
 .menu__nav-sublink{color:#020E66 !important;font-weight:400}
 .menu__nav-sublink:hover,.menu__nav-sublink:focus-visible{color:#00ADEC !important}
 
-/* o .col do tema encolhia no conteudo: sem isto a grade ocupava so 1/3 do painel */
+/* Largura do painel — duas camadas, as duas necessarias (medido via CDP):
+   dentro do submenu, o .container do tema e flex, entao o .row e um FLEX ITEM e
+   encolhia no conteudo; e o .col, dentro do .row, tambem. Sem os dois, a grade
+   ficava agrupada a esquerda em vez de ocupar a largura util. */
+.menu__nav-submenu .container>.row{flex:1 1 100%;width:100%}
 .menu__nav-submenu .row>.col{flex:0 0 100%;width:100%;max-width:100%}
 /* Sobre nos: os 5 itens espalhados no width, como o painel da Bain */
 .menu__nav-sublinks:not(.onda18-praticas){display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));gap:2px 24px}
+  grid-template-columns:repeat(5,max-content);justify-content:space-between;
+  gap:2px 24px}
 .menu__nav-sublinks:not(.onda18-praticas) .menu__nav-sublink{font-size:19px !important}
 
 /* Praticas: 3 colunas iguais ocupando o width, divididas por linha cinza
    (o "|" da S-65 vira o divisor da coluna — e o que faz ocupar a caixa toda) */
+/* S-88: colunas do tamanho do conteudo e espalhadas — com 3 colunas iguais,
+   "Sourcing, Compras e Estoques" nao cabia e quebrava em 2 linhas. */
 .menu__nav-sublinks.onda18-praticas{display:grid !important;
-  grid-template-columns:repeat(3,minmax(0,1fr));gap:0;align-items:center}
+  grid-template-columns:repeat(3,max-content);justify-content:space-between;
+  gap:0;align-items:center}
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublink{white-space:nowrap}
 .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem{margin:0;padding:0 24px}
 .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem{
   border-left:1px solid rgba(127,127,127,.55)}
 .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem:first-child{padding-left:0}
 .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem::before{
   content:none}
-.menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:28px !important;
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:26px !important;
   font-weight:700;line-height:1.2;display:block}
-@media only screen and (max-width: 1366px){
-  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:23px !important}
+@media only screen and (max-width: 1440px){
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:22px !important}
 }
+@media only screen and (max-width: 1200px){
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:19px !important}
+}
+
+/* ---- S-90: o balao de idiomas no navy Mirow, nao mais preto -------------- */
+.menu__languages-list{background:#020E66 !important;
+  box-shadow:0 14px 30px rgba(2,14,102,.32)}
+/* a setinha do balao acompanha (no header aponta para cima; no rodape, S-52,
+   ela e invertida e vira border-top) */
+.menu__languages-list::after{border-bottom-color:#020E66 !important}
+.rodape-barra .menu__languages-list::after{border-top-color:#020E66 !important}
+.menu__languages-list li a{color:#fff !important}
+.menu__languages-list li:not(.menu__languages-list-current) a:hover{
+  color:#00ADEC !important}
+.menu__languages-list li.menu__languages-list-current a{color:#00ADEC !important}
 
 /* ---- S-79: a barra do rodape sangra 100vw, como a de cima ---------------- */
 .rodape-barra{width:100vw;margin-left:calc(50% - 50vw) !important;
@@ -873,7 +897,8 @@ html{scroll-behavior:smooth}
   .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem{padding:0}
   .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem{
     border-left:0}
-  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:19px !important}
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:19px !important;
+    white-space:normal}
 }
 /* onda21:menus-bain:fim */
 
@@ -966,21 +991,25 @@ html{scroll-behavior:smooth}
 /* onda21:rede-v2:fim */
 
 /* onda22:marca-secoes:ini */
-/* ---- S-85: a marca de secao como framework da home ----------------------
-   O icone e o glifo que o tema ja desenhava ao lado de "PRATICAS"
-   (.home-experience__title::after + ::before). Aqui virou componente, e a
-   VARIACAO e a posicao da secao: quadrado grande + N quadradinhos, N = numero da
-   secao. Descendo a home, a marca conta 1, 2, 3, 4 — um indice visual.
-   currentColor: a marca herda a cor do cabecalho, entao o contraste se resolve
-   em cada fundo do gradiente. */
-.onda22-marca{position:relative;display:block;width:34px;height:34px;
-  background:currentColor;margin:0 0 20px}
-.onda22-marca::before{content:"";position:absolute;left:42px;bottom:2px;
-  width:10px;height:10px;background:currentColor}
-.onda22-marca--2::before{box-shadow:0 -14px 0 currentColor}
-.onda22-marca--3::before{box-shadow:0 -14px 0 currentColor,0 -28px 0 currentColor}
-.onda22-marca--4::before{box-shadow:0 -14px 0 currentColor,0 -28px 0 currentColor,
-  0 -42px 0 currentColor}
+/* ---- S-85 + S-86: a marca de secao como framework da home ---------------
+   Nasceu do glifo que o tema desenhava ao lado de "PRATICAS"
+   (.home-experience__title::after + ::before). Na v2 (S-86) e uma GRADE 2x2 de
+   quatro blocos: o bloco do quadrante da secao fica maior e opaco, os outros
+   tres pequenos e esmaecidos — "voce esta aqui" no mapa da home.
+       [1] [2]     1 expertise   2 setores
+       [3] [4]     3 lideres     4 reconhecimentos
+   Navy fixo (#020E66) e float:left, a pedido: nos blocos de fundo escuro o
+   marcador fica discreto de proposito. */
+.onda22-marca{float:left;display:grid;
+  grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);
+  gap:4px;width:26px;height:26px;margin:12px 14px 0 0}
+.onda22-marca i{align-self:center;justify-self:center;
+  width:7px;height:7px;background:#020E66;opacity:.42}
+/* o quadrante da secao: um pouco maior e opaco — e o "voce esta aqui" */
+.onda22-marca--1 i:nth-child(1),
+.onda22-marca--2 i:nth-child(2),
+.onda22-marca--3 i:nth-child(3),
+.onda22-marca--4 i:nth-child(4){width:12px;height:12px;opacity:1}
 
 /* ---- titulos parelhos: mesma fonte, peso, caixa, alinhamento e margem ----- */
 .home-experience__subtitle,
@@ -994,6 +1023,10 @@ html{scroll-behavior:smooth}
   font-family:var(--fontFamily),Arial,sans-serif}
 /* a cor NAO pode ser igual: o gradiente da home vai de claro a escuro */
 .home-experience__subtitle{color:#020E66 !important}
+/* S-87: ao rolar, o tema poe .home-experience--dark-mode na secao e o fundo
+   ESCURECE. O navy fixo (que a S-85 forcou com !important) sumia junto — era o
+   "apagar" que o Mario viu. No estado escuro o titulo vira claro. */
+.home-experience--dark-mode .home-experience__subtitle{color:#e9f0ff !important}
 .onda18-orbe__titulo{color:#e9f0ff !important}
 .home-leaders__subtitle{color:#e9f0ff !important}
 .certificates__title,.certificates h2{color:#020E66 !important}
@@ -1011,8 +1044,11 @@ html{scroll-behavior:smooth}
   .home-experience__subtitle,.onda18-orbe__titulo,.home-leaders__subtitle,
   .certificates__title,.certificates h2{font-size:34px !important;
     margin-bottom:22px !important}
-  .onda22-marca{width:28px;height:28px;margin-bottom:16px}
-  .onda22-marca::before{left:34px;width:8px;height:8px}
+  .onda22-marca{width:22px;height:22px;gap:3px;margin:8px 12px 0 0}
+  .onda22-marca i{width:6px;height:6px}
+  .onda22-marca--1 i:nth-child(1),.onda22-marca--2 i:nth-child(2),
+  .onda22-marca--3 i:nth-child(3),.onda22-marca--4 i:nth-child(4){
+    width:10px;height:10px}
 }
 @media only screen and (max-width: 767px){
   .home-experience__subtitle,.onda18-orbe__titulo,.home-leaders__subtitle,
