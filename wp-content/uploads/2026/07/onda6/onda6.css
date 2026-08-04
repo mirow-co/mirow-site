@@ -1065,3 +1065,90 @@ html{scroll-behavior:smooth}
 .menu__nav-sublink{font-weight:600 !important}
 .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-weight:600 !important}
 /* onda25:peso-submenu:fim */
+
+/* onda26:fonte-unica:ini */
+/* ---- S-98: UMA fonte em todo o site ------------------------------------
+   O tema pedia Archivo/Libre Franklin/Roboto Serif por variavel, mas nenhuma
+   das tres e carregada em nenhuma das 275 paginas — so o Titillium Web esta no
+   <head>. As variaveis passam a apontar para ela; assim as ~130 regras do tema
+   que usam var(--fontFamily)/var(--secondaryFontFamily) continuam valendo e
+   convergem para a mesma familia. */
+:root{
+  --fontFamily:"Titillium Web",sans-serif;
+  --secondaryFontFamily:"Titillium Web",sans-serif;
+  --secondaryfontFamily:"Titillium Web",sans-serif; /* typo que existe no CSS do tema */
+  --tertiaryFontFamily:"Titillium Web",sans-serif;
+  --bs-font-sans-serif:"Titillium Web",sans-serif;
+  --bs-body-font-family:"Titillium Web",sans-serif;
+}
+body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans-serif}
+/* o widget "chosen" e o unico lugar do tema que nomeia sans-serif na mao */
+.chosen-container-single .chosen-search input[type=text],
+.chosen-container-multi .chosen-choices li.search-field input[type=text]{
+  font-family:"Titillium Web",sans-serif}
+/* onda26:fonte-unica:fim */
+
+/* onda26:ajustes-s97-s100:ini */
+/* ---- S-97: "Ver todos os lideres" em azul ------------------------------
+   Era branco (onda 7, quando a secao era escura). Depois da S-91 o fundo ficou
+   claro — navy e o que le. */
+.onda7-vertodos{color:#020E66 !important}
+.onda7-vertodos:hover,.onda7-vertodos:focus-visible{color:#00ADEC !important}
+
+/* ---- S-99: Praticas no mesmo tamanho de Sobre nos (19px) ---------------
+   Revoga o tamanho maior da S-65/S-88 (26px no desktop). Vale em toda a
+   largura, no header e no rodape. */
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublink,
+.menu__nav-sublinks:not(.onda18-praticas) .menu__nav-sublink{
+  font-size:19px !important}
+@media only screen and (max-width: 1440px){
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:19px !important}
+}
+@media only screen and (max-width: 1200px){
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:19px !important}
+}
+/* o "|" que separa as praticas acompanha o texto menor */
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem::before{
+  font-size:19px}
+
+/* ---- S-100: nada separando a politica de privacidade da barra ---------- */
+.rodape-barra{border-bottom:0 !important}
+/* onda26:ajustes-s97-s100:fim */
+
+/* onda26:imprensa-linha:ini */
+/* ---- S-102: a linha inteira e o link ----------------------------------
+   O grid sai do <li> e vai para o <a> que agora envolve a linha toda: assim
+   clicar no logo, no veiculo ou na data abre o artigo, e existe UM link por
+   linha (nao dois sobrepostos) — o leitor de tela anuncia uma vez, o Tab para
+   uma vez. */
+.onda18-imprensa__item{display:block;padding:0}
+.onda26-imprensa__link{display:grid;
+  grid-template-columns:34px minmax(150px,190px) 108px 1fr;
+  align-items:center;gap:0 18px;padding:16px 22px;
+  text-decoration:none;color:inherit}
+.onda26-imprensa__link:focus-visible{outline:2px solid #00ADEC;outline-offset:-2px}
+.onda18-imprensa__item:hover .onda18-imprensa__titulo{color:#00ADEC;
+  border-bottom-color:#00ADEC}
+@media only screen and (max-width: 991px){
+  .onda26-imprensa__link{grid-template-columns:28px 1fr;gap:6px 14px;
+    padding:14px 16px}
+}
+/* onda26:imprensa-linha:fim */
+
+/* onda26:lider-mail:ini */
+/* ---- S-101: e-mail no card de lider da home ---------------------------
+   O card e um <button> (modal da bio), entao o link mora no wrapper e se
+   sobrepoe — mesmo padrao do icone do LinkedIn da S-50. Fica a esquerda dele. */
+.onda26-lider__mail{position:absolute;right:35px;bottom:0;width:35px;height:35px;
+  z-index:3;display:flex;align-items:center;justify-content:center;
+  color:#0E41A7;border-radius:3px;transition:background 200ms ease,color 200ms ease}
+.onda26-lider__mail:hover,.onda26-lider__mail:focus-visible{
+  background:rgba(0,173,236,.22);color:#00ADEC;outline:none}
+.onda26-lider__mail svg{display:block}
+/* no mobile o card estreita (45% da largura) e o cargo chegava a passar por
+   baixo do envelope — "Managing Partne✉". Reserva a faixa dos dois icones. */
+@media only screen and (max-width: 991px){
+  .onda26-lider--mail .home-leaders__card span p{padding-right:74px;
+    box-sizing:border-box}
+}
+/* onda26:lider-mail:fim */
