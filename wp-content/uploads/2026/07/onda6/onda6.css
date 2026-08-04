@@ -1152,8 +1152,11 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 /* a agulha: 8px de ponto no lugar exato + haste subindo ate o chip */
 .onda31-pin__agulha{position:absolute;left:-4px;top:-4px;width:8px;height:8px;
   border-radius:50%;background:#00ADEC;box-shadow:0 0 0 3px rgba(0,173,236,.28)}
-.onda31-pin__corpo{position:absolute;left:0;bottom:var(--sobe,12px);
-  transform:translateX(calc(-50% + var(--dx,0px)))}
+/* o chip e CENTRADO no deslocamento que o gerador calculou — pode estar acima,
+   ao lado ou abaixo do ponto (S-117), o que importa e ser o lugar livre mais
+   proximo da cidade */
+.onda31-pin__corpo{position:absolute;left:0;top:0;
+  transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,-40px)))}
 .onda31-pin__chip{display:block;padding:8px 12px;border:0;cursor:pointer;
   background:#fff;border-radius:4px;box-shadow:0 6px 18px rgba(2,14,102,.34);
   transition:transform 200ms ease,box-shadow 200ms ease}
@@ -1168,7 +1171,7 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   height:var(--len,12px);transform-origin:bottom center;
   transform:rotate(var(--ang,0deg));background:rgba(0,173,236,.85)}
 
-.onda31-pin__card{position:absolute;left:50%;bottom:calc(100% + 12px);
+.onda31-pin__card{position:absolute;left:50%;bottom:calc(100% + 10px);
   transform:translateX(-50%) translateY(6px);width:230px;padding:14px 16px;
   background:#fff;border-radius:4px;box-shadow:0 16px 34px rgba(2,14,102,.34);
   opacity:0;visibility:hidden;transition:all 220ms ease;z-index:6}
