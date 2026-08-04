@@ -8,7 +8,7 @@ Issue mirow-marketing#3. Idempotente: rodar 2x reporta 0 mudancas.
 O espelho do WordPress trouxe um bloco gtag inline em cada pagina, apontando para a
 propriedade G-VK4QHHHS5X (herdada do site antigo, dono nao confirmado) e sem Consent
 Mode. Este script troca esse bloco por uma referencia unica a
-wp-content/uploads/2026/07/onda6/onda17-medicao.js, que configura as duas
+wp-content/uploads/2026/07/onda6/onda31-medicao.js, que configura as duas
 propriedades da transicao, trata consentimento e instrumenta os eventos.
 
 A referencia sai SEM ?v= de proposito: o carimbo e do 27_cache_busting.py, que roda
@@ -26,7 +26,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import resolve_public, base_prefix, ler, gravar  # noqa: E402
 
-ASSET = "wp-content/uploads/2026/07/onda6/onda17-medicao.js"
+ASSET = "wp-content/uploads/2026/07/onda6/onda31-medicao.js"
 
 # Bloco gtag inline que veio no espelho (identico nas 275 paginas).
 GTAG_INLINE = re.compile(

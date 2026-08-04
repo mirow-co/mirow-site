@@ -7,6 +7,13 @@ O seletor aponta o elemento sobre o qual o mouse e posicionado (ex.: o link
 "Sobre nos" ou o botao de idiomas). O hover e disparado via CDP
 (Input.dispatchMouseEvent), entao tanto o :hover do CSS quanto o mouseenter do
 jQuery do tema rodam de verdade.
+
+CUIDADO (achado na onda 27): a captura usa `captureBeyondViewport`, e nesse modo
+o Chrome REPINTA a pagina e parte do estado de hover se perde — os links e os
+icones da barra saem invisiveis (brancos sobre o painel branco) mesmo estando
+corretos no navegador. Isso ja rendeu uma caca a bug inexistente. Para conferir
+COR em estado de hover, capture sem `captureBeyondViewport` (viewport puro) ou
+meca `getComputedStyle` via Runtime.evaluate.
 """
 import base64
 import json

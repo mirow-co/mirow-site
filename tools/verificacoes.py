@@ -72,6 +72,13 @@ BLOCOS_CSS = [
     "onda11:s13-form-topo", "onda12:praticas-nav", "onda13:hero-malha",
     "onda14:hero-malha-cheia", "onda14:menu-executivo", "onda14:fundo-sem-sobras",
     "onda15:hero-scrims", "onda15:barras-gemeas", "onda15:rodape-barra",
+    "onda16:hero-layout-s41", "onda16:hover-marcas-s42",
+    "onda17:hero-horizonte-s49",
+    # onda 18 (S-50..S-71, pedidos do Mario de 03/08)
+    "onda18:contato-botao", "onda18:barras", "onda18:voltar-topo",
+    "onda18:carreiras", "onda18:insights-colorido", "onda18:home-lideres",
+    "onda18:imprensa", "onda18:planeta-setores", "onda18:hero-numeros-s73",
+    "onda19:lateral-e-idiomas", "onda21:menus-bain", "onda21:rede-v2", "onda22:marca-secoes", "onda25:peso-submenu",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -81,14 +88,24 @@ BLOCOS_CSS = [
 # páginas terem link de carreiras no menu — é a asserção H08, não o marcador.
 MARCADORES = [
     ("onda5:clientes-logos", 4), ("onda6:praticas", 4), ("onda7:lideres-link", 4),
-    ("onda7:menu-sobre", 275), ("onda7:menu-praticas", 275), ("onda7:menu-carreiras", 200),
-    ("onda8:menu-contatos", 275), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
-    ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 5),
-    ("onda13:hero-malha", 4),
+    # ATENCAO (onda 29 / S-107): as 275 paginas viraram 125 de CONTEUDO + 160
+    # stubs de redirect (uma URL por pagina). Os marcadores de barra/rodape agora
+    # se contam sobre as 125 — o numero 120 e o piso, nao a meta.
+    ("onda7:menu-sobre", 120), ("onda7:menu-praticas", 120),
+    # o marcador de carreiras nunca existiu nas paginas DE (medido: 44 pt + 41 en,
+    # 0 de) — o item esta lá, o comentario e que nao. Piso = pt+en.
+    ("onda7:menu-carreiras", 80),
+    ("onda8:menu-contatos", 120), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
+    ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 3),
+    # onda13:hero-malha saiu em 03/08 (S-49/#107): o bloco do video virou os
+    # canvases do Horizonte 2050.
+    ("onda17:hero-horizonte", 4),
     # onda14:rodape-menu e onda15:rodape-contatos saíram em 31/07 (decisão
     # explícita do Mario na #91: "IDENTICAS" — a nav recriada virou o clone
     # literal onda15:rodape-barra).
-    ("onda15:hero-texto", 4), ("onda15:rodape-barra", 275),
+    ("onda15:hero-texto", 4), ("onda15:rodape-barra", 120),
+    # onda 18: botao de voltar ao topo em todas; planeta so nas homes
+    ("onda18:voltar-topo", 120), ("onda18:planeta-setores", 4),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -144,12 +161,17 @@ TITULO_BARRA = {
 }
 
 # Páginas de contato (todas as variantes do espelho) — S-07 e S-08.
-CONTATOS = ["contato/index.html", "pt/contato/index.html", "en/contact-us/index.html",
-            "de/kontakt/index.html", "novo/contato/index.html"]
+# Só as URLs CANÔNICAS: depois da S-107 (#165) as variantes de raiz
+# (`contato/`, `carreiras/`, `imprensa/`…) são stubs de redirect.
+CONTATOS = ["pt/contato/index.html", "en/contact-us/index.html",
+            "de/kontakt/index.html"]
 
 # Páginas de carreiras — S-13.
-CARREIRAS = ["carreiras/index.html", "pt/carreiras/index.html",
+CARREIRAS = ["pt/carreiras/index.html",
              "en/careers/index.html", "de/karrieren/index.html"]
+
+# Páginas de imprensa — S-106 (#164) criou EN e DE; antes só existia em PT.
+IMPRENSA = ["pt/imprensa/index.html", "en/press/index.html", "de/presse/index.html"]
 
 # ------------------------------------------------------------------ mecânica
 
@@ -176,7 +198,20 @@ class Suite(object):
         `public/index.html` é um `<meta refresh>` de 1 linha: não tem menu nem
         corpo, e não deve ser cobrado por asserção de conteúdo.
         """
-        return [(rel, h) for rel, h in self.todas() if rel != "index.html"]
+        return [(rel, h) for rel, h in self.todas() if not self.eh_stub(rel, h)]
+
+    @staticmethod
+    def eh_stub(rel, html):
+        """Stub de redirect (<meta refresh> sem corpo) nao e pagina de conteudo.
+
+        Sao o public/index.html da raiz do Pages e os caminhos antigos que a S-67
+        deixou redirecionando para nossos-valores. Nenhum deles tem menu, rodape
+        ou corpo — cobra-los por assercao de conteudo e falso positivo.
+        """
+        if rel == "index.html":
+            return True
+        return ('http-equiv="refresh"' in html
+                and '<footer class="footer">' not in html)
 
     def todas(self):
         """[(rel, html)] de todas as páginas HTML sob public/."""
@@ -561,8 +596,9 @@ def estaticas(s):
         # simples .praticas-nav (3 práticas atuais) nas ~97 páginas de prática.
         sobrou = [rel for rel, h in s.todas() if "mandala-wrap" in h]
         n_nav = sum(1 for _rel, h in s.todas() if "<!-- onda12:praticas-nav -->" in h)
-        ok = not sobrou and n_nav >= 90
-        return (ok, u"mandala em %d página(s) %s; praticas-nav em %d (esperado >= 90)"
+        # 90 -> 20: a S-107 (#165) deixou 21 páginas de prática (uma URL cada)
+        ok = not sobrou and n_nav >= 20
+        return (ok, u"mandala em %d página(s) %s; praticas-nav em %d (esperado >= 20)"
                 % (len(sobrou), ", ".join(sobrou[:3]), n_nav))
     s.check("S09", u"0 rodas de 8 práticas; navegação simples no lugar", s09)
 
@@ -605,22 +641,25 @@ def estaticas(s):
     s.check("S03", u"Sotreq na barra de clientes das 4 homes", s03)
 
     def s23():
-        # S-23/S-37 (#73 -> #92): depois de testar malha animada e foto
-        # estática, o Mario decidiu (31/07, 3ª rodada) voltar ao VÍDEO
-        # original do tema ("tem que ficar como era no mirow.com.br") —
-        # decisão explícita do dono, custo do MP4 aceito e registrado.
-        # A malha/canvas não podem voltar.
+        # Historico: #73 (malha animada) -> S-37/#92 (31/07: volta do video)
+        # -> S-49/#107 (03/08: o Mario pediu fundo dinamico futurista, viu 3
+        # sugestoes prototipadas e ESCOLHEU o "Horizonte 2050" com convite ao
+        # scroll — decisao do dono, reverte a S-37). O hero das 4 homes usa os
+        # 2 canvases da onda17 + JS; o MP4 de 22,8 MB NAO pode voltar, nem os
+        # restos da malha antiga.
         ruins = []
         for rel in HOMES:
             h = s.ler(rel)
-            if "video-bg-home-1.mp4" not in h:
-                ruins.append("%s sem o vídeo original" % rel)
-            for morto in ("hero-malha__img", "hero-malha__canvas",
-                          "onda13-hero-plexus.js"):
+            for vivo in ("hero-horizonte__cena", "hero-horizonte__convite",
+                         "onda17-horizonte.js"):
+                if vivo not in h:
+                    ruins.append("%s sem %s" % (rel, vivo))
+            for morto in ("video-bg-home-1.mp4", "hero-malha__img",
+                          "hero-malha__canvas", "onda13-hero-plexus.js"):
                 if morto in h:
                     ruins.append("%s ainda tem %s" % (rel, morto))
-        return (not ruins, u"; ".join(ruins))
-    s.check("S23", u"hero com o vídeo original da lâmpada (decisão 31/07)", s23)
+        return (not ruins, u"; ".join(ruins[:4]))
+    s.check("S23", u"hero Horizonte 2050 (canvas, S-49); 0 vídeo de 22,8 MB", s23)
 
     def s30():
         # S-30 (#82): a malha preenche o quadro — a classe que desliga a
@@ -799,10 +838,972 @@ def estaticas(s):
         return (not det, u"; ".join(det[:5]))
     s.check("S42", u"hover na cor da marca (classes + cores no CSS)", s42)
 
+    # ------------------------------------------------------------------ onda 18
+    # 22 pedidos do Mario de 03/08 (S-50..S-71, issues #108..#129). Uma asserção
+    # por pedido — id S50..S71, na mesma numeração das issues.
+    css_o18 = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
+
+    def s50():
+        # o ícone "in" do card de líder tem que ser <a> para o LinkedIn real,
+        # nunca o SVG decorativo dentro do <button> (que abria a bio)
+        det = []
+        for rel in HOMES:
+            h = s.ler(rel)
+            n_cards = h.count('class="home-leaders__card"')
+            n_links = len(re.findall(
+                r'class="onda18-lider__in" href="https://[^"]*linkedin\.com/in/', h))
+            if n_cards != n_links:
+                det.append(u"%s: %d card(s) e %d link(s) de LinkedIn"
+                           % (rel, n_cards, n_links))
+        return (not det, u"; ".join(det))
+    s.check("S50", u"card de líder com link real do LinkedIn (#108)", s50)
+
+    def s51():
+        faltam = [rel for rel, h in s.conteudo()
+                  if 'class="onda19-lateral__link onda19-lateral__link--topo"' not in h]
+        semanc = [rel for rel, h in s.conteudo() if 'id="topo"' not in h]
+        det = []
+        if faltam:
+            det.append(u"%d página(s) sem botão de voltar ao topo: %s"
+                       % (len(faltam), ", ".join(faltam[:3])))
+        if semanc:
+            det.append(u"%d página(s) sem a âncora id=topo: %s"
+                       % (len(semanc), ", ".join(semanc[:3])))
+        return (not det, u"; ".join(det))
+    s.check("S51", u"botão de voltar ao topo em todas as páginas (#109)", s51)
+
+    def s52():
+        # no rodapé a lista de idiomas tem que subir (bottom), não descer (top)
+        ok = (".rodape-barra .menu__languages-list" in css_o18
+              and "bottom:calc(100% - 2px)" in css_o18)
+        return (ok, u"falta a regra que abre o seletor de idiomas para cima")
+    s.check("S52", u"idiomas do rodapé abrem para cima (#110)", s52)
+
+    def s53():
+        ok = ("margin-bottom:8px !important" in css_o18
+              and ".rodape-legal{padding-top:0 !important}" in css_o18)
+        return (ok, u"falta a redução de espaço entre a linha e a política")
+    s.check("S53", u"menos espaco linha -> politica de privacidade (#111)", s53)
+
+    def s54():
+        # texto e ícones maiores que o estado da onda 15 (15px / 22px)
+        det = []
+        if ".menu__nav-link{font-size:17px !important}" not in css_o18:
+            det.append(u"menu não está em 17px")
+        if ".menu__contatos svg{width:26px !important;height:26px !important}" not in css_o18:
+            det.append(u"ícones de contato não estão em 26px")
+        if ".rodape-menu a{font-size:17px}" not in css_o18:
+            det.append(u"nav do rodapé não está em 17px")
+        return (not det, u"; ".join(det))
+    s.check("S54", u"texto e ícones maiores nas duas barras (#112)", s54)
+
+    def s55():
+        ok = ".job-contact--topo .job-contact__title{color:#fff !important}" in css_o18
+        return (ok, u'falta o branco no título "Trabalhe Conosco"')
+    s.check("S55", u'"Trabalhe Conosco" legível em carreiras (#113)', s55)
+
+    def s56():
+        # o card de insight não pode começar em grayscale(100%)
+        ok = (".page-insights__list-image{filter:grayscale(0%) brightness(0.38) !important}"
+              in css_o18)
+        return (ok, u"falta a regra que tira o grayscale inicial dos insights")
+    s.check("S56", u"insights começam coloridos (#114)", s56)
+
+    def s57():
+        alvos = IMPRENSA
+        det = []
+        for rel in alvos:
+            h = s.ler(rel)
+            if 'class="onda18-imprensa"' not in h:
+                det.append(u"%s sem a lista nova" % rel)
+                continue
+            n = h.count('class="onda18-imprensa__item"')
+            if n < 20:
+                det.append(u"%s com só %d item(ns)" % (rel, n))
+            for campo in ("__veiculo", "__data", "__titulo"):
+                if ("onda18-imprensa%s" % campo) not in h:
+                    det.append(u"%s sem %s" % (rel, campo))
+        if ".onda18-imprensa{list-style:none;margin:0 0 60px;padding:0;background:#fff}" \
+                not in css_o18:
+            det.append(u"lista de imprensa sem fundo branco no CSS")
+        return (not det, u"; ".join(det[:5]))
+    s.check("S57", u"imprensa em lista branca com veículo/data/link (#115)", s57)
+
+    def s58():
+        # título com "quer ser nosso cliente", nas páginas de contato de verdade
+        alvos = {"pt/contato/index.html": u"quer ser nosso cliente",
+                 "en/contact-us/index.html": u"become our client",
+                 "de/kontakt/index.html": u"unser Kunde werden"}
+        det = [rel for rel, txt in alvos.items() if txt not in s.ler(rel)]
+        return (not det, u"página(s) com o título antigo: %s" % ", ".join(det))
+    s.check("S58", u'contato: "Você quer ser nosso cliente?" (#116)', s58)
+
+    def s59():
+        det = []
+        for rel, h in s.todas():
+            if 'id="form_contact-form"' not in h:
+                continue
+            m = re.search(r'<label for="field_e6lis6"[^>]*>([^<]*)', h)
+            rotulo = (m.group(1) if m else "").strip()
+            if rotulo not in (u"Empresa", u"Company", u"Unternehmen"):
+                det.append(u"%s -> %r" % (rel, rotulo))
+        return (not det, u"%d página(s) com o rótulo antigo: %s"
+                % (len(det), ", ".join(det[:3])))
+    s.check("S59", u'contato: campo "Empresa" no lugar de área de atuação (#117)', s59)
+
+    def s60():
+        det = []
+        for rel, h in s.todas():
+            if 'id="form_contact-form"' not in h:
+                continue
+            m = re.search(r'<div id="frm_field_6_container"[^>]*>.*?</div>', h, re.S)
+            bloco = m.group(0) if m else ""
+            if "frm_required_field" in bloco or 'aria-required="true"' in bloco:
+                det.append(rel)
+        return (not det, u"%d página(s) ainda exigindo telefone: %s"
+                % (len(det), ", ".join(det[:3])))
+    s.check("S60", u"contato: telefone não obrigatório (#118)", s60)
+
+    def s61():
+        det = []
+        for rel, h in s.todas():
+            if 'id="form_contact-form"' not in h:
+                continue
+            m = re.search(r'<textarea name="item_meta\[5\]"[^>]*>(.*?)</textarea>', h, re.S)
+            if not m or len(m.group(1).strip()) < 30:
+                det.append(rel)
+        return (not det, u"%d página(s) sem mensagem-padrão: %s"
+                % (len(det), ", ".join(det[:3])))
+    s.check("S61", u"contato: mensagem-padrão pré-preenchida (#119)", s61)
+
+    def s62():
+        # a regra tem que bater a especificidade do tema
+        # (.contact__form .frm_pro_form .frm_button_submit, com !important)
+        ok = ("background:#00ADEC !important" in css_o18
+              and ".contact .contact__form .frm_pro_form .frm_button_submit" in css_o18)
+        return (ok, u"botão de envio segue sem contraste próprio")
+    s.check("S62", u'contato: botão "Enviar mensagem" visível (#120)', s62)
+
+    def s63():
+        det = []
+        for rel in CARREIRAS:
+            h = s.ler(rel)
+            if "onda11:s12-cta-cliente" in h:
+                det.append(u'%s ainda tem o bloco "já é cliente?"' % rel)
+            m = re.search(r'value-offer__title">([^<]*)', h)
+            if m and (u"para você" in m.group(1) or u"for you" in m.group(1)
+                      or u"für Sie" in m.group(1)):
+                det.append(u'%s: título ainda diz "para você"' % rel)
+        return (not det, u"; ".join(det[:4]))
+    s.check("S63", u'carreiras: sem "já é cliente?" e sem "para você" (#121)', s63)
+
+    def s64():
+        det = []
+        for rel in CARREIRAS:
+            h = s.ler(rel)
+            if 'class="onda18-inscrever__link" href="#inscricao"' not in h:
+                det.append(u"%s sem botão de inscrição no fim" % rel)
+            if 'id="inscricao"' not in h:
+                det.append(u"%s sem a âncora do formulário" % rel)
+        return (not det, u"; ".join(det[:4]))
+    s.check("S64", u"carreiras: botão de inscrição no fim da página (#122)", s64)
+
+    def s65():
+        det = []
+        faltam = [rel for rel, h in s.conteudo() if "onda18-praticas" not in h]
+        if faltam:
+            det.append(u"%d página(s) sem a classe no <ul> das práticas: %s"
+                       % (len(faltam), ", ".join(faltam[:3])))
+        if ".menu__nav-sublinks.onda18-praticas{display:flex" not in css_o18:
+            det.append(u"CSS não põe as práticas em linha")
+        if 'content:"|";color:#7F7F7F' not in css_o18:
+            det.append(u"CSS sem o separador | cinza")
+        return (not det, u"; ".join(det[:4]))
+    s.check("S65", u'menu "Práticas" horizontal com "|" cinza (#123)', s65)
+
+    def s66():
+        # "Sobre nós" continua vertical (nunca ganha a classe das práticas) e
+        # com fonte maior
+        det = []
+        for rel in HOMES:
+            h = s.ler(rel)
+            m = re.search(r'<!-- onda7:menu-sobre -->.*?<!-- /onda7:menu-sobre -->', h, re.S)
+            if m and "onda18-praticas" in m.group(0):
+                det.append(u"%s: submenu de Sobre nós virou horizontal" % rel)
+        if ".menu__nav-sublink{font-size:19px !important}" not in css_o18:
+            det.append(u"sublinks não estão em 19px")
+        return (not det, u"; ".join(det[:4]))
+    s.check("S66", u'menu "Sobre nós" vertical e com texto maior (#124)', s66)
+
+    def s67():
+        novas = ["pt/sobre-nos/nossos-valores", "sobre-nos/nossos-valores",
+                 "en/about-us/our-values", "de/ueber-uns/unsere-werte",
+                 "de/unsere-werte"]
+        det = []
+        for d in novas:
+            if not os.path.exists(os.path.join(pub, d.replace("/", os.sep), "index.html")):
+                det.append(u"falta %s/" % d)
+        # o caminho antigo tem que existir, mas só como redirect
+        for antigo in ["pt/sobre-nos/nosso-trabalho", "en/about-us/our-work",
+                       "de/ueber-uns/unsere-arbeit"]:
+            p = os.path.join(pub, antigo.replace("/", os.sep), "index.html")
+            if not os.path.exists(p):
+                det.append(u"%s/ sem redirect" % antigo)
+            elif "onda18:redirect-s67" not in s.ler(antigo + "/index.html"):
+                det.append(u"%s/ não é o stub de redirect" % antigo)
+        # e nenhum link interno pode continuar apontando para o caminho velho
+        vivos = [rel for rel, h in s.todas()
+                 if "onda18:redirect-s67" not in h
+                 and re.search(r'/(sobre-nos/nosso-trabalho|about-us/our-work|'
+                               r'ueber-uns/unsere-arbeit)/', h)]
+        if vivos:
+            det.append(u"%d página(s) com link para a URL antiga: %s"
+                       % (len(vivos), ", ".join(vivos[:3])))
+        return (not det, u"; ".join(det[:5]))
+    s.check("S67", u"URL nossos-valores no ar, com redirect da antiga (#125)", s67)
+
+    def s68():
+        det = []
+        for rel in ["pt/sobre-nos/nossos-valores/index.html",
+                    "en/about-us/our-values/index.html",
+                    "de/ueber-uns/unsere-werte/index.html"]:
+            h = s.ler(rel)
+            if '<section class="internal-banner"' in h:
+                det.append(u"%s ainda tem o banner de topo" % rel)
+            if '<section class="culture"' not in h or '<section class="reasons"' not in h:
+                det.append(u"%s perdeu cultura ou 'por que a Mirow'" % rel)
+            elif h.index('<section class="culture"') > h.index('<section class="reasons"'):
+                det.append(u"%s: cultura depois de 'por que a Mirow'" % rel)
+        return (not det, u"; ".join(det[:4]))
+    s.check("S68", u"nossos-valores: sem banner, cultura -> por que (#126)", s68)
+
+    def s69():
+        det = [rel for rel in ["pt/sobre-nos/nossos-valores/index.html",
+                               "en/about-us/our-values/index.html",
+                               "de/ueber-uns/unsere-werte/index.html"]
+               if '<section class="segments"' in s.ler(rel)]
+        return (not det, u"página(s) com o bloco de setores: %s" % ", ".join(det))
+    s.check("S69", u'nossos-valores sem "soluções para vários setores" (#127)', s69)
+
+    def s70():
+        # v4 (#128 / S-77): o Mario encerrou a metafora visual — "remova isso e
+        # coloque ... 5 cards com cada grupo de industrias listado, sem planeta nem
+        # nada disso. faca no tema do resto da pagina."
+        det = []
+        for rel in HOMES:
+            h = s.ler(rel)
+            cards = h.count('class="onda18-const"')
+            itens = h.count('class="onda18-const__item"')
+            if cards != 5:
+                det.append(u"%s com %d card(s) de grupo (esperado 5)" % (rel, cards))
+            if itens != 19:
+                det.append(u"%s com %d setor(es) (esperado 19)" % (rel, itens))
+            # nada de planeta/esfera/ceu: as 3 versoes anteriores estao aposentadas
+            for morto in ("onda18-orbe__mapa", "o18hub", "onda18-orbe__ceu",
+                          "onda18-orbe__planeta", "onda18-const__lista::before"):
+                if morto in h:
+                    det.append(u"%s ainda tem resto de versao antiga (%s)" % (rel, morto))
+        # S-84: sem a contagem "5 setores", sem o subtexto, titulo branco tipo
+        # "Lideres", e os setores na ordem de frequencia do acervo (mirow-rag)
+        for rel in HOMES:
+            hh = s.ler(rel)
+            if "onda18-const__conta" in hh:
+                det.append(u'%s ainda mostra a contagem "N setores"' % rel)
+            if "onda18-orbe__sub" in hh:
+                det.append(u"%s ainda tem o subtexto das 19 indústrias" % rel)
+        # a ordem publicada tem que ser a que o script calcula do FREQ
+        import importlib.util as _u
+        _s = _u.spec_from_file_location(
+            "_o71", os.path.join(os.path.dirname(AQUI), "tools_onda6",
+                                 "71_home_planeta_setores.py"))
+        _m = _u.module_from_spec(_s)
+        _s.loader.exec_module(_m)
+        esperados, ordem = _m._ordenar_por_frequencia()
+        planos = [_m.NOMES["pt"][i] for grupo in esperados for i in grupo]
+        hpt = s.ler("pt/index.html")
+        achados = re.findall(r'class="onda18-const__item">([^<]+)</li>', hpt)
+        if achados != planos:
+            det.append(u"a ordem publicada não é a de frequência (esperado começar "
+                       u"com %s, veio %s)" % (planos[:2], achados[:2]))
+        grupos_pub = re.findall(r'class="onda18-const__nome">([^<]+)</span>', hpt)
+        if grupos_pub != [_m.GRUPOS["pt"][g] for g in ordem]:
+            det.append(u"os cards não estão na ordem de frequência: %s" % grupos_pub)
+        if ".onda18-orbe__titulo{color:#e9f0ff" not in css_o18:
+            det.append(u'título não está no branco do estilo "Líderes"')
+        if ".onda18-orbe__cards{display:grid" not in css_o18:
+            det.append(u"CSS sem a grade dos 5 cards")
+        for morto in ("@keyframes onda18-orbita", "@keyframes onda18-flutua",
+                      "@keyframes onda18-pulso"):
+            if morto in css_o18:
+                det.append(u"%s voltou (versao aposentada)" % morto)
+        return (not det, u"; ".join(det[:4]))
+    s.check("S70", u"home: 5 cards de grupos de setores, sem planeta (#128/S-77)", s70)
+
+    def s71():
+        det = []
+        if ".home-leaders .container .row__content .col{padding-bottom:40px !important}" \
+                not in css_o18:
+            det.append(u"grade de líderes sem a redução de padding")
+        if ".certificates{padding-top:48px !important}" not in css_o18:
+            det.append(u"seção de reconhecimentos sem a redução de padding")
+        return (not det, u"; ".join(det))
+    s.check("S71", u"home: menos vão entre líderes e reconhecimentos (#129)", s71)
+
+    def s72():
+        det = []
+        for rel, hh in s.conteudo():
+            for m in re.finditer(r'<a[^>]*href="mailto:[^"]*"[^>]*>', hh):
+                tag = m.group(0)
+                if not ("menu__contatos-link--mail" in tag
+                        or "hero-contatos__link--mail" in tag):
+                    continue  # e-mail pessoal de líder: não entra no pedido
+                if "subject=" not in tag or "body=" not in tag:
+                    det.append(rel)
+                    break
+        return (not det, u"%d página(s) com e-mail de canal sem assunto/texto: %s"
+                % (len(det), ", ".join(det[:3])))
+    s.check("S72", u"e-mail dos canais abre com assunto e texto-padrão (#130)", s72)
+
+    def s73():
+        # os tamanhos têm que ser os MESMOS tokens do hero do tema:
+        # .banner h2 = 62px (slogan) e .banner p = 18px (parágrafo)
+        det = []
+        if ".hero-numeros__valor{font-size:62px !important;line-height:1}" not in css_o18:
+            det.append(u"big number não está em 62px (tamanho do slogan)")
+        if ".hero-numeros__texto{font-size:18px !important;line-height:1.35;margin-top:6px}"                 not in css_o18:
+            det.append(u"texto do número não está em 18px (tamanho do parágrafo)")
+        tema = s.ler("wp-content/themes/mirow/public/bundle-css.css")
+        if "font-size:62px;font-size:3.875rem" not in tema:
+            det.append(u"o slogan do tema deixou de ser 62px — reveja o pedido")
+        return (not det, u"; ".join(det))
+    s.check("S73", u"hero: números no tamanho do slogan, texto no do parágrafo (#131)", s73)
+
+    # ------------------------------------------------------------------ onda 19
+    css_o19 = css_o18   # mesmo arquivo, blocos onda19:*
+
+    def s74():
+        # a lista de idiomas do rodape abre para cima (S-52) e nao pode ficar
+        # atras da secao anterior — foi por isso que o Mario nao via as linguas
+        det = []
+        for regra in (".footer{position:relative;z-index:20}",
+                      ".rodape-barra .menu__languages{z-index:30}",
+                      ".rodape-barra .menu__languages-list{z-index:40}"):
+            if regra not in css_o19:
+                det.append(u"falta a regra %s" % regra)
+        return (not det, u"; ".join(det))
+    s.check("S74", u"as 3 línguas do rodapé aparecem inteiras (#132)", s74)
+
+    def s75():
+        sobrou = [rel for rel, h in s.todas() if '<section class="links">' in h]
+        return (not sobrou, u'%d página(s) ainda com o bloco "Como podemos ajudar?": %s'
+                % (len(sobrou), ", ".join(sobrou[:3])))
+    s.check("S75", u'0 blocos "Como podemos ajudar? / Transforme sua carreira" (#133)', s75)
+
+    def s76():
+        det = []
+        sem = [rel for rel, h in s.conteudo() if 'class="onda19-lateral"' not in h]
+        if sem:
+            det.append(u"%d página(s) sem a coluna lateral: %s"
+                       % (len(sem), ", ".join(sem[:3])))
+        # os 3 atalhos, com o e-mail levando assunto/corpo (S-72)
+        ruins = []
+        for rel, h in s.conteudo():
+            if ("onda19-lateral__link--wa" not in h
+                    or "onda19-lateral__link--mail" not in h
+                    or "onda19-lateral__link--topo" not in h):
+                ruins.append(rel)
+                continue
+            m = re.search(r'onda19-lateral__link--mail" href="mailto:([^"]+)"', h)
+            if not m or "subject=" not in m.group(1) or "body=" not in m.group(1):
+                ruins.append(rel)
+        if ruins:
+            det.append(u"%d página(s) sem os 3 atalhos (ou e-mail sem assunto): %s"
+                       % (len(ruins), ", ".join(ruins[:3])))
+        return (not det, u"; ".join(det))
+    s.check("S76", u"coluna lateral com WhatsApp, e-mail e voltar ao topo (#134)", s76)
+
+    def s67b():
+        # ajuste do #125: o ROTULO tambem mudou, nao so a URL
+        det = []
+        for rel, h in s.conteudo():
+            for antigo in (u">Nosso Trabalho<", u">Our Work<", u">Unsere Arbeit<"):
+                if antigo in h:
+                    det.append(u"%s com %s" % (rel, antigo))
+                    break
+        alvos = {"pt/index.html": u">Nossos Valores<", "en/index.html": u">Our Values<",
+                 "de/index.html": u">Unsere Werte<"}
+        for rel, txt in alvos.items():
+            if txt not in s.ler(rel):
+                det.append(u"%s sem o rótulo novo" % rel)
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S67b", u'menu diz "Nossos Valores" em toda parte (#125)', s67b)
+
+    def s57b():
+        # ajuste do #115: o icone segue o VEICULO, nao o dominio do link — os 2
+        # itens com veiculo e link divergentes saiam com o logo de outro jornal
+        det = []
+        for rel in IMPRENSA:
+            h = s.ler(rel)
+            for veic, dom in ((u"Estadão", "estadao.com.br"),
+                              (u"Folha de S.Paulo", "folha.uol.com.br"),
+                              (u"Valor Econômico", "valor.globo.com")):
+                itens = re.findall(
+                    r'<img class="onda18-imprensa__logo" src="([^"]+)"[^>]*>'
+                    r'<span class="onda18-imprensa__veiculo">' + re.escape(veic) + '</span>', h)
+                if not itens:
+                    det.append(u"%s: nenhum item de %s" % (rel, veic))
+                ruins = [i for i in itens if dom not in i]
+                if ruins:
+                    det.append(u"%s: %d item(ns) de %s com logo de outro veículo"
+                               % (rel, len(ruins), veic))
+        return (not det, u"; ".join(det[:4]))
+    s.check("S57b", u"imprensa: logo segue o veículo, não o link (#115)", s57b)
+
+    # ------------------------------------------------------------------ onda 21
+    def s78():
+        alvos = {"pt/index.html": u"dos nossos clientes<br>nos contratam novamente",
+                 "de/index.html": u"unserer Kunden<br>beauftragen uns erneut"}
+        det = [rel for rel, txt in alvos.items() if txt not in s.ler(rel)]
+        # EN nao entra: a frase la e "of client re-engagement rate", sem o mesmo
+        # ponto de quebra (registrado na #136)
+        return (not det, u"página(s) sem a quebra: %s" % ", ".join(det))
+    s.check("S78", u'hero: "nos contratam novamente" em linha própria (#136)', s78)
+
+    def s79():
+        ok = (".rodape-barra{width:100vw" in css_o18
+              and "margin-left:calc(50% - 50vw) !important" in css_o18)
+        return (ok, u"a barra do rodapé não sangra 100vw como a de cima")
+    s.check("S79", u"barra do rodapé com branco até os cantos (#137)", s79)
+
+    def s80():
+        det = []
+        if ".menu__nav-sublinks.onda18-praticas{display:grid !important" not in css_o18:
+            det.append(u"práticas não estão em grade")
+        # a S-88 trocou o MECANISMO: colunas iguais nao cabiam "Sourcing, Compras e
+        # Estoques" em 1 linha, entao virou coluna do tamanho do conteudo espalhada
+        # (mesmo pedido — ocupar a largura da caixa — outra tecnica)
+        if "grid-template-columns:repeat(3,max-content);justify-content:space-between"                 not in css_o18:
+            det.append(u"as práticas não ocupam a largura da caixa")
+        if ".menu__nav-submenu .row>.col{flex:0 0 100%" not in css_o18:
+            det.append(u"a coluna do painel não ocupa a largura (grade ficava em 1/3)")
+        return (not det, u"; ".join(det))
+    s.check("S80", u"práticas distribuídas na largura da caixa (#138)", s80)
+
+    def s81():
+        # slug e rotulo mudam por idioma; a ordem pedida e a mesma nos tres
+        POR_IDIOMA = {
+            "pt": (["nossos-valores", "lideres", "nossa-historia", "reconhecimentos",
+                    "nossa-rede"], [u">Nossos Líderes<", u">Nossa História<"]),
+            "en": (["our-values", "leaders", "our-history", "recognitions",
+                    "our-network"], [u">Our Leaders<"]),
+            "de": (["unsere-werte", "fuehrungskraefte", "unsere-geschichte",
+                    "anerkennungen", "unser-netzwerk"], [u">Unsere Führungskräfte<"]),
+        }
+        det = []
+        for rel in HOMES + ["pt/contato/index.html", "de/kontakt/index.html"]:
+            hh = s.ler(rel)
+            idioma = "de" if "/de/" in ("/" + rel) else ("en" if "/en/" in ("/" + rel)
+                                                        else "pt")
+            if rel.startswith("en/"):
+                idioma = "en"
+            elif rel.startswith("de/"):
+                idioma = "de"
+            ordem, rotulos = POR_IDIOMA[idioma]
+            m = re.search(r'<!-- onda7:menu-sobre -->(.*?)<!-- /onda7:menu-sobre -->',
+                          hh, re.S)
+            if not m:
+                det.append(u"%s sem o marcador do submenu" % rel)
+                continue
+            achados = re.findall(r'/(?:sobre-nos|about-us|ueber-uns)/([a-z-]+)/',
+                                 m.group(1))
+            vistos = [a for a in achados if a in ordem]
+            if vistos != ordem:
+                det.append(u"%s (%s) com ordem %s" % (rel, idioma, vistos))
+            for rot in rotulos:
+                if rot not in m.group(1):
+                    det.append(u"%s sem o rótulo %s" % (rel, rot.strip("><")))
+        return (not det, u"; ".join(det[:3]))
+    s.check("S81", u'submenu "Sobre nós" na ordem e rótulos pedidos (#139)', s81)
+
+    def s82():
+        alvos = ["pt/sobre-nos/nossa-rede/index.html",
+                 "en/about-us/our-network/index.html",
+                 "de/ueber-uns/unser-netzwerk/index.html"]
+        det = []
+        for rel in alvos:
+            h = s.ler(rel)
+            mapas = h.count('class="onda21-mapa"')
+            pins = h.count('class="onda21-pin"')
+            itens = h.count('class="onda21-lista__item"')
+            # S-92: o logo E o pin (sempre visivel), nao mais so no hover
+            logos_no_mapa = len(re.findall(
+                r'class="onda21-pin__botao"[^>]*>\s*<img ', h))
+            if mapas != 2:
+                det.append(u"%s com %d mapa(s) (esperado 2)" % (rel, mapas))
+            if pins != 6:
+                det.append(u"%s com %d pin(s) de parceiro (esperado 6)" % (rel, pins))
+            if logos_no_mapa != 6:
+                det.append(u"%s com %d logo(s) dentro do pin (esperado 6)"
+                           % (rel, logos_no_mapa))
+            if itens != 6:
+                det.append(u"%s: lista com %d item(ns)" % (rel, itens))
+            # o logo saiu da lista de baixo, e a Mirow saiu do mapa
+            if "onda21-lista__logo" in h:
+                det.append(u"%s ainda tem logo na lista de baixo" % rel)
+            if "onda21-pin--mirow" in h:
+                det.append(u"%s ainda marca escritórios da Mirow no mapa" % rel)
+            if "onda21-lista__num" in h:
+                det.append(u"%s ainda numera os parceiros na lista" % rel)
+            if u"Virtus" in h:
+                det.append(u"%s cita a Virtus (comprada pela Deloitte, não é parceira)" % rel)
+            if 'class="rede-mapa__svg"' in h:
+                det.append(u"%s ainda tem o mapa-múndi único da onda 9" % rel)
+        return (not det, u"; ".join(det[:4]))
+    s.check("S82", u"rede: 2 mapas, 6 pins com logo, lista com logo (#140)", s82)
+
+    def s83():
+        # o painel do menu no modelo Bain: branco no >div INTERNO (o tema pinta
+        # navy justamente ali), filete ciano e sombra
+        det = []
+        if ".menu__nav-submenu>div{background:#fff !important" not in css_o18:
+            det.append(u"o painel branco não está no >div interno")
+        if "border-bottom:3px solid #00ADEC" not in css_o18:
+            det.append(u"falta o filete ciano do painel")
+        if ".menu__nav-sublink{color:#020E66 !important;font-weight:400}" not in css_o18:
+            det.append(u"os itens do painel não estão em navy sobre o branco")
+        return (not det, u"; ".join(det))
+    s.check("S83", u"painel do menu branco e destacado do fundo (#141)", s83)
+
+    # ------------------------------------------------------------------ onda 23
+    def s85():
+        det = []
+        for rel in HOMES:
+            hh = s.ler(rel)
+            # o framework: uma marca por secao, 1 a 4, descendo a home
+            for n in range(1, 5):
+                c = hh.count("onda22-marca--%d" % n)
+                if c != 1:
+                    det.append(u"%s com %d marca(s) --%d (esperado 1)" % (rel, c, n))
+            # a ordem das marcas na pagina tem que ser 1,2,3,4
+            achadas = [int(x) for x in re.findall(r'onda22-marca onda22-marca--(\d)', hh)]
+            if achadas != [1, 2, 3, 4]:
+                det.append(u"%s com as marcas fora de ordem: %s" % (rel, achadas))
+            # os dois textos que saem
+            for classe, nome in (("home-experience__title", u'"Práticas"'),
+                                 ("home-leaders__title", u'super título "Líderes"')):
+                m = re.search(r'<h[1-6][^>]*class="%s"[^>]*>(.*?)</h[1-6]>' % classe,
+                              hh, re.S)
+                if m and m.group(1).strip():
+                    det.append(u"%s ainda tem o %s" % (rel, nome))
+        # ATUALIZADA na onda 30 (S-110): a tipografia dos 4 títulos saiu da regra
+        # de 4 seletores e virou UMA classe compartilhada — ver S110.
+        m = re.search(r'\.onda30-titulo-secao\{([^}]*)\}', css_o18)
+        if not m:
+            det.append(u"a classe única dos títulos (.onda30-titulo-secao) não existe")
+        else:
+            for prop in ("font-size:48px !important", "font-weight:700 !important",
+                         "text-transform:none !important", "text-align:left !important"):
+                if prop not in m.group(1):
+                    det.append(u"a classe dos títulos sem %s" % prop)
+        # v2 do marcador (S-86): grade 2x2, navy fixo, a esquerda do titulo
+        if ".onda22-marca{float:left;display:grid" not in css_o18:
+            det.append(u"marca não é grade 2x2 flutuando à esquerda do título")
+        if "width:7px;height:7px;background:#020E66;opacity:.42" not in css_o18:
+            det.append(u"os 3 blocos pequenos não estão navy/discretos")
+        if ".onda22-marca--4 i:nth-child(4){width:12px;height:12px;opacity:1}" not in css_o18:
+            det.append(u"o quadrante da seção não fica maior/opaco")
+        if "currentColor" in css_o18.split("onda22:marca-secoes:ini")[-1].split(
+                "onda22:marca-secoes:fim")[0]:
+            det.append(u"a marca voltou a usar currentColor (o pedido é navy sempre)")
+        # cada marca tem os 4 quadrantes no HTML
+        for rel in HOMES:
+            hh = s.ler(rel)
+            for n in range(1, 5):
+                esperado = ('<span class="onda22-marca onda22-marca--%d" '
+                            'aria-hidden="true"><i></i><i></i><i></i><i></i></span>' % n)
+                if esperado not in hh:
+                    det.append(u"%s: marca --%d sem os 4 quadrantes" % (rel, n))
+        return (not det, u"; ".join(det[:4]))
+    s.check("S85", u"marca de seção 1-4 como framework da home; títulos parelhos", s85)
+
+    # ------------------------------------------------------------------ onda 24
+    def s87():
+        # ATUALIZADA na onda 25 (S-91): na onda 24 a solucao era deixar o titulo
+        # claro no dark-mode; o Mario pediu o inverso — os 4 titulos em navy e o
+        # darken fora de cena. O pedido protegido e o mesmo: o titulo nao apaga.
+        det = []
+        if ".home-experience--dark-mode::after{opacity:1 !important}" not in css_o18:
+            det.append(u"o darken ao rolar voltou (o véu claro do tema é removido)")
+        # ATUALIZADA na onda 30 (S-110): o navy é propriedade da classe única
+        m = re.search(r'\.onda30-titulo-secao\{[^}]*color:#020E66 !important', css_o18)
+        if not m:
+            det.append(u"o navy saiu da classe única dos títulos")
+        if "color:#e9f0ff !important" in css_o18:
+            det.append(u"sobrou título claro (o pedido é navy nos quatro)")
+        return (not det, u"; ".join(det))
+    s.check("S87", u"4 títulos da home em navy, sem darken ao rolar (#145/#149)", s87)
+
+    def s88():
+        det = []
+        if "grid-template-columns:repeat(3,max-content);justify-content:space-between"                 not in css_o18:
+            det.append(u"práticas sem colunas de conteúdo espalhadas")
+        if ".menu__nav-sublinks.onda18-praticas .menu__nav-sublink{white-space:nowrap}"                 not in css_o18:
+            det.append(u"práticas sem nowrap (podem voltar a quebrar em 2 linhas)")
+        return (not det, u"; ".join(det))
+    s.check("S88", u'"Sourcing, Compras e Estoques" em uma linha só (#146)', s88)
+
+    def s89():
+        det = []
+        if "grid-template-columns:repeat(5,max-content);justify-content:space-between"                 not in css_o18:
+            det.append(u"Sobre nós não está espalhado na largura")
+        # as DUAS camadas de largura do painel (medidas via CDP)
+        if ".menu__nav-submenu .container>.row{flex:1 1 100%;width:100%}" not in css_o18:
+            det.append(u"falta a largura do .row (ele encolhia no conteúdo)")
+        if ".menu__nav-submenu .row>.col{flex:0 0 100%" not in css_o18:
+            det.append(u"falta a largura do .col")
+        return (not det, u"; ".join(det))
+    s.check("S89", u'submenu "Sobre nós" esticado até a direita (#147)', s89)
+
+    def s90():
+        det = []
+        if ".menu__languages-list{background:#020E66 !important" not in css_o18:
+            det.append(u"balão de idiomas não está no navy Mirow")
+        for regra in (".menu__languages-list::after{border-bottom-color:#020E66 !important}",
+                      ".rodape-barra .menu__languages-list::after"
+                      "{border-top-color:#020E66 !important}"):
+            if regra not in css_o18:
+                det.append(u"a setinha do balão não acompanha o navy")
+        return (not det, u"; ".join(det[:2]))
+    s.check("S90", u"balão de idiomas no azul Mirow, não preto (#148)", s90)
+
+    # ------------------------------------------------------------------ onda 25
+    def s94():
+        # mesmo peso nos dois submenus (Praticas estava 700, Sobre nos 400)
+        ok = (".menu__nav-sublink{font-weight:600 !important}" in css_o18
+              and ".menu__nav-sublinks.onda18-praticas .menu__nav-sublink"
+                  "{font-weight:600 !important}" in css_o18)
+        return (ok, u"os dois submenus não estão no mesmo peso de fonte")
+    s.check("S94", u"peso do texto igual nos dois submenus (#152)", s94)
+
+    def s95():
+        det = []
+        for d in ("pt/insights", "insights"):
+            if not os.path.exists(os.path.join(pub, d.replace("/", os.sep), "index.html")):
+                det.append(u"falta %s/" % d)
+        for antigo_dir in ("pt/analises", "analises"):
+            p2 = os.path.join(pub, antigo_dir.replace("/", os.sep), "index.html")
+            if not os.path.exists(p2):
+                det.append(u"%s/ sem redirect" % antigo_dir)
+            elif "onda25:redirect-s95" not in s.ler(antigo_dir + "/index.html"):
+                det.append(u"%s/ não é o stub de redirect" % antigo_dir)
+        vivos = [rel for rel, hh in s.todas()
+                 if "onda25:redirect-s95" not in hh and re.search(r'/analises/', hh)]
+        if vivos:
+            det.append(u"%d página(s) com link para /analises/: %s"
+                       % (len(vivos), ", ".join(vivos[:3])))
+        return (not det, u"; ".join(det[:4]))
+    s.check("S95", u"insights em /insights/, com redirect de /analises/ (#153)", s95)
+
+    def s96():
+        # a agencia de imprensa nao atende mais a Mirow: nenhuma pagina pode citar
+        det = [rel for rel, hh in s.todas() if "agenciaecomunica" in hh]
+        # e o marcador da onda 12, que fechava DENTRO daquele <h5>, tem de sobrar
+        # o marcador da onda 12 nasceu no <h1> da página PT; as páginas EN/DE
+        # (S-106) têm o título próprio, sem esse marcador
+        for rel in ("pt/imprensa/index.html",):
+            if "onda12:imprensa-formatacao" not in s.ler(rel):
+                det.append(u"%s perdeu o marcador da onda 12" % rel)
+        return (not det, u"%d problema(s): %s" % (len(det), ", ".join(det[:3])))
+    s.check("S96", u"0 menção à agência de imprensa antiga (#154)", s96)
+
+    # ------------------------------------------------------------------ onda 26
+    def s97():
+        # o link nasceu branco (onda 7, seção escura); depois da S-91 o fundo é
+        # claro e ele tem de ser navy
+        det = []
+        if ".onda7-vertodos{color:#020E66 !important}" not in css_o18:
+            det.append(u'"Ver todos os líderes" não está em navy')
+        if ".onda7-vertodos:hover,.onda7-vertodos:focus-visible{color:#00ADEC" not in css_o18:
+            det.append(u"o hover do link não é ciano")
+        for rel in HOMES:
+            if "onda7-vertodos" not in s.ler(rel):
+                det.append(u"%s sem o link Ver todos os líderes" % rel)
+        return (not det, u"; ".join(det[:3]))
+    s.check("S97", u'home: "Ver todos os líderes" em azul (#155)', s97)
+
+    def s98():
+        # UMA fonte no site inteiro. O tema pede 3 famílias por variável e nenhuma
+        # é carregada — só o Titillium Web está no <head>. As variáveis apontam
+        # para ela; a checagem do render em si é a V08 (fontes computadas).
+        det = []
+        for var in ("--fontFamily", "--secondaryFontFamily", "--tertiaryFontFamily",
+                    "--bs-font-sans-serif", "--bs-body-font-family"):
+            if '%s:"Titillium Web",sans-serif;' % var not in css_o18:
+                det.append(u"%s não aponta para Titillium Web" % var)
+        # e nenhuma página pode carregar webfont novo (Titillium é o único)
+        familias = set()
+        for rel, hh in s.todas():
+            familias.update(re.findall(r'fonts\.googleapis\.com/css2\?family=([^:"\'&]+)',
+                                       hh))
+        if familias - {"Titillium+Web"}:
+            det.append(u"webfont(s) além do Titillium: %s"
+                       % ", ".join(sorted(familias - {"Titillium+Web"})))
+        return (not det, u"; ".join(det[:3]))
+    s.check("S98", u"uma fonte só declarada em todo o site (#156)", s98)
+
+    def s99():
+        # Práticas no mesmo tamanho de Sobre nós (19px), em toda a largura.
+        # Revoga o tamanho maior da S-65/S-88 — decisão do Mario em 04/08.
+        bloco = css_o18.split("onda26:ajustes-s97-s100:ini")[-1].split(
+            "onda26:ajustes-s97-s100:fim")[0]
+        det = []
+        if "font-size:19px !important" not in bloco:
+            det.append(u"o submenu de Práticas não foi igualado a 19px")
+        if re.search(r'onda18-praticas .menu__nav-sublink\{font-size:(?!19px)', bloco):
+            det.append(u"sobrou tamanho diferente de 19px no bloco da onda 26")
+        return (not det, u"; ".join(det[:2]))
+    s.check("S99", u"submenu Práticas no tamanho de Sobre nós (#157)", s99)
+
+    def s100():
+        ok = ".rodape-barra{border-bottom:0 !important}" in css_o18
+        return (ok, u"a barra do rodapé ainda tem filete separando a política")
+    s.check("S100", u"rodapé sem linha antes da política de privacidade (#158)", s100)
+
+    def s101():
+        # e-mail no card de Andreas e Felipe; Stephan e Elmar ficam sem
+        det = []
+        esperado = {u"Andreas Mirow": "andreas.mirow@mirow.com.br",
+                    u"Felipe Diniz": "felipe.diniz@mirow.com.br"}
+        for rel in HOMES:
+            hh = s.ler(rel)
+            for bloco in re.findall(r'<div class="onda18-lider.*?</div>', hh, re.S):
+                mn = re.search(r'<h4>([^<]*)</h4>', bloco)
+                nome = mn.group(1).strip() if mn else "?"
+                tem = "onda26-lider__mail" in bloco
+                if nome in esperado:
+                    if not tem:
+                        det.append(u"%s: %s sem e-mail" % (rel, nome))
+                    elif ("mailto:%s?subject=" % esperado[nome]) not in bloco:
+                        det.append(u"%s: e-mail de %s errado ou sem assunto"
+                                   % (rel, nome))
+                elif tem:
+                    det.append(u"%s: %s não devia ter e-mail" % (rel, nome))
+        if ".onda26-lider__mail{position:absolute" not in css_o18:
+            det.append(u"o link de e-mail não está posicionado sobre o card")
+        return (not det, u"; ".join(det[:3]))
+    s.check("S101", u"e-mail de Andreas e Felipe nos cards da home (#159)", s101)
+
+    def s102():
+        det = []
+        for rel in IMPRENSA:
+            hh = s.ler(rel)
+            itens = re.findall(r'<li class="onda18-imprensa__item">(.*?)</li>', hh, re.S)
+            if not itens:
+                det.append(u"%s sem itens de imprensa" % rel)
+                continue
+            for i, it in enumerate(itens):
+                if not it.startswith('<a class="onda26-imprensa__link" href="http'):
+                    det.append(u"%s item %d não é uma linha-link" % (rel, i + 1))
+                    break
+                # um link por linha: o título deixou de ser <a>
+                if it.count("<a ") != 1:
+                    det.append(u"%s item %d com %d links (esperado 1)"
+                               % (rel, i + 1, it.count("<a ")))
+                    break
+        if ".onda26-imprensa__link{display:grid" not in css_o18:
+            det.append(u"a grade não migrou para o link da linha")
+        return (not det, u"; ".join(det[:3]))
+    s.check("S102", u"imprensa: a linha inteira é link (#160)", s102)
+
+    def s103():
+        det = []
+        praticas = [(rel, hh) for rel, hh in s.todas()
+                    if 'class="experience-single__banner-owner-list"' in hh]
+        # 88 -> 21: depois da S-107 (#165) cada prática tem UMA URL
+        if len(praticas) < 20:
+            det.append(u"só %d páginas de prática encontradas (esperado 21)"
+                       % len(praticas))
+        for rel, hh in praticas:
+            donos = re.findall(r'experience-single__banner-owner" data-bs-toggle='
+                               r'"modal"\s*data-bs-target="[^"]*"><img[^>]*>'
+                               r'<p><strong>([^<]*)</strong>', hh)
+            if any(u"Elmar" in d for d in donos):
+                det.append(u"%s ainda mostra Elmar" % rel)
+            elif not ({u"Andreas Mirow", u"Felipe Diniz"} & set(donos)):
+                det.append(u"%s sem Andreas nem Felipe: %s" % (rel, donos))
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S103", u"práticas sem Elmar, com Andreas e Felipe (#161)", s103)
+
+    # ------------------------------------------------------------------ onda 27
+    ORDEM_MENU = {
+        "pt": [u"Sobre nós", u"Práticas", u"Insights", u"Imprensa", u"Carreiras",
+               u"Contato"],
+        # EN e DE ganharam o item de imprensa na S-106 (#164) — 6 itens nas três
+        "en": [u"About us", u"Practices", u"Insights", u"Press", u"Careers",
+               u"Contact Us"],
+        "de": [u"Über uns", u"Branchen", u"Insights", u"Presse", u"Karrieren",
+               u"Kontakt"],
+    }
+
+    def s104():
+        # a ordem pedida pelo Mario, página a página, nas DUAS barras (a do rodapé
+        # é clone byte a byte — a S36 garante a igualdade, aqui se cobra a ordem)
+        det = []
+        for rel, hh in s.conteudo():
+            # a barra do header é o PRIMEIRO <nav class="menu"> da página (o
+            # segundo é o clone do rodapé — ver S36)
+            i = hh.find('<nav class="menu"')
+            j = hh.find("</nav>", i)
+            if i < 0 or j < 0:
+                det.append(u"%s sem header" % rel)
+                continue
+            itens = [x.strip() for x in re.findall(
+                r'class="menu__nav-link[^"]*" href="[^"]*"[^>]*>([^<]+)<', hh[i:j])]
+            lang = re.search(r'pll_language=([a-z]{2})', hh)
+            lang = lang.group(1) if lang else "pt"
+            esperado = ORDEM_MENU.get(lang)
+            if esperado and itens != esperado:
+                det.append(u"%s: %s" % (rel, " > ".join(itens)))
+        return (not det, u"%d página(s) fora da ordem: %s"
+                % (len(det), "; ".join(det[:2])))
+    s.check("S104", u"menu na ordem Insights > Imprensa > Carreiras (#162)", s104)
+
+    def s105():
+        # o repouso da barra não pode voltar a depender do que está atrás dela
+        det = []
+        for regra in (".header .menu{background:#020E66 !important",
+                      ".rodape-barra .menu{background:#020E66 !important}"):
+            if regra not in css_o18:
+                det.append(u"falta a regra de fundo sólido: %s" % regra[:40])
+        # o hover branco (painel do menu, S-83) tem de continuar vencendo
+        if ".header .menu:hover" not in css_o18:
+            det.append(u"o hover branco da barra foi perdido")
+        return (not det, u"; ".join(det[:2]))
+    s.check("S105", u"barra com fundo sólido igual em toda página (#163)", s105)
+
+    # ------------------------------------------------------------------ onda 29
+    def s106():
+        # #164: Imprensa passa a existir em EN e DE, e o menu tem 6 itens nas três
+        det = []
+        for rel in IMPRENSA:
+            p = os.path.join(pub, rel.replace("/", os.sep))
+            if not os.path.exists(p):
+                det.append(u"falta %s" % rel)
+                continue
+            hh = s.ler(rel)
+            n = len(re.findall(r'class="onda18-imprensa__item"', hh))
+            if n < 20:
+                det.append(u"%s com só %d itens de imprensa" % (rel, n))
+            can = re.search(r'rel="canonical" href="([^"]+)"', hh)
+            propria = "/mirow-site/" + rel[:-len("index.html")]
+            if not can or can.group(1).rstrip("/") + "/" != propria:
+                det.append(u"%s com canonical errado: %s"
+                           % (rel, can.group(1) if can else "-"))
+        # o seletor de idiomas das três aponta uma para a outra (era home antes)
+        urls = ["/mirow-site/pt/imprensa/", "/mirow-site/en/press/",
+                "/mirow-site/de/presse/"]
+        for rel in IMPRENSA:
+            hh = s.ler(rel)
+            m = re.search(r'<ul class="menu__languages-list">(.*?)</ul>', hh, re.S)
+            achou = re.findall(r'<a href="([^"]+)"', m.group(1)) if m else []
+            if achou[:3] != urls:
+                det.append(u"%s: seletor de idiomas não liga as três (%s)"
+                           % (rel, achou[:3]))
+        return (not det, u"; ".join(det[:3]))
+    s.check("S106", u"imprensa existe em pt/en/de, ligadas entre si (#164)", s106)
+
+    def s107():
+        # #165: UMA URL por página. Toda página de conteúdo se autocanonicaliza, e
+        # nenhum link interno leva a uma URL que virou stub (clique sem 2 saltos).
+        det = []
+        stubs = set()
+        conteudo = []
+        for rel, hh in s.todas():
+            if not rel.endswith("index.html"):
+                continue
+            if "menu__nav-item" not in hh:            # é stub de redirect
+                if rel != "index.html":
+                    stubs.add("/mirow-site/" + rel[:-len("index.html")])
+                continue
+            conteudo.append((rel, hh))
+            if rel == "en/homepage/index.html":
+                continue          # home duplicada declarada (S-16)
+            can = re.search(r'rel="canonical" href="([^"]+)"', hh)
+            propria = "/mirow-site/" + rel[:-len("index.html")]
+            if not can or can.group(1).rstrip("/") + "/" != propria:
+                det.append(u"%s não é a própria canônica (%s)"
+                           % (rel, can.group(1) if can else "-"))
+        if len(stubs) < 140:
+            det.append(u"só %d stubs de redirect (esperado >= 140)" % len(stubs))
+        for rel, hh in conteudo:
+            for url in re.findall(r'href="(/mirow-site/[^"#?]*/)"', hh):
+                if url in stubs:
+                    det.append(u"%s ainda linka para o stub %s" % (rel, url))
+                    break
+        return (not det, u"%d problema(s) em %d páginas de conteúdo: %s"
+                % (len(det), len(conteudo), "; ".join(det[:3])))
+    s.check("S107", u"uma URL por página; nenhum link para redirect (#165)", s107)
+
+    def s108():
+        # #166: nenhuma página de conteúdo abre "nua", e nenhuma fica vazia
+        det = []
+        for rel, hh in s.conteudo():
+            if "menu__nav-item" not in hh:
+                continue
+            m = re.search(r'<main class="[^"]*">(.*?)</main>', hh, re.S)
+            corpo = m.group(1) if m else ""
+            texto = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", corpo)).strip()
+            if len(texto) < 40:
+                det.append(u"%s tem <main> vazio" % rel)
+                continue
+            tem_abertura = (re.search(r'class="(banner|internal-banner|'
+                                      r'experience-single__banner|blog-single__banner)',
+                                      hh)
+                            or "onda29-abertura" in hh
+                            or 'class="culture' in hh)
+            if not tem_abertura:
+                det.append(u"%s abre sem banner nem faixa" % rel)
+        if ".onda29-abertura{background:#020E66" not in css_o18:
+            det.append(u"a faixa de abertura não está no CSS")
+        return (not det, u"%d página(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S108", u"toda página abre com banner ou faixa; 0 página vazia (#166)",
+            s108)
+
+    # ------------------------------------------------------------------ onda 30
+    def s110():
+        # #168: os 4 títulos de seção da home são a MESMA coisa — uma classe, a
+        # mesma animação e o mesmo nível de heading. O render é medido na V17.
+        det = []
+        historicas = ["home-experience__subtitle", "onda18-orbe__titulo",
+                      "home-leaders__subtitle", "certificates__title"]
+        for rel in HOMES:
+            hh = s.ler(rel)
+            for classe in historicas:
+                m = re.search(r'<(h[1-6])([^>]*class="[^"]*' + re.escape(classe)
+                              + r'[^"]*"[^>]*)>', hh)
+                if not m:
+                    det.append(u"%s: não achei o título %s" % (rel, classe))
+                    continue
+                tag, attrs = m.group(1), m.group(2)
+                if "onda30-titulo-secao" not in attrs:
+                    det.append(u"%s: %s sem a classe compartilhada" % (rel, classe))
+                if 'data-aos="fade-up"' not in attrs:
+                    det.append(u"%s: %s sem a animação fade-up" % (rel, classe))
+                if tag != "h2":
+                    det.append(u"%s: %s é <%s>, esperado <h2>" % (rel, classe, tag))
+        # e a tipografia não pode voltar a ser escrita por seletor de seção
+        bloco22 = css_o18.split("onda22:marca-secoes:ini")[-1].split(
+            "onda22:marca-secoes:fim")[0]
+        if "font-size:48px" in bloco22:
+            det.append(u"a tipografia dos títulos voltou para o bloco da onda 22")
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S110", u"4 títulos da home numa classe só, com a mesma animação (#168)",
+            s110)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
-    MEDICAO = "wp-content/uploads/2026/07/onda6/onda17-medicao.js"
+    MEDICAO = "wp-content/uploads/2026/07/onda6/onda31-medicao.js"
 
     def m01():
         sem = [rel for rel, h in s.todas() if MEDICAO not in h]
@@ -957,6 +1958,18 @@ class Navegador(object):
                          {"expression": expr, "returnByValue": True})
         return r.get("result", {}).get("result", {}).get("value")
 
+    def hover(self, x, y, espera=1.0):
+        """Hover de verdade (Input.dispatchMouseEvent), como o mouse do Mario.
+
+        Serve para medir o que só existe em hover — o painel dos submenus. NÃO
+        vale conferir cor em hover por screenshot: com `captureBeyondViewport` o
+        Chrome repinta e o estado se perde (ver o aviso no shot_menu.py).
+        """
+        self.ws.call(self._id(), "Input.dispatchMouseEvent",
+                     {"type": "mouseMoved", "x": x, "y": y,
+                      "button": "none", "clickCount": 0})
+        time.sleep(espera)
+
     def __exit__(self, *a):
         try:
             self.proc.terminate()
@@ -1030,6 +2043,191 @@ def ao_vivo(s):
                 return (True, u"%s blocos, todos com ≤2 linhas (1920x1080)" % v[3:])
             return (False, u"bloco(s) com mais de 2 linhas: %s" % v)
         s.check("V07", u"números do hero com no máximo 2 linhas por bloco", v07)
+
+        # V08 — S-98 (#156): UMA fonte renderizada por página. Aqui não se olha
+        # o CSS, se olha o que o navegador computou em cada elemento visível —
+        # era exatamente isso que denunciava expertise (Arial, porque Archivo não
+        # existe) x setores (Titillium). Varre as páginas de cada template.
+        def faz_fonte_unica(rel):
+            def f():
+                nav.abrir("%s/%s" % (base, rel.replace("index.html", "")), 1400, 900)
+                v = nav.js(
+                    "(function(){var m={},es=document.querySelectorAll('body *');"
+                    "for(var i=0;i<es.length;i++){var e=es[i];"
+                    "if(!e.getClientRects().length)continue;"
+                    "var t=e.tagName;"
+                    "if(t=='SCRIPT'||t=='STYLE'||t=='SVG'||t=='PATH')continue;"
+                    "var f=getComputedStyle(e).fontFamily;"
+                    "m[f]=(m[f]||0)+1;}"
+                    "return JSON.stringify(m);})()")
+                try:
+                    mapa = json.loads(v)
+                except Exception:
+                    return (False, u"não deu para medir as fontes: %r" % v)
+                fora = {k: n for k, n in mapa.items() if "Titillium Web" not in k}
+                if fora:
+                    itens = sorted(fora.items(), key=lambda kv: -kv[1])[:2]
+                    return (False, u"%d família(s) fora do Titillium: %s"
+                            % (len(fora), "; ".join(u"%s (%d elem.)" % (k, n)
+                                                   for k, n in itens)))
+                return (True, u"1 família em %d elementos visíveis"
+                        % sum(mapa.values()))
+            return f
+        for i, rel in enumerate(["pt/index.html", "pt/pratica/estrategia/index.html",
+                                 "pt/imprensa/index.html", "pt/sobre-nos/lideres/index.html",
+                                 # canônicas: `contato/` virou stub na S-107
+                                 "pt/contato/index.html", "de/index.html"], 8):
+            s.check("V%02d" % i, u"uma fonte só renderizada em %s" % rel,
+                    faz_fonte_unica(rel))
+
+        # V14 — S-105 (#163): a barra tem de ser a MESMA coisa medida no navegador,
+        # em páginas de templates diferentes (home com hero, prática com foto,
+        # imprensa sem banner, post de blog, política de privacidade). Não se
+        # compara CSS: compara-se a assinatura renderizada da barra.
+        def v14():
+            paginas = ["pt/", "pt/insights/", "pt/imprensa/", "pt/carreiras/",
+                       "pt/pratica/estrategia/", "pt/sobre-nos/nossos-valores/",
+                       "pt/sobre-nos/lideres/", "pt/politica-de-privacidade/"]
+            js = ("(function(){var n=document.querySelector('.header .menu');"
+                  "if(!n)return 'sem barra';var c=getComputedStyle(n),"
+                  "r=n.getBoundingClientRect(),"
+                  "l=document.querySelector('.header .menu__nav-link');"
+                  "return JSON.stringify({bg:c.backgroundColor,h:Math.round(r.height),"
+                  "cor:getComputedStyle(l).color,"
+                  "fonte:getComputedStyle(l).fontFamily+'|'+getComputedStyle(l).fontSize,"
+                  "itens:[].map.call(document.querySelectorAll("
+                  "'.header .menu__nav-link'),function(a){return a.textContent.trim()})"
+                  ".join('>'),"
+                  "canais:document.querySelectorAll('.header .menu__contatos-link').length,"
+                  "idiomas:!!document.querySelector('.header .menu__languages')});})()")
+            assinaturas = {}
+            for rel in paginas:
+                nav.abrir("%s/%s" % (base, rel), 1400, 900)
+                v = nav.js(js)
+                if not isinstance(v, str) or v.startswith("sem"):
+                    return (False, u"%s: %s" % (rel, v))
+                assinaturas[rel] = v
+            distintas = {}
+            for rel, sig in assinaturas.items():
+                distintas.setdefault(sig, []).append(rel)
+            if len(distintas) > 1:
+                pares = sorted(distintas.items(), key=lambda kv: -len(kv[1]))
+                fora = pares[1][1]
+                d1 = json.loads(pares[0][0])
+                d2 = json.loads(pares[1][0])
+                difs = [u"%s: %r x %r" % (k, d1.get(k), d2.get(k))
+                        for k in d1 if d1.get(k) != d2.get(k)]
+                return (False, u"%d barras diferentes — %s difere em %s"
+                        % (len(distintas), ", ".join(fora[:2]), "; ".join(difs[:3])))
+            d = json.loads(list(distintas)[0])
+            return (True, u"1 barra só nas %d páginas (fundo %s, %dpx, %s)"
+                    % (len(paginas), d["bg"], d["h"], d["itens"]))
+        s.check("V14", u"a mesma barra superior em 8 páginas de templates diferentes",
+                v14)
+
+        # V15 — S-109 (#167): o painel do submenu tem de ter a MESMA altura,
+        # qualquer que seja o item. "Sobre nós" media 159px e "Práticas" 129px
+        # porque a margem da lista (40px do tema x 6px da S-65) e o padding do
+        # link (6px x 2px) nunca foram igualados. Medido com hover real.
+        def faz_paineis_iguais(largura):
+            def f():
+                js_pos = ("(function(i){var a=document.querySelectorAll("
+                          "'.header .menu__nav-link')[i];if(!a)return null;"
+                          "var r=a.getBoundingClientRect();"
+                          "return [Math.round(r.left+r.width/2),"
+                          "Math.round(r.top+r.height/2)];})(%d)")
+                js_h = ("(function(){var sms=document.querySelectorAll("
+                        "'.header .menu__nav-submenu');"
+                        "for(var i=0;i<sms.length;i++){"
+                        "if(getComputedStyle(sms[i]).display!=='none')"
+                        "return Math.round(sms[i].getBoundingClientRect().height);}"
+                        "return 0;})()")
+                nav.abrir("%s/pt/" % base, largura, 900)
+                alturas = {}
+                for i, nome in ((0, u"Sobre nós"), (1, u"Práticas")):
+                    pos = nav.js(js_pos % i)
+                    if not pos:
+                        return (False, u"não achei o item %d da barra" % i)
+                    nav.hover(pos[0], pos[1])
+                    alturas[nome] = nav.js(js_h)
+                    nav.hover(10, 800, espera=0.6)   # sai do hover
+                if not all(alturas.values()):
+                    return (False, u"painel não abriu no hover: %r" % alturas)
+                dif = abs(alturas[u"Sobre nós"] - alturas[u"Práticas"])
+                return (dif <= 2, u"%dpx: Sobre nós=%dpx, Práticas=%dpx (dif %dpx, "
+                        u"tolerância 2)" % (largura, alturas[u"Sobre nós"],
+                                            alturas[u"Práticas"], dif))
+            return f
+        for i, largura in enumerate((1400, 1200), 15):
+            s.check("V%02d" % i,
+                    u"painéis de submenu com a mesma altura em %dpx" % largura,
+                    faz_paineis_iguais(largura))
+
+        # V17 — S-110 (#168): os 4 títulos de seção da home têm de sair IGUAIS do
+        # navegador (família, tamanho, peso, cor, alinhamento) e com a mesma
+        # animação. Não se lê CSS: lê-se o computado de cada um, na home de fato.
+        def v17():
+            js = ("(function(){var cls=['home-experience__subtitle',"
+                  "'onda18-orbe__titulo','home-leaders__subtitle',"
+                  "'certificates__title'];var out=[];"
+                  "for(var i=0;i<cls.length;i++){var e=document.querySelector('.'+cls[i]);"
+                  "if(!e){out.push({classe:cls[i],erro:'não achei'});continue;}"
+                  "var c=getComputedStyle(e);"
+                  "out.push({classe:cls[i],tag:e.tagName,"
+                  "aos:e.getAttribute('data-aos')||'-',"
+                  "assinatura:[c.fontFamily,c.fontSize,c.fontWeight,c.color,"
+                  "c.textAlign,c.textTransform].join('|')});}"
+                  "return JSON.stringify(out);})()")
+            nav.abrir("%s/pt/" % base, 1400, 900)
+            v = nav.js(js)
+            try:
+                dados = json.loads(v)
+            except Exception:
+                return (False, u"não deu para medir os títulos: %r" % v)
+            faltando = [d["classe"] for d in dados if d.get("erro")]
+            if faltando:
+                return (False, u"título(s) ausente(s): %s" % ", ".join(faltando))
+            assinaturas = set(d["assinatura"] for d in dados)
+            aos = set(d["aos"] for d in dados)
+            tags = set(d["tag"] for d in dados)
+            det = []
+            if len(assinaturas) > 1:
+                det.append(u"%d estilos diferentes: %s"
+                           % (len(assinaturas),
+                              " x ".join(sorted(assinaturas))[:160]))
+            if aos != {"fade-up"}:
+                det.append(u"animações diferentes: %s" % sorted(aos))
+            if len(tags) > 1:
+                det.append(u"níveis de heading diferentes: %s" % sorted(tags))
+            if det:
+                return (False, u"; ".join(det))
+            # e a animação tem de RODAR igual nos quatro: o AOS marca aos-init com
+            # opacity 0 antes de entrar na viewport e troca para aos-animate depois.
+            # Era exatamente o que faltava no título de Setores (#168).
+            js_estado = ("(function(){var cls=['home-experience__subtitle',"
+                         "'onda18-orbe__titulo','home-leaders__subtitle',"
+                         "'certificates__title'];var o=[];"
+                         "for(var i=0;i<cls.length;i++){var e="
+                         "document.querySelector('.'+cls[i]);"
+                         "o.push((e.className.indexOf('aos-animate')>=0)?'anima':"
+                         "((e.className.indexOf('aos-init')>=0)?'init':'sem-aos'));}"
+                         "return o.join(',');})()")
+            antes = nav.js(js_estado)
+            if antes != "init,init,init,init":
+                return (False, u"antes de rolar, o AOS não armou os quatro igual: %s"
+                        % antes)
+            # rola até o fim em passos, para o observer do AOS disparar em todos
+            for frac in (0.35, 0.6, 0.85, 1.0):
+                nav.js("window.scrollTo(0,document.body.scrollHeight*%s);'ok'" % frac)
+                time.sleep(1.2)
+            depois = nav.js(js_estado)
+            if depois != "anima,anima,anima,anima":
+                return (False, u"depois de rolar, a animação não rodou nos quatro: %s"
+                        % depois)
+            return (True, u"4 títulos com o mesmo estilo (%s), o mesmo nível (%s) e a "
+                    u"mesma animação — os quatro saem de opacity 0 e animam ao rolar"
+                    % (list(assinaturas)[0].split("|")[1], list(tags)[0]))
+        s.check("V17", u"os 4 títulos da home saem idênticos e animam igual", v17)
 
 
 # ------------------------------------------------------------------- main

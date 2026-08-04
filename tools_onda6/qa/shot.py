@@ -125,6 +125,13 @@ def main():
             "width": width, "height": altura, "deviceScaleFactor": 1, "mobile": False})
         ws.call(2, "Page.navigate", {"url": url})
         time.sleep(7)
+        # flake observado (03/08): as vezes o layout assenta ANTES do override
+        # valer e a pagina fica ~9% mais estreita (faixa preta a direita no
+        # screenshot). Reaplicar o override depois do load forca o reflow na
+        # largura certa; inocuo quando o primeiro ja pegou.
+        ws.call(11, "Emulation.setDeviceMetricsOverride", {
+            "width": width, "height": altura, "deviceScaleFactor": 1, "mobile": False})
+        time.sleep(1)
         if aos_off:
             # o tema usa AOS (data-aos) e mantem os elementos invisiveis ate entrarem
             # na viewport — no screenshot de pagina inteira isso esconde titulos e

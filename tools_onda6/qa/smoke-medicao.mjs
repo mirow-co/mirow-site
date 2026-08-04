@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 const SRC = readFileSync(
-  new URL('../../public/wp-content/uploads/2026/07/onda6/onda17-medicao.js', import.meta.url),
+  new URL('../../public/wp-content/uploads/2026/07/onda6/onda31-medicao.js', import.meta.url),
   'utf8'
 );
 

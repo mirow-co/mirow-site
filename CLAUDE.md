@@ -107,6 +107,15 @@ Ferramentas em `tools_onda6/qa/` (Chrome via CDP, screenshot real):
 | `click_test.py` | clique real | — |
 | `shot_hover.py` | estado de hover real | — |
 | `shot_modal.py`, `shot_menu.py` | modais e menus | — |
+| `breakpoints.py` | contact sheet multi-breakpoint (320/390/768/1024/1366/1920) num HTML único com métricas (overflow-x + culpados, telas de dobra, elementos zerados) | `aos-off`, `bp=…`, saída em `_qa_breakpoints/` (gitignored) |
+
+**Regra P4 ampliada (03/08):** nenhuma onda vira "PRONTO, aguardando OK" sem o **contact sheet**
+(`breakpoints.py`) da(s) página(s)-alvo anexado junto dos screenshots. Culpado de overflow achado
+no contact sheet é candidato natural a asserção V-nova na suíte.
+
+**Design system:** ler `docs/DESIGN-SYSTEM.md` **antes de escrever qualquer CSS novo** — tokens
+reais do tema (cores, fontes Archivo/Libre Franklin, breakpoints 992/1200), componentes canônicos
+e o passo a passo de capturar referência visual de outro site via CDP (sem playwright).
 
 ## Histórico das ondas (o que já está NO AR)
 
@@ -119,7 +128,14 @@ Ferramentas em `tools_onda6/qa/` (Chrome via CDP, screenshot real):
 | 8.1 | Cache-busting `?v=8` nas 275 páginas; pills do hero maiores; 4 contatos como ícones no header |
 | 8.2 | Slogan mais alto e mais espaçado, com "Resultado" parado no pixel |
 | **9** | **PRONTA, NÃO publicada** — branch `onda9/contato-e-rede`: contato sem escritórios (S-07) + mapa único com hover card (S-14). Publica na onda 11. |
+| **18** | **NO AR** (03/08) — os 24 pedidos do Mario numa sessão (S-50..S-73, issues #108–#131): LinkedIn real no card de líder; botão de voltar ao topo nas 275; idiomas do rodapé abrindo para cima; barras com texto/ícones maiores; "Práticas" em linha com `|` cinza; contato (título, Empresa, telefone opcional, mensagem-padrão, botão ciano); carreiras (título legível, sem "já é cliente?", botão de inscrição no fim); imprensa em lista branca com ícone do veículo; insights coloridos; `nosso-trabalho` → `nossos-valores` com redirect; planeta com 19 setores orbitando na home; menos vão líderes→reconhecimentos; e-mail com assunto/corpo; big numbers no tamanho do slogan. Suíte: 88 asserções. |
 
+| **26** | **NO AR** (04/08, gh-pages `509a588`, v=24) — 7 pedidos do Mario (S-97..S-103, issues #155–#161): "Ver todos os líderes" em navy; **o site inteiro em UMA fonte** (Titillium Web — as 3 famílias do tema nunca eram carregadas, ver `docs/DESIGN-SYSTEM.md` §2); submenu Práticas no tamanho de Sobre nós (19px, revoga a S-94/S-88); rodapé sem filete antes da política; e-mail de Andreas e Felipe nos cards de líder da home; imprensa com a linha inteira clicável; práticas sem Elmar, com Andreas e Felipe (36 páginas). Suíte: 120 asserções. |
+
+| **27** | **NO AR** (04/08, gh-pages `1bf8f66`, v=25) — 2 pedidos (S-104/S-105, #162/#163): menu na ordem Sobre nós · Práticas · Insights · **Imprensa · Carreiras** · Contato (header e clone do rodapé juntos) e a barra com **fundo navy sólido em toda página** — o HTML dela sempre foi idêntico nas 275; o que mudava era o fundo, porque o tema a deixa transparente e ela exibia o hero navy / a foto da interna / o gradiente claro. Suíte: 123 asserções, com a **V14** medindo a assinatura *renderizada* da barra em 8 páginas de templates diferentes. **3 achados abertos, aguardando decisão do Mario:** #164 (EN/DE com 5 itens de menu — falta Imprensa, página só existe em PT) · #165 (216 das 283 páginas são o mesmo conteúdo em URLs diferentes; canonical correto, problema de experiência) · #166 (26 páginas abrem sem banner). |
+| **28** | **NO AR** (04/08, gh-pages `3cc94c3`, v=26) — S-109 (#167): os dois painéis de submenu com a **mesma altura**. Sobre nós abria 159px e Práticas 129px porque a margem da lista (40px do tema x 6px da S-65) e o padding do link (6px x 2px) nunca foram igualados; agora 133px nos dois, em pt/en/de e em 1400/1200/1024px. Suíte: 125 asserções — V15/V16 fazem **hover de verdade** (`Navegador.hover`, novo) e exigem diferença ≤ 2px. |
+| **29** | **NO AR** (04/08, gh-pages `3e5b59c`, v=27) — os 3 achados da onda 27 (S-106/S-107/S-108, #164/#165/#166): **imprensa em EN e DE** (`/en/press/`, `/de/presse/`; menu com 6 itens nas três, seletor de idiomas ligando as três) · **uma URL por página** — 145 duplicatas viraram redirect para a canônica (descobertas pelo próprio `canonical`) e os links internos de 199 páginas foram reescritos, inclusive os do menu; o espelho passa a ser **125 páginas de conteúdo + 160 redirects** · **abertura padrão**: 8 páginas ganharam faixa navy e **12 páginas VAZIAS** (stubs de arquivo do WordPress, `<main>` sem texto) viraram redirect. Suíte: 128 asserções — a S107 cobra que nenhuma página linke para um stub (nenhum clique com 2 saltos). |
+| **30** | **NO AR** (04/08, gh-pages `e26fc82`, v=28) — S-110 (#168): os **4 títulos da home numa classe só** (`.onda30-titulo-secao`) com tamanho, cor, estilo, margem e responsivo; os quatro passam a `h2` e a `data-aos="fade-up"` — o de Setores nunca teve animação porque nasceu na onda 18 fora do tema. A regra de 4 seletores da S-85 sai: uma fonte de verdade. Suíte: 130 asserções — a **V17** mede o computado dos quatro E o ciclo do AOS (os quatro saem de opacity 0 e animam ao rolar). |
 Backlog aberto: issues `site-onda` (S-01..S-19) no `mirow-co/mirow-marketing`.
 
 ## Erros a NÃO repetir
