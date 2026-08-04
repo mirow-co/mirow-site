@@ -902,90 +902,6 @@ html{scroll-behavior:smooth}
 }
 /* onda21:menus-bain:fim */
 
-/* onda21:rede-v2:ini */
-/* ---- S-82 (#140): Nossa Rede v2 — dois mapas, logo no hover, lista viva -
-   O mapa-mundi unico da onda 9 amontoava 4 dos 6 parceiros sobre a Europa. Aqui
-   cada regiao tem janela propria (bbox), o que da zoom sem precisar empurrar pin.
-   Tudo no tema da pagina: fundo navy da secao, texto claro, acento ciano. */
-.onda21-rede{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:0 0 44px}
-.onda21-mapa{position:relative;background:rgba(255,255,255,.04);
-  border:1px solid rgba(170,213,232,.20);padding:14px 14px 10px}
-.onda21-mapa__nome{display:block;color:#00ADEC;font-size:13px;font-weight:700;
-  letter-spacing:.10em;text-transform:uppercase;margin:0 0 10px}
-.onda21-mapa__palco{position:relative}
-.onda21-mapa__svg{display:block;width:100%;height:auto}
-.onda21-mapa__terra{fill:#12307F;stroke:#AAD5E8;stroke-opacity:.55;stroke-width:.8}
-.onda21-mapa__grade{stroke:#AAD5E8;stroke-opacity:.12;stroke-width:.6}
-.onda21-mapa__pins{position:absolute;inset:0}
-
-/* S-92: o pin E o logo do parceiro, numa placa branca visivel o tempo todo */
-.onda21-pin{position:absolute;transform:translate(-50%,-50%)}
-.onda21-pin__botao{display:flex;align-items:center;justify-content:center;
-  width:auto;height:auto;padding:5px 7px;border:1px solid rgba(0,173,236,.55);
-  border-radius:4px;background:#fff;cursor:pointer;
-  box-shadow:0 4px 12px rgba(2,14,102,.35);transition:transform 180ms ease,
-    box-shadow 180ms ease}
-.onda21-pin__botao img{display:block;width:auto;height:20px;max-width:64px;
-  object-fit:contain}
-.onda21-pin:hover .onda21-pin__botao,
-.onda21-pin__botao:focus-visible{transform:scale(1.12);
-  box-shadow:0 8px 20px rgba(2,14,102,.45)}
-/* o ponto de ancoragem, para a placa nao parecer solta no mapa */
-.onda21-pin::after{content:"";position:absolute;left:50%;bottom:-9px;
-  width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:#00ADEC;
-  box-shadow:0 0 0 3px rgba(0,173,236,.30)}
-
-/* o cartao com o LOGO do parceiro */
-.onda21-pin__card{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);
-  width:236px;background:#fff;color:#071C25;padding:14px;text-align:left;
-  box-shadow:0 18px 40px rgba(2,14,102,.35);border-bottom:3px solid #00ADEC;
-  opacity:0;visibility:hidden;pointer-events:none;transition:opacity 180ms ease;
-  z-index:5}
-.onda21-pin:hover .onda21-pin__card,
-.onda21-pin:focus-within .onda21-pin__card{opacity:1;visibility:visible;
-  pointer-events:auto}
-.onda21-pin__nome{color:#020E66;font-size:16px;font-weight:700;margin:0 0 2px}
-.onda21-pin__local{color:#7F7F7F;font-size:13px;margin:0 0 8px}
-.onda21-pin__link{color:#0A79B8;font-size:13px;font-weight:700;text-decoration:none}
-.onda21-pin__link:hover{color:#020E66}
-/* pin junto da borda: o cartao encosta para dentro */
-.onda21-pin--esq .onda21-pin__card{left:0;transform:none}
-.onda21-pin--dir .onda21-pin__card{left:auto;right:0;transform:none}
-
-.onda21-legenda{display:flex;flex-wrap:wrap;gap:8px 22px;list-style:none;
-  margin:14px 0 6px;padding:0;color:#AAD5E8;font-size:14px}
-.onda21-legenda li{display:flex;align-items:center;gap:8px}
-.onda21-legenda__chave{width:11px;height:11px;border-radius:50%;background:#00ADEC;
-  display:inline-block}
-.onda21-legenda__chave--mirow{background:#fff}
-.onda21-nota{color:#AAD5E8;font-size:14px;opacity:.8;margin:0 0 8px}
-
-/* a lista de parceiros — barra que cresce, elevacao, logo */
-.onda21-lista{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
-  list-style:none;margin:0;padding:0}
-.onda21-lista__item{position:relative;background:rgba(255,255,255,.05);
-  border:1px solid rgba(170,213,232,.18);padding:20px 20px 22px;overflow:hidden;
-  transition:transform 220ms ease,background 220ms ease}
-.onda21-lista__item::before{content:"";position:absolute;left:0;top:0;bottom:0;
-  width:3px;background:#00ADEC;transform:scaleY(0);transform-origin:top;
-  transition:transform 260ms ease}
-.onda21-lista__item:hover{transform:translateY(-4px);background:rgba(255,255,255,.09)}
-.onda21-lista__item:hover::before{transform:scaleY(1)}
-.onda21-lista__nome{color:#fff;font-size:19px;font-weight:700;margin:0 0 2px}
-.onda21-lista__local{color:#AAD5E8;font-size:14px;margin:0 0 12px}
-.onda21-lista__link{color:#00ADEC;font-size:14px;font-weight:700;
-  text-decoration:none}
-.onda21-lista__link:hover{color:#fff}
-
-@media only screen and (max-width: 1200px){
-  .onda21-lista{grid-template-columns:repeat(2,1fr)}
-}
-@media only screen and (max-width: 991px){
-  .onda21-rede{grid-template-columns:1fr}
-  .onda21-lista{grid-template-columns:1fr}
-  .onda21-pin__card{width:200px}
-}
-/* onda21:rede-v2:fim */
 
 /* onda22:marca-secoes:ini */
 /* ---- S-85 + S-86: a marca de secao como framework da home ---------------
@@ -1212,3 +1128,66 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   .onda30-titulo-secao{font-size:28px !important}
 }
 /* onda30:titulo-secao:fim */
+
+/* onda31:rede:ini */
+/* ---- S-111 a S-116: a Nossa Rede com mapa de verdade ---------------------
+   Mapas: SVG gerado do Natural Earth (dominio publico) em projecao Mercator, um
+   recorte por mapa. O `aspect-ratio` de cada palco vem do proprio recorte, entao o
+   mapa PREENCHE a caixa (S-114) — antes o SVG da Europa tinha proporcao fixa e
+   sobrava faixa vazia.
+   Pins: chip branco com o logo do parceiro (S-111/S-115, no lugar do favicon de
+   128px) e uma AGULHA que marca o ponto exato da cidade (S-116). O chip pode se
+   afastar lateralmente (--desvio) quando dois parceiros dividem a cidade — a agulha
+   fica onde a projecao mandou. */
+.onda31-rede{display:grid;grid-template-columns:repeat(2,1fr);gap:34px;margin:26px 0 0}
+.onda31-mapa__nome{display:block;color:#fff;font-size:15px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;margin:0 0 10px}
+.onda31-mapa__palco{position:relative;width:100%;
+  background:rgba(2,14,102,.28);border:1px solid rgba(170,213,232,.30);border-radius:3px;
+  overflow:hidden}
+.onda31-mapa__svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.onda31-mapa__pins{position:absolute;inset:0}
+
+.onda31-pin{position:absolute;width:0;height:0}
+/* a agulha: 8px de ponto no lugar exato + haste subindo ate o chip */
+.onda31-pin__agulha{position:absolute;left:-4px;top:-4px;width:8px;height:8px;
+  border-radius:50%;background:#00ADEC;box-shadow:0 0 0 3px rgba(0,173,236,.28)}
+.onda31-pin__corpo{position:absolute;left:0;bottom:var(--sobe,12px);
+  transform:translateX(calc(-50% + var(--dx,0px)))}
+.onda31-pin__chip{display:block;padding:8px 12px;border:0;cursor:pointer;
+  background:#fff;border-radius:4px;box-shadow:0 6px 18px rgba(2,14,102,.34);
+  transition:transform 200ms ease,box-shadow 200ms ease}
+.onda31-pin__chip img{display:block;height:26px;width:auto;max-width:132px;
+  object-fit:contain}
+.onda31-pin__chip:hover,.onda31-pin__chip:focus-visible{outline:none;
+  transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,173,236,.45)}
+/* haste ligando o ponto da cidade ao chip: nasce NO ponto e gira o quanto o
+   gerador calculou (atan2 do desvio pelo quanto subiu), entao o chip pode sair do
+   eixo sem a linha desgrudar dele */
+.onda31-pin__haste{position:absolute;left:0;bottom:0;width:1px;
+  height:var(--len,12px);transform-origin:bottom center;
+  transform:rotate(var(--ang,0deg));background:rgba(0,173,236,.85)}
+
+.onda31-pin__card{position:absolute;left:50%;bottom:calc(100% + 12px);
+  transform:translateX(-50%) translateY(6px);width:230px;padding:14px 16px;
+  background:#fff;border-radius:4px;box-shadow:0 16px 34px rgba(2,14,102,.34);
+  opacity:0;visibility:hidden;transition:all 220ms ease;z-index:6}
+.onda31-pin:hover .onda31-pin__card,
+.onda31-pin__chip:focus-visible + .onda31-pin__card,
+.onda31-pin__card:hover{opacity:1;visibility:visible;transform:translateX(-50%)}
+.onda31-pin__nome{color:#020E66;font-size:16px;font-weight:700;margin:0 0 2px}
+.onda31-pin__local{color:#4A4A4A;font-size:14px;margin:0 0 8px}
+.onda31-pin__link{color:#00ADEC;font-size:14px;font-weight:700;text-decoration:none}
+.onda31-pin__link:hover{text-decoration:underline}
+/* o pin com hover sobe na pilha, senao o card fica atras do chip vizinho */
+.onda31-pin:hover{z-index:7}
+
+.onda31-nota{color:#fff;opacity:.82;font-size:15px;margin:6px 0 0}
+
+@media only screen and (max-width: 991px){
+  .onda31-rede{grid-template-columns:1fr;gap:26px}
+  .onda31-pin__chip{padding:6px 9px}
+  .onda31-pin__chip img{height:20px;max-width:104px}
+  .onda31-pin__card{width:200px}
+}
+/* onda31:rede:fim */
