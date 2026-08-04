@@ -1622,6 +1622,52 @@ def estaticas(s):
         return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
     s.check("S103", u"práticas sem Elmar, com Andreas e Felipe (#161)", s103)
 
+    # ------------------------------------------------------------------ onda 27
+    ORDEM_MENU = {
+        "pt": [u"Sobre nós", u"Práticas", u"Insights", u"Imprensa", u"Carreiras",
+               u"Contato"],
+        # EN e DE não têm item de Imprensa: a página só existe em português (#164).
+        # Quando a decisão da #164 sair, esta lista muda junto.
+        "en": [u"About us", u"Practices", u"Insights", u"Careers", u"Contact Us"],
+        "de": [u"Über uns", u"Branchen", u"Insights", u"Karrieren", u"Kontakt"],
+    }
+
+    def s104():
+        # a ordem pedida pelo Mario, página a página, nas DUAS barras (a do rodapé
+        # é clone byte a byte — a S36 garante a igualdade, aqui se cobra a ordem)
+        det = []
+        for rel, hh in s.conteudo():
+            # a barra do header é o PRIMEIRO <nav class="menu"> da página (o
+            # segundo é o clone do rodapé — ver S36)
+            i = hh.find('<nav class="menu"')
+            j = hh.find("</nav>", i)
+            if i < 0 or j < 0:
+                det.append(u"%s sem header" % rel)
+                continue
+            itens = [x.strip() for x in re.findall(
+                r'class="menu__nav-link[^"]*" href="[^"]*"[^>]*>([^<]+)<', hh[i:j])]
+            lang = re.search(r'pll_language=([a-z]{2})', hh)
+            lang = lang.group(1) if lang else "pt"
+            esperado = ORDEM_MENU.get(lang)
+            if esperado and itens != esperado:
+                det.append(u"%s: %s" % (rel, " > ".join(itens)))
+        return (not det, u"%d página(s) fora da ordem: %s"
+                % (len(det), "; ".join(det[:2])))
+    s.check("S104", u"menu na ordem Insights > Imprensa > Carreiras (#162)", s104)
+
+    def s105():
+        # o repouso da barra não pode voltar a depender do que está atrás dela
+        det = []
+        for regra in (".header .menu{background:#020E66 !important",
+                      ".rodape-barra .menu{background:#020E66 !important}"):
+            if regra not in css_o18:
+                det.append(u"falta a regra de fundo sólido: %s" % regra[:40])
+        # o hover branco (painel do menu, S-83) tem de continuar vencendo
+        if ".header .menu:hover" not in css_o18:
+            det.append(u"o hover branco da barra foi perdido")
+        return (not det, u"; ".join(det[:2]))
+    s.check("S105", u"barra com fundo sólido igual em toda página (#163)", s105)
+
 
 # ------------------------------------------------------- asserções ao vivo
 
@@ -1839,6 +1885,51 @@ def ao_vivo(s):
                                  "contato/index.html", "de/index.html"], 8):
             s.check("V%02d" % i, u"uma fonte só renderizada em %s" % rel,
                     faz_fonte_unica(rel))
+
+        # V14 — S-105 (#163): a barra tem de ser a MESMA coisa medida no navegador,
+        # em páginas de templates diferentes (home com hero, prática com foto,
+        # imprensa sem banner, post de blog, política de privacidade). Não se
+        # compara CSS: compara-se a assinatura renderizada da barra.
+        def v14():
+            paginas = ["pt/", "pt/insights/", "pt/imprensa/", "pt/carreiras/",
+                       "pt/pratica/estrategia/", "pt/sobre-nos/nossos-valores/",
+                       "pt/sobre-nos/lideres/", "politica-de-privacidade/"]
+            js = ("(function(){var n=document.querySelector('.header .menu');"
+                  "if(!n)return 'sem barra';var c=getComputedStyle(n),"
+                  "r=n.getBoundingClientRect(),"
+                  "l=document.querySelector('.header .menu__nav-link');"
+                  "return JSON.stringify({bg:c.backgroundColor,h:Math.round(r.height),"
+                  "cor:getComputedStyle(l).color,"
+                  "fonte:getComputedStyle(l).fontFamily+'|'+getComputedStyle(l).fontSize,"
+                  "itens:[].map.call(document.querySelectorAll("
+                  "'.header .menu__nav-link'),function(a){return a.textContent.trim()})"
+                  ".join('>'),"
+                  "canais:document.querySelectorAll('.header .menu__contatos-link').length,"
+                  "idiomas:!!document.querySelector('.header .menu__languages')});})()")
+            assinaturas = {}
+            for rel in paginas:
+                nav.abrir("%s/%s" % (base, rel), 1400, 900)
+                v = nav.js(js)
+                if not isinstance(v, str) or v.startswith("sem"):
+                    return (False, u"%s: %s" % (rel, v))
+                assinaturas[rel] = v
+            distintas = {}
+            for rel, sig in assinaturas.items():
+                distintas.setdefault(sig, []).append(rel)
+            if len(distintas) > 1:
+                pares = sorted(distintas.items(), key=lambda kv: -len(kv[1]))
+                fora = pares[1][1]
+                d1 = json.loads(pares[0][0])
+                d2 = json.loads(pares[1][0])
+                difs = [u"%s: %r x %r" % (k, d1.get(k), d2.get(k))
+                        for k in d1 if d1.get(k) != d2.get(k)]
+                return (False, u"%d barras diferentes — %s difere em %s"
+                        % (len(distintas), ", ".join(fora[:2]), "; ".join(difs[:3])))
+            d = json.loads(list(distintas)[0])
+            return (True, u"1 barra só nas %d páginas (fundo %s, %dpx, %s)"
+                    % (len(paginas), d["bg"], d["h"], d["itens"]))
+        s.check("V14", u"a mesma barra superior em 8 páginas de templates diferentes",
+                v14)
 
 
 # ------------------------------------------------------------------- main

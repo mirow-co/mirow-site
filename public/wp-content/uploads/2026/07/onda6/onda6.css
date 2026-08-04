@@ -1152,3 +1152,21 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
     box-sizing:border-box}
 }
 /* onda26:lider-mail:fim */
+
+/* onda27:barra-igual:ini */
+/* ---- S-105: a MESMA barra em toda pagina --------------------------------
+   O HTML da barra sempre foi identico nas 275 paginas (mesmos itens, 4 canais,
+   seletor de idiomas, 98px). O que mudava era o FUNDO: o tema a deixa
+   transparente (`.menu{background:rgba(0,0,0,0)}`), entao ela exibia o que
+   estivesse atras — hero navy na home, FOTO nas internas, gradiente claro nas 26
+   paginas sem banner. Agora o repouso e navy solido em todas.
+   O hover branco (que casa com o painel branco do menu, S-83) continua: precisa
+   de seletor mais especifico para vencer a regra de repouso. */
+.header .menu{background:#020E66 !important;
+  transition:background 300ms ease-in-out}
+.header .menu:hover,
+.header .menu.menu--mobile-opened{background:#fff !important}
+/* o clone do rodape mora sobre o navy do footer: mesma cor, sem costura */
+.rodape-barra .menu{background:#020E66 !important}
+.rodape-barra .menu:hover{background:#fff !important}
+/* onda27:barra-igual:fim */
