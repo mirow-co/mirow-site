@@ -88,28 +88,52 @@ CSS = """/* ---- S-83 + S-80: o painel do menu no modelo da barra da Bain ------
 .menu__nav-sublink{color:#020E66 !important;font-weight:400}
 .menu__nav-sublink:hover,.menu__nav-sublink:focus-visible{color:#00ADEC !important}
 
-/* o .col do tema encolhia no conteudo: sem isto a grade ocupava so 1/3 do painel */
+/* Largura do painel — duas camadas, as duas necessarias (medido via CDP):
+   dentro do submenu, o .container do tema e flex, entao o .row e um FLEX ITEM e
+   encolhia no conteudo; e o .col, dentro do .row, tambem. Sem os dois, a grade
+   ficava agrupada a esquerda em vez de ocupar a largura util. */
+.menu__nav-submenu .container>.row{flex:1 1 100%;width:100%}
 .menu__nav-submenu .row>.col{flex:0 0 100%;width:100%;max-width:100%}
 /* Sobre nos: os 5 itens espalhados no width, como o painel da Bain */
 .menu__nav-sublinks:not(.onda18-praticas){display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));gap:2px 24px}
+  grid-template-columns:repeat(5,max-content);justify-content:space-between;
+  gap:2px 24px}
 .menu__nav-sublinks:not(.onda18-praticas) .menu__nav-sublink{font-size:19px !important}
 
 /* Praticas: 3 colunas iguais ocupando o width, divididas por linha cinza
    (o "|" da S-65 vira o divisor da coluna — e o que faz ocupar a caixa toda) */
+/* S-88: colunas do tamanho do conteudo e espalhadas — com 3 colunas iguais,
+   "Sourcing, Compras e Estoques" nao cabia e quebrava em 2 linhas. */
 .menu__nav-sublinks.onda18-praticas{display:grid !important;
-  grid-template-columns:repeat(3,minmax(0,1fr));gap:0;align-items:center}
+  grid-template-columns:repeat(3,max-content);justify-content:space-between;
+  gap:0;align-items:center}
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublink{white-space:nowrap}
 .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem{margin:0;padding:0 24px}
 .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem{
   border-left:1px solid rgba(127,127,127,.55)}
 .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem:first-child{padding-left:0}
 .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem::before{
   content:none}
-.menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:28px !important;
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:26px !important;
   font-weight:700;line-height:1.2;display:block}
-@media only screen and (max-width: 1366px){
-  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:23px !important}
+@media only screen and (max-width: 1440px){
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:22px !important}
 }
+@media only screen and (max-width: 1200px){
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:19px !important}
+}
+
+/* ---- S-90: o balao de idiomas no navy Mirow, nao mais preto -------------- */
+.menu__languages-list{background:#020E66 !important;
+  box-shadow:0 14px 30px rgba(2,14,102,.32)}
+/* a setinha do balao acompanha (no header aponta para cima; no rodape, S-52,
+   ela e invertida e vira border-top) */
+.menu__languages-list::after{border-bottom-color:#020E66 !important}
+.rodape-barra .menu__languages-list::after{border-top-color:#020E66 !important}
+.menu__languages-list li a{color:#fff !important}
+.menu__languages-list li:not(.menu__languages-list-current) a:hover{
+  color:#00ADEC !important}
+.menu__languages-list li.menu__languages-list-current a{color:#00ADEC !important}
 
 /* ---- S-79: a barra do rodape sangra 100vw, como a de cima ---------------- */
 .rodape-barra{width:100vw;margin-left:calc(50% - 50vw) !important;
@@ -123,7 +147,8 @@ CSS = """/* ---- S-83 + S-80: o painel do menu no modelo da barra da Bain ------
   .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem{padding:0}
   .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem{
     border-left:0}
-  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:19px !important}
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:19px !important;
+    white-space:normal}
 }"""
 
 

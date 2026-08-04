@@ -1267,8 +1267,11 @@ def estaticas(s):
         det = []
         if ".menu__nav-sublinks.onda18-praticas{display:grid !important" not in css_o18:
             det.append(u"práticas não estão em grade")
-        if "grid-template-columns:repeat(3,minmax(0,1fr));gap:0" not in css_o18:
-            det.append(u"a grade das práticas não tem 3 colunas iguais")
+        # a S-88 trocou o MECANISMO: colunas iguais nao cabiam "Sourcing, Compras e
+        # Estoques" em 1 linha, entao virou coluna do tamanho do conteudo espalhada
+        # (mesmo pedido — ocupar a largura da caixa — outra tecnica)
+        if "grid-template-columns:repeat(3,max-content);justify-content:space-between"                 not in css_o18:
+            det.append(u"as práticas não ocupam a largura da caixa")
         if ".menu__nav-submenu .row>.col{flex:0 0 100%" not in css_o18:
             det.append(u"a coluna do painel não ocupa a largura (grade ficava em 1/3)")
         return (not det, u"; ".join(det))
@@ -1381,12 +1384,68 @@ def estaticas(s):
                          "text-transform:none !important", "text-align:left !important"):
                 if prop not in m.group(1):
                     det.append(u"regra dos títulos sem %s" % prop)
-        if ".onda22-marca{position:relative" not in css_o18:
-            det.append(u"CSS sem o componente da marca")
-        if ".onda22-marca--4::before{box-shadow:0 -14px 0 currentColor,0 -28px 0 currentColor,"                 not in css_o18:
-            det.append(u"CSS sem a variação --4 da marca")
+        # v2 do marcador (S-86): grade 2x2, navy fixo, a esquerda do titulo
+        if ".onda22-marca{float:left;display:grid" not in css_o18:
+            det.append(u"marca não é grade 2x2 flutuando à esquerda do título")
+        if "width:7px;height:7px;background:#020E66;opacity:.42" not in css_o18:
+            det.append(u"os 3 blocos pequenos não estão navy/discretos")
+        if ".onda22-marca--4 i:nth-child(4){width:12px;height:12px;opacity:1}" not in css_o18:
+            det.append(u"o quadrante da seção não fica maior/opaco")
+        if "currentColor" in css_o18.split("onda22:marca-secoes:ini")[-1].split(
+                "onda22:marca-secoes:fim")[0]:
+            det.append(u"a marca voltou a usar currentColor (o pedido é navy sempre)")
+        # cada marca tem os 4 quadrantes no HTML
+        for rel in HOMES:
+            hh = s.ler(rel)
+            for n in range(1, 5):
+                esperado = ('<span class="onda22-marca onda22-marca--%d" '
+                            'aria-hidden="true"><i></i><i></i><i></i><i></i></span>' % n)
+                if esperado not in hh:
+                    det.append(u"%s: marca --%d sem os 4 quadrantes" % (rel, n))
         return (not det, u"; ".join(det[:4]))
     s.check("S85", u"marca de seção 1-4 como framework da home; títulos parelhos", s85)
+
+    # ------------------------------------------------------------------ onda 24
+    def s87():
+        # ao rolar, o tema poe .home-experience--dark-mode e o fundo escurece; o
+        # navy forcado pela S-85 sumia junto (era o "apagar" que o Mario viu)
+        ok = (".home-experience--dark-mode .home-experience__subtitle"
+              "{color:#e9f0ff !important}" in css_o18)
+        return (ok, u'"Nossas áreas de expertise" volta a apagar no estado dark-mode')
+    s.check("S87", u'"Nossas áreas de expertise" legível ao rolar (#145)', s87)
+
+    def s88():
+        det = []
+        if "grid-template-columns:repeat(3,max-content);justify-content:space-between"                 not in css_o18:
+            det.append(u"práticas sem colunas de conteúdo espalhadas")
+        if ".menu__nav-sublinks.onda18-praticas .menu__nav-sublink{white-space:nowrap}"                 not in css_o18:
+            det.append(u"práticas sem nowrap (podem voltar a quebrar em 2 linhas)")
+        return (not det, u"; ".join(det))
+    s.check("S88", u'"Sourcing, Compras e Estoques" em uma linha só (#146)', s88)
+
+    def s89():
+        det = []
+        if "grid-template-columns:repeat(5,max-content);justify-content:space-between"                 not in css_o18:
+            det.append(u"Sobre nós não está espalhado na largura")
+        # as DUAS camadas de largura do painel (medidas via CDP)
+        if ".menu__nav-submenu .container>.row{flex:1 1 100%;width:100%}" not in css_o18:
+            det.append(u"falta a largura do .row (ele encolhia no conteúdo)")
+        if ".menu__nav-submenu .row>.col{flex:0 0 100%" not in css_o18:
+            det.append(u"falta a largura do .col")
+        return (not det, u"; ".join(det))
+    s.check("S89", u'submenu "Sobre nós" esticado até a direita (#147)', s89)
+
+    def s90():
+        det = []
+        if ".menu__languages-list{background:#020E66 !important" not in css_o18:
+            det.append(u"balão de idiomas não está no navy Mirow")
+        for regra in (".menu__languages-list::after{border-bottom-color:#020E66 !important}",
+                      ".rodape-barra .menu__languages-list::after"
+                      "{border-top-color:#020E66 !important}"):
+            if regra not in css_o18:
+                det.append(u"a setinha do balão não acompanha o navy")
+        return (not det, u"; ".join(det[:2]))
+    s.check("S90", u"balão de idiomas no azul Mirow, não preto (#148)", s90)
 
 
 # ------------------------------------------------------- asserções ao vivo

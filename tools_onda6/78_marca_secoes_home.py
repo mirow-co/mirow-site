@@ -20,18 +20,15 @@ proprio e ganha VARIACOES.
 
 O FRAMEWORK (a parte "mapa da pagina")
 --------------------------------------
-A variacao e a POSICAO da secao na home: quadrado grande + N quadradinhos
-empilhados, N = numero da secao. Percorrendo a home de cima para baixo, a marca
-conta 1, 2, 3, 4 — o leitor tem um indice visual de onde esta.
+A variacao e a POSICAO da secao na home. Percorrendo a home de cima para baixo, a
+marca aponta 1, 2, 3, 4 — o leitor tem um indice visual de onde esta. O DESENHO da
+variacao mudou na v2 (ver "V2 DO MARCADOR" abaixo): era quadrado grande + N
+quadradinhos, hoje e a grade 2x2 com o quadrante da secao maior.
 
   1 · Nossas areas de expertise   (era o bloco "PRATICAS")
   2 · Setores em que atuamos
   3 · Nossos Lideres
   4 · Reconhecimentos
-
-Os quadradinhos extras sao `box-shadow` do mesmo pseudo-elemento (nao ha limite de 2
-como em ::before/::after), e todos usam `currentColor` — assim a marca herda a cor do
-cabecalho da secao e o contraste se resolve sozinho em cada fundo.
 
 TITULOS PARELHOS
 ----------------
@@ -47,6 +44,28 @@ TEXTOS QUE SAEM
 - a palavra "Praticas" (era um rotulo acima do titulo de verdade)
 - o super titulo "Lideres" (a marca d'agua gigante de 335px atras do bloco)
 Os dois elementos ficam vazios no HTML e escondidos no CSS.
+
+V2 DO MARCADOR (S-86)
+---------------------
+Pedido do Mario: "esse marcador pode ser em azul escuro sempre, e ter como 4 blocos
+em que um esta um pouco maior que os outros (o atual), e os outros pequenos em cada
+quadrante, sempre do lado esquerdo dos titulos, menor e mais discreto."
+
+Mudou de "quadrado grande + N quadradinhos empilhados" para uma GRADE 2x2 de quatro
+blocos: o bloco do QUADRANTE da secao fica um pouco maior e opaco, os outros tres
+ficam pequenos e esmaecidos. O mapa continua legivel — a posicao do bloco grande diz
+onde voce esta:
+
+    [1] [2]      1 Nossas areas de expertise    2 Setores em que atuamos
+    [3] [4]      3 Nossos Lideres               4 Reconhecimentos
+
+Tres consequencias do pedido:
+  - COR FIXA navy #020E66 (saiu o currentColor da v1). Nos dois blocos de fundo
+    escuro o marcador fica de proposito discreto — foi o que ele pediu ("mais
+    discreto"); nao e falta de contraste por descuido.
+  - VAI A ESQUERDA do titulo, nao acima: `float:left` resolve sem tocar no markup
+    do tema (o titulo e bloco e flui ao lado do float).
+  - MENOR: 26px no total, contra 34px + quadradinhos da v1.
 
 Idempotente: a marca so entra se ainda nao existe; CSS em bloco marcado.
 """
@@ -69,21 +88,25 @@ SECOES = [
 # elementos cujo TEXTO sai
 VAZIOS = ["home-experience__title", "home-leaders__title"]
 
-CSS = """/* ---- S-85: a marca de secao como framework da home ----------------------
-   O icone e o glifo que o tema ja desenhava ao lado de "PRATICAS"
-   (.home-experience__title::after + ::before). Aqui virou componente, e a
-   VARIACAO e a posicao da secao: quadrado grande + N quadradinhos, N = numero da
-   secao. Descendo a home, a marca conta 1, 2, 3, 4 — um indice visual.
-   currentColor: a marca herda a cor do cabecalho, entao o contraste se resolve
-   em cada fundo do gradiente. */
-.onda22-marca{position:relative;display:block;width:34px;height:34px;
-  background:currentColor;margin:0 0 20px}
-.onda22-marca::before{content:"";position:absolute;left:42px;bottom:2px;
-  width:10px;height:10px;background:currentColor}
-.onda22-marca--2::before{box-shadow:0 -14px 0 currentColor}
-.onda22-marca--3::before{box-shadow:0 -14px 0 currentColor,0 -28px 0 currentColor}
-.onda22-marca--4::before{box-shadow:0 -14px 0 currentColor,0 -28px 0 currentColor,
-  0 -42px 0 currentColor}
+CSS = """/* ---- S-85 + S-86: a marca de secao como framework da home ---------------
+   Nasceu do glifo que o tema desenhava ao lado de "PRATICAS"
+   (.home-experience__title::after + ::before). Na v2 (S-86) e uma GRADE 2x2 de
+   quatro blocos: o bloco do quadrante da secao fica maior e opaco, os outros
+   tres pequenos e esmaecidos — "voce esta aqui" no mapa da home.
+       [1] [2]     1 expertise   2 setores
+       [3] [4]     3 lideres     4 reconhecimentos
+   Navy fixo (#020E66) e float:left, a pedido: nos blocos de fundo escuro o
+   marcador fica discreto de proposito. */
+.onda22-marca{float:left;display:grid;
+  grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);
+  gap:4px;width:26px;height:26px;margin:12px 14px 0 0}
+.onda22-marca i{align-self:center;justify-self:center;
+  width:7px;height:7px;background:#020E66;opacity:.42}
+/* o quadrante da secao: um pouco maior e opaco — e o "voce esta aqui" */
+.onda22-marca--1 i:nth-child(1),
+.onda22-marca--2 i:nth-child(2),
+.onda22-marca--3 i:nth-child(3),
+.onda22-marca--4 i:nth-child(4){width:12px;height:12px;opacity:1}
 
 /* ---- titulos parelhos: mesma fonte, peso, caixa, alinhamento e margem ----- */
 .home-experience__subtitle,
@@ -97,6 +120,10 @@ CSS = """/* ---- S-85: a marca de secao como framework da home -----------------
   font-family:var(--fontFamily),Arial,sans-serif}
 /* a cor NAO pode ser igual: o gradiente da home vai de claro a escuro */
 .home-experience__subtitle{color:#020E66 !important}
+/* S-87: ao rolar, o tema poe .home-experience--dark-mode na secao e o fundo
+   ESCURECE. O navy fixo (que a S-85 forcou com !important) sumia junto — era o
+   "apagar" que o Mario viu. No estado escuro o titulo vira claro. */
+.home-experience--dark-mode .home-experience__subtitle{color:#e9f0ff !important}
 .onda18-orbe__titulo{color:#e9f0ff !important}
 .home-leaders__subtitle{color:#e9f0ff !important}
 .certificates__title,.certificates h2{color:#020E66 !important}
@@ -114,8 +141,11 @@ CSS = """/* ---- S-85: a marca de secao como framework da home -----------------
   .home-experience__subtitle,.onda18-orbe__titulo,.home-leaders__subtitle,
   .certificates__title,.certificates h2{font-size:34px !important;
     margin-bottom:22px !important}
-  .onda22-marca{width:28px;height:28px;margin-bottom:16px}
-  .onda22-marca::before{left:34px;width:8px;height:8px}
+  .onda22-marca{width:22px;height:22px;gap:3px;margin:8px 12px 0 0}
+  .onda22-marca i{width:6px;height:6px}
+  .onda22-marca--1 i:nth-child(1),.onda22-marca--2 i:nth-child(2),
+  .onda22-marca--3 i:nth-child(3),.onda22-marca--4 i:nth-child(4){
+    width:10px;height:10px}
 }
 @media only screen and (max-width: 767px){
   .home-experience__subtitle,.onda18-orbe__titulo,.home-leaders__subtitle,
@@ -124,12 +154,22 @@ CSS = """/* ---- S-85: a marca de secao como framework da home -----------------
 
 
 def marca(n):
-    return ('<span class="onda22-marca onda22-marca--%d" aria-hidden="true"></span>' % n)
+    """Grade 2x2: um <i> por quadrante; o do quadrante n fica maior (CSS)."""
+    return ('<span class="onda22-marca onda22-marca--%d" aria-hidden="true">'
+            '<i></i><i></i><i></i><i></i></span>' % n)
 
 
 def aplicar(html):
     """Insere a marca antes de cada titulo e esvazia os textos que saem."""
     mudou = False
+
+    # upgrade da v1 (span vazio) para a v2 (grade 2x2 com 4 filhos)
+    for n in range(1, 5):
+        velho = ('<span class="onda22-marca onda22-marca--%d" aria-hidden="true">'
+                 '</span>' % n)
+        if velho in html:
+            html = html.replace(velho, marca(n))
+            mudou = True
 
     for classe, n in SECOES:
         # a marca entra imediatamente ANTES da tag do titulo
