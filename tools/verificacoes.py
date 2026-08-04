@@ -1777,6 +1777,18 @@ class Navegador(object):
                          {"expression": expr, "returnByValue": True})
         return r.get("result", {}).get("result", {}).get("value")
 
+    def hover(self, x, y, espera=1.0):
+        """Hover de verdade (Input.dispatchMouseEvent), como o mouse do Mario.
+
+        Serve para medir o que só existe em hover — o painel dos submenus. NÃO
+        vale conferir cor em hover por screenshot: com `captureBeyondViewport` o
+        Chrome repinta e o estado se perde (ver o aviso no shot_menu.py).
+        """
+        self.ws.call(self._id(), "Input.dispatchMouseEvent",
+                     {"type": "mouseMoved", "x": x, "y": y,
+                      "button": "none", "clickCount": 0})
+        time.sleep(espera)
+
     def __exit__(self, *a):
         try:
             self.proc.terminate()
@@ -1930,6 +1942,44 @@ def ao_vivo(s):
                     % (len(paginas), d["bg"], d["h"], d["itens"]))
         s.check("V14", u"a mesma barra superior em 8 páginas de templates diferentes",
                 v14)
+
+        # V15 — S-109 (#167): o painel do submenu tem de ter a MESMA altura,
+        # qualquer que seja o item. "Sobre nós" media 159px e "Práticas" 129px
+        # porque a margem da lista (40px do tema x 6px da S-65) e o padding do
+        # link (6px x 2px) nunca foram igualados. Medido com hover real.
+        def faz_paineis_iguais(largura):
+            def f():
+                js_pos = ("(function(i){var a=document.querySelectorAll("
+                          "'.header .menu__nav-link')[i];if(!a)return null;"
+                          "var r=a.getBoundingClientRect();"
+                          "return [Math.round(r.left+r.width/2),"
+                          "Math.round(r.top+r.height/2)];})(%d)")
+                js_h = ("(function(){var sms=document.querySelectorAll("
+                        "'.header .menu__nav-submenu');"
+                        "for(var i=0;i<sms.length;i++){"
+                        "if(getComputedStyle(sms[i]).display!=='none')"
+                        "return Math.round(sms[i].getBoundingClientRect().height);}"
+                        "return 0;})()")
+                nav.abrir("%s/pt/" % base, largura, 900)
+                alturas = {}
+                for i, nome in ((0, u"Sobre nós"), (1, u"Práticas")):
+                    pos = nav.js(js_pos % i)
+                    if not pos:
+                        return (False, u"não achei o item %d da barra" % i)
+                    nav.hover(pos[0], pos[1])
+                    alturas[nome] = nav.js(js_h)
+                    nav.hover(10, 800, espera=0.6)   # sai do hover
+                if not all(alturas.values()):
+                    return (False, u"painel não abriu no hover: %r" % alturas)
+                dif = abs(alturas[u"Sobre nós"] - alturas[u"Práticas"])
+                return (dif <= 2, u"%dpx: Sobre nós=%dpx, Práticas=%dpx (dif %dpx, "
+                        u"tolerância 2)" % (largura, alturas[u"Sobre nós"],
+                                            alturas[u"Práticas"], dif))
+            return f
+        for i, largura in enumerate((1400, 1200), 15):
+            s.check("V%02d" % i,
+                    u"painéis de submenu com a mesma altura em %dpx" % largura,
+                    faz_paineis_iguais(largura))
 
 
 # ------------------------------------------------------------------- main
