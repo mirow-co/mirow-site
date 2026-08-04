@@ -78,7 +78,13 @@ BLOCOS_CSS = [
     "onda18:contato-botao", "onda18:barras", "onda18:voltar-topo",
     "onda18:carreiras", "onda18:insights-colorido", "onda18:home-lideres",
     "onda18:imprensa", "onda18:planeta-setores", "onda18:hero-numeros-s73",
-    "onda19:lateral-e-idiomas", "onda21:menus-bain", "onda21:rede-v2", "onda22:marca-secoes", "onda25:peso-submenu",
+    "onda19:lateral-e-idiomas", "onda21:menus-bain", "onda22:marca-secoes",
+    "onda25:peso-submenu",
+    # onda21:rede-v2 SAIU na onda 31: a página da rede é gerada por
+    # tools/gen_rede.py e o estilo vive no bloco onda31:rede. O antigo era CSS
+    # morto — as classes .onda21-* não existem mais na página.
+    "onda26:fonte-unica", "onda27:barra-igual", "onda29:abertura-padrao",
+    "onda30:titulo-secao", "onda31:rede",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -172,6 +178,10 @@ CARREIRAS = ["pt/carreiras/index.html",
 
 # Páginas de imprensa — S-106 (#164) criou EN e DE; antes só existia em PT.
 IMPRENSA = ["pt/imprensa/index.html", "en/press/index.html", "de/presse/index.html"]
+
+# Páginas da Nossa Rede — geradas por tools/gen_rede.py (onda 31).
+REDE = ["pt/sobre-nos/nossa-rede/index.html", "en/about-us/our-network/index.html",
+        "de/ueber-uns/unser-netzwerk/index.html"]
 
 # ------------------------------------------------------------------ mecânica
 
@@ -1326,41 +1336,32 @@ def estaticas(s):
     s.check("S81", u'submenu "Sobre nós" na ordem e rótulos pedidos (#139)', s81)
 
     def s82():
-        alvos = ["pt/sobre-nos/nossa-rede/index.html",
-                 "en/about-us/our-network/index.html",
-                 "de/ueber-uns/unser-netzwerk/index.html"]
+        # ATUALIZADA na onda 31 (S-111..S-116): os mapas deixaram de ser desenho a
+        # mao e a pagina passou a ser GERADA do arquivo mestre (tools/gen_rede.py).
+        # O que a S-82 protegia continua protegido: 2 mapas, 6 parceiros, logo no
+        # proprio pin, sem escritorio da Mirow e sem a Virtus.
         det = []
-        for rel in alvos:
+        for rel in REDE:
             h = s.ler(rel)
-            mapas = h.count('class="onda21-mapa"')
-            pins = h.count('class="onda21-pin"')
-            itens = h.count('class="onda21-lista__item"')
-            # S-92: o logo E o pin (sempre visivel), nao mais so no hover
-            logos_no_mapa = len(re.findall(
-                r'class="onda21-pin__botao"[^>]*>\s*<img ', h))
+            mapas = h.count('class="onda31-mapa"')
+            pins = h.count('class="onda31-pin"')
+            logos_no_pin = len(re.findall(
+                r'class="onda31-pin__chip"[^>]*>\s*<img ', h))
             if mapas != 2:
                 det.append(u"%s com %d mapa(s) (esperado 2)" % (rel, mapas))
             if pins != 6:
                 det.append(u"%s com %d pin(s) de parceiro (esperado 6)" % (rel, pins))
-            if logos_no_mapa != 6:
+            if logos_no_pin != 6:
                 det.append(u"%s com %d logo(s) dentro do pin (esperado 6)"
-                           % (rel, logos_no_mapa))
-            if itens != 6:
-                det.append(u"%s: lista com %d item(ns)" % (rel, itens))
-            # o logo saiu da lista de baixo, e a Mirow saiu do mapa
-            if "onda21-lista__logo" in h:
-                det.append(u"%s ainda tem logo na lista de baixo" % rel)
+                           % (rel, logos_no_pin))
             if "onda21-pin--mirow" in h:
                 det.append(u"%s ainda marca escritórios da Mirow no mapa" % rel)
-            if "onda21-lista__num" in h:
-                det.append(u"%s ainda numera os parceiros na lista" % rel)
             if u"Virtus" in h:
                 det.append(u"%s cita a Virtus (comprada pela Deloitte, não é parceira)" % rel)
             if 'class="rede-mapa__svg"' in h:
                 det.append(u"%s ainda tem o mapa-múndi único da onda 9" % rel)
         return (not det, u"; ".join(det[:4]))
-    s.check("S82", u"rede: 2 mapas, 6 pins com logo, lista com logo (#140)", s82)
-
+    s.check("S82", u"rede: 2 mapas, 6 parceiros com logo no pin (#140)", s82)
     def s83():
         # o painel do menu no modelo Bain: branco no >div INTERNO (o tema pinta
         # navy justamente ali), filete ciano e sombra
@@ -1800,6 +1801,116 @@ def estaticas(s):
     s.check("S110", u"4 títulos da home numa classe só, com a mesma animação (#168)",
             s110)
 
+    # ------------------------------------------------------------------ onda 31
+    def s111():
+        # #169: logo de verdade no pin, não mais o favicon de 128px que a S-82 pegou
+        det = []
+        dir_logos = os.path.join(pub, "wp-content", "uploads", "2026", "08", "rede")
+        try:
+            arquivos = os.listdir(dir_logos)
+        except OSError:
+            return (False, u"pasta de logos da rede não existe")
+        favicons = [a for a in arquivos
+                    if not (a.endswith("-logo.svg") or a.endswith("-logo.png")
+                            or a.startswith("mapa-"))]
+        if favicons:
+            det.append(u"favicon(s) antigo(s) ainda na pasta: %s"
+                       % ", ".join(favicons[:3]))
+        logos = [a for a in arquivos if a.endswith(("-logo.svg", "-logo.png"))]
+        if len(logos) < 6:
+            det.append(u"só %d logo(s) de parceiro (esperado 6)" % len(logos))
+        for a in logos:
+            tam = os.path.getsize(os.path.join(dir_logos, a))
+            if tam < 1500:
+                det.append(u"%s tem só %d bytes (parece favicon)" % (a, tam))
+        for rel in REDE:
+            hh = s.ler(rel)
+            for a in logos:
+                pass
+            if re.search(r'onda31-pin__chip[^>]*>\s*<img src="[^"]*/(?:www\.)?[a-z0-9.-]+\.com',
+                         hh):
+                det.append(u"%s ainda usa favicon por domínio no pin" % rel)
+        return (not det, u"; ".join(det[:3]))
+    s.check("S111", u"logo de verdade no pin dos parceiros (#169/#140)", s111)
+
+    def s112():
+        # #170: o mapa e um SVG GERADO do Natural Earth, servido como arquivo
+        det = []
+        for chave in ("americas", "europa"):
+            p = os.path.join(pub, "wp-content", "uploads", "2026", "08", "rede",
+                             "mapa-%s.svg" % chave)
+            if not os.path.exists(p):
+                det.append(u"falta mapa-%s.svg" % chave)
+                continue
+            svg = s.ler("wp-content/uploads/2026/08/rede/mapa-%s.svg" % chave)
+            # geometria de verdade tem MUITO ponto; o desenho a mao da onda 21
+            # cabia em 4 KB
+            pontos = svg.count("L")
+            if pontos < 800:
+                det.append(u"mapa-%s.svg com só %d segmentos (parece desenho à mão)"
+                           % (chave, pontos))
+            if 'viewBox="0 0 1000' not in svg:
+                det.append(u"mapa-%s.svg fora do viewBox de 1000 de largura" % chave)
+        for rel in REDE:
+            hh = s.ler(rel)
+            if hh.count("onda31-mapa__svg") != 2:
+                det.append(u"%s não tem os 2 mapas como arquivo" % rel)
+            if "<svg" in hh.split('class="onda31-rede"')[-1][:4000]:
+                det.append(u"%s voltou a embutir SVG de mapa na página" % rel)
+        return (not det, u"; ".join(det[:3]))
+    s.check("S112", u"mapas gerados de geometria real, em arquivo (#170)", s112)
+
+    def s113():
+        # #171: a lista de parceiros abaixo dos mapas saiu
+        det = []
+        for rel in REDE:
+            hh = s.ler(rel)
+            for marca in ("onda21-lista", "onda31-lista"):
+                if marca in hh:
+                    det.append(u"%s ainda tem a lista de parceiros (%s)" % (rel, marca))
+        return (not det, u"; ".join(det[:3]))
+    s.check("S113", u"rede sem a lista de parceiros abaixo dos mapas (#171)", s113)
+
+    def s116():
+        # #174: a posição de cada pin é a projeção da lat/lon do mestre — o caso do
+        # PSE "em Londres" mas desenhado no mar não pode voltar. A suíte RECALCULA
+        # a projeção e compara com o que está no HTML: pin editado à mão quebra aqui.
+        import math as _m
+        publicados = os.path.join(os.path.dirname(AQUI), "tools",
+                                  "rede-publicada.json")
+        if not os.path.exists(publicados):
+            return (False, u"falta tools/rede-publicada.json (gerado por gen_rede.py)")
+        with io.open(publicados, encoding="utf-8") as f:
+            dados = json.load(f)
+
+        def merc(lat):
+            lat = max(min(lat, 84.0), -84.0)
+            return _m.log(_m.tan(_m.radians(45.0 + lat / 2.0)))
+
+        det = []
+        for chave, mapa in sorted(dados["mapas"].items()):
+            lon0, lat0, lon1, lat1 = mapa["bbox"]
+            x0, x1 = _m.radians(lon0), _m.radians(lon1)
+            y_topo, y_base = merc(lat1), merc(lat0)
+            for pa in mapa["pins"]:
+                esq = 100.0 * (_m.radians(pa["lon"]) - x0) / (x1 - x0)
+                top = 100.0 * (y_topo - merc(pa["lat"])) / (y_topo - y_base)
+                if abs(esq - pa["esq"]) > 0.05 or abs(top - pa["top"]) > 0.05:
+                    det.append(u"%s: publicado %.2f/%.2f, projeção diz %.2f/%.2f"
+                               % (pa["nome"], pa["esq"], pa["top"], esq, top))
+                if not (0 < esq < 100 and 0 < top < 100):
+                    det.append(u"%s cai fora do mapa (%.1f/%.1f)"
+                               % (pa["nome"], esq, top))
+                # e o HTML tem de trazer exatamente esses números
+                for rel in REDE:
+                    hh = s.ler(rel)
+                    if 'style="left:%.2f%%;top:%.2f%%"' % (pa["esq"], pa["top"]) not in hh:
+                        det.append(u"%s: %s sem o pin na posição projetada"
+                                   % (rel, pa["nome"]))
+                        break
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S116", u"pin de cada parceiro na projeção da sua lat/lon (#174)", s116)
+
 
 # ------------------------------------------------------- asserções ao vivo
 
@@ -2179,6 +2290,89 @@ def ao_vivo(s):
                     u"mesma animação — os quatro saem de opacity 0 e animam ao rolar"
                     % (list(assinaturas)[0].split("|")[1], list(tags)[0]))
         s.check("V17", u"os 4 títulos da home saem idênticos e animam igual", v17)
+
+        # V18 — S-114 (#172) e S-115 (#173): o mapa tem de PREENCHER o palco (o da
+        # Europa sobrava faixa vazia) e o chip do logo tem de ser o tamanho novo.
+        # Medido no render: proporção do SVG contra a do palco e caixa do chip.
+        def v18():
+            nav.abrir("%s/pt/sobre-nos/nossa-rede/" % base, 1400, 900)
+            js = ("(function(){var out={mapas:[],chips:[]};"
+                  "var ps=document.querySelectorAll('.onda31-mapa__palco');"
+                  "for(var i=0;i<ps.length;i++){var pal=ps[i].getBoundingClientRect();"
+                  "var img=ps[i].querySelector('.onda31-mapa__svg');"
+                  "var r=img.getBoundingClientRect();"
+                  "out.mapas.push({palco:[Math.round(pal.width),Math.round(pal.height)],"
+                  "mapa:[Math.round(r.width),Math.round(r.height)],"
+                  "cobre:Math.round(100*(r.width*r.height)/(pal.width*pal.height))});}"
+                  "var cs=document.querySelectorAll('.onda31-pin__chip');"
+                  "for(var j=0;j<cs.length;j++){var c=cs[j].getBoundingClientRect();"
+                  "var im=cs[j].querySelector('img').getBoundingClientRect();"
+                  "out.chips.push({chip:[Math.round(c.width),Math.round(c.height)],"
+                  "logo:Math.round(im.height)});}"
+                  "return JSON.stringify(out);})()")
+            v = nav.js(js)
+            try:
+                d = json.loads(v)
+            except Exception:
+                return (False, u"não deu para medir a rede: %r" % v)
+            det = []
+            if len(d["mapas"]) != 2:
+                det.append(u"%d palco(s) de mapa (esperado 2)" % len(d["mapas"]))
+            for i, m in enumerate(d["mapas"]):
+                if m["cobre"] < 95:
+                    det.append(u"mapa %d cobre só %d%% do palco (S-114 pede ~100%%)"
+                               % (i + 1, m["cobre"]))
+            if len(d["chips"]) != 6:
+                det.append(u"%d chip(s) de parceiro (esperado 6)" % len(d["chips"]))
+            baixos = [c for c in d["chips"] if c["logo"] < 24]
+            if baixos:
+                det.append(u"%d chip(s) com logo abaixo de 24px (S-115 pede 26px)"
+                           % len(baixos))
+            estreitos = [c for c in d["chips"] if c["chip"][0] < 46]
+            if estreitos:
+                det.append(u"%d chip(s) mais estreito(s) que 46px" % len(estreitos))
+            if det:
+                return (False, u"; ".join(det[:3]))
+            return (True, u"2 mapas cobrindo %s do palco; 6 chips (logo de %dpx, "
+                    u"largura %s)"
+                    % ("/".join("%d%%" % m["cobre"] for m in d["mapas"]),
+                       d["chips"][0]["logo"],
+                       "-".join(str(min(c["chip"][0] for c in d["chips"]))
+                                for _ in [0]) + ".."
+                       + str(max(c["chip"][0] for c in d["chips"]))))
+        s.check("V18", u"mapas preenchendo o palco e chips no tamanho novo", v18)
+
+        # V19 — S-116 (#174) ao vivo: o ponto de cada pin cai DENTRO do mapa e a
+        # agulha fica visível no palco. A conferência da coordenada em si é a S116
+        # (recalcula a projeção); aqui se prova que nada escapou da caixa.
+        def v19():
+            nav.abrir("%s/pt/sobre-nos/nossa-rede/" % base, 1400, 900)
+            js = ("(function(){var out=[];"
+                  "var ps=document.querySelectorAll('.onda31-mapa__palco');"
+                  "for(var i=0;i<ps.length;i++){var pal=ps[i].getBoundingClientRect();"
+                  "var ag=ps[i].querySelectorAll('.onda31-pin__agulha');"
+                  "for(var j=0;j<ag.length;j++){var r=ag[j].getBoundingClientRect();"
+                  "var nome=ag[j].parentElement.querySelector('.onda31-pin__nome');"
+                  "out.push({nome:nome?nome.textContent:'?',"
+                  "dentro:(r.left>=pal.left-2&&r.right<=pal.right+2&&"
+                  "r.top>=pal.top-2&&r.bottom<=pal.bottom+2),"
+                  "visivel:r.width>0&&r.height>0});}}"
+                  "return JSON.stringify(out);})()")
+            v = nav.js(js)
+            try:
+                d = json.loads(v)
+            except Exception:
+                return (False, u"não deu para medir os pins: %r" % v)
+            if len(d) != 6:
+                return (False, u"%d agulha(s) de pin no palco (esperado 6)" % len(d))
+            fora = [x["nome"] for x in d if not x["dentro"]]
+            invisivel = [x["nome"] for x in d if not x["visivel"]]
+            if fora:
+                return (False, u"pin(s) fora do mapa: %s" % ", ".join(fora))
+            if invisivel:
+                return (False, u"pin(s) sem marca visível: %s" % ", ".join(invisivel))
+            return (True, u"6 pins com o ponto dentro do mapa e visível")
+        s.check("V19", u"os 6 pins marcam um ponto dentro do mapa", v19)
 
 
 # ------------------------------------------------------------------- main

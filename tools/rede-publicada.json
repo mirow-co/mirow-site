@@ -1,0 +1,66 @@
+{
+ "mapas": {
+  "americas": {
+   "bbox": [
+    -168.0,
+    -56.0,
+    -33.0,
+    60.0
+   ],
+   "pins": [
+    {
+     "esq": 51.01,
+     "lat": 19.4326,
+     "lon": -99.1332,
+     "nome": "Akya",
+     "top": 38.81
+    }
+   ]
+  },
+  "europa": {
+   "bbox": [
+    -12.0,
+    34.0,
+    33.0,
+    62.0
+   ],
+   "pins": [
+    {
+     "esq": 41.72,
+     "lat": 51.2277,
+     "lon": 6.7735,
+     "nome": "Batten & Company",
+     "top": 45.49
+    },
+    {
+     "esq": 63.05,
+     "lat": 48.2082,
+     "lon": 16.3738,
+     "nome": "IMP Consulting",
+     "top": 56.26
+    },
+    {
+     "esq": 26.38,
+     "lat": 51.5074,
+     "lon": -0.1278,
+     "nome": "CAA Portas",
+     "top": 44.46
+    },
+    {
+     "esq": 26.38,
+     "lat": 51.5074,
+     "lon": -0.1278,
+     "nome": "PSE Consulting",
+     "top": 44.46
+    },
+    {
+     "esq": 56.46,
+     "lat": 52.52,
+     "lon": 13.405,
+     "nome": "Undconsorten",
+     "top": 40.67
+    }
+   ]
+  }
+ }
+}
