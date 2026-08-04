@@ -78,7 +78,7 @@ BLOCOS_CSS = [
     "onda18:contato-botao", "onda18:barras", "onda18:voltar-topo",
     "onda18:carreiras", "onda18:insights-colorido", "onda18:home-lideres",
     "onda18:imprensa", "onda18:planeta-setores", "onda18:hero-numeros-s73",
-    "onda19:lateral-e-idiomas",
+    "onda19:lateral-e-idiomas", "onda21:menus-bain", "onda21:rede-v2",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -1074,42 +1074,31 @@ def estaticas(s):
     s.check("S69", u'nossos-valores sem "soluções para vários setores" (#127)', s69)
 
     def s70():
-        # v3 (#128): grafo de esferas em ceu escuro. O pedido do Mario tinha DUAS
-        # partes — cada grupo como esfera com os temas ligados a ela, E texto
-        # legivel (preto/navy sobre o azul do tema estava ilegivel).
+        # v4 (#128 / S-77): o Mario encerrou a metafora visual — "remova isso e
+        # coloque ... 5 cards com cada grupo de industrias listado, sem planeta nem
+        # nada disso. faca no tema do resto da pagina."
         det = []
         for rel in HOMES:
             h = s.ler(rel)
-            if 'class="onda18-orbe__ceu"' not in h:
-                det.append(u"%s sem o céu escuro (legibilidade)" % rel)
-                continue
-            nos = h.count('r="4" fill="#7FE3FF"')          # um nó por setor
-            hubs = h.count('fill="url(#o18hub)"')          # uma esfera por grupo
-            itens_mob = h.count('class="onda18-const__item"')
-            if nos != 19:
-                det.append(u"%s com %d nó(s) de setor (esperado 19)" % (rel, nos))
-            if hubs != 5:
-                det.append(u"%s com %d esfera(s) de grupo (esperado 5)" % (rel, hubs))
-            if itens_mob != 19:
-                det.append(u"%s: lista de mobile com %d item(ns)" % (rel, itens_mob))
-            if "MIROW &amp; CO." not in h:
-                det.append(u"%s sem o núcleo Mirow no centro" % rel)
-            # nenhum texto do mapa pode ser escuro: o pedido era exatamente isso
-            for cor in ('fill="#020E66"', 'fill="#071C25"', 'fill="#000000"'):
-                if cor in h[h.index('onda18-orbe__mapa'):h.index('onda18-orbe__lista')]:
-                    det.append(u"%s tem texto escuro no mapa (%s)" % (rel, cor))
-        if ".onda18-orbe__ceu{" not in css_o18:
-            det.append(u"CSS sem o painel de céu escuro")
-        if "@keyframes onda18-pulso" not in css_o18:
-            det.append(u"CSS sem o pulso das esferas")
-        if "prefers-reduced-motion" not in css_o18:
-            det.append(u"sem fallback de reduced-motion")
-        # as duas versões anteriores foram aposentadas por causar overlap/ilegibilidade
-        for morto in ("@keyframes onda18-orbita", "@keyframes onda18-flutua"):
+            cards = h.count('class="onda18-const"')
+            itens = h.count('class="onda18-const__item"')
+            if cards != 5:
+                det.append(u"%s com %d card(s) de grupo (esperado 5)" % (rel, cards))
+            if itens != 19:
+                det.append(u"%s com %d setor(es) (esperado 19)" % (rel, itens))
+            # nada de planeta/esfera/ceu: as 3 versoes anteriores estao aposentadas
+            for morto in ("onda18-orbe__mapa", "o18hub", "onda18-orbe__ceu",
+                          "onda18-orbe__planeta", "onda18-const__lista::before"):
+                if morto in h:
+                    det.append(u"%s ainda tem resto de versao antiga (%s)" % (rel, morto))
+        if ".onda18-orbe__cards{display:grid" not in css_o18:
+            det.append(u"CSS sem a grade dos 5 cards")
+        for morto in ("@keyframes onda18-orbita", "@keyframes onda18-flutua",
+                      "@keyframes onda18-pulso"):
             if morto in css_o18:
-                det.append(u"%s voltou (versão aposentada)" % morto)
+                det.append(u"%s voltou (versao aposentada)" % morto)
         return (not det, u"; ".join(det[:4]))
-    s.check("S70", u"home: 5 esferas de setores em ceu escuro legivel (#128)", s70)
+    s.check("S70", u"home: 5 cards de grupos de setores, sem planeta (#128/S-77)", s70)
 
     def s71():
         det = []
@@ -1230,6 +1219,108 @@ def estaticas(s):
                                % (rel, len(ruins), veic))
         return (not det, u"; ".join(det[:4]))
     s.check("S57b", u"imprensa: logo segue o veículo, não o link (#115)", s57b)
+
+    # ------------------------------------------------------------------ onda 21
+    def s78():
+        alvos = {"pt/index.html": u"dos nossos clientes<br>nos contratam novamente",
+                 "de/index.html": u"unserer Kunden<br>beauftragen uns erneut"}
+        det = [rel for rel, txt in alvos.items() if txt not in s.ler(rel)]
+        # EN nao entra: a frase la e "of client re-engagement rate", sem o mesmo
+        # ponto de quebra (registrado na #136)
+        return (not det, u"página(s) sem a quebra: %s" % ", ".join(det))
+    s.check("S78", u'hero: "nos contratam novamente" em linha própria (#136)', s78)
+
+    def s79():
+        ok = (".rodape-barra{width:100vw" in css_o18
+              and "margin-left:calc(50% - 50vw) !important" in css_o18)
+        return (ok, u"a barra do rodapé não sangra 100vw como a de cima")
+    s.check("S79", u"barra do rodapé com branco até os cantos (#137)", s79)
+
+    def s80():
+        det = []
+        if ".menu__nav-sublinks.onda18-praticas{display:grid !important" not in css_o18:
+            det.append(u"práticas não estão em grade")
+        if "grid-template-columns:repeat(3,minmax(0,1fr));gap:0" not in css_o18:
+            det.append(u"a grade das práticas não tem 3 colunas iguais")
+        if ".menu__nav-submenu .row>.col{flex:0 0 100%" not in css_o18:
+            det.append(u"a coluna do painel não ocupa a largura (grade ficava em 1/3)")
+        return (not det, u"; ".join(det))
+    s.check("S80", u"práticas distribuídas na largura da caixa (#138)", s80)
+
+    def s81():
+        # slug e rotulo mudam por idioma; a ordem pedida e a mesma nos tres
+        POR_IDIOMA = {
+            "pt": (["nossos-valores", "lideres", "nossa-historia", "reconhecimentos",
+                    "nossa-rede"], [u">Nossos Líderes<", u">Nossa História<"]),
+            "en": (["our-values", "leaders", "our-history", "recognitions",
+                    "our-network"], [u">Our Leaders<"]),
+            "de": (["unsere-werte", "fuehrungskraefte", "unsere-geschichte",
+                    "anerkennungen", "unser-netzwerk"], [u">Unsere Führungskräfte<"]),
+        }
+        det = []
+        for rel in HOMES + ["pt/contato/index.html", "de/kontakt/index.html"]:
+            hh = s.ler(rel)
+            idioma = "de" if "/de/" in ("/" + rel) else ("en" if "/en/" in ("/" + rel)
+                                                        else "pt")
+            if rel.startswith("en/"):
+                idioma = "en"
+            elif rel.startswith("de/"):
+                idioma = "de"
+            ordem, rotulos = POR_IDIOMA[idioma]
+            m = re.search(r'<!-- onda7:menu-sobre -->(.*?)<!-- /onda7:menu-sobre -->',
+                          hh, re.S)
+            if not m:
+                det.append(u"%s sem o marcador do submenu" % rel)
+                continue
+            achados = re.findall(r'/(?:sobre-nos|about-us|ueber-uns)/([a-z-]+)/',
+                                 m.group(1))
+            vistos = [a for a in achados if a in ordem]
+            if vistos != ordem:
+                det.append(u"%s (%s) com ordem %s" % (rel, idioma, vistos))
+            for rot in rotulos:
+                if rot not in m.group(1):
+                    det.append(u"%s sem o rótulo %s" % (rel, rot.strip("><")))
+        return (not det, u"; ".join(det[:3]))
+    s.check("S81", u'submenu "Sobre nós" na ordem e rótulos pedidos (#139)', s81)
+
+    def s82():
+        alvos = ["pt/sobre-nos/nossa-rede/index.html",
+                 "en/about-us/our-network/index.html",
+                 "de/ueber-uns/unser-netzwerk/index.html"]
+        det = []
+        for rel in alvos:
+            h = s.ler(rel)
+            mapas = h.count('class="onda21-mapa"')
+            pins = h.count('class="onda21-pin"')       # só parceiros (Mirow tem --mirow)
+            logos_pin = h.count('class="onda21-pin__logo"')
+            itens = h.count('class="onda21-lista__item"')
+            logos_lista = h.count('class="onda21-lista__logo"')
+            if mapas != 2:
+                det.append(u"%s com %d mapa(s) (esperado 2)" % (rel, mapas))
+            if pins != 6:
+                det.append(u"%s com %d pin(s) de parceiro (esperado 6)" % (rel, pins))
+            if logos_pin != 6:
+                det.append(u"%s com %d logo(s) no hover (esperado 6)" % (rel, logos_pin))
+            if itens != 6 or logos_lista != 6:
+                det.append(u"%s: lista com %d item(ns) e %d logo(s)"
+                           % (rel, itens, logos_lista))
+            if 'class="rede-mapa__svg"' in h:
+                det.append(u"%s ainda tem o mapa-múndi único da onda 9" % rel)
+        return (not det, u"; ".join(det[:4]))
+    s.check("S82", u"rede: 2 mapas, 6 pins com logo, lista com logo (#140)", s82)
+
+    def s83():
+        # o painel do menu no modelo Bain: branco no >div INTERNO (o tema pinta
+        # navy justamente ali), filete ciano e sombra
+        det = []
+        if ".menu__nav-submenu>div{background:#fff !important" not in css_o18:
+            det.append(u"o painel branco não está no >div interno")
+        if "border-bottom:3px solid #00ADEC" not in css_o18:
+            det.append(u"falta o filete ciano do painel")
+        if ".menu__nav-sublink{color:#020E66 !important;font-weight:400}" not in css_o18:
+            det.append(u"os itens do painel não estão em navy sobre o branco")
+        return (not det, u"; ".join(det))
+    s.check("S83", u"painel do menu branco e destacado do fundo (#141)", s83)
 
 
 # ------------------------------------------------------- asserções ao vivo

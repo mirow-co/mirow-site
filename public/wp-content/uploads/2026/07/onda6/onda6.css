@@ -726,63 +726,42 @@ html{scroll-behavior:smooth}
 /* onda18:imprensa:fim */
 
 /* onda18:planeta-setores:ini */
-/* ---- S-70 v3 (#128): 5 constelacoes de esferas ao redor da Mirow --------
-   Pedido do Mario: cada grupo e uma esfera com os temas conectados a ela, as
-   esferas circundando a Mirow, e TEXTO LEGIVEL — preto sobre o azul do tema e
-   navy sobre azul estavam ilegiveis. Por isso a secao ganha o proprio ceu
-   escuro e todo texto e branco/azul-claro. Referencia do padrao: hub-and-spoke
-   glowing network (ver cabecalho do script 71). */
-.onda18-orbe{position:relative;z-index:6;margin:44px 0 0;padding:0}
-.onda18-orbe__ceu{position:relative;border-radius:18px;overflow:hidden;
-  background:radial-gradient(120% 90% at 50% 42%,#0A2596 0%,#020E66 46%,#071C25 100%);
-  padding:34px 24px 26px;
-  box-shadow:0 18px 50px rgba(2,14,102,.30)}
-/* estrelas fracas do fundo */
-.onda18-orbe__ceu::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:radial-gradient(1.5px 1.5px at 12% 18%,rgba(255,255,255,.55),transparent),
-    radial-gradient(1.5px 1.5px at 78% 12%,rgba(255,255,255,.40),transparent),
-    radial-gradient(1.5px 1.5px at 32% 78%,rgba(255,255,255,.45),transparent),
-    radial-gradient(1.5px 1.5px at 88% 66%,rgba(255,255,255,.35),transparent),
-    radial-gradient(1.5px 1.5px at 56% 30%,rgba(255,255,255,.30),transparent),
-    radial-gradient(1.5px 1.5px at 22% 52%,rgba(255,255,255,.28),transparent),
-    radial-gradient(1.5px 1.5px at 68% 88%,rgba(255,255,255,.32),transparent)}
-.onda18-orbe__titulo{position:relative;color:#fff;font-size:34px;font-weight:700;
-  margin:0 0 6px;text-align:center}
-.onda18-orbe__sub{position:relative;color:#AAD5E8;font-size:17px;margin:0 0 4px;
+/* ---- S-77 (#128 v4): 5 cards de grupos de setores ---------------------
+   O Mario encerrou a metafora visual: "remova isso e coloque ... 5 cards com cada
+   grupo de industrias listado, sem planeta nem nada disso. faca no tema do resto
+   da pagina." Entao aqui nao ha SVG, esfera, orbita nem ceu escuro — e o mesmo
+   vocabulario dos 3 cards de praticas da propria secao: caixa navy, titulo
+   branco, itens claros. Sobre o fundo claro do gradiente, navy tem contraste de
+   sobra (o problema anterior era texto navy SOBRE o azul medio, nao a caixa). */
+.onda18-orbe{position:relative;z-index:6;margin:56px 0 0}
+.onda18-orbe__titulo{color:#020E66;font-size:34px;font-weight:700;margin:0 0 6px;
   text-align:center}
-.onda18-orbe__mapa{position:relative;display:block;width:100%;height:auto}
-
-/* pulso suave das esferas — sugere que a rede esta viva, sem girar nada */
-.onda18-orbe__hub-brilho{animation:onda18-pulso 6s ease-in-out infinite}
-.onda18-orbe__hub-brilho--2{animation-delay:-1.2s}
-.onda18-orbe__hub-brilho--3{animation-delay:-2.4s}
-.onda18-orbe__hub-brilho--4{animation-delay:-3.6s}
-.onda18-orbe__hub-brilho--5{animation-delay:-4.8s}
-@keyframes onda18-pulso{0%,100%{opacity:.30}50%{opacity:.62}}
-
-/* a lista empilhada, para mobile (o mesmo conteudo, no mesmo ceu) */
-.onda18-orbe__lista{display:none;margin:0;padding:0;list-style:none;position:relative}
-.onda18-const{margin:0 0 22px}
-.onda18-const:last-child{margin-bottom:0}
-.onda18-const__nome{display:block;color:#00ADEC;font-size:14px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px;padding:0 0 6px;
-  border-bottom:1px solid rgba(0,173,236,.45)}
+.onda18-orbe__sub{color:#071C25;font-size:17px;margin:0 0 28px;text-align:center;
+  opacity:.78}
+.onda18-orbe__cards{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;
+  list-style:none;margin:0;padding:0}
+.onda18-const{background:#020E66;border-top:3px solid #00ADEC;
+  padding:20px 18px 22px;display:flex;flex-direction:column;
+  transition:transform 220ms ease,box-shadow 220ms ease}
+.onda18-const:hover{transform:translateY(-4px);
+  box-shadow:0 14px 30px rgba(2,14,102,.28)}
+.onda18-const__nome{display:block;color:#fff;font-size:17px;font-weight:700;
+  line-height:1.25;margin:0 0 4px}
+.onda18-const__conta{display:block;color:#00ADEC;font-size:13px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;margin:0 0 14px}
 .onda18-const__lista{list-style:none;margin:0;padding:0}
-.onda18-const__item{position:relative;padding-left:18px;margin:0 0 6px;
-  color:#fff;font-size:15px;font-weight:600;line-height:1.3}
-.onda18-const__item::before{content:"";position:absolute;left:0;top:50%;
-  width:7px;height:7px;margin-top:-3px;border-radius:50%;background:#00ADEC;
-  box-shadow:0 0 0 3px rgba(0,173,236,.25)}
-
-@media only screen and (max-width: 991px){
-  .onda18-orbe__titulo{font-size:26px}
-  .onda18-orbe__sub{font-size:15px}
-  .onda18-orbe__ceu{padding:26px 20px 22px;border-radius:14px}
-  .onda18-orbe__mapa{display:none}
-  .onda18-orbe__lista{display:block;margin-top:20px}
+.onda18-const__item{position:relative;padding-left:16px;margin:0 0 8px;
+  color:#fff;font-size:14px;font-weight:400;line-height:1.35}
+.onda18-const__item:last-child{margin-bottom:0}
+.onda18-const__item::before{content:"";position:absolute;left:0;top:7px;
+  width:6px;height:6px;background:#00ADEC}
+@media only screen and (max-width: 1200px){
+  .onda18-orbe__cards{grid-template-columns:repeat(3,1fr)}
 }
-@media (prefers-reduced-motion: reduce){
-  .onda18-orbe__hub-brilho{animation:none;opacity:.45}
+@media only screen and (max-width: 767px){
+  .onda18-orbe__titulo{font-size:26px}
+  .onda18-orbe__sub{font-size:15px;margin-bottom:20px}
+  .onda18-orbe__cards{grid-template-columns:1fr;gap:12px}
 }
 /* onda18:planeta-setores:fim */
 
@@ -841,3 +820,146 @@ html{scroll-behavior:smooth}
 }
 @media print{.onda19-lateral{display:none}}
 /* onda19:lateral-e-idiomas:fim */
+
+/* onda21:menus-bain:ini */
+/* ---- S-83 + S-80: o painel do menu no modelo da barra da Bain -----------
+   Painel BRANCO (contrasta com qualquer fundo e combina com a barra do topo, que
+   ja fica branca no hover), titulo grande em cima, itens em GRADE ocupando a
+   largura util, e um filete ciano fechando embaixo. */
+/* ATENCAO: o branco vai no >div INTERNO. O tema pinta
+   `.menu__nav-submenu>div{background:url(texture-7.png),#020e66}` — pintar so o
+   pai deixava esse div navy por cima do branco, e o texto navy sumia. */
+.menu__nav-submenu{background:transparent !important}
+.menu__nav-submenu>div{background:#fff !important;padding:26px 0 30px !important;
+  box-shadow:0 20px 44px rgba(2,14,102,.20);border-bottom:3px solid #00ADEC}
+.menu__nav-submenu h5{color:#020E66 !important;font-size:21px;font-weight:700;
+  margin:0 0 18px}
+.menu__nav-sublink{color:#020E66 !important;font-weight:400}
+.menu__nav-sublink:hover,.menu__nav-sublink:focus-visible{color:#00ADEC !important}
+
+/* o .col do tema encolhia no conteudo: sem isto a grade ocupava so 1/3 do painel */
+.menu__nav-submenu .row>.col{flex:0 0 100%;width:100%;max-width:100%}
+/* Sobre nos: os 5 itens espalhados no width, como o painel da Bain */
+.menu__nav-sublinks:not(.onda18-praticas){display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));gap:2px 24px}
+.menu__nav-sublinks:not(.onda18-praticas) .menu__nav-sublink{font-size:19px !important}
+
+/* Praticas: 3 colunas iguais ocupando o width, divididas por linha cinza
+   (o "|" da S-65 vira o divisor da coluna — e o que faz ocupar a caixa toda) */
+.menu__nav-sublinks.onda18-praticas{display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr));gap:0;align-items:center}
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem{margin:0;padding:0 24px}
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem{
+  border-left:1px solid rgba(127,127,127,.55)}
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem:first-child{padding-left:0}
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem::before{
+  content:none}
+.menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:28px !important;
+  font-weight:700;line-height:1.2;display:block}
+@media only screen and (max-width: 1366px){
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:23px !important}
+}
+
+/* ---- S-79: a barra do rodape sangra 100vw, como a de cima ---------------- */
+.rodape-barra{width:100vw;margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;padding-left:0;padding-right:0}
+.rodape-barra .menu{padding-left:0;padding-right:0}
+
+/* no mobile o menu do tema e lista empilhada — a grade volta a coluna */
+@media only screen and (max-width: 991px){
+  .menu__nav-sublinks:not(.onda18-praticas),
+  .menu__nav-sublinks.onda18-praticas{display:block !important}
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem{padding:0}
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublinkitem+.menu__nav-sublinkitem{
+    border-left:0}
+  .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{font-size:19px !important}
+}
+/* onda21:menus-bain:fim */
+
+/* onda21:rede-v2:ini */
+/* ---- S-82 (#140): Nossa Rede v2 — dois mapas, logo no hover, lista viva -
+   O mapa-mundi unico da onda 9 amontoava 4 dos 6 parceiros sobre a Europa. Aqui
+   cada regiao tem janela propria (bbox), o que da zoom sem precisar empurrar pin.
+   Tudo no tema da pagina: fundo navy da secao, texto claro, acento ciano. */
+.onda21-rede{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:0 0 44px}
+.onda21-mapa{position:relative;background:rgba(255,255,255,.04);
+  border:1px solid rgba(170,213,232,.20);padding:14px 14px 10px}
+.onda21-mapa__nome{display:block;color:#00ADEC;font-size:13px;font-weight:700;
+  letter-spacing:.10em;text-transform:uppercase;margin:0 0 10px}
+.onda21-mapa__palco{position:relative}
+.onda21-mapa__svg{display:block;width:100%;height:auto}
+.onda21-mapa__terra{fill:#12307F;stroke:#AAD5E8;stroke-opacity:.55;stroke-width:.8}
+.onda21-mapa__grade{stroke:#AAD5E8;stroke-opacity:.12;stroke-width:.6}
+.onda21-mapa__pins{position:absolute;inset:0}
+
+/* o pin */
+.onda21-pin{position:absolute;transform:translate(-50%,-50%)}
+.onda21-pin__botao{width:26px;height:26px;border-radius:50%;border:2px solid #fff;
+  background:#00ADEC;color:#020E66;font-size:12px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0;
+  box-shadow:0 0 0 4px rgba(0,173,236,.25);transition:transform 180ms ease}
+.onda21-pin--mirow .onda21-pin__botao{background:#fff;color:#020E66;
+  border-color:#00ADEC;box-shadow:0 0 0 4px rgba(255,255,255,.22)}
+.onda21-pin:hover .onda21-pin__botao,
+.onda21-pin__botao:focus-visible{transform:scale(1.18)}
+
+/* o cartao com o LOGO do parceiro */
+.onda21-pin__card{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);
+  width:236px;background:#fff;color:#071C25;padding:14px;text-align:left;
+  box-shadow:0 18px 40px rgba(2,14,102,.35);border-bottom:3px solid #00ADEC;
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity 180ms ease;
+  z-index:5}
+.onda21-pin:hover .onda21-pin__card,
+.onda21-pin:focus-within .onda21-pin__card{opacity:1;visibility:visible;
+  pointer-events:auto}
+.onda21-pin__logo{display:block;max-width:120px;max-height:34px;width:auto;
+  height:auto;margin:0 0 10px}
+.onda21-pin__nome{color:#020E66;font-size:16px;font-weight:700;margin:0 0 2px}
+.onda21-pin__local{color:#7F7F7F;font-size:13px;margin:0 0 8px}
+.onda21-pin__link{color:#0A79B8;font-size:13px;font-weight:700;text-decoration:none}
+.onda21-pin__link:hover{color:#020E66}
+/* pin junto da borda: o cartao encosta para dentro */
+.onda21-pin--esq .onda21-pin__card{left:0;transform:none}
+.onda21-pin--dir .onda21-pin__card{left:auto;right:0;transform:none}
+
+.onda21-legenda{display:flex;flex-wrap:wrap;gap:8px 22px;list-style:none;
+  margin:14px 0 6px;padding:0;color:#AAD5E8;font-size:14px}
+.onda21-legenda li{display:flex;align-items:center;gap:8px}
+.onda21-legenda__chave{width:11px;height:11px;border-radius:50%;background:#00ADEC;
+  display:inline-block}
+.onda21-legenda__chave--mirow{background:#fff}
+.onda21-nota{color:#AAD5E8;font-size:14px;opacity:.8;margin:0 0 8px}
+
+/* a lista de parceiros — barra que cresce, elevacao, logo */
+.onda21-lista{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+  list-style:none;margin:0;padding:0}
+.onda21-lista__item{position:relative;background:rgba(255,255,255,.05);
+  border:1px solid rgba(170,213,232,.18);padding:20px 20px 22px;overflow:hidden;
+  transition:transform 220ms ease,background 220ms ease}
+.onda21-lista__item::before{content:"";position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:#00ADEC;transform:scaleY(0);transform-origin:top;
+  transition:transform 260ms ease}
+.onda21-lista__item:hover{transform:translateY(-4px);background:rgba(255,255,255,.09)}
+.onda21-lista__item:hover::before{transform:scaleY(1)}
+.onda21-lista__topo{display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin:0 0 12px}
+.onda21-lista__logo{max-width:118px;max-height:32px;width:auto;height:auto;
+  display:block;background:#fff;padding:4px;border-radius:3px}
+.onda21-lista__num{width:26px;height:26px;border-radius:50%;background:#00ADEC;
+  color:#020E66;font-size:13px;font-weight:700;display:flex;align-items:center;
+  justify-content:center;flex:none}
+.onda21-lista__nome{color:#fff;font-size:19px;font-weight:700;margin:0 0 2px}
+.onda21-lista__local{color:#AAD5E8;font-size:14px;margin:0 0 12px}
+.onda21-lista__link{color:#00ADEC;font-size:14px;font-weight:700;
+  text-decoration:none}
+.onda21-lista__link:hover{color:#fff}
+
+@media only screen and (max-width: 1200px){
+  .onda21-lista{grid-template-columns:repeat(2,1fr)}
+}
+@media only screen and (max-width: 991px){
+  .onda21-rede{grid-template-columns:1fr}
+  .onda21-lista{grid-template-columns:1fr}
+  .onda21-pin__card{width:200px}
+}
+/* onda21:rede-v2:fim */
