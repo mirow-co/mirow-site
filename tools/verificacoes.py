@@ -78,7 +78,7 @@ BLOCOS_CSS = [
     "onda18:contato-botao", "onda18:barras", "onda18:voltar-topo",
     "onda18:carreiras", "onda18:insights-colorido", "onda18:home-lideres",
     "onda18:imprensa", "onda18:planeta-setores", "onda18:hero-numeros-s73",
-    "onda19:lateral-e-idiomas", "onda21:menus-bain", "onda21:rede-v2",
+    "onda19:lateral-e-idiomas", "onda21:menus-bain", "onda21:rede-v2", "onda22:marca-secoes",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -1348,6 +1348,45 @@ def estaticas(s):
             det.append(u"os itens do painel não estão em navy sobre o branco")
         return (not det, u"; ".join(det))
     s.check("S83", u"painel do menu branco e destacado do fundo (#141)", s83)
+
+    # ------------------------------------------------------------------ onda 23
+    def s85():
+        det = []
+        for rel in HOMES:
+            hh = s.ler(rel)
+            # o framework: uma marca por secao, 1 a 4, descendo a home
+            for n in range(1, 5):
+                c = hh.count("onda22-marca--%d" % n)
+                if c != 1:
+                    det.append(u"%s com %d marca(s) --%d (esperado 1)" % (rel, c, n))
+            # a ordem das marcas na pagina tem que ser 1,2,3,4
+            achadas = [int(x) for x in re.findall(r'onda22-marca onda22-marca--(\d)', hh)]
+            if achadas != [1, 2, 3, 4]:
+                det.append(u"%s com as marcas fora de ordem: %s" % (rel, achadas))
+            # os dois textos que saem
+            for classe, nome in (("home-experience__title", u'"Práticas"'),
+                                 ("home-leaders__title", u'super título "Líderes"')):
+                m = re.search(r'<h[1-6][^>]*class="%s"[^>]*>(.*?)</h[1-6]>' % classe,
+                              hh, re.S)
+                if m and m.group(1).strip():
+                    det.append(u"%s ainda tem o %s" % (rel, nome))
+        # titulos parelhos: os 4 seletores no MESMO bloco de regra, 48px
+        m = re.search(r'\.home-experience__subtitle,\s*\.onda18-orbe__titulo,\s*'
+                      r'\.home-leaders__subtitle,\s*\.certificates__title,\s*'
+                      r'\.certificates h2\{([^}]*)\}', css_o18)
+        if not m:
+            det.append(u"os 4 títulos não estão na mesma regra de tipografia")
+        else:
+            for prop in ("font-size:48px !important", "font-weight:700 !important",
+                         "text-transform:none !important", "text-align:left !important"):
+                if prop not in m.group(1):
+                    det.append(u"regra dos títulos sem %s" % prop)
+        if ".onda22-marca{position:relative" not in css_o18:
+            det.append(u"CSS sem o componente da marca")
+        if ".onda22-marca--4::before{box-shadow:0 -14px 0 currentColor,0 -28px 0 currentColor,"                 not in css_o18:
+            det.append(u"CSS sem a variação --4 da marca")
+        return (not det, u"; ".join(det[:4]))
+    s.check("S85", u"marca de seção 1-4 como framework da home; títulos parelhos", s85)
 
 
 # ------------------------------------------------------- asserções ao vivo

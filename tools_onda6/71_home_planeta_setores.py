@@ -242,7 +242,9 @@ def cards(lang):
 def bloco(lang):
     titulo = TITULO.get(lang, TITULO["pt"])[0]
     return ('%s<section class="onda18-orbe"><div class="container"><div class="row">'
-            '<div class="col"><h2 class="onda18-orbe__titulo">%s</h2>%s'
+            '<div class="col">'
+            '<span class="onda22-marca onda22-marca--2" aria-hidden="true"></span>'
+            '<h2 class="onda18-orbe__titulo">%s</h2>%s'
             '</div></div></div></section>%s'
             % (MARK_INI, titulo, cards(lang), MARK_FIM))
 
