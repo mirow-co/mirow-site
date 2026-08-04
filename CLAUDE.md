@@ -132,6 +132,7 @@ e o passo a passo de capturar referência visual de outro site via CDP (sem play
 
 | **26** | **NO AR** (04/08, gh-pages `509a588`, v=24) — 7 pedidos do Mario (S-97..S-103, issues #155–#161): "Ver todos os líderes" em navy; **o site inteiro em UMA fonte** (Titillium Web — as 3 famílias do tema nunca eram carregadas, ver `docs/DESIGN-SYSTEM.md` §2); submenu Práticas no tamanho de Sobre nós (19px, revoga a S-94/S-88); rodapé sem filete antes da política; e-mail de Andreas e Felipe nos cards de líder da home; imprensa com a linha inteira clicável; práticas sem Elmar, com Andreas e Felipe (36 páginas). Suíte: 120 asserções. |
 
+| **27** | **NO AR** (04/08, gh-pages `1bf8f66`, v=25) — 2 pedidos (S-104/S-105, #162/#163): menu na ordem Sobre nós · Práticas · Insights · **Imprensa · Carreiras** · Contato (header e clone do rodapé juntos) e a barra com **fundo navy sólido em toda página** — o HTML dela sempre foi idêntico nas 275; o que mudava era o fundo, porque o tema a deixa transparente e ela exibia o hero navy / a foto da interna / o gradiente claro. Suíte: 123 asserções, com a **V14** medindo a assinatura *renderizada* da barra em 8 páginas de templates diferentes. **3 achados abertos, aguardando decisão do Mario:** #164 (EN/DE com 5 itens de menu — falta Imprensa, página só existe em PT) · #165 (216 das 283 páginas são o mesmo conteúdo em URLs diferentes; canonical correto, problema de experiência) · #166 (26 páginas abrem sem banner). |
 Backlog aberto: issues `site-onda` (S-01..S-19) no `mirow-co/mirow-marketing`.
 
 ## Erros a NÃO repetir
