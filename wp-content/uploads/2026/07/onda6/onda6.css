@@ -180,7 +180,7 @@
 .rede__titulo{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
   font-size:30px;font-weight:700;line-height:130%;margin:0 0 24px}
 .rede__eyebrow{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
-  font-size:14px;font-weight:800;letter-spacing:.5em;text-transform:uppercase;
+  font-size:14px;font-weight:900;letter-spacing:.5em;text-transform:uppercase;
   margin:0 0 12px}
 .rede-mapa{margin:0 0 70px}
 .rede-mapa__box{background:rgba(255,255,255,.05);border:1px solid rgba(170,213,232,.35);
@@ -198,7 +198,7 @@
 .rede-pin__botao{position:absolute;left:-12px;top:-12px;width:24px;height:24px;
   padding:0;border:1px solid #020E66;border-radius:50%;background:#00ADEC;color:#020E66;
   cursor:pointer;font-family:var(--fontFamily),Arial,sans-serif;font-size:12px;
-  font-weight:800;line-height:22px;text-align:center;
+  font-weight:900;line-height:22px;text-align:center;
   box-shadow:0 0 0 4px rgba(0,173,236,.25);
   transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
 .rede-pin__botao:hover,.rede-pin__botao:focus-visible{outline:0;background:#fff;
@@ -245,7 +245,7 @@
 .rede-lista__item:hover{background:rgba(255,255,255,.1);border-color:#00ADEC}
 .rede-lista__num{display:inline-flex;align-items:center;justify-content:center;
   width:30px;height:30px;border-radius:50%;background:#00ADEC;color:#020E66;
-  font-family:var(--fontFamily),Arial,sans-serif;font-weight:800;font-size:14px}
+  font-family:var(--fontFamily),Arial,sans-serif;font-weight:900;font-size:14px}
 .rede-lista__nome{color:var(--whiteColor,#fff);font-family:var(--fontFamily),Arial,sans-serif;
   font-size:22px;font-weight:700;margin:0}
 .rede-lista__local{color:#AAD5E8;font-family:var(--fontFamily),Arial,sans-serif;
@@ -339,8 +339,14 @@
     width:300px;text-align:right;z-index:4}
   .hero-numeros__item{display:block;border-right:2px solid rgba(0,173,236,.85);
     padding-right:14px}
+  /* onda35 (S-126 / #179): peso 800 -> 400. O 800 NAO esta entre os pesos
+     carregados (o <head> pede wght@200;300;400;600;700;900), entao o navegador
+     arredondava para cima e os numeros saiam em 900/Black — o "gordinho" que o
+     Mario apontou. Corrigido AQUI, no lugar, e nao num bloco de override: dois
+     lugares declarando o mesmo font-weight e a classe de bug dos "valores
+     gemeos" que custou 4 achados na onda 31. Tamanho e cor nao mudam. */
   .hero-numeros__valor{display:block;
-    font-family:var(--fontFamily);font-weight:800;
+    font-family:var(--fontFamily);font-weight:400;
     font-size:40px;line-height:1;color:#00adec}
   .hero-numeros__texto{display:block;margin-top:5px;
     font-family:var(--secondaryFontFamily);font-weight:400;
