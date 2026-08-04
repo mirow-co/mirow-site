@@ -78,6 +78,7 @@ BLOCOS_CSS = [
     "onda18:contato-botao", "onda18:barras", "onda18:voltar-topo",
     "onda18:carreiras", "onda18:insights-colorido", "onda18:home-lideres",
     "onda18:imprensa", "onda18:planeta-setores", "onda18:hero-numeros-s73",
+    "onda19:lateral-e-idiomas",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -846,7 +847,8 @@ def estaticas(s):
     s.check("S50", u"card de líder com link real do LinkedIn (#108)", s50)
 
     def s51():
-        faltam = [rel for rel, h in s.conteudo() if 'class="onda18-topo"' not in h]
+        faltam = [rel for rel, h in s.conteudo()
+                  if 'class="onda19-lateral__link onda19-lateral__link--topo"' not in h]
         semanc = [rel for rel, h in s.conteudo() if 'id="topo"' not in h]
         det = []
         if faltam:
@@ -1078,18 +1080,27 @@ def estaticas(s):
             if 'class="onda18-orbe"' not in h:
                 det.append(u"%s sem o planeta" % rel)
                 continue
-            n = h.count('class="onda18-orbe__pill"')
+            n = h.count('class="onda18-const__item"')
+            g = h.count('class="onda18-const__nome"')
             if n != 19:
-                det.append(u"%s com %d setor(es) em órbita (esperado 19)" % (rel, n))
+                det.append(u"%s com %d setor(es) (esperado 19)" % (rel, n))
+            if g != 5:
+                det.append(u"%s com %d constelação(ões) (esperado 5)" % (rel, g))
             # tem que ficar dentro da seção de "Nossas áreas de expertise"
             if h.index('class="onda18-orbe"') < h.index('home-experience__subtitle'):
                 det.append(u"%s: planeta antes do subtítulo de expertise" % rel)
-        if "@keyframes onda18-orbita" not in css_o18:
-            det.append(u"CSS sem a animação da órbita")
+        if "@keyframes onda18-flutua" not in css_o18:
+            det.append(u"CSS sem a flutuação das constelações")
+        # a rotacao saiu de proposito (#128): era a causa do overlap
+        if "@keyframes onda18-orbita" in css_o18:
+            det.append(u"a rotação da v1 voltou — ela é a causa do overlap")
+        for i in range(1, 6):
+            if ".onda18-const--%d{" % i not in css_o18:
+                det.append(u"falta o slot fixo da constelação %d" % i)
         if "prefers-reduced-motion" not in css_o18:
             det.append(u"órbita sem fallback de reduced-motion")
         return (not det, u"; ".join(det[:4]))
-    s.check("S70", u"home: planeta com 19 setores orbitando (#128)", s70)
+    s.check("S70", u"home: 19 setores em 5 constelacoes fixas (#128)", s70)
 
     def s71():
         det = []
@@ -1129,6 +1140,87 @@ def estaticas(s):
             det.append(u"o slogan do tema deixou de ser 62px — reveja o pedido")
         return (not det, u"; ".join(det))
     s.check("S73", u"hero: números no tamanho do slogan, texto no do parágrafo (#131)", s73)
+
+    # ------------------------------------------------------------------ onda 19
+    css_o19 = css_o18   # mesmo arquivo, blocos onda19:*
+
+    def s74():
+        # a lista de idiomas do rodape abre para cima (S-52) e nao pode ficar
+        # atras da secao anterior — foi por isso que o Mario nao via as linguas
+        det = []
+        for regra in (".footer{position:relative;z-index:20}",
+                      ".rodape-barra .menu__languages{z-index:30}",
+                      ".rodape-barra .menu__languages-list{z-index:40}"):
+            if regra not in css_o19:
+                det.append(u"falta a regra %s" % regra)
+        return (not det, u"; ".join(det))
+    s.check("S74", u"as 3 línguas do rodapé aparecem inteiras (#132)", s74)
+
+    def s75():
+        sobrou = [rel for rel, h in s.todas() if '<section class="links">' in h]
+        return (not sobrou, u'%d página(s) ainda com o bloco "Como podemos ajudar?": %s'
+                % (len(sobrou), ", ".join(sobrou[:3])))
+    s.check("S75", u'0 blocos "Como podemos ajudar? / Transforme sua carreira" (#133)', s75)
+
+    def s76():
+        det = []
+        sem = [rel for rel, h in s.conteudo() if 'class="onda19-lateral"' not in h]
+        if sem:
+            det.append(u"%d página(s) sem a coluna lateral: %s"
+                       % (len(sem), ", ".join(sem[:3])))
+        # os 3 atalhos, com o e-mail levando assunto/corpo (S-72)
+        ruins = []
+        for rel, h in s.conteudo():
+            if ("onda19-lateral__link--wa" not in h
+                    or "onda19-lateral__link--mail" not in h
+                    or "onda19-lateral__link--topo" not in h):
+                ruins.append(rel)
+                continue
+            m = re.search(r'onda19-lateral__link--mail" href="mailto:([^"]+)"', h)
+            if not m or "subject=" not in m.group(1) or "body=" not in m.group(1):
+                ruins.append(rel)
+        if ruins:
+            det.append(u"%d página(s) sem os 3 atalhos (ou e-mail sem assunto): %s"
+                       % (len(ruins), ", ".join(ruins[:3])))
+        return (not det, u"; ".join(det))
+    s.check("S76", u"coluna lateral com WhatsApp, e-mail e voltar ao topo (#134)", s76)
+
+    def s67b():
+        # ajuste do #125: o ROTULO tambem mudou, nao so a URL
+        det = []
+        for rel, h in s.conteudo():
+            for antigo in (u">Nosso Trabalho<", u">Our Work<", u">Unsere Arbeit<"):
+                if antigo in h:
+                    det.append(u"%s com %s" % (rel, antigo))
+                    break
+        alvos = {"pt/index.html": u">Nossos Valores<", "en/index.html": u">Our Values<",
+                 "de/index.html": u">Unsere Werte<"}
+        for rel, txt in alvos.items():
+            if txt not in s.ler(rel):
+                det.append(u"%s sem o rótulo novo" % rel)
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S67b", u'menu diz "Nossos Valores" em toda parte (#125)', s67b)
+
+    def s57b():
+        # ajuste do #115: o icone segue o VEICULO, nao o dominio do link — os 2
+        # itens com veiculo e link divergentes saiam com o logo de outro jornal
+        det = []
+        for rel in ["imprensa/index.html", "pt/imprensa/index.html"]:
+            h = s.ler(rel)
+            for veic, dom in ((u"Estadão", "estadao.com.br"),
+                              (u"Folha de S.Paulo", "folha.uol.com.br"),
+                              (u"Valor Econômico", "valor.globo.com")):
+                itens = re.findall(
+                    r'<img class="onda18-imprensa__logo" src="([^"]+)"[^>]*>'
+                    r'<span class="onda18-imprensa__veiculo">' + re.escape(veic) + '</span>', h)
+                if not itens:
+                    det.append(u"%s: nenhum item de %s" % (rel, veic))
+                ruins = [i for i in itens if dom not in i]
+                if ruins:
+                    det.append(u"%s: %d item(ns) de %s com logo de outro veículo"
+                               % (rel, len(ruins), veic))
+        return (not det, u"; ".join(det[:4]))
+    s.check("S57b", u"imprensa: logo segue o veículo, não o link (#115)", s57b)
 
 
 # ------------------------------------------------------- asserções ao vivo

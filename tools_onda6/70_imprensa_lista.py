@@ -38,10 +38,40 @@ ICONES_REL = "wp-content/uploads/2026/08/imprensa"
 MARK_INI = "<!-- onda18:imprensa-lista -->"
 MARK_FIM = "<!-- /onda18:imprensa-lista -->"
 
+REX_LISTA = re.compile(
+    r'<li class="onda18-imprensa__item">.*?__veiculo">(?P<veiculo>[^<]+)</span>'
+    r'<time[^>]*>(?P<data>[^<]+)</time>'
+    r'<a class="onda18-imprensa__titulo" href="(?P<url>[^"]+)"[^>]*>(?P<titulo>[^<]+)', re.S)
+
 REX_PAR = re.compile(
     r'<strong>(?P<data>\d{2}/\d{2}/\d{4})\s*\|\s*(?P<veiculo>[^<]+?)\s*</strong>.*?'
     r'<h5 class="wp-block-heading"><a href="(?P<url>[^"]+)"[^>]*>(?:<mark[^>]*>)?'
     r'(?P<titulo>[^<]+)', re.S)
+
+# grafia correta do nome do veiculo + o dominio CANONICO dele (de onde sai o
+# icone). O dominio vem do veiculo, nunca do link do material: dois itens tem
+# link divergente do veiculo desde antes da onda 18 (ver DIVERGENTES no fim da
+# execucao) e seguiam com o logo de outro jornal.
+DOMINIO = {
+    u"Empresas & Negócios": "jornalempresasenegocios.com.br",
+    u"Reuters": "www.reuters.com",
+    u"Technibus": "technibus.com.br",
+    u"Move News": "www.movenews.com.br",
+    u"Estadão": "www.estadao.com.br",
+    u"iG": "www.ig.com.br",
+    u"The Economist": "www.economist.com",
+    u"Público": "www.publico.pt",
+    u"Valor Econômico": "valor.globo.com",
+    u"CZ Insights": "www.czapp.com",
+    u"Gazeta do Povo": "www.gazetadopovo.com.br",
+    u"UOL": "www.uol.com.br",
+    u"Money Times": "www.moneytimes.com.br",
+    u"epbr": "epbr.com.br",
+    u"O Globo": "oglobo.globo.com",
+    u"BNews": "www.bnews.com.br",
+    u"Folha de S.Paulo": "www1.folha.uol.com.br",
+    u"IstoÉ Dinheiro": "istoedinheiro.com.br",
+}
 
 # grafia correta do nome do veiculo (o badge original esta em CAPS)
 VEICULOS = {
@@ -74,7 +104,8 @@ CSS = """/* S-57: imprensa como lista sobre fundo branco — icone do veiculo, n
   border-bottom:1px solid rgba(2,14,102,.12)}
 .onda18-imprensa__item:last-child{border-bottom:0}
 .onda18-imprensa__item:hover{background:#F4F8FC}
-.onda18-imprensa__logo{width:28px;height:28px;object-fit:contain;display:block}
+.onda18-imprensa__logo{width:28px;height:28px;object-fit:contain;display:block;
+  background:#F0F4F8;border-radius:4px;padding:2px;box-sizing:border-box}
 .onda18-imprensa__logo--vazio{display:flex;align-items:center;justify-content:center;
   width:28px;height:28px;background:#AAD5E8;color:#020E66;font-weight:700;
   font-size:13px;border-radius:3px}
@@ -156,20 +187,24 @@ def main():
             rel = os.path.relpath(p, pub).replace(os.sep, "/")
 
             if MARK_INI in h:
-                print("  %s: lista ja aplicada (nada a fazer)" % rel)
-                continue
-
-            itens = [m.groupdict() for m in REX_PAR.finditer(h)]
+                itens = [m.groupdict() for m in REX_LISTA.finditer(h)]
+            else:
+                itens = [m.groupdict() for m in REX_PAR.finditer(h)]
             if not itens:
                 print("  %s: nao achei os pares data|veiculo — NAO alterada" % rel)
                 continue
             print("  %s: %d item(ns)" % (rel, len(itens)))
 
             lis = []
+            divergentes = []
             for it in itens:
-                dom = dominio(it["url"])
-                arq = baixar_icone(pub, dom, baixar)
                 veic = nome_veiculo(it["veiculo"])
+                dom_link = dominio(it["url"])
+                dom = DOMINIO.get(veic, dom_link)
+                if dom_link and dom_link.replace("www.", "") not in dom.replace("www.", "")                         and dom.replace("www.", "") not in dom_link.replace("www.", ""):
+                    divergentes.append(u"%s %s: veiculo %s, link em %s"
+                                       % (it["data"], veic, veic, dom_link))
+                arq = baixar_icone(pub, dom, baixar)
                 if arq:
                     logo = ('<img class="onda18-imprensa__logo" src="/mirow-site/%s/%s" '
                             'alt="%s" width="28" height="28" loading="lazy">'
@@ -190,15 +225,21 @@ def main():
 
             # troca da 1a badge ate o ultimo separador pela lista;
             # o rodape editorial ("solicitacoes de imprensa") continua depois
-            ini = h.find('<!-- wp:heading {"level":6} -->')
-            fim = h.rfind('<!-- /wp:separator -->')
-            if ini < 0 or fim < 0 or fim < ini:
-                print("  %s: nao achei os limites do trecho — NAO alterada" % rel)
-                continue
-            fim += len('<!-- /wp:separator -->')
+            if MARK_INI in h:
+                ini = h.index(MARK_INI)
+                fim = h.index(MARK_FIM) + len(MARK_FIM)
+            else:
+                ini = h.find('<!-- wp:heading {"level":6} -->')
+                fim = h.rfind('<!-- /wp:separator -->')
+                if ini < 0 or fim < 0 or fim < ini:
+                    print("  %s: nao achei os limites do trecho — NAO alterada" % rel)
+                    continue
+                fim += len('<!-- /wp:separator -->')
             novo = h[:ini] + bloco + h[fim:]
             gravar(p, novo)
             paginas += 1
+            for d in divergentes:
+                print(u"    DIVERGENTE (dado antigo, logo agora segue o veiculo): %s" % d)
 
     print("resumo: %d pagina(s) de imprensa convertida(s) em lista" % paginas)
 

@@ -704,7 +704,8 @@ html{scroll-behavior:smooth}
   border-bottom:1px solid rgba(2,14,102,.12)}
 .onda18-imprensa__item:last-child{border-bottom:0}
 .onda18-imprensa__item:hover{background:#F4F8FC}
-.onda18-imprensa__logo{width:28px;height:28px;object-fit:contain;display:block}
+.onda18-imprensa__logo{width:28px;height:28px;object-fit:contain;display:block;
+  background:#F0F4F8;border-radius:4px;padding:2px;box-sizing:border-box}
 .onda18-imprensa__logo--vazio{display:flex;align-items:center;justify-content:center;
   width:28px;height:28px;background:#AAD5E8;color:#020E66;font-weight:700;
   font-size:13px;border-radius:3px}
@@ -725,87 +726,92 @@ html{scroll-behavior:smooth}
 /* onda18:imprensa:fim */
 
 /* onda18:planeta-setores:ini */
-/* ---- S-70: planeta com os setores orbitando (home) ---------------------
-   Sem lib e sem video: 3 aneis girando por @keyframes, chips posicionados por
-   rotate+translate e texto com a animacao inversa para ficar sempre de pe. */
+/* ---- S-70 v2 (#128): 19 setores em 5 CONSTELACOES de posicao fixa --------
+   A v1 girava 3 aneis de chips e os rotulos se cruzavam (o mais longo tem ~3x a
+   largura do mais curto). Referencia do padrao: ESA Star Mapper (TULP) —
+   estrelas pequenas, linha fina ligando o grupo, nome da constelacao como
+   etiqueta permanente, regioes fixas do ceu. Sem rotacao = sem colisao. */
 .onda18-orbe{position:relative;z-index:6;margin:36px 0 0;padding:0 0 10px}
 .onda18-orbe__titulo{color:#020E66;font-size:34px;font-weight:700;margin:0 0 6px;
   text-align:center}
 .onda18-orbe__sub{color:#071C25;font-size:17px;margin:0 0 10px;text-align:center;
   opacity:.72}
-/* z-index: a secao do tema desenha gradientes decorativos por cima — sem isto os
-   chips da metade de cima saem lavados */
-.onda18-orbe__palco{position:relative;z-index:6;width:900px;height:900px;
+.onda18-orbe__palco{position:relative;z-index:6;width:980px;height:600px;
   max-width:100%;margin:0 auto}
-/* o planeta */
-.onda18-orbe__planeta{position:absolute;left:50%;top:50%;width:210px;height:210px;
-  margin:-105px 0 0 -105px;border-radius:50%;
+
+/* o planeta, no centro */
+.onda18-orbe__planeta{position:absolute;left:50%;top:50%;width:200px;height:200px;
+  margin:-100px 0 0 -100px;border-radius:50%;
   background:radial-gradient(circle at 32% 28%,#1B4FD8 0%,#0A2596 42%,#020E66 100%);
-  box-shadow:0 0 0 1px rgba(0,173,236,.45),0 0 60px 10px rgba(0,173,236,.18);
-  overflow:hidden;z-index:2}
-/* meridianos e paralelos, so com bordas */
+  box-shadow:0 0 0 1px rgba(0,173,236,.45),0 0 60px 12px rgba(0,173,236,.20);
+  overflow:hidden;z-index:3}
 .onda18-orbe__planeta::before,.onda18-orbe__planeta::after{content:"";
   position:absolute;left:50%;top:50%;border:1px solid rgba(170,213,232,.28);
   border-radius:50%}
-.onda18-orbe__planeta::before{width:210px;height:70px;margin:-35px 0 0 -105px}
-.onda18-orbe__planeta::after{width:82px;height:210px;margin:-105px 0 0 -41px}
-.onda18-orbe__marca{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
-  text-align:center;color:#fff;font-size:15px;font-weight:700;letter-spacing:.14em;
-  z-index:3}
-/* as orbitas */
-.onda18-orbe__anel{position:absolute;left:50%;top:50%;border-radius:50%;
-  border:1px dashed rgba(170,213,232,.22);pointer-events:none}
-.onda18-orbe__gira{position:absolute;left:0;top:0;right:0;bottom:0;
-  animation:onda18-orbita var(--dur) linear infinite}
-.onda18-orbe__chip{position:absolute;left:50%;top:50%;
-  transform:rotate(var(--a)) translate(var(--r)) rotate(calc(-1 * var(--a)))}
-.onda18-orbe__contra{display:block;
-  animation:onda18-orbita var(--dur) linear infinite reverse}
-.onda18-orbe__pill{display:inline-flex;align-items:center;gap:8px;
-  transform:translate(-50%,-50%);
-  background:#020E66;border:1px solid rgba(0,173,236,.55);
-  padding:7px 13px;border-radius:18px;
-  white-space:normal;max-width:168px;line-height:1.2;text-align:left;
-  color:#fff;font-size:13px;font-weight:600;
-  box-shadow:0 2px 10px rgba(2,14,102,.18);
-  transition:border-color 200ms ease,background 200ms ease}
-.onda18-orbe__pill img{width:19px;height:19px;display:block;flex:none;
-  filter:brightness(0) invert(1)}
-.onda18-orbe__gira--rev .onda18-orbe__contra{animation-direction:normal}
-.onda18-orbe__gira--rev{animation-direction:reverse}
-/* parar ao passar o mouse: o executivo consegue ler o setor */
-.onda18-orbe__palco:hover .onda18-orbe__gira,
-.onda18-orbe__palco:hover .onda18-orbe__contra{animation-play-state:paused}
-.onda18-orbe__pill:hover{background:#00ADEC;border-color:#00ADEC;color:#020E66}
-.onda18-orbe__pill:hover img{filter:none}
-@keyframes onda18-orbita{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.onda18-orbe__planeta::before{width:200px;height:66px;margin:-33px 0 0 -100px}
+.onda18-orbe__planeta::after{width:78px;height:200px;margin:-100px 0 0 -39px}
+.onda18-orbe__marca{position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);color:#fff;font-size:14px;font-weight:700;
+  letter-spacing:.14em;z-index:4;white-space:nowrap}
 
-/* telas menores: o palco encolhe por escala (mantem as proporcoes da orbita) */
-@media only screen and (max-width: 1440px){
-  .onda18-orbe__palco{transform:scale(.86);margin:-63px auto}
-}
+/* uma constelacao */
+.onda18-const{position:absolute;width:268px;
+  animation:onda18-flutua 9s ease-in-out infinite}
+.onda18-const__nome{display:block;color:#020E66;font-size:15px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px;padding:0 0 7px;
+  border-bottom:1px solid rgba(0,173,236,.55)}
+.onda18-const__lista{list-style:none;margin:0;padding:0;position:relative}
+/* a "linha da constelacao", ligando as estrelas do grupo */
+.onda18-const__lista::before{content:"";position:absolute;left:3px;top:10px;
+  bottom:10px;border-left:1px dashed rgba(2,14,102,.35)}
+.onda18-const__item{position:relative;display:flex;align-items:center;gap:8px;
+  margin:0 0 7px;padding-left:18px;color:#071C25;font-size:14px;font-weight:600;
+  line-height:1.25}
+.onda18-const__item:last-child{margin-bottom:0}
+/* a estrela */
+.onda18-const__item::before{content:"";position:absolute;left:0;top:50%;
+  width:7px;height:7px;margin-top:-3px;border-radius:50%;background:#00ADEC;
+  box-shadow:0 0 0 3px rgba(0,173,236,.22)}
+.onda18-const__item img,.onda18-const__item svg{width:20px !important;
+  height:20px !important;flex:none;display:block}
+/* a linha que liga a constelacao ao planeta */
+.onda18-const::after{content:"";position:absolute;height:0;
+  border-top:1px dashed rgba(2,14,102,.28);transform-origin:0 50%;
+  pointer-events:none}
+
+/* os 5 slots — regioes fixas, e por isso nao ha como um rotulo cobrir o outro */
+.onda18-const--1{left:0;top:0;animation-delay:0s}
+.onda18-const--1::after{left:268px;top:80px;width:220px;transform:rotate(38deg)}
+.onda18-const--2{right:0;top:0;animation-delay:-1.6s}
+.onda18-const--2::after{left:0;top:80px;width:220px;transform:rotate(142deg)}
+.onda18-const--3{left:0;top:250px;animation-delay:-3.2s}
+.onda18-const--3::after{left:268px;top:56px;width:200px;transform:rotate(-16deg)}
+.onda18-const--4{right:0;top:250px;animation-delay:-4.8s}
+.onda18-const--4::after{left:0;top:48px;width:200px;transform:rotate(196deg)}
+.onda18-const--5{left:50%;margin-left:-134px;bottom:0;animation-delay:-6.4s}
+.onda18-const--5::after{left:134px;top:0;width:120px;transform:rotate(-90deg)}
+
+@keyframes onda18-flutua{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
 @media only screen and (max-width: 1200px){
-  .onda18-orbe__palco{transform:scale(.72);margin:-126px auto}
+  .onda18-orbe__palco{transform:scale(.8);margin:-60px auto}
 }
-/* abaixo de 992px orbita nao cabe: nuvem de chips, sem rotacao */
+/* abaixo de 992px o ceu nao cabe: as constelacoes viram colunas empilhadas */
 @media only screen and (max-width: 991px){
   .onda18-orbe__titulo{font-size:26px}
   .onda18-orbe__sub{font-size:15px}
   .onda18-orbe__palco{width:auto;height:auto;transform:none;margin:0;
-    display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:24px 0 0}
-  .onda18-orbe__anel{display:none}
-  .onda18-orbe__planeta{position:relative;left:auto;top:auto;margin:0 auto 18px;
+    display:flex;flex-wrap:wrap;gap:26px 30px;justify-content:center;padding:22px 0 0}
+  .onda18-orbe__planeta{position:relative;left:auto;top:auto;margin:0 auto;
     width:150px;height:150px;flex:0 0 100%}
   .onda18-orbe__planeta::before{width:150px;height:50px;margin:-25px 0 0 -75px}
   .onda18-orbe__planeta::after{width:58px;height:150px;margin:-75px 0 0 -29px}
-  .onda18-orbe__gira{position:static;animation:none;display:flex;flex-wrap:wrap;
-    justify-content:center;gap:10px}
-  .onda18-orbe__chip{position:static;transform:none}
-  .onda18-orbe__contra{animation:none}
-  .onda18-orbe__pill{transform:none;font-size:13px;padding:7px 12px}
+  .onda18-orbe__marca{position:absolute}
+  .onda18-const{position:static;width:250px;margin:0;animation:none}
+  .onda18-const::after{display:none}
 }
 @media (prefers-reduced-motion: reduce){
-  .onda18-orbe__gira,.onda18-orbe__contra{animation:none !important}
+  .onda18-const{animation:none}
 }
 /* onda18:planeta-setores:fim */
 
@@ -830,3 +836,37 @@ html{scroll-behavior:smooth}
   .hero-numeros__texto{font-size:18px !important}
 }
 /* onda18:hero-numeros-s73:fim */
+
+/* onda19:lateral-e-idiomas:ini */
+/* ---- S-74: as 3 linguas do rodape aparecem inteiras ---------------------
+   Nao era overflow: o rodape nao tinha contexto de empilhamento proprio e a
+   secao anterior pintava por cima da lista que a S-52 fez abrir para cima. */
+.footer{position:relative;z-index:20}
+.rodape-barra .menu__languages{z-index:30}
+.rodape-barra .menu__languages-list{z-index:40}
+
+/* ---- S-76: coluna fixa de acoes na lateral direita ---------------------- */
+.onda19-lateral{position:fixed;right:22px;bottom:34px;z-index:900;
+  display:flex;flex-direction:column;gap:12px;align-items:center}
+.onda19-lateral__link{width:52px;height:52px;display:flex;align-items:center;
+  justify-content:center;border-radius:50%;text-decoration:none;
+  background:#020E66;border:2px solid #00ADEC;color:#fff;
+  box-shadow:0 4px 14px rgba(2,14,102,.28);
+  transition:background 200ms ease,color 200ms ease,border-color 200ms ease}
+.onda19-lateral__link svg{width:22px;height:22px;display:block}
+.onda19-lateral__link:hover,.onda19-lateral__link:focus-visible{
+  background:#00ADEC;color:#020E66}
+.onda19-lateral__link--wa:hover,.onda19-lateral__link--wa:focus-visible{
+  background:#25D366;border-color:#25D366;color:#fff}
+/* o de subir so aparece depois de rolar (herda o comportamento da S-51) */
+.onda19-lateral__link--topo{opacity:0;visibility:hidden;transform:translateY(10px);
+  transition:opacity 220ms ease,transform 220ms ease,visibility 220ms ease,
+    background 200ms ease,color 200ms ease}
+.onda19-lateral__link--topo.is-visivel{opacity:1;visibility:visible;transform:none}
+@media only screen and (max-width: 767px){
+  .onda19-lateral{right:12px;bottom:16px;gap:9px}
+  .onda19-lateral__link{width:44px;height:44px}
+  .onda19-lateral__link svg{width:19px;height:19px}
+}
+@media print{.onda19-lateral{display:none}}
+/* onda19:lateral-e-idiomas:fim */
