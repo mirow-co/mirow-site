@@ -726,92 +726,63 @@ html{scroll-behavior:smooth}
 /* onda18:imprensa:fim */
 
 /* onda18:planeta-setores:ini */
-/* ---- S-70 v2 (#128): 19 setores em 5 CONSTELACOES de posicao fixa --------
-   A v1 girava 3 aneis de chips e os rotulos se cruzavam (o mais longo tem ~3x a
-   largura do mais curto). Referencia do padrao: ESA Star Mapper (TULP) —
-   estrelas pequenas, linha fina ligando o grupo, nome da constelacao como
-   etiqueta permanente, regioes fixas do ceu. Sem rotacao = sem colisao. */
-.onda18-orbe{position:relative;z-index:6;margin:36px 0 0;padding:0 0 10px}
-.onda18-orbe__titulo{color:#020E66;font-size:34px;font-weight:700;margin:0 0 6px;
+/* ---- S-70 v3 (#128): 5 constelacoes de esferas ao redor da Mirow --------
+   Pedido do Mario: cada grupo e uma esfera com os temas conectados a ela, as
+   esferas circundando a Mirow, e TEXTO LEGIVEL — preto sobre o azul do tema e
+   navy sobre azul estavam ilegiveis. Por isso a secao ganha o proprio ceu
+   escuro e todo texto e branco/azul-claro. Referencia do padrao: hub-and-spoke
+   glowing network (ver cabecalho do script 71). */
+.onda18-orbe{position:relative;z-index:6;margin:44px 0 0;padding:0}
+.onda18-orbe__ceu{position:relative;border-radius:18px;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 42%,#0A2596 0%,#020E66 46%,#071C25 100%);
+  padding:34px 24px 26px;
+  box-shadow:0 18px 50px rgba(2,14,102,.30)}
+/* estrelas fracas do fundo */
+.onda18-orbe__ceu::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(1.5px 1.5px at 12% 18%,rgba(255,255,255,.55),transparent),
+    radial-gradient(1.5px 1.5px at 78% 12%,rgba(255,255,255,.40),transparent),
+    radial-gradient(1.5px 1.5px at 32% 78%,rgba(255,255,255,.45),transparent),
+    radial-gradient(1.5px 1.5px at 88% 66%,rgba(255,255,255,.35),transparent),
+    radial-gradient(1.5px 1.5px at 56% 30%,rgba(255,255,255,.30),transparent),
+    radial-gradient(1.5px 1.5px at 22% 52%,rgba(255,255,255,.28),transparent),
+    radial-gradient(1.5px 1.5px at 68% 88%,rgba(255,255,255,.32),transparent)}
+.onda18-orbe__titulo{position:relative;color:#fff;font-size:34px;font-weight:700;
+  margin:0 0 6px;text-align:center}
+.onda18-orbe__sub{position:relative;color:#AAD5E8;font-size:17px;margin:0 0 4px;
   text-align:center}
-.onda18-orbe__sub{color:#071C25;font-size:17px;margin:0 0 10px;text-align:center;
-  opacity:.72}
-.onda18-orbe__palco{position:relative;z-index:6;width:980px;height:600px;
-  max-width:100%;margin:0 auto}
+.onda18-orbe__mapa{position:relative;display:block;width:100%;height:auto}
 
-/* o planeta, no centro */
-.onda18-orbe__planeta{position:absolute;left:50%;top:50%;width:200px;height:200px;
-  margin:-100px 0 0 -100px;border-radius:50%;
-  background:radial-gradient(circle at 32% 28%,#1B4FD8 0%,#0A2596 42%,#020E66 100%);
-  box-shadow:0 0 0 1px rgba(0,173,236,.45),0 0 60px 12px rgba(0,173,236,.20);
-  overflow:hidden;z-index:3}
-.onda18-orbe__planeta::before,.onda18-orbe__planeta::after{content:"";
-  position:absolute;left:50%;top:50%;border:1px solid rgba(170,213,232,.28);
-  border-radius:50%}
-.onda18-orbe__planeta::before{width:200px;height:66px;margin:-33px 0 0 -100px}
-.onda18-orbe__planeta::after{width:78px;height:200px;margin:-100px 0 0 -39px}
-.onda18-orbe__marca{position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%);color:#fff;font-size:14px;font-weight:700;
-  letter-spacing:.14em;z-index:4;white-space:nowrap}
+/* pulso suave das esferas — sugere que a rede esta viva, sem girar nada */
+.onda18-orbe__hub-brilho{animation:onda18-pulso 6s ease-in-out infinite}
+.onda18-orbe__hub-brilho--2{animation-delay:-1.2s}
+.onda18-orbe__hub-brilho--3{animation-delay:-2.4s}
+.onda18-orbe__hub-brilho--4{animation-delay:-3.6s}
+.onda18-orbe__hub-brilho--5{animation-delay:-4.8s}
+@keyframes onda18-pulso{0%,100%{opacity:.30}50%{opacity:.62}}
 
-/* uma constelacao */
-.onda18-const{position:absolute;width:268px;
-  animation:onda18-flutua 9s ease-in-out infinite}
-.onda18-const__nome{display:block;color:#020E66;font-size:15px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px;padding:0 0 7px;
-  border-bottom:1px solid rgba(0,173,236,.55)}
-.onda18-const__lista{list-style:none;margin:0;padding:0;position:relative}
-/* a "linha da constelacao", ligando as estrelas do grupo */
-.onda18-const__lista::before{content:"";position:absolute;left:3px;top:10px;
-  bottom:10px;border-left:1px dashed rgba(2,14,102,.35)}
-.onda18-const__item{position:relative;display:flex;align-items:center;gap:8px;
-  margin:0 0 7px;padding-left:18px;color:#071C25;font-size:14px;font-weight:600;
-  line-height:1.25}
-.onda18-const__item:last-child{margin-bottom:0}
-/* a estrela */
+/* a lista empilhada, para mobile (o mesmo conteudo, no mesmo ceu) */
+.onda18-orbe__lista{display:none;margin:0;padding:0;list-style:none;position:relative}
+.onda18-const{margin:0 0 22px}
+.onda18-const:last-child{margin-bottom:0}
+.onda18-const__nome{display:block;color:#00ADEC;font-size:14px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px;padding:0 0 6px;
+  border-bottom:1px solid rgba(0,173,236,.45)}
+.onda18-const__lista{list-style:none;margin:0;padding:0}
+.onda18-const__item{position:relative;padding-left:18px;margin:0 0 6px;
+  color:#fff;font-size:15px;font-weight:600;line-height:1.3}
 .onda18-const__item::before{content:"";position:absolute;left:0;top:50%;
   width:7px;height:7px;margin-top:-3px;border-radius:50%;background:#00ADEC;
-  box-shadow:0 0 0 3px rgba(0,173,236,.22)}
-.onda18-const__item img,.onda18-const__item svg{width:20px !important;
-  height:20px !important;flex:none;display:block}
-/* a linha que liga a constelacao ao planeta */
-.onda18-const::after{content:"";position:absolute;height:0;
-  border-top:1px dashed rgba(2,14,102,.28);transform-origin:0 50%;
-  pointer-events:none}
+  box-shadow:0 0 0 3px rgba(0,173,236,.25)}
 
-/* os 5 slots — regioes fixas, e por isso nao ha como um rotulo cobrir o outro */
-.onda18-const--1{left:0;top:0;animation-delay:0s}
-.onda18-const--1::after{left:268px;top:80px;width:220px;transform:rotate(38deg)}
-.onda18-const--2{right:0;top:0;animation-delay:-1.6s}
-.onda18-const--2::after{left:0;top:80px;width:220px;transform:rotate(142deg)}
-.onda18-const--3{left:0;top:250px;animation-delay:-3.2s}
-.onda18-const--3::after{left:268px;top:56px;width:200px;transform:rotate(-16deg)}
-.onda18-const--4{right:0;top:250px;animation-delay:-4.8s}
-.onda18-const--4::after{left:0;top:48px;width:200px;transform:rotate(196deg)}
-.onda18-const--5{left:50%;margin-left:-134px;bottom:0;animation-delay:-6.4s}
-.onda18-const--5::after{left:134px;top:0;width:120px;transform:rotate(-90deg)}
-
-@keyframes onda18-flutua{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-
-@media only screen and (max-width: 1200px){
-  .onda18-orbe__palco{transform:scale(.8);margin:-60px auto}
-}
-/* abaixo de 992px o ceu nao cabe: as constelacoes viram colunas empilhadas */
 @media only screen and (max-width: 991px){
   .onda18-orbe__titulo{font-size:26px}
   .onda18-orbe__sub{font-size:15px}
-  .onda18-orbe__palco{width:auto;height:auto;transform:none;margin:0;
-    display:flex;flex-wrap:wrap;gap:26px 30px;justify-content:center;padding:22px 0 0}
-  .onda18-orbe__planeta{position:relative;left:auto;top:auto;margin:0 auto;
-    width:150px;height:150px;flex:0 0 100%}
-  .onda18-orbe__planeta::before{width:150px;height:50px;margin:-25px 0 0 -75px}
-  .onda18-orbe__planeta::after{width:58px;height:150px;margin:-75px 0 0 -29px}
-  .onda18-orbe__marca{position:absolute}
-  .onda18-const{position:static;width:250px;margin:0;animation:none}
-  .onda18-const::after{display:none}
+  .onda18-orbe__ceu{padding:26px 20px 22px;border-radius:14px}
+  .onda18-orbe__mapa{display:none}
+  .onda18-orbe__lista{display:block;margin-top:20px}
 }
 @media (prefers-reduced-motion: reduce){
-  .onda18-const{animation:none}
+  .onda18-orbe__hub-brilho{animation:none;opacity:.45}
 }
 /* onda18:planeta-setores:fim */
 

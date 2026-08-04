@@ -1074,33 +1074,42 @@ def estaticas(s):
     s.check("S69", u'nossos-valores sem "soluções para vários setores" (#127)', s69)
 
     def s70():
+        # v3 (#128): grafo de esferas em ceu escuro. O pedido do Mario tinha DUAS
+        # partes — cada grupo como esfera com os temas ligados a ela, E texto
+        # legivel (preto/navy sobre o azul do tema estava ilegivel).
         det = []
         for rel in HOMES:
             h = s.ler(rel)
-            if 'class="onda18-orbe"' not in h:
-                det.append(u"%s sem o planeta" % rel)
+            if 'class="onda18-orbe__ceu"' not in h:
+                det.append(u"%s sem o céu escuro (legibilidade)" % rel)
                 continue
-            n = h.count('class="onda18-const__item"')
-            g = h.count('class="onda18-const__nome"')
-            if n != 19:
-                det.append(u"%s com %d setor(es) (esperado 19)" % (rel, n))
-            if g != 5:
-                det.append(u"%s com %d constelação(ões) (esperado 5)" % (rel, g))
-            # tem que ficar dentro da seção de "Nossas áreas de expertise"
-            if h.index('class="onda18-orbe"') < h.index('home-experience__subtitle'):
-                det.append(u"%s: planeta antes do subtítulo de expertise" % rel)
-        if "@keyframes onda18-flutua" not in css_o18:
-            det.append(u"CSS sem a flutuação das constelações")
-        # a rotacao saiu de proposito (#128): era a causa do overlap
-        if "@keyframes onda18-orbita" in css_o18:
-            det.append(u"a rotação da v1 voltou — ela é a causa do overlap")
-        for i in range(1, 6):
-            if ".onda18-const--%d{" % i not in css_o18:
-                det.append(u"falta o slot fixo da constelação %d" % i)
+            nos = h.count('r="4" fill="#7FE3FF"')          # um nó por setor
+            hubs = h.count('fill="url(#o18hub)"')          # uma esfera por grupo
+            itens_mob = h.count('class="onda18-const__item"')
+            if nos != 19:
+                det.append(u"%s com %d nó(s) de setor (esperado 19)" % (rel, nos))
+            if hubs != 5:
+                det.append(u"%s com %d esfera(s) de grupo (esperado 5)" % (rel, hubs))
+            if itens_mob != 19:
+                det.append(u"%s: lista de mobile com %d item(ns)" % (rel, itens_mob))
+            if "MIROW &amp; CO." not in h:
+                det.append(u"%s sem o núcleo Mirow no centro" % rel)
+            # nenhum texto do mapa pode ser escuro: o pedido era exatamente isso
+            for cor in ('fill="#020E66"', 'fill="#071C25"', 'fill="#000000"'):
+                if cor in h[h.index('onda18-orbe__mapa'):h.index('onda18-orbe__lista')]:
+                    det.append(u"%s tem texto escuro no mapa (%s)" % (rel, cor))
+        if ".onda18-orbe__ceu{" not in css_o18:
+            det.append(u"CSS sem o painel de céu escuro")
+        if "@keyframes onda18-pulso" not in css_o18:
+            det.append(u"CSS sem o pulso das esferas")
         if "prefers-reduced-motion" not in css_o18:
-            det.append(u"órbita sem fallback de reduced-motion")
+            det.append(u"sem fallback de reduced-motion")
+        # as duas versões anteriores foram aposentadas por causar overlap/ilegibilidade
+        for morto in ("@keyframes onda18-orbita", "@keyframes onda18-flutua"):
+            if morto in css_o18:
+                det.append(u"%s voltou (versão aposentada)" % morto)
         return (not det, u"; ".join(det[:4]))
-    s.check("S70", u"home: 19 setores em 5 constelacoes fixas (#128)", s70)
+    s.check("S70", u"home: 5 esferas de setores em ceu escuro legivel (#128)", s70)
 
     def s71():
         det = []

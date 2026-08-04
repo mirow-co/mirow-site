@@ -1,62 +1,59 @@
 # -*- coding: utf-8 -*-
-"""71 — S-70 / issue #128: planeta com os setores em CONSTELACOES, na home.
+"""71 — S-70 / issue #128: as 5 CONSTELACOES de setores ao redor da Mirow, na home.
 
 Uso:
     python tools_onda6/71_home_planeta_setores.py <raiz-que-contem-public>
 
-HISTORICO DO PEDIDO
--------------------
-Onda 18: "vamos colocar o planeta com os diversos setores orbitando esse planeta na
-pagina inicial junto com 'nossas areas de expertise'. vamos buscar em alglum site
-que tenha planeta e temas orbitando esse planeta para tentar imitar."
-  -> 1a versao: 3 aneis girando com os 19 setores em chips.
+HISTORICO DO PEDIDO (3 versoes, mesma issue)
+--------------------------------------------
+v1 (onda 18) "planeta com os diversos setores orbitando esse planeta ... junto com
+   'nossas areas de expertise'" -> 3 aneis girando com 19 chips.
+v2 (onda 19) "tem muito overlap ... podemos fazer um search por paginas com
+   constelacoes para agruparmos industrias semelhantes em grupos de constelacoes"
+   -> 5 grupos em slots fixos, em lista. Matou o overlap, mas ficou uma lista.
+v3 (esta)    "quero que sejam constelacoes ultramodernas mesmo, com cada grupo
+   sendo uma esfera central enquanto os outros temas se conectam a ela. elas devem
+   circundar mirow & co. a letra precisa ser mais facilmente legivel contra o
+   background. texto preto sobre esse azul e dificil de ler. texto azul sobre azul
+   dificil tambem."
 
-Onda 19 (mesma issue): "tem muito overlap nos projetos que temos. sera que podemos
-fazer um search por paginas com constelacoes para agruparmos industrias semelhantes
-em grupos de constelacoes."
-  -> esta versao. A rotacao era a causa do overlap: 19 rotulos de largura muito
-     diferente ("Esportes, midia e entretenimento" tem ~3x a largura de "Saude")
-     em 3 raios se cruzam em algum quadro da animacao, sempre.
+PESQUISA DE REFERENCIA (03/08/2026)
+-----------------------------------
+Padrao pedido = hub-and-spoke / node-link graph, o visual de "rede de nos
+brilhantes". O que as fontes convergem:
+  - fundo ESCURO com esferas translucidas e linhas finas luminosas; um hub central
+    mais brilhante que os outros (efeito starburst) — colecoes de referencia de
+    "glowing network of interconnected nodes" e material de topologia no Dribbble
+  - COR distingue cluster, TAMANHO distingue importancia/centralidade, e animacao
+    serve para sugerir fluxo (guias de knowledge-graph visualization: yFiles,
+    Tom Sawyer, Datavid)
+  - layouts force-directed existem justamente para evitar sobreposicao de no; aqui
+    a geometria e calculada a mao em Python, o que da o mesmo efeito de forma
+    deterministica (e reproduzivel entre builds)
+  - ESA Star Mapper (TULP), levantado na v2, segue valendo para a parte de
+    "constelacao": estrela pequena, linha fina, nome do grupo como etiqueta fixa.
 
-PESQUISA DE REFERENCIA (o "search" pedido, 03/08/2026)
-------------------------------------------------------
-Nao existe um caso canonico de consultoria com esse padrao. A referencia mais
-solida do padrao em si e o ESA Star Mapper (https://sci.esa.int/star_mapper/,
-visualizacao da TULP Interactive sobre dados da missao Hipparcos). O que se
-aproveita dele:
-  - estrelas pequenas e linhas FINAS ligando as estrelas de um mesmo grupo
-  - o nome da CONSTELACAO e a etiqueta permanente; o nome de cada estrela e
-    camada secundaria
-  - constelacoes ocupam regioes FIXAS do ceu — e isso que resolve o overlap aqui
-Tambem olhados, sem agregar: colecao de data-visualization do Awwwards (padrao
-"dots + connection lines"), Pega Constellation (design system homonimo, nada a
-ver) e material de cluster diagram.
-
-DECISAO DE DESIGN
------------------
-Sai a rotacao. Os 19 setores viram 5 constelacoes em posicoes fixas ao redor do
-planeta, cada uma ligada a ele por uma linha tracejada. Overlap deixa de ser
-possivel por construcao. O movimento que sobra e uma flutuacao de 6px, com fase
-diferente por grupo.
-
-Os 5 grupos (agrupamento por proximidade de cadeia produtiva e de tipo de decisao
-de compra — proposta do Claude, vale revisao do Mario):
-  1 Energia & Recursos         (5) oleo e gas, energia eletrica, utilidades,
-                                   mineracao e siderurgia, quimicos
-  2 Industria & Base florestal (5) florestal/papel/celulose, maquinas e
-                                   equipamentos, automotivo, infraestrutura e
-                                   cimento, transporte e logistica
-  3 Consumo & Agro             (4) varejo e bens de consumo, agronegocio, saude,
-                                   educacao
-  4 Tecnologia & Midia         (3) tecnologia, telecom, esportes/midia/entret.
-  5 Capital & Servicos         (2) servicos financeiros, private equity
-
-Nomes dos 19 setores (3 idiomas) e icones sao os mesmos do bloco "Industrias /
-Solucoes para diversos setores" que a S-69 tirou da pagina nossos-valores —
-nenhum asset novo.
+DECISOES DESTA VERSAO
+---------------------
+1. LEGIBILIDADE (o pedido explicito): a secao passa a ter seu proprio CEU ESCURO
+   (painel navy #020E66 -> #071C25 com estrelas fracas). Todo texto vira branco ou
+   azul-claro #AAD5E8. Nao ha mais texto preto nem navy sobre o azul medio do
+   gradiente do tema — era isso que estava ilegivel.
+2. Cada grupo e uma ESFERA (hub) com brilho proprio; os setores do grupo sao nos
+   menores ligados a ela por linha fina. As 5 esferas circundam a esfera central
+   MIROW & CO., ligadas a ela por linha tracejada.
+3. Tudo em SVG unico com viewBox — escala sem quebrar, sem lib, sem imagem.
+   Geometria calculada aqui, com os rotulos empilhados por hub: overlap continua
+   impossivel por construcao.
+4. Os icones dos setores SAIRAM. Num grafo de nos o "no" e a estrela; e o icone
+   SVG do tema ja tinha custado a armadilha do plugin svgs-inline (precisa de
+   ?ver=1, ver assercao H09). Menos peca, menos modo de falha.
+5. O pulso das esferas respeita prefers-reduced-motion. Abaixo de 992px o SVG sai
+   e entra a lista empilhada (mesmo conteudo, texto branco no mesmo ceu).
 
 Idempotente: bloco entre marcadores.
 """
+import math
 import os
 import sys
 
@@ -66,7 +63,6 @@ from _onda7_css import (escrever_bloco_css, gravar, idioma_da_pagina, ler,  # no
 
 MARK_INI = "<!-- onda18:planeta-setores -->"
 MARK_FIM = "<!-- /onda18:planeta-setores -->"
-ICON_DIR = "wp-content/uploads/2023/03"
 
 # nome do setor por idioma, na ordem original do bloco de industrias
 NOMES = {
@@ -89,13 +85,6 @@ NOMES = {
            u"Bergbau und Stahlindustrie", u"Private Equity", u"Finanzdienstleistungen",
            u"Gesundheit", u"Technologie", u"Telekommunikation", u"Transport und Logistik"],
 }
-ICONES = ["icon-segment-auto.svg", "icon-segment-agro.svg", "icon-segment-edu.svg",
-          "icon-segment-market.svg", "icon-segment-energy.svg", "icon-segment-oilgas.svg",
-          "icon-segment-chemical.svg", "icon-segment-utilities.svg",
-          "icon-segment-media.svg", "icon-segment-forestry.svg", "icon-segment-infra.svg",
-          "icon-segment-equipaments.svg", "icon-segment-mining.svg",
-          "icon-segment-equity.svg", "icon-segment-finance.svg", "icon-segment-health.svg",
-          "icon-segment-tech.svg", "icon-segment-telecom.svg", "icon-segment-logistics.svg"]
 
 # nome da constelacao por idioma
 GRUPOS = {
@@ -117,128 +106,236 @@ MEMBROS = [
 
 TITULO = {
     "pt": (u"Setores em que atuamos",
-           u"19 indústrias em 5 constelações — todas girando em torno do mesmo núcleo"),
+           u"19 indústrias em 5 constelações — todas conectadas ao mesmo núcleo"),
     "en": (u"Industries we serve",
-           u"19 industries in 5 constellations — all orbiting the same core"),
+           u"19 industries in 5 constellations — all connected to the same core"),
     "de": (u"Branchen, in denen wir arbeiten",
-           u"19 Branchen in 5 Konstellationen — alle um denselben Kern"),
+           u"19 Branchen in 5 Konstellationen — alle mit demselben Kern verbunden"),
 }
 
-CSS = """/* ---- S-70 v2 (#128): 19 setores em 5 CONSTELACOES de posicao fixa --------
-   A v1 girava 3 aneis de chips e os rotulos se cruzavam (o mais longo tem ~3x a
-   largura do mais curto). Referencia do padrao: ESA Star Mapper (TULP) —
-   estrelas pequenas, linha fina ligando o grupo, nome da constelacao como
-   etiqueta permanente, regioes fixas do ceu. Sem rotacao = sem colisao. */
-.onda18-orbe{position:relative;z-index:6;margin:36px 0 0;padding:0 0 10px}
-.onda18-orbe__titulo{color:#020E66;font-size:34px;font-weight:700;margin:0 0 6px;
+# --- geometria do ceu ------------------------------------------------------
+# A largura do viewBox e a posicao dos hubs sao dimensionadas pelo ROTULO MAIS
+# LONGO dos 3 idiomas (o aleao "Forstwirtschaft, Papier und Zellstoff" com 37
+# caracteres e o pior caso). Antes o viewBox era 1200 e "INDUSTRIA & BASE
+# FLORESTAL" saia cortado na borda direita.
+VB_W, VB_H = 1300, 980
+CX, CY, CR = 620, 470, 92          # esfera central
+HUB_R = 46                          # esfera de cada grupo
+# (hx, hy, lado) — lado 'e' = rotulos crescem para a esquerda, 'd' para a direita
+HUBS = [
+    (380, 232, "e"),   # 1 Energia & Recursos (5)
+    (860, 232, "d"),   # 2 Industria & Base florestal (5)
+    (380, 700, "e"),   # 3 Consumo & Agro (4)
+    (860, 700, "d"),   # 4 Tecnologia & Midia (3)
+    (620, 892, "d"),   # 5 Capital & Servicos (2)
+]
+PASSO = 34          # espacamento vertical entre setores do mesmo grupo
+DIST_NO = 72        # distancia do no ao centro da esfera do grupo
+DIST_TXT = 88       # distancia do rotulo ao centro da esfera do grupo
+MARGEM = 20         # respiro minimo entre qualquer texto e a borda do ceu
+
+CSS = """/* ---- S-70 v3 (#128): 5 constelacoes de esferas ao redor da Mirow --------
+   Pedido do Mario: cada grupo e uma esfera com os temas conectados a ela, as
+   esferas circundando a Mirow, e TEXTO LEGIVEL — preto sobre o azul do tema e
+   navy sobre azul estavam ilegiveis. Por isso a secao ganha o proprio ceu
+   escuro e todo texto e branco/azul-claro. Referencia do padrao: hub-and-spoke
+   glowing network (ver cabecalho do script 71). */
+.onda18-orbe{position:relative;z-index:6;margin:44px 0 0;padding:0}
+.onda18-orbe__ceu{position:relative;border-radius:18px;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 42%,#0A2596 0%,#020E66 46%,#071C25 100%);
+  padding:34px 24px 26px;
+  box-shadow:0 18px 50px rgba(2,14,102,.30)}
+/* estrelas fracas do fundo */
+.onda18-orbe__ceu::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(1.5px 1.5px at 12% 18%,rgba(255,255,255,.55),transparent),
+    radial-gradient(1.5px 1.5px at 78% 12%,rgba(255,255,255,.40),transparent),
+    radial-gradient(1.5px 1.5px at 32% 78%,rgba(255,255,255,.45),transparent),
+    radial-gradient(1.5px 1.5px at 88% 66%,rgba(255,255,255,.35),transparent),
+    radial-gradient(1.5px 1.5px at 56% 30%,rgba(255,255,255,.30),transparent),
+    radial-gradient(1.5px 1.5px at 22% 52%,rgba(255,255,255,.28),transparent),
+    radial-gradient(1.5px 1.5px at 68% 88%,rgba(255,255,255,.32),transparent)}
+.onda18-orbe__titulo{position:relative;color:#fff;font-size:34px;font-weight:700;
+  margin:0 0 6px;text-align:center}
+.onda18-orbe__sub{position:relative;color:#AAD5E8;font-size:17px;margin:0 0 4px;
   text-align:center}
-.onda18-orbe__sub{color:#071C25;font-size:17px;margin:0 0 10px;text-align:center;
-  opacity:.72}
-.onda18-orbe__palco{position:relative;z-index:6;width:980px;height:600px;
-  max-width:100%;margin:0 auto}
+.onda18-orbe__mapa{position:relative;display:block;width:100%;height:auto}
 
-/* o planeta, no centro */
-.onda18-orbe__planeta{position:absolute;left:50%;top:50%;width:200px;height:200px;
-  margin:-100px 0 0 -100px;border-radius:50%;
-  background:radial-gradient(circle at 32% 28%,#1B4FD8 0%,#0A2596 42%,#020E66 100%);
-  box-shadow:0 0 0 1px rgba(0,173,236,.45),0 0 60px 12px rgba(0,173,236,.20);
-  overflow:hidden;z-index:3}
-.onda18-orbe__planeta::before,.onda18-orbe__planeta::after{content:"";
-  position:absolute;left:50%;top:50%;border:1px solid rgba(170,213,232,.28);
-  border-radius:50%}
-.onda18-orbe__planeta::before{width:200px;height:66px;margin:-33px 0 0 -100px}
-.onda18-orbe__planeta::after{width:78px;height:200px;margin:-100px 0 0 -39px}
-.onda18-orbe__marca{position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%);color:#fff;font-size:14px;font-weight:700;
-  letter-spacing:.14em;z-index:4;white-space:nowrap}
+/* pulso suave das esferas — sugere que a rede esta viva, sem girar nada */
+.onda18-orbe__hub-brilho{animation:onda18-pulso 6s ease-in-out infinite}
+.onda18-orbe__hub-brilho--2{animation-delay:-1.2s}
+.onda18-orbe__hub-brilho--3{animation-delay:-2.4s}
+.onda18-orbe__hub-brilho--4{animation-delay:-3.6s}
+.onda18-orbe__hub-brilho--5{animation-delay:-4.8s}
+@keyframes onda18-pulso{0%,100%{opacity:.30}50%{opacity:.62}}
 
-/* uma constelacao */
-.onda18-const{position:absolute;width:268px;
-  animation:onda18-flutua 9s ease-in-out infinite}
-.onda18-const__nome{display:block;color:#020E66;font-size:15px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px;padding:0 0 7px;
-  border-bottom:1px solid rgba(0,173,236,.55)}
-.onda18-const__lista{list-style:none;margin:0;padding:0;position:relative}
-/* a "linha da constelacao", ligando as estrelas do grupo */
-.onda18-const__lista::before{content:"";position:absolute;left:3px;top:10px;
-  bottom:10px;border-left:1px dashed rgba(2,14,102,.35)}
-.onda18-const__item{position:relative;display:flex;align-items:center;gap:8px;
-  margin:0 0 7px;padding-left:18px;color:#071C25;font-size:14px;font-weight:600;
-  line-height:1.25}
-.onda18-const__item:last-child{margin-bottom:0}
-/* a estrela */
+/* a lista empilhada, para mobile (o mesmo conteudo, no mesmo ceu) */
+.onda18-orbe__lista{display:none;margin:0;padding:0;list-style:none;position:relative}
+.onda18-const{margin:0 0 22px}
+.onda18-const:last-child{margin-bottom:0}
+.onda18-const__nome{display:block;color:#00ADEC;font-size:14px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px;padding:0 0 6px;
+  border-bottom:1px solid rgba(0,173,236,.45)}
+.onda18-const__lista{list-style:none;margin:0;padding:0}
+.onda18-const__item{position:relative;padding-left:18px;margin:0 0 6px;
+  color:#fff;font-size:15px;font-weight:600;line-height:1.3}
 .onda18-const__item::before{content:"";position:absolute;left:0;top:50%;
   width:7px;height:7px;margin-top:-3px;border-radius:50%;background:#00ADEC;
-  box-shadow:0 0 0 3px rgba(0,173,236,.22)}
-.onda18-const__item img,.onda18-const__item svg{width:20px !important;
-  height:20px !important;flex:none;display:block}
-/* a linha que liga a constelacao ao planeta */
-.onda18-const::after{content:"";position:absolute;height:0;
-  border-top:1px dashed rgba(2,14,102,.28);transform-origin:0 50%;
-  pointer-events:none}
+  box-shadow:0 0 0 3px rgba(0,173,236,.25)}
 
-/* os 5 slots — regioes fixas, e por isso nao ha como um rotulo cobrir o outro */
-.onda18-const--1{left:0;top:0;animation-delay:0s}
-.onda18-const--1::after{left:268px;top:80px;width:220px;transform:rotate(38deg)}
-.onda18-const--2{right:0;top:0;animation-delay:-1.6s}
-.onda18-const--2::after{left:0;top:80px;width:220px;transform:rotate(142deg)}
-.onda18-const--3{left:0;top:250px;animation-delay:-3.2s}
-.onda18-const--3::after{left:268px;top:56px;width:200px;transform:rotate(-16deg)}
-.onda18-const--4{right:0;top:250px;animation-delay:-4.8s}
-.onda18-const--4::after{left:0;top:48px;width:200px;transform:rotate(196deg)}
-.onda18-const--5{left:50%;margin-left:-134px;bottom:0;animation-delay:-6.4s}
-.onda18-const--5::after{left:134px;top:0;width:120px;transform:rotate(-90deg)}
-
-@keyframes onda18-flutua{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-
-@media only screen and (max-width: 1200px){
-  .onda18-orbe__palco{transform:scale(.8);margin:-60px auto}
-}
-/* abaixo de 992px o ceu nao cabe: as constelacoes viram colunas empilhadas */
 @media only screen and (max-width: 991px){
   .onda18-orbe__titulo{font-size:26px}
   .onda18-orbe__sub{font-size:15px}
-  .onda18-orbe__palco{width:auto;height:auto;transform:none;margin:0;
-    display:flex;flex-wrap:wrap;gap:26px 30px;justify-content:center;padding:22px 0 0}
-  .onda18-orbe__planeta{position:relative;left:auto;top:auto;margin:0 auto;
-    width:150px;height:150px;flex:0 0 100%}
-  .onda18-orbe__planeta::before{width:150px;height:50px;margin:-25px 0 0 -75px}
-  .onda18-orbe__planeta::after{width:58px;height:150px;margin:-75px 0 0 -29px}
-  .onda18-orbe__marca{position:absolute}
-  .onda18-const{position:static;width:250px;margin:0;animation:none}
-  .onda18-const::after{display:none}
+  .onda18-orbe__ceu{padding:26px 20px 22px;border-radius:14px}
+  .onda18-orbe__mapa{display:none}
+  .onda18-orbe__lista{display:block;margin-top:20px}
 }
 @media (prefers-reduced-motion: reduce){
-  .onda18-const{animation:none}
+  .onda18-orbe__hub-brilho{animation:none;opacity:.45}
 }"""
 
 
-def bloco(lang, prefix):
+def defs():
+    """Gradientes das esferas — a central mais clara que as dos grupos."""
+    return (
+        '<defs>'
+        '<radialGradient id="o18nucleo" cx="34%" cy="28%" r="78%">'
+        '<stop offset="0%" stop-color="#5B8CFF"/><stop offset="45%" stop-color="#1B4FD8"/>'
+        '<stop offset="100%" stop-color="#020E66"/></radialGradient>'
+        '<radialGradient id="o18hub" cx="34%" cy="28%" r="80%">'
+        '<stop offset="0%" stop-color="#37C6F5"/><stop offset="52%" stop-color="#0A79B8"/>'
+        '<stop offset="100%" stop-color="#04225E"/></radialGradient>'
+        '<radialGradient id="o18halo" cx="50%" cy="50%" r="50%">'
+        '<stop offset="55%" stop-color="#00ADEC" stop-opacity=".38"/>'
+        '<stop offset="100%" stop-color="#00ADEC" stop-opacity="0"/></radialGradient>'
+        '</defs>')
+
+
+def largura(texto, fs, ls=0.0):
+    """Largura aproximada de um texto em SVG (Archivo/Libre Franklin, ~0.56em)."""
+    return len(texto) * fs * 0.56 + len(texto) * ls
+
+
+def cabe(texto, x, lado, fs, ls=0.0):
+    w = largura(texto, fs, ls)
+    return (x - w) >= MARGEM if lado == "e" else (x + w) <= (VB_W - MARGEM)
+
+
+def fonte_que_cabe(texto, x, lado, fs_max, fs_min, ls=0.0, onde=""):
+    """Maior fonte (inteira) em que o texto cabe no ceu. Avisa se nem a minima cabe."""
+    fs = fs_max
+    while fs > fs_min and not cabe(texto, x, lado, fs, ls):
+        fs -= 1
+    if not cabe(texto, x, lado, fs, ls):
+        print("  AVISO: %r estoura o ceu mesmo em %dpx (%s) — reveja a geometria"
+              % (texto, fs, onde))
+    return fs
+
+
+def borda_esfera(x0, y0, x1, y1, r):
+    """Ponto na borda de uma esfera (x0,y0,r) na direcao de (x1,y1)."""
+    dx, dy = x1 - x0, y1 - y0
+    d = math.hypot(dx, dy) or 1.0
+    return x0 + dx / d * r, y0 + dy / d * r
+
+
+def mapa(lang):
+    """O SVG inteiro do ceu, com geometria calculada."""
     nomes = NOMES.get(lang, NOMES["pt"])
     grupos = GRUPOS.get(lang, GRUPOS["pt"])
-    titulo, sub = TITULO.get(lang, TITULO["pt"])
+    p = []
 
-    consts = []
+    p.append('<svg class="onda18-orbe__mapa" viewBox="0 0 %d %d" role="img" '
+             'aria-label="%s">' % (VB_W, VB_H, grupos and u"Setores da Mirow & Co."))
+    p.append(defs())
+
+    # (1) linhas hub -> nucleo (tracejadas, atras de tudo)
+    for hx, hy, _lado in HUBS:
+        ax, ay = borda_esfera(hx, hy, CX, CY, HUB_R)
+        bx, by = borda_esfera(CX, CY, hx, hy, CR)
+        p.append('<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="#AAD5E8" '
+                 'stroke-opacity=".38" stroke-width="1" stroke-dasharray="5 6"/>'
+                 % (ax, ay, bx, by))
+
+    # (2) cada constelacao: linhas hub -> no, nos e rotulos
+    for g, (hx, hy, lado) in enumerate(HUBS):
+        membros = MEMBROS[g]
+        n = len(membros)
+        sinal = -1 if lado == "e" else 1
+        y0 = hy - (n - 1) * PASSO / 2.0
+        for k, idx in enumerate(membros):
+            ny = y0 + k * PASSO
+            nx = hx + sinal * DIST_NO
+            ax, ay = borda_esfera(hx, hy, nx, ny, HUB_R)
+            p.append('<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="#00ADEC" '
+                     'stroke-opacity=".55" stroke-width="1"/>' % (ax, ay, nx, ny))
+            p.append('<circle cx="%.1f" cy="%.1f" r="9" fill="#00ADEC" fill-opacity=".18"/>'
+                     % (nx, ny))
+            p.append('<circle cx="%.1f" cy="%.1f" r="4" fill="#7FE3FF"/>' % (nx, ny))
+            tx = hx + sinal * DIST_TXT
+            fs = fonte_que_cabe(nomes[idx], tx, lado, 16, 13,
+                                onde="setor do grupo %d" % (g + 1))
+            p.append('<text x="%.1f" y="%.1f" fill="#FFFFFF" font-size="%d" '
+                     'font-weight="600" text-anchor="%s" dominant-baseline="middle">%s</text>'
+                     % (tx, ny, fs, "end" if lado == "e" else "start", nomes[idx]))
+
+        # a esfera do grupo: halo pulsante + corpo + aro
+        p.append('<circle class="onda18-orbe__hub-brilho onda18-orbe__hub-brilho--%d" '
+                 'cx="%d" cy="%d" r="%d" fill="url(#o18halo)"/>'
+                 % (g + 1, hx, hy, HUB_R + 26))
+        p.append('<circle cx="%d" cy="%d" r="%d" fill="url(#o18hub)"/>' % (hx, hy, HUB_R))
+        p.append('<circle cx="%d" cy="%d" r="%d" fill="none" stroke="#7FE3FF" '
+                 'stroke-opacity=".55" stroke-width="1"/>' % (hx, hy, HUB_R))
+        # nome do grupo: ACIMA da coluna de rotulos e alinhado com ela — centrado
+        # na esfera ele caia na mesma altura do 1o setor e os dois se sobrepunham
+        gx = hx + sinal * DIST_TXT
+        gnome = grupos[g].upper()
+        gfs = fonte_que_cabe(gnome, gx, lado, 18, 13, ls=1.4,
+                             onde="nome do grupo %d" % (g + 1))
+        p.append('<text x="%.1f" y="%.1f" fill="#7FE3FF" font-size="%d" '
+                 'font-weight="700" letter-spacing="1.4" text-anchor="%s">%s</text>'
+                 % (gx, y0 - 38, gfs, "end" if lado == "e" else "start", gnome))
+        # quantos setores, dentro da esfera
+        p.append('<text x="%d" y="%d" fill="#FFFFFF" font-size="26" font-weight="700" '
+                 'text-anchor="middle" dominant-baseline="middle">%d</text>'
+                 % (hx, hy, n))
+
+    # (3) o nucleo
+    p.append('<circle cx="%d" cy="%d" r="%d" fill="url(#o18halo)"/>' % (CX, CY, CR + 40))
+    p.append('<circle cx="%d" cy="%d" r="%d" fill="url(#o18nucleo)"/>' % (CX, CY, CR))
+    p.append('<ellipse cx="%d" cy="%d" rx="%d" ry="%d" fill="none" stroke="#AAD5E8" '
+             'stroke-opacity=".30" stroke-width="1"/>' % (CX, CY, CR, CR * 0.33))
+    p.append('<ellipse cx="%d" cy="%d" rx="%d" ry="%d" fill="none" stroke="#AAD5E8" '
+             'stroke-opacity=".30" stroke-width="1"/>' % (CX, CY, int(CR * 0.38), CR))
+    p.append('<circle cx="%d" cy="%d" r="%d" fill="none" stroke="#7FE3FF" '
+             'stroke-opacity=".65" stroke-width="1.5"/>' % (CX, CY, CR))
+    p.append('<text x="%d" y="%d" fill="#FFFFFF" font-size="19" font-weight="700" '
+             'letter-spacing="2.4" text-anchor="middle" dominant-baseline="middle">'
+             'MIROW &amp; CO.</text>' % (CX, CY))
+    p.append('</svg>')
+    return "".join(p)
+
+
+def lista(lang):
+    """Fallback empilhado (mobile) — mesmo conteudo, texto branco no mesmo ceu."""
+    nomes = NOMES.get(lang, NOMES["pt"])
+    grupos = GRUPOS.get(lang, GRUPOS["pt"])
+    out = ['<ul class="onda18-orbe__lista">']
     for g, membros in enumerate(MEMBROS):
-        itens = "".join(
-            '<li class="onda18-const__item">'
-            '<img src="%s%s/%s?ver=1" alt="" aria-hidden="true" width="20" height="20"'
-            '>%s</li>' % (prefix, ICON_DIR, ICONES[i], nomes[i])
-            for i in membros)
-        consts.append(
-            '<div class="onda18-const onda18-const--%d">'
-            '<span class="onda18-const__nome">%s</span>'
-            '<ul class="onda18-const__lista">%s</ul></div>'
-            % (g + 1, grupos[g], itens))
+        itens = "".join('<li class="onda18-const__item">%s</li>' % nomes[i] for i in membros)
+        out.append('<li class="onda18-const"><span class="onda18-const__nome">%s</span>'
+                   '<ul class="onda18-const__lista">%s</ul></li>' % (grupos[g], itens))
+    out.append('</ul>')
+    return "".join(out)
 
-    planeta = ('<div class="onda18-orbe__planeta"></div>'
-               '<span class="onda18-orbe__marca">MIROW &amp; CO.</span>')
 
+def bloco(lang):
+    titulo, sub = TITULO.get(lang, TITULO["pt"])
     return ('%s<section class="onda18-orbe"><div class="container"><div class="row">'
-            '<div class="col"><h3 class="onda18-orbe__titulo">%s</h3>'
-            '<p class="onda18-orbe__sub">%s</p>'
-            '<div class="onda18-orbe__palco">%s%s</div></div></div></div></section>%s'
-            % (MARK_INI, titulo, sub, planeta, "".join(consts), MARK_FIM))
+            '<div class="col"><div class="onda18-orbe__ceu">'
+            '<h3 class="onda18-orbe__titulo">%s</h3>'
+            '<p class="onda18-orbe__sub">%s</p>%s%s'
+            '</div></div></div></div></section>%s'
+            % (MARK_INI, titulo, sub, mapa(lang), lista(lang), MARK_FIM))
 
 
 def main():
@@ -249,6 +346,8 @@ def main():
     total = sum(len(m) for m in MEMBROS)
     if total != 19:
         raise SystemExit("os 5 grupos somam %d setores, deveriam somar 19" % total)
+    if len(HUBS) != len(MEMBROS):
+        raise SystemExit("HUBS e MEMBROS tem tamanhos diferentes")
 
     mudou = escrever_bloco_css(pub, "planeta-setores", CSS, onda="onda18")
     print("bloco onda18:planeta-setores %s" % ("gravado" if mudou else "ja estava igual"))
@@ -264,8 +363,7 @@ def main():
                 continue
             rel = os.path.relpath(p, pub).replace(os.sep, "/")
             lang = idioma_da_pagina(h)
-            prefix = "/mirow-site/" if "/mirow-site/wp-content/" in h else "/"
-            novo_bloco = bloco(lang, prefix)
+            novo_bloco = bloco(lang)
 
             if MARK_INI in h:
                 velho = h[h.index(MARK_INI):h.index(MARK_FIM) + len(MARK_FIM)]
@@ -282,7 +380,7 @@ def main():
             if novo != h:
                 gravar(p, novo)
                 alterados += 1
-                print("  %s (%s, 5 constelacoes, 19 setores)" % (rel, lang))
+                print("  %s (%s, 5 esferas, 19 setores)" % (rel, lang))
     print("resumo: %d home(s) com as constelacoes" % alterados)
 
 
