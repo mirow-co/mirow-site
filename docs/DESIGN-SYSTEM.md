@@ -21,17 +21,29 @@
 
 **Proibido:** cores fora desta tabela; verde/amarelo/vermelho decorativos; trocar o gradiente do tema.
 
-## 2. Tipografia (do tema — NÃO é a identidade Arial dos decks!)
+## 2. Tipografia — UMA fonte: Titillium Web (S-98, onda 26)
+
+O site tem **uma única família**: `"Titillium Web", sans-serif` — a única de fato carregada
+(Google Fonts no `<head>` das 275 páginas, pesos 200–900).
 
 | Token | Valor | Uso |
 |---|---|---|
-| `--fontFamily` | `"Archivo", sans-serif` | Títulos (h1/h2), números do hero |
-| `--secondaryFontFamily` | `"Libre Franklin", sans-serif` | Corpo, subtítulos, pills, labels |
-| `--tertiaryFontFamily` | `"Roboto Serif", sans-serif` | Raro (citações) |
+| `--fontFamily` | `"Titillium Web", sans-serif` | Títulos (h1/h2), números do hero |
+| `--secondaryFontFamily` | `"Titillium Web", sans-serif` | Corpo, subtítulos, pills, labels |
+| `--tertiaryFontFamily` | `"Titillium Web", sans-serif` | Raro (citações) |
 | Tamanhos-base | `--titleSize:25` · `--subtitleSize:20` · `--textSize:14` | O tema escala por media query |
 
+**Histórico (era bug, não escolha):** o tema declarava Archivo (títulos), Libre Franklin (corpo) e
+Roboto Serif — e **nenhuma das três era carregada**. Onde o tema forçava essas famílias o navegador
+caía no sans-serif do sistema (Arial); onde não forçava, ficava Titillium. Por isso o site
+renderizava em duas fontes ao mesmo tempo — o Mario viu isso entre "Nossas áreas de expertise"
+(Arial) e "Setores em que atuamos" (Titillium) na home. A onda 26 aponta as variáveis (e as do
+Bootstrap) para o Titillium: uma família, zero webfont novo, tema intocado.
+
 **Proibido:** introduzir família nova (nem Arial — Arial é identidade de *deck*, não do site);
-tamanhos soltos fora da escala visível na página em que se está mexendo.
+carregar outro webfont; tamanhos soltos fora da escala visível na página em que se está mexendo.
+A asserção **S98** cobra as variáveis e as **V08–V13** medem a fonte *computada* de cada elemento
+visível em 6 páginas-modelo — qualquer família fora do Titillium derruba o deploy.
 
 ## 3. Breakpoints do tema
 

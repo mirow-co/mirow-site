@@ -1505,6 +1505,123 @@ def estaticas(s):
         return (not det, u"%d problema(s): %s" % (len(det), ", ".join(det[:3])))
     s.check("S96", u"0 menção à agência de imprensa antiga (#154)", s96)
 
+    # ------------------------------------------------------------------ onda 26
+    def s97():
+        # o link nasceu branco (onda 7, seção escura); depois da S-91 o fundo é
+        # claro e ele tem de ser navy
+        det = []
+        if ".onda7-vertodos{color:#020E66 !important}" not in css_o18:
+            det.append(u'"Ver todos os líderes" não está em navy')
+        if ".onda7-vertodos:hover,.onda7-vertodos:focus-visible{color:#00ADEC" not in css_o18:
+            det.append(u"o hover do link não é ciano")
+        for rel in HOMES:
+            if "onda7-vertodos" not in s.ler(rel):
+                det.append(u"%s sem o link Ver todos os líderes" % rel)
+        return (not det, u"; ".join(det[:3]))
+    s.check("S97", u'home: "Ver todos os líderes" em azul (#155)', s97)
+
+    def s98():
+        # UMA fonte no site inteiro. O tema pede 3 famílias por variável e nenhuma
+        # é carregada — só o Titillium Web está no <head>. As variáveis apontam
+        # para ela; a checagem do render em si é a V08 (fontes computadas).
+        det = []
+        for var in ("--fontFamily", "--secondaryFontFamily", "--tertiaryFontFamily",
+                    "--bs-font-sans-serif", "--bs-body-font-family"):
+            if '%s:"Titillium Web",sans-serif;' % var not in css_o18:
+                det.append(u"%s não aponta para Titillium Web" % var)
+        # e nenhuma página pode carregar webfont novo (Titillium é o único)
+        familias = set()
+        for rel, hh in s.todas():
+            familias.update(re.findall(r'fonts\.googleapis\.com/css2\?family=([^:"\'&]+)',
+                                       hh))
+        if familias - {"Titillium+Web"}:
+            det.append(u"webfont(s) além do Titillium: %s"
+                       % ", ".join(sorted(familias - {"Titillium+Web"})))
+        return (not det, u"; ".join(det[:3]))
+    s.check("S98", u"uma fonte só declarada em todo o site (#156)", s98)
+
+    def s99():
+        # Práticas no mesmo tamanho de Sobre nós (19px), em toda a largura.
+        # Revoga o tamanho maior da S-65/S-88 — decisão do Mario em 04/08.
+        bloco = css_o18.split("onda26:ajustes-s97-s100:ini")[-1].split(
+            "onda26:ajustes-s97-s100:fim")[0]
+        det = []
+        if "font-size:19px !important" not in bloco:
+            det.append(u"o submenu de Práticas não foi igualado a 19px")
+        if re.search(r'onda18-praticas .menu__nav-sublink\{font-size:(?!19px)', bloco):
+            det.append(u"sobrou tamanho diferente de 19px no bloco da onda 26")
+        return (not det, u"; ".join(det[:2]))
+    s.check("S99", u"submenu Práticas no tamanho de Sobre nós (#157)", s99)
+
+    def s100():
+        ok = ".rodape-barra{border-bottom:0 !important}" in css_o18
+        return (ok, u"a barra do rodapé ainda tem filete separando a política")
+    s.check("S100", u"rodapé sem linha antes da política de privacidade (#158)", s100)
+
+    def s101():
+        # e-mail no card de Andreas e Felipe; Stephan e Elmar ficam sem
+        det = []
+        esperado = {u"Andreas Mirow": "andreas.mirow@mirow.com.br",
+                    u"Felipe Diniz": "felipe.diniz@mirow.com.br"}
+        for rel in HOMES:
+            hh = s.ler(rel)
+            for bloco in re.findall(r'<div class="onda18-lider.*?</div>', hh, re.S):
+                mn = re.search(r'<h4>([^<]*)</h4>', bloco)
+                nome = mn.group(1).strip() if mn else "?"
+                tem = "onda26-lider__mail" in bloco
+                if nome in esperado:
+                    if not tem:
+                        det.append(u"%s: %s sem e-mail" % (rel, nome))
+                    elif ("mailto:%s?subject=" % esperado[nome]) not in bloco:
+                        det.append(u"%s: e-mail de %s errado ou sem assunto"
+                                   % (rel, nome))
+                elif tem:
+                    det.append(u"%s: %s não devia ter e-mail" % (rel, nome))
+        if ".onda26-lider__mail{position:absolute" not in css_o18:
+            det.append(u"o link de e-mail não está posicionado sobre o card")
+        return (not det, u"; ".join(det[:3]))
+    s.check("S101", u"e-mail de Andreas e Felipe nos cards da home (#159)", s101)
+
+    def s102():
+        det = []
+        for rel in ("imprensa/index.html", "pt/imprensa/index.html"):
+            hh = s.ler(rel)
+            itens = re.findall(r'<li class="onda18-imprensa__item">(.*?)</li>', hh, re.S)
+            if not itens:
+                det.append(u"%s sem itens de imprensa" % rel)
+                continue
+            for i, it in enumerate(itens):
+                if not it.startswith('<a class="onda26-imprensa__link" href="http'):
+                    det.append(u"%s item %d não é uma linha-link" % (rel, i + 1))
+                    break
+                # um link por linha: o título deixou de ser <a>
+                if it.count("<a ") != 1:
+                    det.append(u"%s item %d com %d links (esperado 1)"
+                               % (rel, i + 1, it.count("<a ")))
+                    break
+        if ".onda26-imprensa__link{display:grid" not in css_o18:
+            det.append(u"a grade não migrou para o link da linha")
+        return (not det, u"; ".join(det[:3]))
+    s.check("S102", u"imprensa: a linha inteira é link (#160)", s102)
+
+    def s103():
+        det = []
+        praticas = [(rel, hh) for rel, hh in s.todas()
+                    if 'class="experience-single__banner-owner-list"' in hh]
+        if len(praticas) < 80:
+            det.append(u"só %d páginas de prática encontradas (esperado ~88)"
+                       % len(praticas))
+        for rel, hh in praticas:
+            donos = re.findall(r'experience-single__banner-owner" data-bs-toggle='
+                               r'"modal"\s*data-bs-target="[^"]*"><img[^>]*>'
+                               r'<p><strong>([^<]*)</strong>', hh)
+            if any(u"Elmar" in d for d in donos):
+                det.append(u"%s ainda mostra Elmar" % rel)
+            elif not ({u"Andreas Mirow", u"Felipe Diniz"} & set(donos)):
+                det.append(u"%s sem Andreas nem Felipe: %s" % (rel, donos))
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S103", u"práticas sem Elmar, com Andreas e Felipe (#161)", s103)
+
 
 # ------------------------------------------------------- asserções ao vivo
 
@@ -1687,6 +1804,41 @@ def ao_vivo(s):
                 return (True, u"%s blocos, todos com ≤2 linhas (1920x1080)" % v[3:])
             return (False, u"bloco(s) com mais de 2 linhas: %s" % v)
         s.check("V07", u"números do hero com no máximo 2 linhas por bloco", v07)
+
+        # V08 — S-98 (#156): UMA fonte renderizada por página. Aqui não se olha
+        # o CSS, se olha o que o navegador computou em cada elemento visível —
+        # era exatamente isso que denunciava expertise (Arial, porque Archivo não
+        # existe) x setores (Titillium). Varre as páginas de cada template.
+        def faz_fonte_unica(rel):
+            def f():
+                nav.abrir("%s/%s" % (base, rel.replace("index.html", "")), 1400, 900)
+                v = nav.js(
+                    "(function(){var m={},es=document.querySelectorAll('body *');"
+                    "for(var i=0;i<es.length;i++){var e=es[i];"
+                    "if(!e.getClientRects().length)continue;"
+                    "var t=e.tagName;"
+                    "if(t=='SCRIPT'||t=='STYLE'||t=='SVG'||t=='PATH')continue;"
+                    "var f=getComputedStyle(e).fontFamily;"
+                    "m[f]=(m[f]||0)+1;}"
+                    "return JSON.stringify(m);})()")
+                try:
+                    mapa = json.loads(v)
+                except Exception:
+                    return (False, u"não deu para medir as fontes: %r" % v)
+                fora = {k: n for k, n in mapa.items() if "Titillium Web" not in k}
+                if fora:
+                    itens = sorted(fora.items(), key=lambda kv: -kv[1])[:2]
+                    return (False, u"%d família(s) fora do Titillium: %s"
+                            % (len(fora), "; ".join(u"%s (%d elem.)" % (k, n)
+                                                   for k, n in itens)))
+                return (True, u"1 família em %d elementos visíveis"
+                        % sum(mapa.values()))
+            return f
+        for i, rel in enumerate(["pt/index.html", "pt/pratica/estrategia/index.html",
+                                 "pt/imprensa/index.html", "pt/sobre-nos/lideres/index.html",
+                                 "contato/index.html", "de/index.html"], 8):
+            s.check("V%02d" % i, u"uma fonte só renderizada em %s" % rel,
+                    faz_fonte_unica(rel))
 
 
 # ------------------------------------------------------------------- main
