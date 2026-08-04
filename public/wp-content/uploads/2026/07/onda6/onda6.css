@@ -1190,3 +1190,24 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   .menu__nav-submenu .menu__nav-sublinks.onda18-praticas{margin:10px 0 0 !important}
 }
 /* onda28:painel-mesma-altura:fim */
+
+/* onda29:abertura-padrao:ini */
+/* ---- S-108: faixa de abertura das paginas sem banner --------------------
+   Imprensa e politica de privacidade abriam com o titulo nu sobre o gradiente,
+   enquanto toda pagina interna abre com uma faixa. Aqui a faixa existe sem foto:
+   navy solido e a MESMA tipografia do `.internal-banner` do tema (62px/22px),
+   para o ritmo ser o mesmo sem inventar imagem. */
+.onda29-abertura{background:#020E66;padding:150px 0 70px;position:relative}
+.onda29-abertura__titulo{color:#fff;font-family:var(--fontFamily);
+  font-size:62px;font-weight:700;line-height:1.1;margin:0}
+.onda29-abertura__apoio{color:#fff;font-family:var(--secondaryFontFamily);
+  font-size:22px;font-weight:400;line-height:1.4;margin:14px 0 0;max-width:60ch}
+/* o conteudo que segue nao precisa mais do respiro que compensava a falta da faixa */
+.onda29-abertura + .page-default,
+.onda29-abertura + div .page-default{padding-top:60px}
+@media only screen and (max-width: 991px){
+  .onda29-abertura{padding:110px 0 50px}
+  .onda29-abertura__titulo{font-size:40px}
+  .onda29-abertura__apoio{font-size:18px}
+}
+/* onda29:abertura-padrao:fim */

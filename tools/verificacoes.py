@@ -88,18 +88,24 @@ BLOCOS_CSS = [
 # páginas terem link de carreiras no menu — é a asserção H08, não o marcador.
 MARCADORES = [
     ("onda5:clientes-logos", 4), ("onda6:praticas", 4), ("onda7:lideres-link", 4),
-    ("onda7:menu-sobre", 275), ("onda7:menu-praticas", 275), ("onda7:menu-carreiras", 200),
-    ("onda8:menu-contatos", 275), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
-    ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 5),
+    # ATENCAO (onda 29 / S-107): as 275 paginas viraram 125 de CONTEUDO + 160
+    # stubs de redirect (uma URL por pagina). Os marcadores de barra/rodape agora
+    # se contam sobre as 125 — o numero 120 e o piso, nao a meta.
+    ("onda7:menu-sobre", 120), ("onda7:menu-praticas", 120),
+    # o marcador de carreiras nunca existiu nas paginas DE (medido: 44 pt + 41 en,
+    # 0 de) — o item esta lá, o comentario e que nao. Piso = pt+en.
+    ("onda7:menu-carreiras", 80),
+    ("onda8:menu-contatos", 120), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
+    ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 3),
     # onda13:hero-malha saiu em 03/08 (S-49/#107): o bloco do video virou os
     # canvases do Horizonte 2050.
     ("onda17:hero-horizonte", 4),
     # onda14:rodape-menu e onda15:rodape-contatos saíram em 31/07 (decisão
     # explícita do Mario na #91: "IDENTICAS" — a nav recriada virou o clone
     # literal onda15:rodape-barra).
-    ("onda15:hero-texto", 4), ("onda15:rodape-barra", 275),
+    ("onda15:hero-texto", 4), ("onda15:rodape-barra", 120),
     # onda 18: botao de voltar ao topo em todas; planeta so nas homes
-    ("onda18:voltar-topo", 275), ("onda18:planeta-setores", 4),
+    ("onda18:voltar-topo", 120), ("onda18:planeta-setores", 4),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -155,12 +161,17 @@ TITULO_BARRA = {
 }
 
 # Páginas de contato (todas as variantes do espelho) — S-07 e S-08.
-CONTATOS = ["contato/index.html", "pt/contato/index.html", "en/contact-us/index.html",
-            "de/kontakt/index.html", "novo/contato/index.html"]
+# Só as URLs CANÔNICAS: depois da S-107 (#165) as variantes de raiz
+# (`contato/`, `carreiras/`, `imprensa/`…) são stubs de redirect.
+CONTATOS = ["pt/contato/index.html", "en/contact-us/index.html",
+            "de/kontakt/index.html"]
 
 # Páginas de carreiras — S-13.
-CARREIRAS = ["carreiras/index.html", "pt/carreiras/index.html",
+CARREIRAS = ["pt/carreiras/index.html",
              "en/careers/index.html", "de/karrieren/index.html"]
+
+# Páginas de imprensa — S-106 (#164) criou EN e DE; antes só existia em PT.
+IMPRENSA = ["pt/imprensa/index.html", "en/press/index.html", "de/presse/index.html"]
 
 # ------------------------------------------------------------------ mecânica
 
@@ -585,8 +596,9 @@ def estaticas(s):
         # simples .praticas-nav (3 práticas atuais) nas ~97 páginas de prática.
         sobrou = [rel for rel, h in s.todas() if "mandala-wrap" in h]
         n_nav = sum(1 for _rel, h in s.todas() if "<!-- onda12:praticas-nav -->" in h)
-        ok = not sobrou and n_nav >= 90
-        return (ok, u"mandala em %d página(s) %s; praticas-nav em %d (esperado >= 90)"
+        # 90 -> 20: a S-107 (#165) deixou 21 páginas de prática (uma URL cada)
+        ok = not sobrou and n_nav >= 20
+        return (ok, u"mandala em %d página(s) %s; praticas-nav em %d (esperado >= 20)"
                 % (len(sobrou), ", ".join(sobrou[:3]), n_nav))
     s.check("S09", u"0 rodas de 8 práticas; navegação simples no lugar", s09)
 
@@ -898,7 +910,7 @@ def estaticas(s):
     s.check("S56", u"insights começam coloridos (#114)", s56)
 
     def s57():
-        alvos = ["imprensa/index.html", "pt/imprensa/index.html"]
+        alvos = IMPRENSA
         det = []
         for rel in alvos:
             h = s.ler(rel)
@@ -1230,7 +1242,7 @@ def estaticas(s):
         # ajuste do #115: o icone segue o VEICULO, nao o dominio do link — os 2
         # itens com veiculo e link divergentes saiam com o logo de outro jornal
         det = []
-        for rel in ["imprensa/index.html", "pt/imprensa/index.html"]:
+        for rel in IMPRENSA:
             h = s.ler(rel)
             for veic, dom in ((u"Estadão", "estadao.com.br"),
                               (u"Folha de S.Paulo", "folha.uol.com.br"),
@@ -1499,7 +1511,9 @@ def estaticas(s):
         # a agencia de imprensa nao atende mais a Mirow: nenhuma pagina pode citar
         det = [rel for rel, hh in s.todas() if "agenciaecomunica" in hh]
         # e o marcador da onda 12, que fechava DENTRO daquele <h5>, tem de sobrar
-        for rel in ("imprensa/index.html", "pt/imprensa/index.html"):
+        # o marcador da onda 12 nasceu no <h1> da página PT; as páginas EN/DE
+        # (S-106) têm o título próprio, sem esse marcador
+        for rel in ("pt/imprensa/index.html",):
             if "onda12:imprensa-formatacao" not in s.ler(rel):
                 det.append(u"%s perdeu o marcador da onda 12" % rel)
         return (not det, u"%d problema(s): %s" % (len(det), ", ".join(det[:3])))
@@ -1584,7 +1598,7 @@ def estaticas(s):
 
     def s102():
         det = []
-        for rel in ("imprensa/index.html", "pt/imprensa/index.html"):
+        for rel in IMPRENSA:
             hh = s.ler(rel)
             itens = re.findall(r'<li class="onda18-imprensa__item">(.*?)</li>', hh, re.S)
             if not itens:
@@ -1608,8 +1622,9 @@ def estaticas(s):
         det = []
         praticas = [(rel, hh) for rel, hh in s.todas()
                     if 'class="experience-single__banner-owner-list"' in hh]
-        if len(praticas) < 80:
-            det.append(u"só %d páginas de prática encontradas (esperado ~88)"
+        # 88 -> 21: depois da S-107 (#165) cada prática tem UMA URL
+        if len(praticas) < 20:
+            det.append(u"só %d páginas de prática encontradas (esperado 21)"
                        % len(praticas))
         for rel, hh in praticas:
             donos = re.findall(r'experience-single__banner-owner" data-bs-toggle='
@@ -1626,10 +1641,11 @@ def estaticas(s):
     ORDEM_MENU = {
         "pt": [u"Sobre nós", u"Práticas", u"Insights", u"Imprensa", u"Carreiras",
                u"Contato"],
-        # EN e DE não têm item de Imprensa: a página só existe em português (#164).
-        # Quando a decisão da #164 sair, esta lista muda junto.
-        "en": [u"About us", u"Practices", u"Insights", u"Careers", u"Contact Us"],
-        "de": [u"Über uns", u"Branchen", u"Insights", u"Karrieren", u"Kontakt"],
+        # EN e DE ganharam o item de imprensa na S-106 (#164) — 6 itens nas três
+        "en": [u"About us", u"Practices", u"Insights", u"Press", u"Careers",
+               u"Contact Us"],
+        "de": [u"Über uns", u"Branchen", u"Insights", u"Presse", u"Karrieren",
+               u"Kontakt"],
     }
 
     def s104():
@@ -1667,6 +1683,94 @@ def estaticas(s):
             det.append(u"o hover branco da barra foi perdido")
         return (not det, u"; ".join(det[:2]))
     s.check("S105", u"barra com fundo sólido igual em toda página (#163)", s105)
+
+    # ------------------------------------------------------------------ onda 29
+    def s106():
+        # #164: Imprensa passa a existir em EN e DE, e o menu tem 6 itens nas três
+        det = []
+        for rel in IMPRENSA:
+            p = os.path.join(pub, rel.replace("/", os.sep))
+            if not os.path.exists(p):
+                det.append(u"falta %s" % rel)
+                continue
+            hh = s.ler(rel)
+            n = len(re.findall(r'class="onda18-imprensa__item"', hh))
+            if n < 20:
+                det.append(u"%s com só %d itens de imprensa" % (rel, n))
+            can = re.search(r'rel="canonical" href="([^"]+)"', hh)
+            propria = "/mirow-site/" + rel[:-len("index.html")]
+            if not can or can.group(1).rstrip("/") + "/" != propria:
+                det.append(u"%s com canonical errado: %s"
+                           % (rel, can.group(1) if can else "-"))
+        # o seletor de idiomas das três aponta uma para a outra (era home antes)
+        urls = ["/mirow-site/pt/imprensa/", "/mirow-site/en/press/",
+                "/mirow-site/de/presse/"]
+        for rel in IMPRENSA:
+            hh = s.ler(rel)
+            m = re.search(r'<ul class="menu__languages-list">(.*?)</ul>', hh, re.S)
+            achou = re.findall(r'<a href="([^"]+)"', m.group(1)) if m else []
+            if achou[:3] != urls:
+                det.append(u"%s: seletor de idiomas não liga as três (%s)"
+                           % (rel, achou[:3]))
+        return (not det, u"; ".join(det[:3]))
+    s.check("S106", u"imprensa existe em pt/en/de, ligadas entre si (#164)", s106)
+
+    def s107():
+        # #165: UMA URL por página. Toda página de conteúdo se autocanonicaliza, e
+        # nenhum link interno leva a uma URL que virou stub (clique sem 2 saltos).
+        det = []
+        stubs = set()
+        conteudo = []
+        for rel, hh in s.todas():
+            if not rel.endswith("index.html"):
+                continue
+            if "menu__nav-item" not in hh:            # é stub de redirect
+                if rel != "index.html":
+                    stubs.add("/mirow-site/" + rel[:-len("index.html")])
+                continue
+            conteudo.append((rel, hh))
+            if rel == "en/homepage/index.html":
+                continue          # home duplicada declarada (S-16)
+            can = re.search(r'rel="canonical" href="([^"]+)"', hh)
+            propria = "/mirow-site/" + rel[:-len("index.html")]
+            if not can or can.group(1).rstrip("/") + "/" != propria:
+                det.append(u"%s não é a própria canônica (%s)"
+                           % (rel, can.group(1) if can else "-"))
+        if len(stubs) < 140:
+            det.append(u"só %d stubs de redirect (esperado >= 140)" % len(stubs))
+        for rel, hh in conteudo:
+            for url in re.findall(r'href="(/mirow-site/[^"#?]*/)"', hh):
+                if url in stubs:
+                    det.append(u"%s ainda linka para o stub %s" % (rel, url))
+                    break
+        return (not det, u"%d problema(s) em %d páginas de conteúdo: %s"
+                % (len(det), len(conteudo), "; ".join(det[:3])))
+    s.check("S107", u"uma URL por página; nenhum link para redirect (#165)", s107)
+
+    def s108():
+        # #166: nenhuma página de conteúdo abre "nua", e nenhuma fica vazia
+        det = []
+        for rel, hh in s.conteudo():
+            if "menu__nav-item" not in hh:
+                continue
+            m = re.search(r'<main class="[^"]*">(.*?)</main>', hh, re.S)
+            corpo = m.group(1) if m else ""
+            texto = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", corpo)).strip()
+            if len(texto) < 40:
+                det.append(u"%s tem <main> vazio" % rel)
+                continue
+            tem_abertura = (re.search(r'class="(banner|internal-banner|'
+                                      r'experience-single__banner|blog-single__banner)',
+                                      hh)
+                            or "onda29-abertura" in hh
+                            or 'class="culture' in hh)
+            if not tem_abertura:
+                det.append(u"%s abre sem banner nem faixa" % rel)
+        if ".onda29-abertura{background:#020E66" not in css_o18:
+            det.append(u"a faixa de abertura não está no CSS")
+        return (not det, u"%d página(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S108", u"toda página abre com banner ou faixa; 0 página vazia (#166)",
+            s108)
 
 
 # ------------------------------------------------------- asserções ao vivo
@@ -1894,7 +1998,8 @@ def ao_vivo(s):
             return f
         for i, rel in enumerate(["pt/index.html", "pt/pratica/estrategia/index.html",
                                  "pt/imprensa/index.html", "pt/sobre-nos/lideres/index.html",
-                                 "contato/index.html", "de/index.html"], 8):
+                                 # canônicas: `contato/` virou stub na S-107
+                                 "pt/contato/index.html", "de/index.html"], 8):
             s.check("V%02d" % i, u"uma fonte só renderizada em %s" % rel,
                     faz_fonte_unica(rel))
 
@@ -1905,7 +2010,7 @@ def ao_vivo(s):
         def v14():
             paginas = ["pt/", "pt/insights/", "pt/imprensa/", "pt/carreiras/",
                        "pt/pratica/estrategia/", "pt/sobre-nos/nossos-valores/",
-                       "pt/sobre-nos/lideres/", "politica-de-privacidade/"]
+                       "pt/sobre-nos/lideres/", "pt/politica-de-privacidade/"]
             js = ("(function(){var n=document.querySelector('.header .menu');"
                   "if(!n)return 'sem barra';var c=getComputedStyle(n),"
                   "r=n.getBoundingClientRect(),"
