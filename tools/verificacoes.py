@@ -1395,17 +1395,16 @@ def estaticas(s):
                               hh, re.S)
                 if m and m.group(1).strip():
                     det.append(u"%s ainda tem o %s" % (rel, nome))
-        # titulos parelhos: os 4 seletores no MESMO bloco de regra, 48px
-        m = re.search(r'\.home-experience__subtitle,\s*\.onda18-orbe__titulo,\s*'
-                      r'\.home-leaders__subtitle,\s*\.certificates__title,\s*'
-                      r'\.certificates h2\{([^}]*)\}', css_o18)
+        # ATUALIZADA na onda 30 (S-110): a tipografia dos 4 títulos saiu da regra
+        # de 4 seletores e virou UMA classe compartilhada — ver S110.
+        m = re.search(r'\.onda30-titulo-secao\{([^}]*)\}', css_o18)
         if not m:
-            det.append(u"os 4 títulos não estão na mesma regra de tipografia")
+            det.append(u"a classe única dos títulos (.onda30-titulo-secao) não existe")
         else:
             for prop in ("font-size:48px !important", "font-weight:700 !important",
                          "text-transform:none !important", "text-align:left !important"):
                 if prop not in m.group(1):
-                    det.append(u"regra dos títulos sem %s" % prop)
+                    det.append(u"a classe dos títulos sem %s" % prop)
         # v2 do marcador (S-86): grade 2x2, navy fixo, a esquerda do titulo
         if ".onda22-marca{float:left;display:grid" not in css_o18:
             det.append(u"marca não é grade 2x2 flutuando à esquerda do título")
@@ -1435,12 +1434,10 @@ def estaticas(s):
         det = []
         if ".home-experience--dark-mode::after{opacity:1 !important}" not in css_o18:
             det.append(u"o darken ao rolar voltou (o véu claro do tema é removido)")
-        m = re.search(r'\.home-experience__subtitle,\s*\.onda18-orbe__titulo,\s*'
-                      r'\.home-experience--dark-mode \.home-experience__subtitle,\s*'
-                      r'\.home-leaders__subtitle,\s*\.certificates__title,'
-                      r'\.certificates h2\{color:#020E66 !important\}', css_o18)
+        # ATUALIZADA na onda 30 (S-110): o navy é propriedade da classe única
+        m = re.search(r'\.onda30-titulo-secao\{[^}]*color:#020E66 !important', css_o18)
         if not m:
-            det.append(u"os 4 títulos não estão todos em navy na mesma regra")
+            det.append(u"o navy saiu da classe única dos títulos")
         if "color:#e9f0ff !important" in css_o18:
             det.append(u"sobrou título claro (o pedido é navy nos quatro)")
         return (not det, u"; ".join(det))
@@ -1772,6 +1769,37 @@ def estaticas(s):
     s.check("S108", u"toda página abre com banner ou faixa; 0 página vazia (#166)",
             s108)
 
+    # ------------------------------------------------------------------ onda 30
+    def s110():
+        # #168: os 4 títulos de seção da home são a MESMA coisa — uma classe, a
+        # mesma animação e o mesmo nível de heading. O render é medido na V17.
+        det = []
+        historicas = ["home-experience__subtitle", "onda18-orbe__titulo",
+                      "home-leaders__subtitle", "certificates__title"]
+        for rel in HOMES:
+            hh = s.ler(rel)
+            for classe in historicas:
+                m = re.search(r'<(h[1-6])([^>]*class="[^"]*' + re.escape(classe)
+                              + r'[^"]*"[^>]*)>', hh)
+                if not m:
+                    det.append(u"%s: não achei o título %s" % (rel, classe))
+                    continue
+                tag, attrs = m.group(1), m.group(2)
+                if "onda30-titulo-secao" not in attrs:
+                    det.append(u"%s: %s sem a classe compartilhada" % (rel, classe))
+                if 'data-aos="fade-up"' not in attrs:
+                    det.append(u"%s: %s sem a animação fade-up" % (rel, classe))
+                if tag != "h2":
+                    det.append(u"%s: %s é <%s>, esperado <h2>" % (rel, classe, tag))
+        # e a tipografia não pode voltar a ser escrita por seletor de seção
+        bloco22 = css_o18.split("onda22:marca-secoes:ini")[-1].split(
+            "onda22:marca-secoes:fim")[0]
+        if "font-size:48px" in bloco22:
+            det.append(u"a tipografia dos títulos voltou para o bloco da onda 22")
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+    s.check("S110", u"4 títulos da home numa classe só, com a mesma animação (#168)",
+            s110)
+
 
 # ------------------------------------------------------- asserções ao vivo
 
@@ -2085,6 +2113,72 @@ def ao_vivo(s):
             s.check("V%02d" % i,
                     u"painéis de submenu com a mesma altura em %dpx" % largura,
                     faz_paineis_iguais(largura))
+
+        # V17 — S-110 (#168): os 4 títulos de seção da home têm de sair IGUAIS do
+        # navegador (família, tamanho, peso, cor, alinhamento) e com a mesma
+        # animação. Não se lê CSS: lê-se o computado de cada um, na home de fato.
+        def v17():
+            js = ("(function(){var cls=['home-experience__subtitle',"
+                  "'onda18-orbe__titulo','home-leaders__subtitle',"
+                  "'certificates__title'];var out=[];"
+                  "for(var i=0;i<cls.length;i++){var e=document.querySelector('.'+cls[i]);"
+                  "if(!e){out.push({classe:cls[i],erro:'não achei'});continue;}"
+                  "var c=getComputedStyle(e);"
+                  "out.push({classe:cls[i],tag:e.tagName,"
+                  "aos:e.getAttribute('data-aos')||'-',"
+                  "assinatura:[c.fontFamily,c.fontSize,c.fontWeight,c.color,"
+                  "c.textAlign,c.textTransform].join('|')});}"
+                  "return JSON.stringify(out);})()")
+            nav.abrir("%s/pt/" % base, 1400, 900)
+            v = nav.js(js)
+            try:
+                dados = json.loads(v)
+            except Exception:
+                return (False, u"não deu para medir os títulos: %r" % v)
+            faltando = [d["classe"] for d in dados if d.get("erro")]
+            if faltando:
+                return (False, u"título(s) ausente(s): %s" % ", ".join(faltando))
+            assinaturas = set(d["assinatura"] for d in dados)
+            aos = set(d["aos"] for d in dados)
+            tags = set(d["tag"] for d in dados)
+            det = []
+            if len(assinaturas) > 1:
+                det.append(u"%d estilos diferentes: %s"
+                           % (len(assinaturas),
+                              " x ".join(sorted(assinaturas))[:160]))
+            if aos != {"fade-up"}:
+                det.append(u"animações diferentes: %s" % sorted(aos))
+            if len(tags) > 1:
+                det.append(u"níveis de heading diferentes: %s" % sorted(tags))
+            if det:
+                return (False, u"; ".join(det))
+            # e a animação tem de RODAR igual nos quatro: o AOS marca aos-init com
+            # opacity 0 antes de entrar na viewport e troca para aos-animate depois.
+            # Era exatamente o que faltava no título de Setores (#168).
+            js_estado = ("(function(){var cls=['home-experience__subtitle',"
+                         "'onda18-orbe__titulo','home-leaders__subtitle',"
+                         "'certificates__title'];var o=[];"
+                         "for(var i=0;i<cls.length;i++){var e="
+                         "document.querySelector('.'+cls[i]);"
+                         "o.push((e.className.indexOf('aos-animate')>=0)?'anima':"
+                         "((e.className.indexOf('aos-init')>=0)?'init':'sem-aos'));}"
+                         "return o.join(',');})()")
+            antes = nav.js(js_estado)
+            if antes != "init,init,init,init":
+                return (False, u"antes de rolar, o AOS não armou os quatro igual: %s"
+                        % antes)
+            # rola até o fim em passos, para o observer do AOS disparar em todos
+            for frac in (0.35, 0.6, 0.85, 1.0):
+                nav.js("window.scrollTo(0,document.body.scrollHeight*%s);'ok'" % frac)
+                time.sleep(1.2)
+            depois = nav.js(js_estado)
+            if depois != "anima,anima,anima,anima":
+                return (False, u"depois de rolar, a animação não rodou nos quatro: %s"
+                        % depois)
+            return (True, u"4 títulos com o mesmo estilo (%s), o mesmo nível (%s) e a "
+                    u"mesma animação — os quatro saem de opacity 0 e animam ao rolar"
+                    % (list(assinaturas)[0].split("|")[1], list(tags)[0]))
+        s.check("V17", u"os 4 títulos da home saem idênticos e animam igual", v17)
 
 
 # ------------------------------------------------------------------- main

@@ -996,7 +996,9 @@ html{scroll-behavior:smooth}
        [1] [2]     1 expertise   2 setores
        [3] [4]     3 lideres     4 reconhecimentos
    Navy fixo (#020E66) e float:left, a pedido: nos blocos de fundo escuro o
-   marcador fica discreto de proposito. */
+   marcador fica discreto de proposito.
+   ATENCAO (S-110, onda 30): a tipografia dos 4 titulos NAO mora mais aqui — ela
+   e da classe .onda30-titulo-secao. Nao reintroduzir regra por seletor. */
 .onda22-marca{float:left;display:grid;
   grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);
   gap:4px;width:26px;height:26px;margin:12px 14px 0 0}
@@ -1008,33 +1010,14 @@ html{scroll-behavior:smooth}
 .onda22-marca--3 i:nth-child(3),
 .onda22-marca--4 i:nth-child(4){width:12px;height:12px;opacity:1}
 
-/* ---- titulos parelhos: mesma fonte, peso, caixa, alinhamento e margem ----- */
-.home-experience__subtitle,
-.onda18-orbe__titulo,
-.home-leaders__subtitle,
-.certificates__title,
-.certificates h2{
-  font-size:48px !important;font-weight:700 !important;line-height:1.1 !important;
-  letter-spacing:normal !important;text-transform:none !important;
-  text-align:left !important;margin:0 0 28px !important;
-  font-family:var(--fontFamily),Arial,sans-serif}
-/* S-91: os 4 titulos em NAVY, e o "darken" ao rolar sai de cena.
-   Como o tema fazia: `.home-experience::after` e um VEU CLARO (#A2BAE4) por cima
-   da secao, e `.home-experience--dark-mode::after{opacity:0}` tirava o veu ao
-   rolar — dai o fundo escurecer e o titulo navy sumir (era a S-87). Mantendo o
-   veu sempre opaco, o fundo fica claro e navy funciona nos quatro blocos.
-   As secoes de Setores e Lideres seguem o mesmo veu porque ficam dentro da mesma
-   faixa clara do gradiente. */
+/* S-91: o "darken" ao rolar sai de cena. Como o tema fazia:
+   `.home-experience::after` e um VEU CLARO (#A2BAE4) por cima da secao, e
+   `.home-experience--dark-mode::after{opacity:0}` tirava o veu ao rolar — dai o
+   fundo escurecer e o titulo navy sumir (era a S-87). Mantendo o veu sempre
+   opaco, o fundo fica claro e o navy da classe funciona nos quatro blocos. */
 .home-experience--dark-mode::after{opacity:1 !important}
-.home-experience__subtitle,
-.onda18-orbe__titulo,
-.home-experience--dark-mode .home-experience__subtitle,
-.home-leaders__subtitle,
-.certificates__title,.certificates h2{color:#020E66 !important}
 /* o titulo de Reconhecimentos tinha uma linha decorativa que estica ao lado */
 .certificates h2::after{display:none !important}
-/* o link do titulo dos lideres (onda 7) herda a cor e o tamanho novos */
-.home-leaders__subtitle .onda7-titulo-link{color:inherit;font-size:inherit}
 
 /* ---- textos que saem: "Praticas" e o super titulo "Lideres" -------------- */
 .home-experience__title,.home-leaders__title{display:none !important}
@@ -1042,18 +1025,11 @@ html{scroll-behavior:smooth}
 .home-leaders .container .row__titles{padding-top:0}
 
 @media only screen and (max-width: 991px){
-  .home-experience__subtitle,.onda18-orbe__titulo,.home-leaders__subtitle,
-  .certificates__title,.certificates h2{font-size:34px !important;
-    margin-bottom:22px !important}
   .onda22-marca{width:22px;height:22px;gap:3px;margin:8px 12px 0 0}
   .onda22-marca i{width:6px;height:6px}
   .onda22-marca--1 i:nth-child(1),.onda22-marca--2 i:nth-child(2),
   .onda22-marca--3 i:nth-child(3),.onda22-marca--4 i:nth-child(4){
     width:10px;height:10px}
-}
-@media only screen and (max-width: 767px){
-  .home-experience__subtitle,.onda18-orbe__titulo,.home-leaders__subtitle,
-  .certificates__title,.certificates h2{font-size:28px !important}
 }
 /* onda22:marca-secoes:fim */
 
@@ -1211,3 +1187,28 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   .onda29-abertura__apoio{font-size:18px}
 }
 /* onda29:abertura-padrao:fim */
+
+/* onda30:titulo-secao:ini */
+/* ---- S-110: UMA classe para os 4 titulos de secao da home ---------------
+   Antes, tamanho/peso/cor viviam numa regra com os quatro seletores lado a lado
+   (S-85) e a animacao dependia de cada HTML — o titulo de Setores, que nasceu na
+   onda 18 fora do tema, ficou sem `data-aos` e nao animava. Agora ha UMA fonte de
+   verdade: esta classe. Quem tem estilo proprio de secao (a marca 2x2, o veu, a
+   linha do Reconhecimentos) segue no bloco da onda 22 — o que NAO se repete mais
+   aqui e tipografia. */
+.onda30-titulo-secao{
+  font-family:var(--fontFamily),Arial,sans-serif !important;
+  font-size:48px !important;font-weight:700 !important;line-height:1.1 !important;
+  letter-spacing:normal !important;text-transform:none !important;
+  text-align:left !important;margin:0 0 28px !important;
+  color:#020E66 !important}
+/* o link do titulo dos lideres (onda 7) herda tudo da classe */
+.onda30-titulo-secao .onda7-titulo-link{color:inherit;font-size:inherit;
+  font-family:inherit;font-weight:inherit}
+@media only screen and (max-width: 991px){
+  .onda30-titulo-secao{font-size:34px !important;margin-bottom:22px !important}
+}
+@media only screen and (max-width: 767px){
+  .onda30-titulo-secao{font-size:28px !important}
+}
+/* onda30:titulo-secao:fim */
