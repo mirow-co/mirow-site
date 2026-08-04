@@ -78,7 +78,7 @@ BLOCOS_CSS = [
     "onda18:contato-botao", "onda18:barras", "onda18:voltar-topo",
     "onda18:carreiras", "onda18:insights-colorido", "onda18:home-lideres",
     "onda18:imprensa", "onda18:planeta-setores", "onda18:hero-numeros-s73",
-    "onda19:lateral-e-idiomas", "onda21:menus-bain", "onda21:rede-v2", "onda22:marca-secoes",
+    "onda19:lateral-e-idiomas", "onda21:menus-bain", "onda21:rede-v2", "onda22:marca-secoes", "onda25:peso-submenu",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -1321,19 +1321,29 @@ def estaticas(s):
         for rel in alvos:
             h = s.ler(rel)
             mapas = h.count('class="onda21-mapa"')
-            pins = h.count('class="onda21-pin"')       # só parceiros (Mirow tem --mirow)
-            logos_pin = h.count('class="onda21-pin__logo"')
+            pins = h.count('class="onda21-pin"')
             itens = h.count('class="onda21-lista__item"')
-            logos_lista = h.count('class="onda21-lista__logo"')
+            # S-92: o logo E o pin (sempre visivel), nao mais so no hover
+            logos_no_mapa = len(re.findall(
+                r'class="onda21-pin__botao"[^>]*>\s*<img ', h))
             if mapas != 2:
                 det.append(u"%s com %d mapa(s) (esperado 2)" % (rel, mapas))
             if pins != 6:
                 det.append(u"%s com %d pin(s) de parceiro (esperado 6)" % (rel, pins))
-            if logos_pin != 6:
-                det.append(u"%s com %d logo(s) no hover (esperado 6)" % (rel, logos_pin))
-            if itens != 6 or logos_lista != 6:
-                det.append(u"%s: lista com %d item(ns) e %d logo(s)"
-                           % (rel, itens, logos_lista))
+            if logos_no_mapa != 6:
+                det.append(u"%s com %d logo(s) dentro do pin (esperado 6)"
+                           % (rel, logos_no_mapa))
+            if itens != 6:
+                det.append(u"%s: lista com %d item(ns)" % (rel, itens))
+            # o logo saiu da lista de baixo, e a Mirow saiu do mapa
+            if "onda21-lista__logo" in h:
+                det.append(u"%s ainda tem logo na lista de baixo" % rel)
+            if "onda21-pin--mirow" in h:
+                det.append(u"%s ainda marca escritórios da Mirow no mapa" % rel)
+            if "onda21-lista__num" in h:
+                det.append(u"%s ainda numera os parceiros na lista" % rel)
+            if u"Virtus" in h:
+                det.append(u"%s cita a Virtus (comprada pela Deloitte, não é parceira)" % rel)
             if 'class="rede-mapa__svg"' in h:
                 det.append(u"%s ainda tem o mapa-múndi único da onda 9" % rel)
         return (not det, u"; ".join(det[:4]))
@@ -1407,12 +1417,22 @@ def estaticas(s):
 
     # ------------------------------------------------------------------ onda 24
     def s87():
-        # ao rolar, o tema poe .home-experience--dark-mode e o fundo escurece; o
-        # navy forcado pela S-85 sumia junto (era o "apagar" que o Mario viu)
-        ok = (".home-experience--dark-mode .home-experience__subtitle"
-              "{color:#e9f0ff !important}" in css_o18)
-        return (ok, u'"Nossas áreas de expertise" volta a apagar no estado dark-mode')
-    s.check("S87", u'"Nossas áreas de expertise" legível ao rolar (#145)', s87)
+        # ATUALIZADA na onda 25 (S-91): na onda 24 a solucao era deixar o titulo
+        # claro no dark-mode; o Mario pediu o inverso — os 4 titulos em navy e o
+        # darken fora de cena. O pedido protegido e o mesmo: o titulo nao apaga.
+        det = []
+        if ".home-experience--dark-mode::after{opacity:1 !important}" not in css_o18:
+            det.append(u"o darken ao rolar voltou (o véu claro do tema é removido)")
+        m = re.search(r'\.home-experience__subtitle,\s*\.onda18-orbe__titulo,\s*'
+                      r'\.home-experience--dark-mode \.home-experience__subtitle,\s*'
+                      r'\.home-leaders__subtitle,\s*\.certificates__title,'
+                      r'\.certificates h2\{color:#020E66 !important\}', css_o18)
+        if not m:
+            det.append(u"os 4 títulos não estão todos em navy na mesma regra")
+        if "color:#e9f0ff !important" in css_o18:
+            det.append(u"sobrou título claro (o pedido é navy nos quatro)")
+        return (not det, u"; ".join(det))
+    s.check("S87", u"4 títulos da home em navy, sem darken ao rolar (#145/#149)", s87)
 
     def s88():
         det = []
@@ -1446,6 +1466,44 @@ def estaticas(s):
                 det.append(u"a setinha do balão não acompanha o navy")
         return (not det, u"; ".join(det[:2]))
     s.check("S90", u"balão de idiomas no azul Mirow, não preto (#148)", s90)
+
+    # ------------------------------------------------------------------ onda 25
+    def s94():
+        # mesmo peso nos dois submenus (Praticas estava 700, Sobre nos 400)
+        ok = (".menu__nav-sublink{font-weight:600 !important}" in css_o18
+              and ".menu__nav-sublinks.onda18-praticas .menu__nav-sublink"
+                  "{font-weight:600 !important}" in css_o18)
+        return (ok, u"os dois submenus não estão no mesmo peso de fonte")
+    s.check("S94", u"peso do texto igual nos dois submenus (#152)", s94)
+
+    def s95():
+        det = []
+        for d in ("pt/insights", "insights"):
+            if not os.path.exists(os.path.join(pub, d.replace("/", os.sep), "index.html")):
+                det.append(u"falta %s/" % d)
+        for antigo_dir in ("pt/analises", "analises"):
+            p2 = os.path.join(pub, antigo_dir.replace("/", os.sep), "index.html")
+            if not os.path.exists(p2):
+                det.append(u"%s/ sem redirect" % antigo_dir)
+            elif "onda25:redirect-s95" not in s.ler(antigo_dir + "/index.html"):
+                det.append(u"%s/ não é o stub de redirect" % antigo_dir)
+        vivos = [rel for rel, hh in s.todas()
+                 if "onda25:redirect-s95" not in hh and re.search(r'/analises/', hh)]
+        if vivos:
+            det.append(u"%d página(s) com link para /analises/: %s"
+                       % (len(vivos), ", ".join(vivos[:3])))
+        return (not det, u"; ".join(det[:4]))
+    s.check("S95", u"insights em /insights/, com redirect de /analises/ (#153)", s95)
+
+    def s96():
+        # a agencia de imprensa nao atende mais a Mirow: nenhuma pagina pode citar
+        det = [rel for rel, hh in s.todas() if "agenciaecomunica" in hh]
+        # e o marcador da onda 12, que fechava DENTRO daquele <h5>, tem de sobrar
+        for rel in ("imprensa/index.html", "pt/imprensa/index.html"):
+            if "onda12:imprensa-formatacao" not in s.ler(rel):
+                det.append(u"%s perdeu o marcador da onda 12" % rel)
+        return (not det, u"%d problema(s): %s" % (len(det), ", ".join(det[:3])))
+    s.check("S96", u"0 menção à agência de imprensa antiga (#154)", s96)
 
 
 # ------------------------------------------------------- asserções ao vivo

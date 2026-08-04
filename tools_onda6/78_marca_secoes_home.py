@@ -118,14 +118,18 @@ CSS = """/* ---- S-85 + S-86: a marca de secao como framework da home ----------
   letter-spacing:normal !important;text-transform:none !important;
   text-align:left !important;margin:0 0 28px !important;
   font-family:var(--fontFamily),Arial,sans-serif}
-/* a cor NAO pode ser igual: o gradiente da home vai de claro a escuro */
-.home-experience__subtitle{color:#020E66 !important}
-/* S-87: ao rolar, o tema poe .home-experience--dark-mode na secao e o fundo
-   ESCURECE. O navy fixo (que a S-85 forcou com !important) sumia junto — era o
-   "apagar" que o Mario viu. No estado escuro o titulo vira claro. */
-.home-experience--dark-mode .home-experience__subtitle{color:#e9f0ff !important}
-.onda18-orbe__titulo{color:#e9f0ff !important}
-.home-leaders__subtitle{color:#e9f0ff !important}
+/* S-91: os 4 titulos em NAVY, e o "darken" ao rolar sai de cena.
+   Como o tema fazia: `.home-experience::after` e um VEU CLARO (#A2BAE4) por cima
+   da secao, e `.home-experience--dark-mode::after{opacity:0}` tirava o veu ao
+   rolar — dai o fundo escurecer e o titulo navy sumir (era a S-87). Mantendo o
+   veu sempre opaco, o fundo fica claro e navy funciona nos quatro blocos.
+   As secoes de Setores e Lideres seguem o mesmo veu porque ficam dentro da mesma
+   faixa clara do gradiente. */
+.home-experience--dark-mode::after{opacity:1 !important}
+.home-experience__subtitle,
+.onda18-orbe__titulo,
+.home-experience--dark-mode .home-experience__subtitle,
+.home-leaders__subtitle,
 .certificates__title,.certificates h2{color:#020E66 !important}
 /* o titulo de Reconhecimentos tinha uma linha decorativa que estica ao lado */
 .certificates h2::after{display:none !important}

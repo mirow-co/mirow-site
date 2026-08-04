@@ -39,6 +39,29 @@ NAO FEITO — depende do Mario (registrado na issue #140)
 (b) AUTORIZACAO DE MARCA. Os logos usados sao o favicon do site de cada parceiro.
     Se a rede tiver kit de marca, o ideal e trocar pelos arquivos oficiais.
 
+ONDA 25 — S-92 e S-93
+---------------------
+"vamos colocar os logos dos parceiros direto no mapa, e nao abaixo do mapa nem
+disponivel so depois de passar o mouse em cima. eles tem que aparecer o tempo todo.
+Mirow nao colocar no mapa (nem sp nem rj). nao colocar virtus, forma compradas pela
+deloitte."
+
+  - o PIN passa a ser o proprio LOGO do parceiro, numa placa branca, visivel o tempo
+    todo. O cartao de hover fica, mas so com nome, cidade e link — o logo nao depende
+    mais de hover.
+  - os logos SAEM da lista de baixo (o lugar deles e o mapa). A lista segue com nome,
+    cidade e link, com a barra ciano e a elevacao.
+  - saem os marcadores dos escritorios da propria Mirow (Rio e Sao Paulo).
+  - os NUMEROS saem de vez: com o logo no mapa, ele proprio identifica o parceiro,
+    e numerar virou ruido.
+  - VIRTUS PARTNERS esta DESCARTADA: o Mario informou que foi comprada pela Deloitte,
+    entao nao e parceira da rede. A coordenada de Santiago sai junto.
+    (Registro do que aconteceu: na onda 21 eu levantei a Virtus por busca web como
+    provavel parceira do Chile e NAO publiquei, justamente porque parceria e fato de
+    negocio. A confirmacao veio negativa — foi o processo certo.)
+  - placa de logo e maior que o ponto de antes, entao o afastamento minimo de pin
+    subiu de 30 para 54px (Londres tem dois parceiros no mesmo endereco).
+
 Idempotente: substitui a secao entre marcadores; download so se faltar o arquivo.
 """
 import importlib.util
@@ -66,8 +89,9 @@ def _r21():
 R21 = _r21()
 CONTINENTES = R21.CONTINENTES
 COORD = dict(R21.COORD)
-COORD.setdefault("Virtus Partners", (-33.45, -70.67))   # Santiago, se for confirmado
-MIROW = R21.MIROW
+# Virtus Partners NAO entra: comprada pela Deloitte, nao e parceira da rede
+# (informado pelo Mario em 04/08/2026). Nada de coordenada de Santiago aqui.
+MIROW = []   # S-92: escritorios da propria Mirow saem do mapa (nem Rio, nem SP)
 
 MARK_INI = "<!-- onda21:rede-v2 -->"
 MARK_FIM = "<!-- /onda21:rede-v2 -->"
@@ -78,22 +102,22 @@ REGIOES = [
     ("americas", -118.0, -34.0, -40.0, 32.0, 620.0, 530.0),
     ("europa", -22.0, 34.0, 34.0, 62.0, 620.0, 330.0),
 ]
-MIN_SEP = 30.0   # px entre dois pins no mesmo mapa
+MIN_SEP = 54.0   # px entre dois pins (a placa de logo e maior que o ponto antigo)
 
 TXT = {
     "pt": {"americas": u"Américas", "europa": u"Europa",
            "mapa": u"Onde estão nossos parceiros",
-           "nota": u"Passe o mouse — ou toque, no celular — em cada marcador para ver o parceiro",
+           "nota": u"Passe o mouse — ou toque, no celular — em cada logo para ver cidade e site",
            "lista": u"Os parceiros", "visitar": u"Visitar site",
            "mirow": u"Escritórios Mirow & Co.", "parceiros": u"Parceiros da rede"},
     "en": {"americas": u"Americas", "europa": u"Europe",
            "mapa": u"Where our partners are",
-           "nota": u"Hover — or tap, on mobile — each marker to see the partner",
+           "nota": u"Hover — or tap, on mobile — each logo to see city and website",
            "lista": u"The partners", "visitar": u"Visit site",
            "mirow": u"Mirow & Co. offices", "parceiros": u"Network partners"},
     "de": {"americas": u"Amerika", "europa": u"Europa",
            "mapa": u"Wo unsere Partner sind",
-           "nota": u"Fahren Sie über jeden Marker — oder tippen Sie am Handy — für den Partner",
+           "nota": u"Fahren Sie über jedes Logo — oder tippen Sie am Handy — für Stadt und Website",
            "lista": u"Die Partner", "visitar": u"Website besuchen",
            "mirow": u"Büros von Mirow & Co.", "parceiros": u"Netzwerkpartner"},
 }
@@ -113,16 +137,22 @@ CSS = """/* ---- S-82 (#140): Nossa Rede v2 — dois mapas, logo no hover, lista
 .onda21-mapa__grade{stroke:#AAD5E8;stroke-opacity:.12;stroke-width:.6}
 .onda21-mapa__pins{position:absolute;inset:0}
 
-/* o pin */
+/* S-92: o pin E o logo do parceiro, numa placa branca visivel o tempo todo */
 .onda21-pin{position:absolute;transform:translate(-50%,-50%)}
-.onda21-pin__botao{width:26px;height:26px;border-radius:50%;border:2px solid #fff;
-  background:#00ADEC;color:#020E66;font-size:12px;font-weight:700;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;padding:0;
-  box-shadow:0 0 0 4px rgba(0,173,236,.25);transition:transform 180ms ease}
-.onda21-pin--mirow .onda21-pin__botao{background:#fff;color:#020E66;
-  border-color:#00ADEC;box-shadow:0 0 0 4px rgba(255,255,255,.22)}
+.onda21-pin__botao{display:flex;align-items:center;justify-content:center;
+  width:auto;height:auto;padding:5px 7px;border:1px solid rgba(0,173,236,.55);
+  border-radius:4px;background:#fff;cursor:pointer;
+  box-shadow:0 4px 12px rgba(2,14,102,.35);transition:transform 180ms ease,
+    box-shadow 180ms ease}
+.onda21-pin__botao img{display:block;width:auto;height:20px;max-width:64px;
+  object-fit:contain}
 .onda21-pin:hover .onda21-pin__botao,
-.onda21-pin__botao:focus-visible{transform:scale(1.18)}
+.onda21-pin__botao:focus-visible{transform:scale(1.12);
+  box-shadow:0 8px 20px rgba(2,14,102,.45)}
+/* o ponto de ancoragem, para a placa nao parecer solta no mapa */
+.onda21-pin::after{content:"";position:absolute;left:50%;bottom:-9px;
+  width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:#00ADEC;
+  box-shadow:0 0 0 3px rgba(0,173,236,.30)}
 
 /* o cartao com o LOGO do parceiro */
 .onda21-pin__card{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);
@@ -133,8 +163,6 @@ CSS = """/* ---- S-82 (#140): Nossa Rede v2 — dois mapas, logo no hover, lista
 .onda21-pin:hover .onda21-pin__card,
 .onda21-pin:focus-within .onda21-pin__card{opacity:1;visibility:visible;
   pointer-events:auto}
-.onda21-pin__logo{display:block;max-width:120px;max-height:34px;width:auto;
-  height:auto;margin:0 0 10px}
 .onda21-pin__nome{color:#020E66;font-size:16px;font-weight:700;margin:0 0 2px}
 .onda21-pin__local{color:#7F7F7F;font-size:13px;margin:0 0 8px}
 .onda21-pin__link{color:#0A79B8;font-size:13px;font-weight:700;text-decoration:none}
@@ -162,13 +190,6 @@ CSS = """/* ---- S-82 (#140): Nossa Rede v2 — dois mapas, logo no hover, lista
   transition:transform 260ms ease}
 .onda21-lista__item:hover{transform:translateY(-4px);background:rgba(255,255,255,.09)}
 .onda21-lista__item:hover::before{transform:scaleY(1)}
-.onda21-lista__topo{display:flex;align-items:center;justify-content:space-between;
-  gap:12px;margin:0 0 12px}
-.onda21-lista__logo{max-width:118px;max-height:32px;width:auto;height:auto;
-  display:block;background:#fff;padding:4px;border-radius:3px}
-.onda21-lista__num{width:26px;height:26px;border-radius:50%;background:#00ADEC;
-  color:#020E66;font-size:13px;font-weight:700;display:flex;align-items:center;
-  justify-content:center;flex:none}
 .onda21-lista__nome{color:#fff;font-size:19px;font-weight:700;margin:0 0 2px}
 .onda21-lista__local{color:#AAD5E8;font-size:14px;margin:0 0 12px}
 .onda21-lista__link{color:#00ADEC;font-size:14px;font-weight:700;
@@ -276,7 +297,6 @@ def baixar_logo(pub, dom, baixar=True):
 
 def secao(pub, idioma, parceiros, prefix, baixar):
     t = TXT.get(idioma, TXT["pt"])
-    numero = {p["name"]: i + 1 for i, p in enumerate(parceiros)}
     logos = {}
     for p in parceiros:
         logos[p["name"]] = baixar_logo(pub, dominio(p["url"]), baixar)
@@ -296,20 +316,20 @@ def secao(pub, idioma, parceiros, prefix, baixar):
             elif x > w - 130:
                 borda = " onda21-pin--dir"
             arq = logos.get(p["name"])
-            logo = ('<img class="onda21-pin__logo" src="%s%s/%s" alt="%s">'
-                    % (prefix, LOGO_REL, arq, R21.esc(p["name"]) if hasattr(R21, "esc")
-                       else p["name"])) if arq else ""
+            # o conteudo do pin e o LOGO (S-92); sem logo, o nome como texto curto
+            conteudo = (('<img src="%s%s/%s" alt="%s">'
+                         % (prefix, LOGO_REL, arq, p["name"]))
+                        if arq else ('<span>%s</span>' % p["name"]))
             pins.append(
                 '<div class="onda21-pin%s" style="left:%.2f%%;top:%.2f%%">'
-                '<button class="onda21-pin__botao" type="button" aria-label="%s">%d</button>'
-                '<div class="onda21-pin__card">%s'
+                '<button class="onda21-pin__botao" type="button" aria-label="%s">%s</button>'
+                '<div class="onda21-pin__card">'
                 '<p class="onda21-pin__nome">%s</p>'
                 '<p class="onda21-pin__local">%s</p>'
                 '<a class="onda21-pin__link" href="%s" target="_blank" rel="noopener">'
                 '%s &rarr;</a></div></div>'
-                % (borda, x / w * 100.0, y / reg[6] * 100.0, p["name"],
-                   numero[p["name"]], logo, p["name"],
-                   R21.local(p, idioma), p["url"], t["visitar"]))
+                % (borda, x / w * 100.0, y / reg[6] * 100.0, p["name"], conteudo,
+                   p["name"], R21.local(p, idioma), p["url"], t["visitar"]))
         for nome, lat, lon in MIROW:
             if not dentro(lat, lon, reg):
                 continue
@@ -330,34 +350,25 @@ def secao(pub, idioma, parceiros, prefix, baixar):
 
     itens = []
     for p in parceiros:
-        arq = logos.get(p["name"])
-        logo = ('<img class="onda21-lista__logo" src="%s%s/%s" alt="%s">'
-                % (prefix, LOGO_REL, arq, p["name"])) if arq else "<span></span>"
+        # S-92: o logo mora no mapa, nao aqui embaixo; e o numero saiu de vez
         itens.append(
             '<li class="onda21-lista__item" data-aos="fade-up">'
-            '<div class="onda21-lista__topo">%s'
-            '<span class="onda21-lista__num">%d</span></div>'
             '<h3 class="onda21-lista__nome">%s</h3>'
             '<p class="onda21-lista__local">%s</p>'
             '<a class="onda21-lista__link" href="%s" target="_blank" rel="noopener">'
             '%s &rarr;</a></li>'
-            % (logo, numero[p["name"]], p["name"], R21.local(p, idioma),
-               p["url"], t["visitar"]))
+            % (p["name"], R21.local(p, idioma), p["url"], t["visitar"]))
 
     return ('%s<section class="rede" id="mainContent"><div class="container">'
             '<div class="row"><div class="col">'
             '<h2 class="rede__titulo">%s</h2>'
             '<p class="onda21-nota">%s</p>'
             '<div class="onda21-rede">%s</div>'
-            '<ul class="onda21-legenda">'
-            '<li><span class="onda21-legenda__chave"></span>%s</li>'
-            '<li><span class="onda21-legenda__chave onda21-legenda__chave--mirow">'
-            '</span>%s</li></ul>'
             '<h2 class="rede__titulo">%s</h2>'
             '<ul class="onda21-lista">%s</ul>'
             '</div></div></div></section>%s'
-            % (MARK_INI, t["mapa"], t["nota"], "".join(mapas), t["parceiros"],
-               t["mirow"], t["lista"], "".join(itens), MARK_FIM))
+            % (MARK_INI, t["mapa"], t["nota"], "".join(mapas),
+               t["lista"], "".join(itens), MARK_FIM))
 
 
 def main():
