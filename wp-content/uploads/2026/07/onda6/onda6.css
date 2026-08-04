@@ -1170,3 +1170,23 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 .rodape-barra .menu{background:#020E66 !important}
 .rodape-barra .menu:hover{background:#fff !important}
 /* onda27:barra-igual:fim */
+
+/* onda28:painel-mesma-altura:ini */
+/* ---- S-109: os dois paineis de submenu com a MESMA altura ---------------
+   "Sobre nos" media 159px e "Praticas" 129px: a lista do primeiro herdava
+   margin-top:40px do tema e a do segundo levava 6px da S-65, e o padding do link
+   era 6px x 2px. Aqui os dois lados usam os mesmos numeros — o resto (fonte de
+   19px da S-99, divisor cinza da S-65) fica como esta. */
+.menu__nav-submenu .menu__nav-sublinks,
+.menu__nav-submenu .menu__nav-sublinks.onda18-praticas,
+.menu__nav-submenu .menu__nav-sublinks:not(.onda18-praticas){
+  margin:18px 0 0 !important}
+.menu__nav-submenu .menu__nav-sublink,
+.menu__nav-submenu .menu__nav-sublinks.onda18-praticas .menu__nav-sublink{
+  padding:4px 0 !important;line-height:1.2 !important}
+/* no mobile o menu do tema e lista empilhada: cada item respira igual */
+@media only screen and (max-width: 991px){
+  .menu__nav-submenu .menu__nav-sublinks,
+  .menu__nav-submenu .menu__nav-sublinks.onda18-praticas{margin:10px 0 0 !important}
+}
+/* onda28:painel-mesma-altura:fim */
