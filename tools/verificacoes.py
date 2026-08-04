@@ -1800,6 +1800,55 @@ def estaticas(s):
     s.check("S110", u"4 títulos da home numa classe só, com a mesma animação (#168)",
             s110)
 
+    # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
+    # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
+    # asserções abaixo existem para essa regressão não voltar em silêncio.
+    MEDICAO = "wp-content/uploads/2026/07/onda6/onda31-medicao.js"
+
+    def m01():
+        sem = [rel for rel, h in s.todas() if MEDICAO not in h]
+        # public/index.html é stub de meta refresh: o navegador sai antes de a
+        # medição valer, o pageview é contado na página de destino.
+        sem = [r for r in sem if r != "index.html"]
+        return (not sem, u"%d página(s) sem o asset de medição: %s"
+                % (len(sem), ", ".join(sem[:5])))
+    s.check("M01", u"toda página carrega o asset de medição", m01)
+
+    def m02():
+        maus = [rel for rel, h in s.todas() if MEDICAO in h and (MEDICAO + "?v=") not in h]
+        return (not maus, u"%d página(s) referenciam a medição sem ?v= (cache serve "
+                u"versão velha): %s" % (len(maus), ", ".join(maus[:5])))
+    s.check("M02", u"asset de medição carimbado com ?v=", m02)
+
+    def m03():
+        maus = [rel for rel, h in s.todas() if "gtag('config'" in h or 'gtag("config"' in h]
+        return (not maus, u"%d página(s) com gtag inline sobrando — a configuração tem "
+                u"que vir só do asset: %s" % (len(maus), ", ".join(maus[:5])))
+    s.check("M03", u"nenhum gtag inline sobrando no HTML", m03)
+
+    def m04():
+        p = os.path.join(pub, *MEDICAO.split("/"))
+        if not os.path.exists(p):
+            return (False, u"asset de medição ausente em %s" % MEDICAO)
+        js = s.ler(MEDICAO)
+        falta = [pid for pid in ("G-VK4QHHHS5X", "G-5VTS0MZK79") if pid not in js]
+        return (not falta, u"propriedade(s) fora do asset: %s" % ", ".join(falta))
+    s.check("M04", u"as duas propriedades GA4 configuradas no asset", m04)
+
+    def m05():
+        js = s.ler(MEDICAO)
+        i_consent = js.find("'consent', 'default'")
+        i_config = js.find("'config'")
+        if i_consent < 0:
+            return (False, u"sem Consent Mode: o site passaria a gravar cookie sem base legal")
+        if "analytics_storage: 'denied'" not in js:
+            return (False, u"analytics_storage não está negado por padrão")
+        if i_config >= 0 and i_consent > i_config:
+            return (False, u"consent default vem DEPOIS do config — o GA4 processa a fila "
+                    u"na ordem e o consentimento chegaria tarde")
+        return (True, u"")
+    s.check("M05", u"Consent Mode v2 negado por padrão, antes de qualquer config", m05)
+
 
 # ------------------------------------------------------- asserções ao vivo
 
