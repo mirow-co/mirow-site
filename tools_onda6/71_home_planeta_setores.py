@@ -17,12 +17,35 @@ v3 (onda 20) "quero que sejam constelacoes ultramodernas mesmo, com cada grupo
    background. texto preto sobre esse azul e dificil de ler. texto azul sobre azul
    dificil tambem."
    -> grafo de esferas em ceu escuro.
-v4 (esta)    "ainda nao ficou bom. remova isso e coloque de alguma forma 5 cards com
+v4 (onda 21) "ainda nao ficou bom. remova isso e coloque de alguma forma 5 cards com
    cada grupo de industrias listado, sem planeta nem nada disso. faca no tema do
    resto da pagina."
    -> FIM da metafora visual. 5 cards no tema do site, e ponto. O que sobrevive das
       3 tentativas anteriores e a unica coisa que era conteudo, nao efeito: o
       AGRUPAMENTO dos 19 setores em 5 grupos (que segue aguardando OK do Mario).
+v5 (esta)    "remova o '5 setores', '4 setores', etc. torne o texto 'Setores em que
+   atuamos' em branco mais ou menos no mesmo estilo que 'Lideres', remova o subtexto
+   '19 industrias, agrupadas em 5 frentes de atuacao'. coloque as industrias na ordem
+   de frequencia em que mais atuamos, veja os dados a partir do mirow RAG."
+
+COMO A ORDEM DE FREQUENCIA FOI OBTIDA (R1 - transparencia)
+----------------------------------------------------------
+O MCP mirow-rag NAO tem endpoint de contagem: `buscar_conhecimento_mirow` devolve
+chunks (top_k <= 30), nunca agregados. O proxy disponivel e a LISTA DE CLIENTES do
+acervo (`listar_clientes`, ~330 nomes, consultada em 2026-08-04): cada cliente foi
+classificado em um dos 19 setores do site, e a contagem por setor virou o ranking
+do dicionario FREQ. E um proxy - "quantos clientes do acervo pertencem ao setor" -,
+nao horas nem receita.
+
+Sanidade do topo: bate com o que a propria firma afirma. Uma proposta Klabin de 2019
+no acervo diz textualmente "consultoria estrategica com raizes no setor florestal,
+tendo trabalhado com as 10 maiores empresas do ramo", e o CLAUDE.md do projeto de
+marketing lista como territorios fortes Papel & Celulose, Energia e Automotivo.
+
+LIMITE CONHECIDO: a classificacao dos ~330 clientes e do Claude, nao do Mario. Casos
+de fronteira foram decididos pela atividade dominante (Raizen -> oleo e gas, nao
+agro; Bayer e Syngenta -> agronegocio; Dexco e TANAC -> base florestal). Discordando
+da ordem, e trocar numero no FREQ.
 
 PESQUISA DE REFERENCIA (03/08/2026)
 -----------------------------------
@@ -101,6 +124,30 @@ GRUPOS = {
     "de": [u"Energie & Ressourcen", u"Industrie & Forstbasis", u"Konsum & Agrar",
            u"Technologie & Medien", u"Kapital & Dienstleistungen"],
 }
+# frequencia = nº de clientes do acervo mirow-rag classificados no setor
+# (indice na lista de 19 -> contagem). Ver "COMO A ORDEM ..." no cabecalho.
+FREQ = {
+    3: 30,   # Varejo e bens de consumo
+    9: 26,   # Florestal, papel e celulose
+    1: 24,   # Agronegocio
+    4: 19,   # Energia eletrica
+    18: 19,  # Transporte e logistica
+    14: 17,  # Servicos financeiros
+    10: 16,  # Infraestrutura e cimento
+    5: 15,   # Oleo e gas
+    0: 14,   # Automotivo
+    12: 12,  # Mineracao e siderurgia
+    15: 12,  # Saude
+    13: 9,   # Private Equity
+    6: 9,    # Quimicos
+    16: 9,   # Tecnologia
+    2: 8,    # Educacao
+    17: 5,   # Telecom
+    7: 5,    # Utilidades
+    8: 4,    # Esportes, midia e entretenimento
+    11: 4,   # Maquinas e equipamentos
+}
+
 # indice (na lista de 19) dos setores de cada constelacao
 MEMBROS = [
     [5, 4, 7, 12, 6],      # oleo e gas, energia eletrica, utilidades, mineracao, quimicos
@@ -109,6 +156,14 @@ MEMBROS = [
     [16, 17, 8],           # tecnologia, telecom, esportes/midia
     [14, 13],              # servicos financeiros, private equity
 ]
+
+def _ordenar_por_frequencia():
+    """Ordena os setores DENTRO de cada grupo e os GRUPOS entre si, por frequencia."""
+    grupos = [sorted(m, key=lambda i: -FREQ.get(i, 0)) for m in MEMBROS]
+    ordem = sorted(range(len(grupos)),
+                   key=lambda g: -sum(FREQ.get(i, 0) for i in grupos[g]))
+    return [grupos[g] for g in ordem], ordem
+
 
 TITULO = {
     "pt": (u"Setores em que atuamos",
@@ -134,10 +189,10 @@ CSS = """/* ---- S-77 (#128 v4): 5 cards de grupos de setores ------------------
    branco, itens claros. Sobre o fundo claro do gradiente, navy tem contraste de
    sobra (o problema anterior era texto navy SOBRE o azul medio, nao a caixa). */
 .onda18-orbe{position:relative;z-index:6;margin:56px 0 0}
-.onda18-orbe__titulo{color:#020E66;font-size:34px;font-weight:700;margin:0 0 6px;
-  text-align:center}
-.onda18-orbe__sub{color:#071C25;font-size:17px;margin:0 0 28px;text-align:center;
-  opacity:.78}
+/* titulo no mesmo tratamento do "Nossos Lideres" da propria home:
+   branco-azulado #e9f0ff, display grande, alinhado a esquerda */
+.onda18-orbe__titulo{color:#e9f0ff;font-size:64px;font-weight:700;line-height:1.05;
+  margin:0 0 30px;text-align:left}
 .onda18-orbe__cards{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;
   list-style:none;margin:0;padding:0}
 .onda18-const{background:#020E66;border-top:3px solid #00ADEC;
@@ -146,9 +201,8 @@ CSS = """/* ---- S-77 (#128 v4): 5 cards de grupos de setores ------------------
 .onda18-const:hover{transform:translateY(-4px);
   box-shadow:0 14px 30px rgba(2,14,102,.28)}
 .onda18-const__nome{display:block;color:#fff;font-size:17px;font-weight:700;
-  line-height:1.25;margin:0 0 4px}
-.onda18-const__conta{display:block;color:#00ADEC;font-size:13px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;margin:0 0 14px}
+  line-height:1.25;margin:0 0 14px;padding:0 0 12px;
+  border-bottom:1px solid rgba(0,173,236,.45)}
 .onda18-const__lista{list-style:none;margin:0;padding:0}
 .onda18-const__item{position:relative;padding-left:16px;margin:0 0 8px;
   color:#fff;font-size:14px;font-weight:400;line-height:1.35}
@@ -158,40 +212,39 @@ CSS = """/* ---- S-77 (#128 v4): 5 cards de grupos de setores ------------------
 @media only screen and (max-width: 1200px){
   .onda18-orbe__cards{grid-template-columns:repeat(3,1fr)}
 }
+@media only screen and (max-width: 991px){
+  .onda18-orbe__titulo{font-size:44px}
+}
 @media only screen and (max-width: 767px){
-  .onda18-orbe__titulo{font-size:26px}
-  .onda18-orbe__sub{font-size:15px;margin-bottom:20px}
+  .onda18-orbe__titulo{font-size:32px;margin-bottom:20px}
   .onda18-orbe__cards{grid-template-columns:1fr;gap:12px}
 }
 """
 
 
 def cards(lang):
-    """5 cards, um por grupo, cada um listando seus setores."""
+    """5 cards, um por grupo. Setores e grupos na ordem de frequencia (FREQ)."""
     nomes = NOMES.get(lang, NOMES["pt"])
     grupos = GRUPOS.get(lang, GRUPOS["pt"])
-    rotulo = CONTA.get(lang, CONTA["pt"])
+    membros_ord, ordem = _ordenar_por_frequencia()
     out = ['<ul class="onda18-orbe__cards">']
-    for g, membros in enumerate(MEMBROS):
+    for pos, membros in enumerate(membros_ord):
         itens = "".join('<li class="onda18-const__item">%s</li>' % nomes[i]
                         for i in membros)
         out.append('<li class="onda18-const">'
                    '<span class="onda18-const__nome">%s</span>'
-                   '<span class="onda18-const__conta">%d %s</span>'
                    '<ul class="onda18-const__lista">%s</ul></li>'
-                   % (grupos[g], len(membros),
-                      rotulo[0] if len(membros) == 1 else rotulo[1], itens))
+                   % (grupos[ordem[pos]], itens))
     out.append('</ul>')
     return "".join(out)
 
 
 def bloco(lang):
-    titulo, sub = TITULO.get(lang, TITULO["pt"])
+    titulo = TITULO.get(lang, TITULO["pt"])[0]
     return ('%s<section class="onda18-orbe"><div class="container"><div class="row">'
-            '<div class="col"><h3 class="onda18-orbe__titulo">%s</h3>'
-            '<p class="onda18-orbe__sub">%s</p>%s'
+            '<div class="col"><h2 class="onda18-orbe__titulo">%s</h2>%s'
             '</div></div></div></section>%s'
-            % (MARK_INI, titulo, sub, cards(lang), MARK_FIM))
+            % (MARK_INI, titulo, cards(lang), MARK_FIM))
 
 
 def main():
@@ -237,8 +290,8 @@ def main():
             if novo != h:
                 gravar(p, novo)
                 alterados += 1
-                print("  %s (%s, 5 esferas, 19 setores)" % (rel, lang))
-    print("resumo: %d home(s) com as constelacoes" % alterados)
+                print("  %s (%s, 5 cards, 19 setores por frequencia)" % (rel, lang))
+    print("resumo: %d home(s) com os 5 cards de setores" % alterados)
 
 
 if __name__ == "__main__":

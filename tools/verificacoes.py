@@ -1091,6 +1091,33 @@ def estaticas(s):
                           "onda18-orbe__planeta", "onda18-const__lista::before"):
                 if morto in h:
                     det.append(u"%s ainda tem resto de versao antiga (%s)" % (rel, morto))
+        # S-84: sem a contagem "5 setores", sem o subtexto, titulo branco tipo
+        # "Lideres", e os setores na ordem de frequencia do acervo (mirow-rag)
+        for rel in HOMES:
+            hh = s.ler(rel)
+            if "onda18-const__conta" in hh:
+                det.append(u'%s ainda mostra a contagem "N setores"' % rel)
+            if "onda18-orbe__sub" in hh:
+                det.append(u"%s ainda tem o subtexto das 19 indústrias" % rel)
+        # a ordem publicada tem que ser a que o script calcula do FREQ
+        import importlib.util as _u
+        _s = _u.spec_from_file_location(
+            "_o71", os.path.join(os.path.dirname(AQUI), "tools_onda6",
+                                 "71_home_planeta_setores.py"))
+        _m = _u.module_from_spec(_s)
+        _s.loader.exec_module(_m)
+        esperados, ordem = _m._ordenar_por_frequencia()
+        planos = [_m.NOMES["pt"][i] for grupo in esperados for i in grupo]
+        hpt = s.ler("pt/index.html")
+        achados = re.findall(r'class="onda18-const__item">([^<]+)</li>', hpt)
+        if achados != planos:
+            det.append(u"a ordem publicada não é a de frequência (esperado começar "
+                       u"com %s, veio %s)" % (planos[:2], achados[:2]))
+        grupos_pub = re.findall(r'class="onda18-const__nome">([^<]+)</span>', hpt)
+        if grupos_pub != [_m.GRUPOS["pt"][g] for g in ordem]:
+            det.append(u"os cards não estão na ordem de frequência: %s" % grupos_pub)
+        if ".onda18-orbe__titulo{color:#e9f0ff" not in css_o18:
+            det.append(u'título não está no branco do estilo "Líderes"')
         if ".onda18-orbe__cards{display:grid" not in css_o18:
             det.append(u"CSS sem a grade dos 5 cards")
         for morto in ("@keyframes onda18-orbita", "@keyframes onda18-flutua",
