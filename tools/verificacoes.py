@@ -2422,6 +2422,63 @@ def ao_vivo(s):
             return (True, u"6 pins com o ponto dentro do mapa e visível")
         s.check("V19", u"os 6 pins marcam um ponto dentro do mapa", v19)
 
+        # V20 — S-117 (#175): o chip do logo tem de ficar PERTO do seu ponto e
+        # nenhum par pode se sobrepor. Antes do layout em anel, o chip do Batten
+        # subia três degraus e ia parar longe da Alemanha (o Mario viu a olho).
+        def v20():
+            nav.abrir("%s/pt/sobre-nos/nossa-rede/" % base, 1400, 900)
+            js = ("(function(){var out=[];"
+                  "var ps=document.querySelectorAll('.onda31-mapa__palco');"
+                  "for(var i=0;i<ps.length;i++){var pal=ps[i].getBoundingClientRect();"
+                  "var pins=ps[i].querySelectorAll('.onda31-pin');"
+                  "for(var j=0;j<pins.length;j++){"
+                  "var ag=pins[j].querySelector('.onda31-pin__agulha')"
+                  ".getBoundingClientRect();"
+                  "var ch=pins[j].querySelector('.onda31-pin__chip')"
+                  ".getBoundingClientRect();"
+                  "var nome=pins[j].querySelector('.onda31-pin__nome');"
+                  "out.push({mapa:i,nome:nome?nome.textContent:'?',"
+                  "larguraPalco:Math.round(pal.width),"
+                  "dist:Math.round(Math.hypot((ch.left+ch.width/2)-(ag.left+ag.width/2),"
+                  "(ch.top+ch.height/2)-(ag.top+ag.height/2))),"
+                  "caixa:[ch.left,ch.top,ch.right,ch.bottom],"
+                  "dentro:(ch.left>=pal.left-1&&ch.right<=pal.right+1&&"
+                  "ch.top>=pal.top-1&&ch.bottom<=pal.bottom+1)});}}"
+                  "return JSON.stringify(out);})()")
+            v = nav.js(js)
+            try:
+                d = json.loads(v)
+            except Exception:
+                return (False, u"não deu para medir os chips: %r" % v)
+            if len(d) != 6:
+                return (False, u"%d chip(s) medido(s) (esperado 6)" % len(d))
+            det = []
+            # a distância é medida no palco real e normalizada para o palco de
+            # referência do gerador (580px), onde o limite RAIO_MAX foi definido
+            limite = 96.0 + 42.0 / 2 + 6      # RAIO_MAX + meia altura do chip + folga
+            for c in d:
+                fator = 580.0 / max(c["larguraPalco"], 1)
+                dist_ref = c["dist"] * fator
+                if dist_ref > limite:
+                    det.append(u"%s a %.0fpx do seu ponto (limite %.0f)"
+                               % (c["nome"], dist_ref, limite))
+                if not c["dentro"]:
+                    det.append(u"%s com o chip fora do mapa" % c["nome"])
+            for i in range(len(d)):
+                for j in range(i + 1, len(d)):
+                    if d[i]["mapa"] != d[j]["mapa"]:
+                        continue
+                    a, b = d[i]["caixa"], d[j]["caixa"]
+                    if not (a[2] <= b[0] or a[0] >= b[2] or a[3] <= b[1] or a[1] >= b[3]):
+                        det.append(u"%s e %s se sobrepõem"
+                                   % (d[i]["nome"], d[j]["nome"]))
+            if det:
+                return (False, u"; ".join(det[:3]))
+            longe = max(c["dist"] * (580.0 / max(c["larguraPalco"], 1)) for c in d)
+            return (True, u"6 chips sem sobreposição, o mais distante a %.0fpx do seu "
+                    u"ponto (limite %.0f)" % (longe, limite))
+        s.check("V20", u"chip do logo perto do seu ponto e sem sobrepor vizinho", v20)
+
 
 # ------------------------------------------------------------------- main
 

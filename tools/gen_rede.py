@@ -92,6 +92,7 @@ CHIP_LOGO_H = 26.0         # px: altura do logo dentro do chip
 CHIP_PAD = 24.0            # px: padding horizontal total do chip
 HASTE_BASE = 12.0          # px: haste minima entre o ponto da cidade e o chip
 FOLGA = 7.0                # px: respiro exigido entre dois chips
+RAIO_MAX = 96.0            # px: o chip nunca fica mais longe que isso do seu ponto
 
 
 # ------------------------------------------------------------------ projeção
@@ -202,12 +203,20 @@ def tamanho_do_logo(pub, arquivo):
 
 
 def layout_dos_chips(parceiros, fn, w, h, pub):
-    """Coloca cada chip perto da sua cidade SEM cobrir o vizinho.
+    """Coloca cada chip no lugar livre mais PROXIMO da sua cidade (S-117).
 
-    A agulha (o ponto) fica sempre na coordenada projetada — o que se move e o
-    chip. A conta e feita em pixels sobre um palco de referencia (PALCO_REF) e
-    devolvida em px de deslocamento, entao vale igual em qualquer largura de tela.
-    Ordem: de norte para sul, para o resultado ser estavel entre execucoes.
+    A agulha fica sempre na coordenada projetada — o que se move e o chip, ligado
+    por uma haste inclinada. A conta e feita em pixels sobre um palco de referencia
+    (PALCO_REF) e devolvida em px de deslocamento, entao vale igual em qualquer
+    largura de tela. Ordem: de norte para sul, para o resultado ser estavel.
+
+    Por que busca em ANEL e nao escadinha (pedido do Mario em 04/08): a primeira
+    versao so tentava posicoes acima do pin e, quando batia, subia um degrau. Com
+    quatro parceiros no mesmo canto (Londres x2, Dusseldorf, Berlim) o chip do
+    Batten subiu tres degraus e foi parar longe da Alemanha. Agora se testam
+    posicoes em volta do ponto, em raio crescente e em 16 direcoes, e vence a
+    PRIMEIRA livre — ou seja, a mais perto. O chip pode cair sobre a Franca ou
+    sobre o mar; o que importa e a haste apontando a cidade certa.
     """
     palco_w = PALCO_REF
     palco_h = PALCO_REF * (h / w)
@@ -220,40 +229,43 @@ def layout_dos_chips(parceiros, fn, w, h, pub):
         py = palco_h * y / h
         lw, lh = tamanho_do_logo(pub, p["logo"])
         chip_w = CHIP_PAD + CHIP_LOGO_H * (lw / lh)
-        # Candidatos: primeiro direto em cima, depois subindo um degrau e, so
-        # entao, para os lados. Sair do eixo e permitido porque a haste e
-        # INCLINADA (o gerador manda angulo e comprimento) — o chip nunca fica
-        # solto apontando para o vazio, que foi o primeiro erro deste layout.
+
+        # candidatos em anel: raio crescente x 16 direcoes, do mais perto ao mais
+        # longe. O primeiro raio ja tira o chip de cima do ponto (senao a agulha
+        # fica escondida embaixo do chip).
         candidatos = []
-        for nivel in range(0, 4):
-            sobe = HASTE_BASE + nivel * (CHIP_ALTURA + FOLGA)
-            for dx in (0.0, -(chip_w / 2 + 14), chip_w / 2 + 14):
-                candidatos.append((sobe, dx))
+        for raio in [r * 1.0 for r in range(24, int(RAIO_MAX) + 1, 8)]:
+            for k in range(16):
+                ang = math.radians(90.0 + k * (360.0 / 16))   # comeca para cima
+                dx = raio * math.cos(ang)
+                dy = -raio * math.sin(ang)                    # dy<0 = acima
+                candidatos.append((dx, dy, raio))
         escolhido = None
-        for sobe, dx in candidatos:
-            cx = px + dx
+        for dx, dy, raio in candidatos:
+            cx, cy = px + dx, py + dy
             x0, x1 = cx - chip_w / 2, cx + chip_w / 2
-            y1 = py - sobe
-            y0 = y1 - CHIP_ALTURA
-            if x0 < 2 or x1 > palco_w - 2 or y0 < 2:      # nao pode vazar o palco
-                continue
+            y0, y1 = cy - CHIP_ALTURA / 2, cy + CHIP_ALTURA / 2
+            if x0 < 2 or x1 > palco_w - 2 or y0 < 2 or y1 > palco_h - 2:
+                continue                                     # nao pode vazar o palco
             bate = any(not (x1 + FOLGA < q[0] or x0 - FOLGA > q[2]
                             or y1 + FOLGA < q[1] or y0 - FOLGA > q[3]) for q in postos)
             if not bate:
-                escolhido = (sobe, dx, (x0, y0, x1, y1))
+                escolhido = (dx, dy, (x0, y0, x1, y1), raio)
                 break
-        if escolhido is None:      # tudo ocupado: fica na posicao base (raro)
-            sobe, dx = HASTE_BASE, 0.0
-            escolhido = (sobe, dx, (px - chip_w / 2, py - sobe - CHIP_ALTURA,
-                                    px + chip_w / 2, py - sobe))
-        sobe, dx, rect = escolhido
+        if escolhido is None:      # palco lotado (nao acontece com 6 parceiros)
+            dx, dy, raio = 0.0, -(HASTE_BASE + CHIP_ALTURA / 2), HASTE_BASE
+            escolhido = (dx, dy, (px - chip_w / 2, py + dy - CHIP_ALTURA / 2,
+                                  px + chip_w / 2, py + dy + CHIP_ALTURA / 2), raio)
+        dx, dy, rect, raio = escolhido
         postos.append(rect)
-        # a haste vai do ponto da cidade ate o meio da base do chip
-        comprimento = math.hypot(dx, sobe)
-        angulo = math.degrees(math.atan2(dx, sobe))
+        # a haste vai do ponto ate a BORDA do chip (nao ate o centro, senao ela
+        # atravessaria o logo)
+        comprimento = max(raio - CHIP_ALTURA / 2, 6.0)
+        angulo = math.degrees(math.atan2(dx, -dy))   # 0 = para cima
         saida.append((p, {"esq": 100.0 * x / w, "top": 100.0 * y / h,
-                          "dx": dx, "sobe": sobe,
-                          "haste": comprimento, "ang": angulo}))
+                          "dx": dx, "dy": dy,
+                          "haste": comprimento, "ang": angulo,
+                          "raio": raio}))
     return saida
 
 
@@ -279,7 +291,7 @@ def bloco_rede(mestre, geo, lang, prefixo, pub, dry):
                 u'<span class="onda31-pin__agulha" aria-hidden="true"></span>'
                 u'<span class="onda31-pin__haste" aria-hidden="true" '
                 u'style="--len:%.1fpx;--ang:%.2fdeg"></span>'
-                u'<div class="onda31-pin__corpo" style="--dx:%.1fpx;--sobe:%.1fpx">'
+                u'<div class="onda31-pin__corpo" style="--dx:%.1fpx;--dy:%.1fpx">'
                 u'<button class="onda31-pin__chip" type="button" aria-label="%s">'
                 u'<img src="%s" alt="%s" loading="lazy"></button>'
                 u'<div class="onda31-pin__card"><p class="onda31-pin__nome">%s</p>'
@@ -287,7 +299,7 @@ def bloco_rede(mestre, geo, lang, prefixo, pub, dry):
                 u'<a class="onda31-pin__link" href="%s" target="_blank" rel="noopener">%s</a>'
                 u'</div></div></div>'
                 % (pos["esq"], pos["top"], pos["haste"], pos["ang"], pos["dx"],
-                   pos["sobe"], p["nome"], logo, p["nome"], p["nome"],
+                   pos["dy"], p["nome"], logo, p["nome"], p["nome"],
                    p["cidade"][lang], p["site"], t["visitar"]))
         mapas_html.append(
             u'<div class="onda31-mapa" data-aos="fade-up">'
@@ -329,8 +341,11 @@ CSS = u"""/* ---- S-111 a S-116: a Nossa Rede com mapa de verdade --------------
 /* a agulha: 8px de ponto no lugar exato + haste subindo ate o chip */
 .onda31-pin__agulha{position:absolute;left:-4px;top:-4px;width:8px;height:8px;
   border-radius:50%;background:#00ADEC;box-shadow:0 0 0 3px rgba(0,173,236,.28)}
-.onda31-pin__corpo{position:absolute;left:0;bottom:var(--sobe,12px);
-  transform:translateX(calc(-50% + var(--dx,0px)))}
+/* o chip e CENTRADO no deslocamento que o gerador calculou — pode estar acima,
+   ao lado ou abaixo do ponto (S-117), o que importa e ser o lugar livre mais
+   proximo da cidade */
+.onda31-pin__corpo{position:absolute;left:0;top:0;
+  transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,-40px)))}
 .onda31-pin__chip{display:block;padding:8px 12px;border:0;cursor:pointer;
   background:#fff;border-radius:4px;box-shadow:0 6px 18px rgba(2,14,102,.34);
   transition:transform 200ms ease,box-shadow 200ms ease}
@@ -345,7 +360,7 @@ CSS = u"""/* ---- S-111 a S-116: a Nossa Rede com mapa de verdade --------------
   height:var(--len,12px);transform-origin:bottom center;
   transform:rotate(var(--ang,0deg));background:rgba(0,173,236,.85)}
 
-.onda31-pin__card{position:absolute;left:50%;bottom:calc(100% + 12px);
+.onda31-pin__card{position:absolute;left:50%;bottom:calc(100% + 10px);
   transform:translateX(-50%) translateY(6px);width:230px;padding:14px 16px;
   background:#fff;border-radius:4px;box-shadow:0 16px 34px rgba(2,14,102,.34);
   opacity:0;visibility:hidden;transition:all 220ms ease;z-index:6}
