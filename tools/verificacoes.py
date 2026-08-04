@@ -2139,6 +2139,30 @@ def estaticas(s):
     s.check("S125", u'o "m" do hero vem da marca oficial, sem cópia divergente (#178)',
             s125)
 
+    def s127():
+        # #179, causa-raiz: nenhum font-weight do NOSSO css pode pedir um peso que a
+        # página não carrega. Era o bug dos big numbers: o CSS pedia 800, o <head>
+        # pede wght@200;300;400;600;700;900, e o navegador arredondava para 900 —
+        # os números saíam no peso mais gordo da família sem ninguém ter escrito isso.
+        # A asserção lê os pesos disponíveis do PRÓPRIO <head>, não de uma lista fixa:
+        # se alguém mudar o pedido da fonte, ela acompanha.
+        h = s.ler("pt/index.html")
+        m = re.search(r'family=Titillium\+Web:wght@([0-9;]+)', h)
+        if not m:
+            return (False, u"não achei o pedido de pesos da fonte no <head> da home")
+        disponiveis = set(int(x) for x in m.group(1).split(";") if x)
+        css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
+        orfaos = {}
+        for w in re.findall(r'font-weight:\s*(\d+)', css):
+            if int(w) not in disponiveis:
+                orfaos[w] = orfaos.get(w, 0) + 1
+        return (not orfaos,
+                u"peso(s) declarado(s) e não carregado(s): %s — disponíveis: %s"
+                % (", ".join("%s (%dx)" % (k, v) for k, v in sorted(orfaos.items())),
+                   sorted(disponiveis)))
+    s.check("S127", u"nenhum font-weight pede peso que a fonte não carrega (#179)",
+            s127)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
@@ -2707,6 +2731,37 @@ def ao_vivo(s):
             return (True, u"6 chips sem sobreposição, o mais distante a %.0fpx do seu "
                     u"ponto (limite %.0f)" % (longe, limite))
         s.check("V20", u"chip do logo perto do seu ponto e sem sobrepor vizinho", v20)
+
+        # V21 — S-126 (#179): os big numbers do hero saem SEM bold. Mede o peso
+        # COMPUTADO nas 4 homes, não o declarado: era exatamente aí que o bug morava
+        # (o CSS dizia 800, o navegador desenhava 900, porque 800 não é carregado).
+        # A causa-raiz — peso declarado fora do conjunto carregado — é a S127.
+        def v21():
+            js = ("(function(){var e=document.querySelectorAll('.hero-numeros__valor');"
+                  "var out=[];for(var i=0;i<e.length;i++){var c=getComputedStyle(e[i]);"
+                  "out.push({txt:e[i].textContent.trim(),peso:c.fontWeight,"
+                  "tam:c.fontSize,cor:c.color});}"
+                  "return JSON.stringify(out);})()")
+            det = []
+            for rel in HOMES:
+                nav.abrir("%s/%s" % (base, rel.replace("index.html", "")), 1400, 900)
+                try:
+                    dados = json.loads(nav.js(js))
+                except Exception as e:
+                    det.append(u"%s: não deu para medir (%r)" % (rel, e))
+                    continue
+                if len(dados) != 4:
+                    det.append(u"%s tem %d big numbers, esperado 4" % (rel, len(dados)))
+                for d in dados:
+                    if d["peso"] != "400":
+                        det.append(u"%s: %s em peso %s (esperado 400)"
+                                   % (rel, d["txt"], d["peso"]))
+                    # o pedido foi sobre PESO — tamanho e cor não podem ter mudado
+                    if d["cor"] != "rgb(0, 173, 236)":
+                        det.append(u"%s: %s mudou de cor para %s"
+                                   % (rel, d["txt"], d["cor"]))
+            return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:4])))
+        s.check("V21", u"big numbers do hero sem bold, nas 4 homes (#179)", v21)
 
 
 # ------------------------------------------------------------------- main
