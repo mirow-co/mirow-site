@@ -49,13 +49,20 @@ python tools/verificacoes.py .
 
 > **Asserção que confere o que está escrito passa enquanto o site está errado.**
 
-Aprendido três vezes em 04/08 (ondas 33b e 35), sempre do mesmo jeito: a asserção olhava a
-string e o navegador fazia outra coisa.
+Aprendido **quatro vezes numa só sessão** (04/08, ondas 33b, 35 e 37), sempre do mesmo jeito: a
+asserção olhava a string, ou olhava um recorte estreito, e o navegador fazia outra coisa.
 
-| Asserção que olhava a declaração | O que o navegador realmente fazia | O conserto |
+| Asserção que não media o efeito | O que o navegador realmente fazia | O conserto |
 |---|---|---|
 | `M01` procurava o **nome** do arquivo de medição no HTML | o `src` era `/wp-content/...`, sem o prefixo `/mirow-site/` → **404 em 143 páginas**, e a M01 passava | `S123` resolve o caminho e exige que o arquivo **exista no disco** |
 | o CSS **declarava** `font-weight:800` nos big numbers | 800 não é carregado (`wght@…;700;900`) → o navegador desenhava **900/Black** | `V21` mede o peso **computado**; `S127` proíbe declarar peso fora do conjunto que o `<head>` carrega |
+| `S125` cobrava a string `desenharLogo(` | o logo virou elemento SVG e a função sumiu — a asserção quebrou o deploy por **motivo certo, alvo errado** | passou a cobrar o que importa: o `<path>` usa a constante `M_PATH`, e a `V22` mede o elemento renderizado |
+| `V07` dizia "números do hero com no máximo 2 linhas" mas media **só `pt/` em 1920x1080** | uma legenda **alemã** estava em **3 linhas em 1400px, no ar**, e a V07 passava verde | `V07` cobre **4 homes × 4 larguras** |
+
+**A quarta linha é a mais perigosa das quatro:** a asserção não estava errada, estava
+**estreita**. Título que promete um invariante geral e teste que cobre um caso particular é pior
+que não ter teste, porque dá confiança falsa. Ao escrever asserção, o escopo do teste tem de
+cobrir o escopo do título — ou o título tem de dizer o recorte (como em `V15`, "em 1400px").
 
 **A regra, na prática:** ao escrever asserção, pergunte *"o que o navegador faz com isso?"*, não
 *"o que está escrito?"*. Em ordem de preferência:
