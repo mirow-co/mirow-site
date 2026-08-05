@@ -85,7 +85,7 @@ BLOCOS_CSS = [
     # morto — as classes .onda21-* não existem mais na página.
     "onda26:fonte-unica", "onda27:barra-igual", "onda29:abertura-padrao",
     "onda30:titulo-secao", "onda31:rede", "onda36:logo-frente",
-    "onda39:respiro-hero",
+    "onda39:respiro-hero", "onda40:quebra-pilulas",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -2895,7 +2895,14 @@ def ao_vivo(s):
                   "for(var i=0;i<rc.length;i++) if(rc[i].width>mx) mx=rc[i].width;});"
                   "sobra=Math.round(rn.width-parseFloat(cs.paddingLeft)"
                   "-parseFloat(cs.paddingRight)-mx);}"
-                  "return JSON.stringify({fileiras:fil,total:ps.length,sobra:sobra});})()")
+                  "var g1=null,g2=null;"
+                  "if(ps.length===4){"
+                  "g1=Math.round(ps[1].getBoundingClientRect().left"
+                  "-ps[0].getBoundingClientRect().right);"
+                  "g2=Math.round(ps[3].getBoundingClientRect().left"
+                  "-ps[2].getBoundingClientRect().right);}"
+                  "return JSON.stringify({fileiras:fil,total:ps.length,sobra:sobra,"
+                  "gap1:g1,gap2:g2});})()")
             det = []
             for rel in HOMES:
                 for w, h in [(1920, 1000), (1400, 900), (1200, 900)]:
@@ -2919,8 +2926,20 @@ def ao_vivo(s):
                     if d["sobra"] is not None and d["sobra"] > 30:
                         det.append(u"%s @%dpx: %dpx de sobra no card dos números "
                                    u"(máximo 30px)" % (rel, w, d["sobra"]))
+                    # onda 40 (#184): o Instagram fica a UM GAP do LinkedIn, não
+                    # alinhado ao E-mail. O grid da onda 39 dava 2+2 mas as colunas
+                    # compartilhavam largura, e o Instagram começava na borda da
+                    # coluna do "Falar no WhatsApp" — longe do vizinho. Aqui se
+                    # compara o gap da 2ª fileira com o da 1ª: se o layout voltar a
+                    # ser em colunas, o segundo cresce e isto acusa.
+                    if d.get("gap1") is not None and d.get("gap2") is not None:
+                        if abs(d["gap2"] - d["gap1"]) > 4:
+                            det.append(
+                                u"%s @%dpx: gap LinkedIn→Instagram %dpx vs "
+                                u"WhatsApp→E-mail %dpx — o Instagram descolou do "
+                                u"vizinho" % (rel, w, d["gap2"], d["gap1"]))
             return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
-        s.check("V23", u"4 pílulas em 2 fileiras de 2 e card dos números justo (#183)",
+        s.check("V23", u"pílulas 2+2 com Instagram junto do LinkedIn, e card justo (#183/#184)",
                 v23)
 
 

@@ -1216,7 +1216,7 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 
 /* onda36:logo-frente:ini */
 /* ---- S-127 (#180): o "m" do hero solido e NA FRENTE ---------------------
-   Pedido do Mario (04/08): "quero que o M da pagina inicial nao seja
+   Pedido do Mario (05/08): "quero que o M da pagina inicial nao seja
    transparente, seja branco solido e 'na frente' de tudo que estiver atras".
    z-index 10 = na frente dos cards do hero (.hero-numeros e o convite estao em
    z=4) e atras do header (z=20), que precisa seguir clicavel por cima.
@@ -1230,7 +1230,7 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 
 /* onda39:respiro-hero:ini */
 /* ---- S-130 (#183): tres acertos de respiro no hero -----------------------
-   Pedidos do Mario (04/08), depois de ver o hero publicado:
+   Pedidos do Mario (05/08), depois de ver o hero publicado:
    "card a esquerda pode ter whatsapp/email na linha de cima e linkedin/instagram
     na linha de baixo. card na direita pode ser um pouco mais apertado (ve o
     espaco entre sua borda e o texto 'dos projetos realizados em clientes...'?
@@ -1247,12 +1247,11 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
       einem Jahresumsatz..."). Um numero unico servia o pior caso e deixava 71px
       sobrando em pt. Agora cada idioma tem a largura JUSTA dele — e o vao central
       cresce em pt/en, o que o M aproveita sozinho (ele e fracao do vao). */
-@media only screen and (min-width: 992px){
-  .hero-contatos{
-    display:grid;
-    grid-template-columns:repeat(2, max-content);
-  }
-}
+/* O grid de 2 colunas da onda 39 SAIU na onda 40: ele resolvia o 2+2, mas as duas
+   colunas compartilham largura, entao a coluna 1 ficava do tamanho de "Falar no
+   WhatsApp" e o Instagram comecava naquela borda — alinhado com o "E-mail" e longe
+   do "LinkedIn". O Mario pediu o contrario. O 2+2 agora vem de flex-wrap + um item
+   de quebra (bloco onda40:quebra-pilulas), que empacota com o gap normal. */
 @media only screen and (min-width: 1200px){
   .hero-numeros{width:370px}
   html[lang^="de"] .hero-numeros{width:420px}
@@ -1263,3 +1262,27 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
    16-21px — o override so alargava o card sem necessidade. A V23 pegou isso: ela
    cobrava sobra <= 30px e acusou 36-41px em 1920px. Uma largura por idioma, ponto. */
 /* onda39:respiro-hero:fim */
+
+/* onda40:quebra-pilulas:ini */
+/* ---- S-131 (#184): Instagram junto do LinkedIn, nao alinhado ao E-mail --------
+   Pedido do Mario (05/08): "instagram deve ficar mais proximo de linkedin, nao
+   necessariamente paralelo com o item `email`".
+
+   A lista volta ao flex-wrap do tema (que empacota vizinho a vizinho com o gap
+   normal) e o 2+2 vem de um ITEM DE QUEBRA de largura total e altura zero,
+   inserido depois da 2a pilula por tools_onda6/93_quebra_pilulas_contato.py.
+
+   Diferenca em relacao ao grid da onda 39: no grid as colunas compartilhavam
+   largura e empurravam o Instagram para a borda da coluna do WhatsApp. Aqui cada
+   fileira se resolve sozinha — o Instagram fica a um gap do LinkedIn. */
+.hero-contatos__quebra{
+  flex-basis:100%;
+  width:100%;
+  height:0;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+/* abaixo de 992px o card ocupa a largura toda e o empacotamento natural do tema
+   ja resolve; a quebra continua valendo e nao atrapalha (altura zero). */
+/* onda40:quebra-pilulas:fim */
