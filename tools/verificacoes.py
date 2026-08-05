@@ -85,6 +85,7 @@ BLOCOS_CSS = [
     # morto — as classes .onda21-* não existem mais na página.
     "onda26:fonte-unica", "onda27:barra-igual", "onda29:abertura-padrao",
     "onda30:titulo-secao", "onda31:rede", "onda36:logo-frente",
+    "onda39:respiro-hero",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -2870,6 +2871,57 @@ def ao_vivo(s):
             return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
         s.check("V22", u'o "m" sólido na frente não cobre texto em nenhuma largura (#180)',
                 v22)
+
+        # V23 — S-130 (#183): as 4 pílulas de contato em 2 fileiras de 2, e o card dos
+        # números sem sobra grande. As duas coisas se medem pelo RENDER, não pelo CSS:
+        # as fileiras dependem de onde o grid quebra, e a "sobra" só existe comparando
+        # a largura do conteúdo com a LINHA MAIS LARGA de fato desenhada.
+        # Antes desta onda as pílulas caíam 3+1 em pt/en e 2+2 em de/ — o alemão
+        # acertava por acidente, porque os rótulos dele são mais longos.
+        def v23():
+            js = ("(function(){var ps=[].slice.call("
+                  "document.querySelectorAll('.hero-contatos__link'));"
+                  "if(!ps.length) return JSON.stringify({erro:'sem pilulas'});"
+                  "var f={};ps.forEach(function(p){"
+                  "var t=Math.round(p.getBoundingClientRect().top);f[t]=(f[t]||0)+1;});"
+                  "var fil=Object.keys(f).sort(function(a,b){return a-b;})"
+                  ".map(function(k){return f[k];});"
+                  "var n=document.querySelector('.hero-numeros');var sobra=null;"
+                  "if(n&&getComputedStyle(n).display!=='none'){"
+                  "var cs=getComputedStyle(n),rn=n.getBoundingClientRect(),mx=0;"
+                  "n.querySelectorAll('.hero-numeros__texto').forEach(function(e){"
+                  "var r=document.createRange();r.selectNodeContents(e);"
+                  "var rc=r.getClientRects();"
+                  "for(var i=0;i<rc.length;i++) if(rc[i].width>mx) mx=rc[i].width;});"
+                  "sobra=Math.round(rn.width-parseFloat(cs.paddingLeft)"
+                  "-parseFloat(cs.paddingRight)-mx);}"
+                  "return JSON.stringify({fileiras:fil,total:ps.length,sobra:sobra});})()")
+            det = []
+            for rel in HOMES:
+                for w, h in [(1920, 1000), (1400, 900), (1200, 900)]:
+                    nav.abrir("%s/%s" % (base, rel.replace("index.html", "")), w, h)
+                    try:
+                        d = json.loads(nav.js(js))
+                    except Exception as e:
+                        det.append(u"%s @%d: não deu para medir (%r)" % (rel, w, e))
+                        continue
+                    if d.get("erro"):
+                        det.append(u"%s @%d: %s" % (rel, w, d["erro"]))
+                        continue
+                    if d["total"] != 4:
+                        det.append(u"%s @%d: %d pílulas, esperado 4"
+                                   % (rel, w, d["total"]))
+                    if d["fileiras"] != [2, 2]:
+                        det.append(u"%s @%dpx: pílulas em %s, esperado [2, 2]"
+                                   % (rel, w, d["fileiras"]))
+                    # o alemão precisa de card mais largo (legenda longa), então a
+                    # folga dele é naturalmente menor; o teto de 30px vale para todos.
+                    if d["sobra"] is not None and d["sobra"] > 30:
+                        det.append(u"%s @%dpx: %dpx de sobra no card dos números "
+                                   u"(máximo 30px)" % (rel, w, d["sobra"]))
+            return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+        s.check("V23", u"4 pílulas em 2 fileiras de 2 e card dos números justo (#183)",
+                v23)
 
 
 # ------------------------------------------------------------------- main

@@ -91,7 +91,12 @@
   /* a lampada preenche o hero, qualquer que seja a altura calculada */
   .homepage .banner .banner__background video{object-fit:cover;height:100% !important}
   /* a faixa de logos nao pode crescer alem do que entrou na conta */
-  .homepage .clientes-logos{padding-top:40px;padding-bottom:36px}
+  /* onda39 (S-130 / #183): padding-top 40 -> 24. O Mario apontou que o espaco
+     entre 'Exemplos de empresas que confiam...' e a borda de cima da faixa
+     estava grande. A faixa encurta e o hero cresce na mesma medida — a dobra
+     segue exata porque o onda8-dobra.js a RE-MEDE em runtime, e a imagem de
+     fundo se expande junto (object-fit:cover, logo acima). */
+  .homepage .clientes-logos{padding-top:24px;padding-bottom:36px}
 }
 /* telas baixas (ex.: 1366x768): aperta o respiro para o subtitulo nao ser cortado */
 @media only screen and (min-width: 992px) and (max-height: 820px){
@@ -791,9 +796,8 @@ html{scroll-behavior:smooth}
   .hero-numeros__valor{font-size:62px !important;line-height:1}
   .hero-numeros__texto{font-size:18px !important;line-height:1.35;margin-top:6px}
 }
-@media only screen and (min-width: 1440px){
-  .hero-numeros{width:440px}
-}
+/* o @media 1440px da onda18 (width:440px) saiu na onda 39: medido, o 370/420 do
+   breakpoint de 1200 serve ate 1920px+ com as legendas em 2 linhas. Ver V23. */
 /* viewport baixo: a onda 10 encolhia a pilha (33px/13px). O pedido do Mario e
    igualar ao hero, entao aqui o tamanho fica, e o que cede e o espacamento. */
 @media only screen and (min-width: 1200px) and (max-height: 820px){
@@ -1223,3 +1227,39 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   transform:translate(-50%,-50%);overflow:visible}
 .hero-logo-m path{fill:#fff}
 /* onda36:logo-frente:fim */
+
+/* onda39:respiro-hero:ini */
+/* ---- S-130 (#183): tres acertos de respiro no hero -----------------------
+   Pedidos do Mario (04/08), depois de ver o hero publicado:
+   "card a esquerda pode ter whatsapp/email na linha de cima e linkedin/instagram
+    na linha de baixo. card na direita pode ser um pouco mais apertado (ve o
+    espaco entre sua borda e o texto 'dos projetos realizados em clientes...'?
+    sobra muito. alem disso, a imagem no fundo pode se expandir um pouco mais,
+    pois o espaco entre 'Exemplos de empresas que confiam...' e a borda superior
+    esta grande - pode diminuir um pouco."
+
+   1) PILULAS 2+2. Eram flex-wrap, e com o card em 580px (onda 37) caiam 3+1 em
+      pt/en e 2+2 em de/ — o alemao acertava por acidente, porque os rotulos sao
+      mais longos. Grid de 2 colunas torna o 2+2 deliberado nos 4 idiomas.
+      `max-content` mantem cada pilula do tamanho do seu texto (nao esticadas).
+   2) CARD DA DIREITA por idioma. Medido: pt/en mantem as legendas em 2 linhas
+      com 370px; o alemao precisa de 420px ("der Projekte werden fuer Kunden mit
+      einem Jahresumsatz..."). Um numero unico servia o pior caso e deixava 71px
+      sobrando em pt. Agora cada idioma tem a largura JUSTA dele — e o vao central
+      cresce em pt/en, o que o M aproveita sozinho (ele e fracao do vao). */
+@media only screen and (min-width: 992px){
+  .hero-contatos{
+    display:grid;
+    grid-template-columns:repeat(2, max-content);
+  }
+}
+@media only screen and (min-width: 1200px){
+  .hero-numeros{width:370px}
+  html[lang^="de"] .hero-numeros{width:420px}
+}
+/* Nao ha breakpoint de 1440px aqui de proposito. A onda 18 tinha um (440px) e a
+   onda 39 chegou a repetir o padrao (390/440), mas medido em 1920px o 370/420 do
+   breakpoint de 1200 mantem as legendas em 2 linhas nos 4 idiomas com sobra de
+   16-21px — o override so alargava o card sem necessidade. A V23 pegou isso: ela
+   cobrava sobra <= 30px e acusou 36-41px em 1920px. Uma largura por idioma, ponto. */
+/* onda39:respiro-hero:fim */
