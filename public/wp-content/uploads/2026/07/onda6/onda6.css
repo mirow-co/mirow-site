@@ -448,8 +448,13 @@
 /* onda15:hero-scrims:ini */
 /* S-34: legibilidade do hero sobre a foto da lampada. Vidro fosco branco
    translucido — pedido explicito de "fundo com um branco transparente". */
+/* onda37 (S-128 / #181): max-width 780 -> 580. O card estava SUPERDIMENSIONADO:
+   medido nos 4 homes, o subtitulo cabe em 2 linhas ate 580px (em 560 o alemao vai
+   a 3). Os 200px liberados vao para o vao central, onde mora o "m" — pedido do
+   Mario: "ficou muito larga a caixa transparente dos lados, sobra pouco espaco
+   para o M no centro". Vao em 1400px: 140px -> ~320px. */
 .hero-texto{
-  display:inline-block;max-width:780px;
+  display:inline-block;max-width:580px;
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
   border-radius:14px;padding:26px 30px;margin-left:-30px}
@@ -511,15 +516,15 @@
 @media only screen and (min-width: 1200px){
   .hero-numeros{
     right:calc((100% - 100vw)/2 + 40px);
-    width:330px;
+    /* o width daqui saiu na onda37: era 330px e NUNCA valia — a onda18 declara
+       420px no mesmo breakpoint, mais adiante no arquivo. Valor gemeo morto. */
   }
   .hero-texto{
     margin-left:min(-30px, calc((100% - 100vw)/2 + 40px));
   }
 }
-@media only screen and (min-width: 1440px){
-  .hero-numeros{width:380px}
-}
+/* o bloco @media 1440px daqui saiu na onda37: declarava width:380px, sobrescrito
+   pelos 440px da onda18 no mesmo breakpoint. Valor gemeo morto. */
 /* onda16:hero-layout-s41:fim */
 
 /* onda16:hover-marcas-s42:ini */
@@ -778,7 +783,11 @@ html{scroll-behavior:smooth}
    a pilha estava em 40px/14px. Agora usa os MESMOS tamanhos. A coluna alarga
    junto, senao o texto de 18px passa de 2 linhas (assercao V07). */
 @media only screen and (min-width: 1200px){
-  .hero-numeros{gap:14px;width:400px}
+  /* onda37: 400 -> 420. Com 400 a legenda "der Projekte werden fuer Kunden mit
+     einem Jahresumsatz..." (de/) ia a 3 LINHAS em 1400px — defeito que estava no ar
+     e a V07 nao pegava, porque ela testava so pt/ em 1920. 420px e o minimo medido
+     que mantem os 4 idiomas em <=2 linhas. */
+  .hero-numeros{gap:14px;width:420px}
   .hero-numeros__valor{font-size:62px !important;line-height:1}
   .hero-numeros__texto{font-size:18px !important;line-height:1.35;margin-top:6px}
 }
@@ -1200,3 +1209,17 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   .onda31-pin__card{width:200px}
 }
 /* onda31:rede:fim */
+
+/* onda36:logo-frente:ini */
+/* ---- S-127 (#180): o "m" do hero solido e NA FRENTE ---------------------
+   Pedido do Mario (04/08): "quero que o M da pagina inicial nao seja
+   transparente, seja branco solido e 'na frente' de tudo que estiver atras".
+   z-index 10 = na frente dos cards do hero (.hero-numeros e o convite estao em
+   z=4) e atras do header (z=20), que precisa seguir clicavel por cima.
+   pointer-events:none para o logo nao roubar clique de nada.
+   left/top/width vem do JS (onda17-horizonte.js), que os calcula do centro do
+   vao entre os cards e do horizonte — o mesmo ponto de onde as linhas saem. */
+.hero-logo-m{position:absolute;z-index:10;display:none;pointer-events:none;
+  transform:translate(-50%,-50%);overflow:visible}
+.hero-logo-m path{fill:#fff}
+/* onda36:logo-frente:fim */

@@ -33,25 +33,23 @@
   var M_VB = 102;                       /* lado do viewBox usado para escalar */
   var mPath = (typeof Path2D === 'function') ? new Path2D(M_PATH) : null;
 
-  /* Tamanho do logo por faixa de largura. Nao e so estetica: em <=992px o slogan
-   * e os 4 contatos ocupam a largura inteira do palco, e a folga vertical em volta
-   * do horizonte cai para ~100px — logo grande ali ATROPELA o texto. Por isso ele
-   * e grandioso no desktop (onde existe um vao central real entre o slogan e os
-   * big numbers) e vira marca d'agua discreta no estreito. Medido na S125b. */
+  /* Tamanho do logo. A partir da onda 36 ele e SOLIDO e fica NA FRENTE dos cards,
+   * e isso muda a matematica: enquanto era translucido e ficava atras, podia passar
+   * por tras do texto sem prejuizo. Opaco e na frente, qualquer sobreposicao APAGA
+   * o texto — medido: com 300px fixos ele cobria 200px da linha "Focamos em
+   * estrategia, compras e go-to-market..." em 992px, e 21px da legenda dos big
+   * numbers em 1400px.
+   * Entao o tamanho passa a ser derivado do VAO LIVRE entre os dois cards, medido
+   * do DOM: nunca maior que o vao (menos uma folga), e no maximo 300px. Assim
+   * "nao cobrir texto" e garantido por construcao, e nao por tentativa.
+   * Vao menor que MIN_VAO (cards empilhados, <=1200px): o logo NAO aparece — e
+   * melhor nao ter logo do que ter a proposta de valor tapada por ele. */
+  var MAX_LOGO = 300, FOLGA_VAO = 16, MIN_VAO = 90;
   function tamanhoLogo() {
-    if (W >= 1400) return 300;
-    if (W >= 1200) return 260;
-    if (W >= 992) return 200;
-    if (W >= 768) return 120;
-    return 92;
+    var v = vaoEntreCards();
+    if (v < MIN_VAO) return 0;                       /* nao cabe: nao mostra */
+    return Math.min(MAX_LOGO, Math.floor(v - FOLGA_VAO));
   }
-  /* O logo mora no canvas do FUNDO (.banner__background), atras dos dois cards do
-   * hero (slogan a esquerda, big numbers a direita). No desktop o vao livre entre
-   * eles tem so ~140px, entao um logo grandioso necessariamente passa por tras dos
-   * cards — e por isso entra como marca d'agua luminosa, calibrada para NAO comer a
-   * legibilidade do subtitulo. Variante alternativa (nitido, dentro do vao de
-   * 140px) esta na #178 para o Mario escolher. */
-  function alphaLogo() { return W >= 992 ? 0.68 : 0.40; }
 
   /* ------------------------------- cena ------------------------------- */
   var ctx = cena.getContext('2d'), W, H, cometas = [], centroX = 0;
@@ -64,20 +62,28 @@
    * Entao o centro passa a ser o meio do VAO entre os cards (medido do DOM, para
    * valer nos 3 idiomas e em toda largura). Quando os cards empilham (<992px) nao
    * existe vao horizontal e o centro volta a ser o do palco. */
-  function medirCentro() {
+  /* Borda direita do card da esquerda e borda esquerda do card da direita, em
+   * coordenadas do palco. UMA fonte de verdade: centro e tamanho do logo saem os
+   * dois daqui (valores gemeos e a classe de bug que o P2.1 do CLAUDE.md proibe). */
+  var _vao = null;                      /* {esq, dir, largura} ou null */
+  function medirVao() {
+    _vao = null;
     var a = document.querySelector('.hero-texto');
     var b = document.querySelector('.hero-numeros');
-    var meio = W * .5;
-    if (!a || !b) return meio;
+    if (!a || !b) return;
     var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
-    if (!ra.width || !rb.width) return meio;
-    var esq = Math.max(ra.right, rb.right), dir = Math.min(ra.left, rb.left);
+    if (!ra.width || !rb.width) return;
+    var esq, dir;
     if (rb.left < ra.left) { esq = rb.right; dir = ra.left; }
     else { esq = ra.right; dir = rb.left; }
-    var vao = dir - esq;
-    if (vao < 60) return meio;          /* cards empilhados ou colados */
     var pal = cena.parentNode.getBoundingClientRect();
-    return (esq + dir) / 2 - pal.left;
+    _vao = { esq: esq - pal.left, dir: dir - pal.left, largura: dir - esq };
+  }
+  function vaoEntreCards() { return _vao ? _vao.largura : 0; }
+  function medirCentro() {
+    /* centro do vao quando ele existe; senao o centro do palco */
+    if (_vao && _vao.largura >= MIN_VAO) return (_vao.esq + _vao.dir) / 2;
+    return W * .5;
   }
   function semear() {
     cometas = [];
@@ -92,7 +98,10 @@
     W = r.width; H = r.height;
     cena.width = W * d; cena.height = H * d;
     ctx.setTransform(d, 0, 0, d, 0, 0);
+    medirVao();
     centroX = medirCentro();
+    garantirLogo();
+    posicionarLogo(H * .62);
     semear();
   }
   function vLinha(v, hor) {
@@ -103,25 +112,49 @@
     return { x0: cx + v * 10, y0: hor, x1: cx + v * W * .12, y1: H };
   }
 
-  /* onda34: o "m" no ponto de fuga, com halo. Desenhado DEPOIS da grade e das
-   * linhas (para nao ficar riscado por elas) e ANTES dos cometas (que passam por
-   * cima, reforcando que saem de tras dele). */
-  function desenharLogo(alpha, hor) {
-    if (!mPath) return;                 /* navegador sem Path2D: cena sem logo */
-    var t = tamanhoLogo(), cx = centroX || W * .5, cy = hor, esc = t / M_VB, g;
-    g = ctx.createRadialGradient(cx, cy, 0, cx, cy, t * 1.25);
+  /* onda36 (S-127 / #180): o halo continua no canvas (atras de tudo), mas o "m" em
+   * si saiu do canvas e virou ELEMENTO SVG, em z-index 10 — na frente dos cards
+   * (z=4) e atras do header (z=20). Pedido do Mario: "nao seja transparente, seja
+   * branco solido e na frente de tudo que estiver atras".
+   * Por que elemento e nao canvas: o canvas mora no .banner__background (z=1) e
+   * nada desenhado nele pode passar na frente dos cards — teria de mover o canvas
+   * inteiro, o que poria a grade e os cometas por cima do texto. */
+  function desenharHalo(alpha, hor) {
+    var t = tamanhoLogo(), cx = centroX || W * .5, g;
+    if (!t) return;
+    g = ctx.createRadialGradient(cx, hor, 0, cx, hor, t * 1.25);
     g.addColorStop(0, rgba(alpha * .30));
     g.addColorStop(.55, rgba(alpha * .10));
     g.addColorStop(1, rgba(0));
     ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(cx, cy, t * 1.25, 0, 7); ctx.fill();
-    ctx.save();
-    ctx.translate(cx - t / 2, cy - t / 2);
-    ctx.scale(esc, esc);
-    ctx.shadowColor = rgba(.5); ctx.shadowBlur = 12 / esc;
-    ctx.fillStyle = 'rgba(255,255,255,' + (alpha * alphaLogo()) + ')';
-    ctx.fill(mPath);
-    ctx.restore();
+    ctx.beginPath(); ctx.arc(cx, hor, t * 1.25, 0, 7); ctx.fill();
+  }
+
+  /* O "m" solido, em elemento SVG proprio. Criado uma vez; medir() reposiciona. */
+  var elLogo = null;
+  function garantirLogo() {
+    if (elLogo || !document.querySelector('.banner')) return;
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('class', 'hero-logo-m');
+    svg.setAttribute('viewBox', '0 0 101 102');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+    var p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', M_PATH);
+    svg.appendChild(p);
+    document.querySelector('.banner').appendChild(svg);
+    elLogo = svg;
+  }
+  function posicionarLogo(hor) {
+    if (!elLogo) return;
+    var t = tamanhoLogo(), cx = centroX || W * .5;
+    if (!t) { elLogo.style.display = 'none'; return; }
+    elLogo.style.width = t + 'px';
+    elLogo.style.height = t + 'px';
+    elLogo.style.left = cx + 'px';
+    elLogo.style.top = hor + 'px';
+    elLogo.style.display = 'block';
   }
   function desenhar(t, alpha, vel) {
     var hor = H * .62, f, x, y, g, i, v, c, co, L, p;
@@ -153,7 +186,7 @@
       ctx.strokeStyle = rgba(alpha * .14);
       ctx.beginPath(); ctx.moveTo(L.x0, L.y0); ctx.lineTo(L.x1, L.y1); ctx.stroke();
     }
-    desenharLogo(alpha, hor);            /* onda34: o centro de tudo */
+    desenharHalo(alpha, hor);            /* onda36: so o halo fica no canvas */
     for (c = 0; c < cometas.length; c++) { /* cometas descendo */
       co = cometas[c];
       co.p += co.vel * .011 * vel;

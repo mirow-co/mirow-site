@@ -45,6 +45,36 @@ python tools/verificacoes.py .
 - Toda onda nova **ADICIONA** asserções. Só se remove asserção com decisão explícita do Mario.
 - Asserções ainda não implementáveis entram como `PENDENTE` (não como sucesso silencioso).
 
+#### P2.1 — MEDIR O EFEITO, NÃO A DECLARAÇÃO (a regra mais importante da suíte)
+
+> **Asserção que confere o que está escrito passa enquanto o site está errado.**
+
+Aprendido três vezes em 04/08 (ondas 33b e 35), sempre do mesmo jeito: a asserção olhava a
+string e o navegador fazia outra coisa.
+
+| Asserção que olhava a declaração | O que o navegador realmente fazia | O conserto |
+|---|---|---|
+| `M01` procurava o **nome** do arquivo de medição no HTML | o `src` era `/wp-content/...`, sem o prefixo `/mirow-site/` → **404 em 143 páginas**, e a M01 passava | `S123` resolve o caminho e exige que o arquivo **exista no disco** |
+| o CSS **declarava** `font-weight:800` nos big numbers | 800 não é carregado (`wght@…;700;900`) → o navegador desenhava **900/Black** | `V21` mede o peso **computado**; `S127` proíbe declarar peso fora do conjunto que o `<head>` carrega |
+
+**A regra, na prática:** ao escrever asserção, pergunte *"o que o navegador faz com isso?"*, não
+*"o que está escrito?"*. Em ordem de preferência:
+
+1. **Computado/renderizado** — `getComputedStyle`, `getBoundingClientRect`, hover real, ciclo de
+   animação, imagem com `complete && naturalWidth>0`. É o padrão das asserções `V*`.
+2. **Recalcular e comparar** — refazer a conta e conferir contra o que está no arquivo
+   (`S116` reprojeta os pins, `S120` regera o sitemap inteiro, `S125` recompara o path da marca).
+3. **Resolver a referência** — não basta o nome aparecer: o caminho tem de resolver e o arquivo
+   existir (`S123`, `E05`).
+4. **Atacar a causa-raiz, não só o sintoma** — quando um bug tem uma classe, escreva a asserção
+   da classe. A `S127` não protege os big numbers: proíbe **qualquer** peso órfão, e lê o
+   conjunto disponível do próprio `<head>`, então acompanha se a fonte mudar.
+
+**Corolário — valores gêmeos.** Nunca declarar o mesmo valor em dois lugares. Quatro bugs da
+onda 31 e o peso da onda 35 eram valores gêmeos que divergiram sem ninguém ver. Ao mudar um valor
+que outra onda definiu, **edite no lugar** (com comentário datado) em vez de somar um bloco de
+override.
+
 ### P3 — Fonte única de dados
 Dado curado mora em **um** arquivo mestre, no repo privado, e o HTML é **gerado** dele.
 Caso que originou a regra: a Sotreq ficou fora da barra de clientes porque a decisão do sócio
@@ -66,9 +96,24 @@ screenshots.**
 `C:\dev\mirow-site` é a **única** pasta. Trabalho em branches normais dentro dela.
 Proibido: `git worktree` persistente, cópias `mirow-site-*`, pastas de serve (`_serve9`),
 junctions de deploy. Elas já causaram QA em cima da árvore errada.
-Se precisar servir local para QA: `python -m http.server` a partir da raiz que contém `public/`
-e **matar o processo ao terminar** (conferir se não há um órfão servindo pasta errada antes de
-acreditar em qualquer screenshot).
+Para servir local em QA, **use o `ServidorLocal` da própria suíte** — não suba um `http.server`
+na mão. As páginas referenciam tudo em `/mirow-site/...`; servir `public/` na raiz dá **404 em
+todo CSS/JS** e a página renderiza sem estilo (aconteceu em 04/08 e produziu um contact sheet
+inteiro inválido). O `ServidorLocal` monta a junction `mirow-site -> public` num diretório
+temporário, e o `__exit__` derruba o servidor e remove a junction:
+
+```python
+import sys; sys.path.insert(0, "tools")
+from verificacoes import Navegador, ServidorLocal
+with ServidorLocal("public") as srv, Navegador() as nav:
+    nav.abrir("%s/pt/" % srv.base())          # base() já traz o prefixo
+    print(nav.js("getComputedStyle(document.querySelector('h2')).fontWeight"))
+```
+
+Os scripts de `tools_onda6/qa/` recebem **URL**: passe `srv.base()`, nunca uma porta própria.
+Se ainda assim subir um servidor à mão, confirme que morreu com
+`Get-NetTCPConnection -LocalPort <porta> -State Listen` — um `curl` logo após o kill ainda
+responde 200 e engana.
 
 ## Mudanças de conteúdo — scripts idempotentes
 
@@ -143,6 +188,8 @@ e o passo a passo de capturar referência visual de outro site via CDP (sem play
 | **33b** | **NO AR** (04/08, v=32) — dois achados da própria onda 33, corrigidos a pedido do Mario (S-123/S-124). **O asset de medição 404ava em 143 páginas**: os stubs da S-107 o referenciavam como `/wp-content/...`, sem o prefixo `/mirow-site/`, porque o `base_prefix()` deduz o prefixo de uma referência a wp-content que o stub mínimo não tem. A **M01 passava do mesmo jeito** — ela procura o nome do arquivo na string, não o caminho resolvido; a **S123** agora exige que todo asset próprio tenha o prefixo E exista no disco. **O `hreflang` das páginas de imprensa apontava para a política de privacidade**: a S-106 criou `en/press/` e `de/presse/` de um molde alheio e o bloco de hreflang veio junto, então o Google recebia que a imprensa em inglês era a versão inglesa da política; `pt/imprensa/` não tinha nenhum. As três passam a se apontar (**S124**). **Correção de registro:** não é verdade que o site não tem hreflang — 106 das 113 páginas de conteúdo têm, e corretamente (a busca que disse o contrário assumia `rel` antes de `href`; o tema escreve `href` no meio). Das 7 sem, 4 são artigos só em PT (sem tradução, então sem alternativa a declarar) e 1 é a `en/homepage` (decisão aberta na #65). Suíte: **149 asserções**. |
 | **34** | **NO AR** (04/08, gh-pages `bca52a8`, v=32) — S-125 (#178): o **"m" da Mirow no centro do hero**, como fonte das linhas dinamicas. Tudo dentro de `onda17-horizonte.js`; nenhum HTML ou CSS novo. **O glifo vem da marca oficial em vetor** (primeiro `<path>` de `marca-mirow-co.svg`), nao da imagem do LinkedIn que o pedido citava — aquela e um JPEG de 200x200 com token que expira, e sairia borrada num elemento que o pedido quer grandioso. A **S125 recompara** os dois paths. **O centro nao e o do palco:** medido, um logo de 300px centrado em `W/2` em 1400px fica com 270px atras do card do slogan e 30px no azul aberto — sai torto; entao o centro e o meio do **vao entre `.hero-texto` e `.hero-numeros`**, medido do DOM (3 idiomas, toda largura), com fallback ao centro do palco quando os cards empilham (<=1200px). **As linhas foram apertadas de `v*38` para `v*10`**: as 29 origens passam a cair dentro do logo e a sair de dentro dele. Escala 300px/alpha 0.68 no desktop -> 92px/0.40 no estreito, onde entra como marca d'agua ATRAS do texto em vez de atropela-lo (em 390px fica quase invisivel — deliberado, e o ponto mais provavel de revisao). Contact sheet 320-1920: 0px de overflow. Suite: **150 assercoes**. |
 | **35** | S-126 (#179): os **big numbers do hero sem bold**. O pedido do Mario foi "nao seja bold, esta muito gordinho" — e o achado explica o sintoma: o CSS pedia `font-weight:800`, mas **800 nao esta entre os pesos carregados** (o `<head>` pede `wght@200;300;400;600;700;900`). O navegador arredondava para cima e os numeros saiam em **900/Black** — o peso mais gordo da familia, que ninguem escreveu. Comparados lado a lado num render real, 800 e 900 sao identicos. Peso vai a **400 (Regular)**, que existe de verdade; tamanho (62px) e cor (ciano) nao mudam. Corrigido **no lugar**, dentro do bloco `onda10:hero-numeros`, e nao num bloco de override — dois lugares declarando o mesmo `font-weight` e a classe de bug dos "valores gemeos" da onda 31. Os outros 3 `font-weight:800` do CSS (eyebrow, botao do pin e num da lista da Nossa Rede) passaram a declarar **900**, que e o que o navegador ja lhes dava: CSS honesto, **zero mudanca visual**. Duas assercoes: a **V21** mede o peso COMPUTADO nas 4 homes (era ali que o bug morava) e a **S127** pega a causa-raiz — nenhum `font-weight` pode pedir peso fora do conjunto que o `<head>` carrega, lendo o conjunto do proprio `<head>`. Suite: **152 assercoes**. v=33. |
+| **36** | S-127 (#180): o **"m" solido, branco e NA FRENTE**. Pedido do Mario: "nao seja transparente, seja branco solido e na frente de tudo que estiver atras". O glifo **saiu do canvas** e virou **elemento SVG** em `z-index:10` — na frente dos cards (z=4), atras do header (z=20). Canvas nao servia: ele mora no `.banner__background` (z=1), e mover o canvas inteiro poria a grade e os cometas por cima do texto. O halo ciano fica no canvas, atras. **O conflito que o pedido criou:** translucido e atras, sobrepor texto era inofensivo; **opaco e na frente, sobrepor APAGA**. Medido com os 300px fixos da S-125: cobria 200x27px de "Focamos em estrategia, compras e go-to-market..." em 992px, 3 linhas do subtitulo em 390px, e o botao do WhatsApp em 320px. Solucao: o tamanho passa a ser **derivado do vao livre entre os cards**, medido do DOM — nunca maior que o vao menos 16px, no maximo 300px, e **oculto** se o vao < 90px. "Nao cobrir texto" vira garantia por construcao. Assercao **V22**: 0 colisao com glifo em 9 larguras (320-2560), medindo caixas TIGHT por linha (`Range.getClientRects`), mais fill branco puro, opacidade 1 e z-index > 4. A **S125 foi atualizada** junto (cobrava `desenharLogo(`, que deixou de existir) — a suite bloqueou o deploy e apontou. |
+| **37** | S-128 (#181): **as caixas do hero estreitadas** para o M ter espaco. Pedido do Mario: "ficou muito larga a caixa transparente dos lados, sobra pouco espaco para o M". O card do slogan estava **superdimensionado**: medido nos 4 homes, `.hero-texto` vai de **780 -> 580px** (em 560 o subtitulo alemao quebra em 3 linhas). Vao central em 1400px: **140px -> 320px**, e o logo volta de 124px para **300px**; em 1200px ele passa a aparecer (162px). **Achado no caminho:** a pilha de numeros **ALARGOU** (400 -> 420px) porque a legenda alema "der Projekte werden fuer Kunden mit einem Jahresumsatz..." estava em **3 LINHAS em 1400px, no ar** — e a **V07 passava verde** porque testava so `pt/` em 1920x1080, embora o titulo dela prometa "no maximo 2 linhas" sem qualificar. Quarto caso do **P2.1** na mesma sessao. A V07 passa a cobrir **4 homes x 4 larguras**. Tambem sairam dois **valores gemeos mortos** da onda 16 (`width:330px` e `380px` de `.hero-numeros`, ambos sobrescritos pela onda 18). Consequencia cosmetica: as 4 pilulas de contato quebram em 2 fileiras (2+2 em de/, 3+1 em pt/); 0px de overflow no contact sheet. Suite: **153 assercoes**. |
 | — | **Merge do PR #12** (medição do Marcell) na onda 31: os dois lados somados em `verificacoes.py` (S111–S116 + M01–M05) e em `27_cache_busting.py` (`onda17-horizonte.js` + `onda31-medicao.js`). **Lição:** publiquei `gh-pages` de um `main` local não empurrado e criei a divergência — **empurrar primeiro, publicar depois**. |
 Backlog aberto: issues `site-onda` (S-01..S-19) no `mirow-co/mirow-marketing`.
 
@@ -155,6 +202,14 @@ Backlog aberto: issues `site-onda` (S-01..S-19) no `mirow-co/mirow-marketing`.
 5. QA sem asserção de regressão do acumulado.
 6. Inserir `<link>`/`<script>` sem `?v=` (cache serve versão velha).
 7. Acreditar em screenshot sem checar qual pasta o servidor local está servindo.
+   Em 04/08 subi `http.server --directory public` **sem o prefixo `/mirow-site/`**: todo CSS/JS
+   absoluto deu 404, as páginas renderizaram **sem estilo** e o contact sheet acusou um
+   "PROBLEMA" que não existia. Para QA use o **`ServidorLocal` da própria suíte** — ele monta a
+   junction `mirow-site -> public` num temp e a remove ao sair.
+8. Escrever asserção que confere a **declaração** em vez do **efeito** — ver **P2.1**, a regra
+   mais importante da suíte. É o erro que mais passou desapercebido aqui.
+9. Editar CSS/JS de asset e **não incrementar a `VERSAO`** do cache busting: o navegador serve o
+   arquivo velho e a correção "não funciona" no ar (a onda 35 quase publicou assim).
 
 ## Governança a cada marco
 

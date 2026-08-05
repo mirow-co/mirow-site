@@ -84,7 +84,7 @@ BLOCOS_CSS = [
     # tools/gen_rede.py e o estilo vive no bloco onda31:rede. O antigo era CSS
     # morto — as classes .onda21-* não existem mais na página.
     "onda26:fonte-unica", "onda27:barra-igual", "onda29:abertura-padrao",
-    "onda30:titulo-secao", "onda31:rede",
+    "onda30:titulo-secao", "onda31:rede", "onda36:logo-frente",
 ]
 
 # Marcadores HTML das entregas, e em quantas páginas cada um precisa aparecer.
@@ -2130,11 +2130,19 @@ def estaticas(s):
             return (False, u"o M_PATH do canvas divergiu do 1º path de %s "
                            u"(marca %d chars, canvas %d chars)"
                     % (svg_rel, len(oficial[0]), len(m.group(1))))
-        # e o logo tem de ser efetivamente desenhado na cena
-        falta = [t for t in ("desenharLogo(", "new Path2D(M_PATH)", "medirCentro(")
-                 if t not in js]
+        # e o logo tem de ser efetivamente construído. ATENÇÃO: até a onda 35 isto
+        # cobrava `desenharLogo(` (o m era pintado no canvas). Na onda 36 o glifo saiu
+        # do canvas e virou ELEMENTO SVG (`.hero-logo-m`), para poder ficar na frente
+        # dos cards — então o que se cobra aqui mudou junto. Não é afrouxamento: a
+        # V22 mede o elemento renderizado (sólido, z-index, 0 colisão com texto).
+        falta = [t for t in ("garantirLogo(", "hero-logo-m", "medirCentro(",
+                             "posicionarLogo(") if t not in js]
         if falta:
-            return (False, u"o canvas não desenha o logo: falta %s" % ", ".join(falta))
+            return (False, u"o hero não constrói o logo: falta %s" % ", ".join(falta))
+        # o path do elemento SVG tem de ser o M_PATH, não uma cópia colada
+        if "p.setAttribute('d', M_PATH)" not in js:
+            return (False, u"o <path> do SVG não usa a constante M_PATH — risco de "
+                           u"cópia divergente do glifo")
         return (True, u"M_PATH idêntico ao da marca (%d chars)" % len(oficial[0]))
     s.check("S125", u'o "m" do hero vem da marca oficial, sem cópia divergente (#178)',
             s125)
@@ -2393,19 +2401,41 @@ def ao_vivo(s):
         # V07 — S-41 (#97): nenhum bloquinho da pilha de números com mais de
         # 2 linhas de texto (medido: altura do span / line-height) em desktop.
         def v07():
-            nav.abrir("%s/pt/" % base, 1920, 1080)
-            v = nav.js(
-                "(function(){var ts=document.querySelectorAll('.hero-numeros__texto');"
-                "if(!ts.length)return 'pilha de números não encontrada';var ruins=[];"
-                "for(var i=0;i<ts.length;i++){var cs=getComputedStyle(ts[i]);"
-                "var lh=parseFloat(cs.lineHeight);"
-                "var linhas=Math.round(ts[i].getBoundingClientRect().height/lh);"
-                "if(linhas>2)ruins.push(i+':'+linhas+'linhas');}"
-                "return ruins.length?ruins.join(' '):'ok:'+ts.length;})()")
-            if isinstance(v, str) and v.startswith("ok:"):
-                return (True, u"%s blocos, todos com ≤2 linhas (1920x1080)" % v[3:])
-            return (False, u"bloco(s) com mais de 2 linhas: %s" % v)
-        s.check("V07", u"números do hero com no máximo 2 linhas por bloco", v07)
+            # AMPLIADA na onda 37. Antes media só `pt/` em 1920x1080 — e o título
+            # dela promete "no máximo 2 linhas" sem qualificar. Resultado: a legenda
+            # alemã "der Projekte werden für Kunden mit einem Jahresumsatz..." estava
+            # em 3 LINHAS em 1400px, no ar, e a asserção passava verde. É o mesmo
+            # padrão do P2.1: a asserção era mais estreita que o invariante que diz
+            # proteger. Agora cobre as 4 homes nas larguras onde a pilha existe.
+            js = ("(function(){var ts=document.querySelectorAll('.hero-numeros__texto');"
+                  "if(!ts.length)return JSON.stringify({vazio:true});var ruins=[];"
+                  "for(var i=0;i<ts.length;i++){var cs=getComputedStyle(ts[i]);"
+                  "var lh=parseFloat(cs.lineHeight);"
+                  "var n=Math.round(ts[i].getBoundingClientRect().height/lh);"
+                  "if(n>2)ruins.push(n+'linhas: '+ts[i].textContent.trim().slice(0,34));}"
+                  "return JSON.stringify({total:ts.length,ruins:ruins});})()")
+            det = []
+            medidos = 0
+            for rel in HOMES:
+                for w, h in [(1920, 1080), (1600, 900), (1400, 900), (1200, 900)]:
+                    nav.abrir("%s/%s" % (base, rel.replace("index.html", "")), w, h)
+                    try:
+                        d = json.loads(nav.js(js))
+                    except Exception as e:
+                        det.append(u"%s @%d: não deu para medir (%r)" % (rel, w, e))
+                        continue
+                    if d.get("vazio"):
+                        continue      # abaixo de 1200 a pilha não é exibida
+                    medidos += 1
+                    if d["ruins"]:
+                        det.append(u"%s @%dpx — %s" % (rel, w, "; ".join(d["ruins"])))
+            if not medidos:
+                det.append(u"a pilha não foi encontrada em nenhuma home/largura")
+            return (not det, u"%d bloco(s) com mais de 2 linhas: %s"
+                    % (len(det), "; ".join(det[:3])))
+        # o título não pode ter "≤": o console do Windows é cp1252 e o print explode
+        s.check("V07", u"números do hero com no máximo 2 linhas — 4 homes x 4 larguras",
+                v07)
 
         # V08 — S-98 (#156): UMA fonte renderizada por página. Aqui não se olha
         # o CSS, se olha o que o navegador computou em cada elemento visível —
@@ -2762,6 +2792,68 @@ def ao_vivo(s):
                                    % (rel, d["txt"], d["cor"]))
             return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:4])))
         s.check("V21", u"big numbers do hero sem bold, nas 4 homes (#179)", v21)
+
+        # V22 — S-127 (#180): o "m" sólido e na frente NÃO pode cobrir texto.
+        # Enquanto era translúcido e ficava atrás, sobrepor era inofensivo. Opaco e em
+        # z-index 10, qualquer sobreposição APAGA o que está embaixo — medido: com
+        # 300px fixos ele comia 200px de "Focamos em estratégia, compras e
+        # go-to-market..." em 992px. Aqui se medem as caixas TIGHT de cada linha de
+        # texto (Range.getClientRects, não a caixa do elemento) contra o retângulo do
+        # logo, em 9 larguras. É o P2.1 em ação: mede o efeito, não a declaração.
+        def v22():
+            js = ("(function(){var lg=document.querySelector('.hero-logo-m');"
+                  "if(!lg) return JSON.stringify({erro:'logo nao existe'});"
+                  "var cs=getComputedStyle(lg);"
+                  "if(cs.display==='none') return JSON.stringify({oculto:true});"
+                  "var L=lg.getBoundingClientRect();"
+                  "var pc=getComputedStyle(lg.querySelector('path'));"
+                  "var hero=document.querySelector('.banner');"
+                  "var it=document.createTreeWalker(hero,NodeFilter.SHOW_TEXT,null);"
+                  "var n,out=[];"
+                  "while(n=it.nextNode()){if(!n.nodeValue.trim())continue;"
+                  "var r=document.createRange();r.selectNodeContents(n);"
+                  "var rc=r.getClientRects();"
+                  "for(var i=0;i<rc.length;i++){var b=rc[i];"
+                  "if(!b.width||!b.height)continue;"
+                  "var ox=Math.min(L.right,b.right)-Math.max(L.left,b.left);"
+                  "var oy=Math.min(L.bottom,b.bottom)-Math.max(L.top,b.top);"
+                  "if(ox>0&&oy>0)out.push(n.nodeValue.trim().slice(0,30)+' '"
+                  "+Math.round(ox)+'x'+Math.round(oy));}}"
+                  "return JSON.stringify({larg:Math.round(L.width),z:cs.zIndex,"
+                  "op:cs.opacity,fill:pc.fill,colisoes:out});})()")
+            det = []
+            visto = 0
+            for w, h in [(2560, 1200), (1920, 1000), (1600, 900), (1400, 900),
+                         (1200, 900), (992, 900), (768, 900), (390, 844), (320, 700)]:
+                nav.abrir("%s/pt/" % base, w, h)
+                try:
+                    d = json.loads(nav.js(js))
+                except Exception as e:
+                    det.append(u"%dpx: não deu para medir (%r)" % (w, e))
+                    continue
+                if d.get("erro"):
+                    det.append(u"%dpx: %s" % (w, d["erro"]))
+                    continue
+                if d.get("oculto"):
+                    continue          # oculto é resposta legítima: não cabe no vão
+                visto += 1
+                if d["colisoes"]:
+                    det.append(u"%dpx cobre texto: %s"
+                               % (w, "; ".join(d["colisoes"][:2])))
+                if d["op"] != "1":
+                    det.append(u"%dpx: opacidade %s (o pedido foi sólido)"
+                               % (w, d["op"]))
+                if d["fill"].replace(" ", "") != "rgb(255,255,255)":
+                    det.append(u"%dpx: fill %s (esperado branco puro)"
+                               % (w, d["fill"]))
+                if not d["z"].isdigit() or int(d["z"]) <= 4:
+                    det.append(u"%dpx: z-index %s não fica na frente dos cards"
+                               % (w, d["z"]))
+            if not visto:
+                det.append(u"o logo não apareceu em NENHUMA largura")
+            return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
+        s.check("V22", u'o "m" sólido na frente não cobre texto em nenhuma largura (#180)',
+                v22)
 
 
 # ------------------------------------------------------------------- main
