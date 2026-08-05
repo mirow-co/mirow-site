@@ -33,22 +33,32 @@
   var M_VB = 102;                       /* lado do viewBox usado para escalar */
   var mPath = (typeof Path2D === 'function') ? new Path2D(M_PATH) : null;
 
-  /* Tamanho do logo. A partir da onda 36 ele e SOLIDO e fica NA FRENTE dos cards,
-   * e isso muda a matematica: enquanto era translucido e ficava atras, podia passar
-   * por tras do texto sem prejuizo. Opaco e na frente, qualquer sobreposicao APAGA
-   * o texto — medido: com 300px fixos ele cobria 200px da linha "Focamos em
-   * estrategia, compras e go-to-market..." em 992px, e 21px da legenda dos big
-   * numbers em 1400px.
-   * Entao o tamanho passa a ser derivado do VAO LIVRE entre os dois cards, medido
-   * do DOM: nunca maior que o vao (menos uma folga), e no maximo 300px. Assim
-   * "nao cobrir texto" e garantido por construcao, e nao por tentativa.
-   * Vao menor que MIN_VAO (cards empilhados, <=1200px): o logo NAO aparece — e
-   * melhor nao ter logo do que ter a proposta de valor tapada por ele. */
-  var MAX_LOGO = 300, FOLGA_VAO = 16, MIN_VAO = 90;
+  /* TAMANHO DO LOGO — derivado do vao entre os cards, nunca fixo.
+   *
+   * Por que nao e fixo (onda 36): desde que o "m" e SOLIDO e fica NA FRENTE dos
+   * cards, sobrepor deixou de ser inofensivo e passou a APAGAR o que esta embaixo.
+   * Com 300px fixos ele cobria 200x27px de "Focamos em estrategia, compras e
+   * go-to-market..." em 992px, 3 linhas do subtitulo em 390px e o botao do WhatsApp
+   * em 320px. Derivando do vao, "nao cobrir texto" e garantia por construcao.
+   *
+   * Por que e uma FRACAO e nao "o vao inteiro menos uma folga" (onda 38): com
+   * `vao - 16` o M ficava a 10px de cada card em 1400px. O Mario, olhando o 1920:
+   * "o M pode ser menor, nao precisa ficar encostando nas laterais dos cards. eu
+   * gostei mais desse aqui". No 1920 o vao tem 820px e o M 300px (capado) — ~260px
+   * de ar por lado. E essa proporcao que ele aprovou, e o 0.6 a preserva: em
+   * >=1600px o cap de 300px manda (identico ao aprovado) e em 1400px da 192px com
+   * ~64px de folga por lado.
+   *
+   * MIN_LOGO cobre o outro extremo: abaixo dele o glifo para de ler como marca e
+   * vira sujeira, entao nao aparece. Em <=992px os cards empilham, o vao zera e o
+   * logo sai — melhor nao ter logo do que ter a proposta de valor tapada.
+   *
+   * A folga resultante e cobrada pela V22 (>=24px de cada card). */
+  var MAX_LOGO = 300, FRACAO_VAO = 0.6, MIN_LOGO = 80;
   function tamanhoLogo() {
-    var v = vaoEntreCards();
-    if (v < MIN_VAO) return 0;                       /* nao cabe: nao mostra */
-    return Math.min(MAX_LOGO, Math.floor(v - FOLGA_VAO));
+    var t = Math.floor(vaoEntreCards() * FRACAO_VAO);
+    if (t < MIN_LOGO) return 0;                      /* pequeno demais: nao mostra */
+    return Math.min(MAX_LOGO, t);
   }
 
   /* ------------------------------- cena ------------------------------- */
@@ -82,7 +92,11 @@
   function vaoEntreCards() { return _vao ? _vao.largura : 0; }
   function medirCentro() {
     /* centro do vao quando ele existe; senao o centro do palco */
-    if (_vao && _vao.largura >= MIN_VAO) return (_vao.esq + _vao.dir) / 2;
+    /* mesma condicao de tamanhoLogo(): se o vao comporta um logo legivel, o
+       centro e o meio dele; senao, o centro do palco. Uma condicao so, para
+       centro e tamanho nunca discordarem (P2.1: sem valores gemeos). */
+    if (_vao && _vao.largura * FRACAO_VAO >= MIN_LOGO)
+      return (_vao.esq + _vao.dir) / 2;
     return W * .5;
   }
   function semear() {

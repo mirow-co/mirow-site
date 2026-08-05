@@ -2819,8 +2819,13 @@ def ao_vivo(s):
                   "var oy=Math.min(L.bottom,b.bottom)-Math.max(L.top,b.top);"
                   "if(ox>0&&oy>0)out.push(n.nodeValue.trim().slice(0,30)+' '"
                   "+Math.round(ox)+'x'+Math.round(oy));}}"
+                  "var t=document.querySelector('.hero-texto');"
+                  "var nn=document.querySelector('.hero-numeros');"
+                  "var fe=null,fd=null;"
+                  "if(t&&nn){var rt=t.getBoundingClientRect(),rn=nn.getBoundingClientRect();"
+                  "fe=Math.round(L.left-rt.right);fd=Math.round(rn.left-L.right);}"
                   "return JSON.stringify({larg:Math.round(L.width),z:cs.zIndex,"
-                  "op:cs.opacity,fill:pc.fill,colisoes:out});})()")
+                  "op:cs.opacity,fill:pc.fill,colisoes:out,fe:fe,fd:fd});})()")
             det = []
             visto = 0
             for w, h in [(2560, 1200), (1920, 1000), (1600, 900), (1400, 900),
@@ -2849,6 +2854,17 @@ def ao_vivo(s):
                 if not d["z"].isdigit() or int(d["z"]) <= 4:
                     det.append(u"%dpx: z-index %s não fica na frente dos cards"
                                % (w, d["z"]))
+                # onda 38: o M não pode ENCOSTAR nos cards. Com a regra antiga
+                # (vão - 16) ele ficava a 10px de cada um em 1400px, e o Mario pediu
+                # que respirasse. 24px é o piso; a regra real é a fração de 0,6 do
+                # vão, que na prática dá 64px em 1400 e 260px em 1920.
+                FOLGA_MIN = 24
+                for lado, v in (("esquerda", d.get("fe")), ("direita", d.get("fd"))):
+                    if v is None:
+                        continue
+                    if v < FOLGA_MIN:
+                        det.append(u"%dpx: só %dpx de folga do card da %s "
+                                   u"(mínimo %dpx)" % (w, v, lado, FOLGA_MIN))
             if not visto:
                 det.append(u"o logo não apareceu em NENHUMA largura")
             return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
