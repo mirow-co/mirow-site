@@ -51,8 +51,9 @@ CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 
 # ---------------------------------------------------------------- constantes
 
-# As 4 homes do site (pt, en, de e a duplicata /en/homepage/ — ver S-16).
-HOMES = ["pt/index.html", "en/index.html", "de/index.html", "en/homepage/index.html"]
+# As 3 homes do site (pt, en, de). A duplicata /en/homepage/ virou stub de
+# redirect na onda 41 (S-135/#65): /en/ é a canônica.
+HOMES = ["pt/index.html", "en/index.html", "de/index.html"]
 
 # Versão de cache-busting esperada = a constante VERSAO do 27_cache_busting.py.
 ASSETS_PROPRIOS = [
@@ -94,7 +95,8 @@ BLOCOS_CSS = [
 # alemãs já traziam "Karriere" nativo do tema. O invariante de verdade — todas as
 # páginas terem link de carreiras no menu — é a asserção H08, não o marcador.
 MARCADORES = [
-    ("onda5:clientes-logos", 4), ("onda6:praticas", 4), ("onda7:lideres-link", 4),
+    # Onda 41 (S-135/#65): en/homepage virou stub — marcadores de home valem 3.
+    ("onda5:clientes-logos", 3), ("onda6:praticas", 3), ("onda7:lideres-link", 3),
     # ATENCAO (onda 29 / S-107): as 275 paginas viraram 125 de CONTEUDO + 160
     # stubs de redirect (uma URL por pagina). Os marcadores de barra/rodape agora
     # se contam sobre as de conteudo — o numero e o piso, nao a meta.
@@ -105,17 +107,17 @@ MARCADORES = [
     # o marcador de carreiras nunca existiu nas paginas DE (medido: 44 pt + 41 en,
     # 0 de) — o item esta lá, o comentario e que nao. Piso = pt+en.
     ("onda7:menu-carreiras", 74),
-    ("onda8:menu-contatos", 110), ("onda8:hero-contatos", 4), ("onda8:dobra", 4),
-    ("onda10:hero-numeros", 4), ("onda11:s08-hero-contatos", 3),
+    ("onda8:menu-contatos", 110), ("onda8:hero-contatos", 3), ("onda8:dobra", 3),
+    ("onda10:hero-numeros", 3), ("onda11:s08-hero-contatos", 3),
     # onda13:hero-malha saiu em 03/08 (S-49/#107): o bloco do video virou os
     # canvases do Horizonte 2050.
-    ("onda17:hero-horizonte", 4),
+    ("onda17:hero-horizonte", 3),
     # onda14:rodape-menu e onda15:rodape-contatos saíram em 31/07 (decisão
     # explícita do Mario na #91: "IDENTICAS" — a nav recriada virou o clone
     # literal onda15:rodape-barra).
-    ("onda15:hero-texto", 4), ("onda15:rodape-barra", 110),
+    ("onda15:hero-texto", 3), ("onda15:rodape-barra", 110),
     # onda 18: botao de voltar ao topo em todas; planeta so nas homes
-    ("onda18:voltar-topo", 110), ("onda18:planeta-setores", 4),
+    ("onda18:voltar-topo", 110), ("onda18:planeta-setores", 3),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -918,8 +920,10 @@ def estaticas(s):
     s.check("S55", u'"Trabalhe Conosco" legível em carreiras (#113)', s55)
 
     def s56():
-        # o card de insight não pode começar em grayscale(100%)
-        ok = (".page-insights__list-image{filter:grayscale(0%) brightness(0.38) !important}"
+        # o card de insight não pode começar em grayscale(100%). Onda 41 (#187):
+        # o brightness que apagava a foto subiu de 0.38 para 0.9 e a legibilidade
+        # veio do scrim — o efeito renderizado é a V24; aqui fica a declaração.
+        ok = (".page-insights__list-image{filter:grayscale(0%) brightness(0.9) !important}"
               in css_o18)
         return (ok, u"falta a regra que tira o grayscale inicial dos insights")
     s.check("S56", u"insights começam coloridos (#114)", s56)
@@ -1259,11 +1263,13 @@ def estaticas(s):
         det = []
         for rel in IMPRENSA:
             h = s.ler(rel)
-            for veic, dom in ((u"Estadão", "estadao.com.br"),
-                              (u"Folha de S.Paulo", "folha.uol.com.br"),
-                              (u"Valor Econômico", "valor.globo.com")):
+            # Onda 41 (#190): os favicons viraram wordmarks em imprensa-logos/;
+            # o invariante segue o mesmo — o logo pertence ao VEÍCULO da linha.
+            for veic, dom in ((u"Estadão", "imprensa-logos/estadao.svg"),
+                              (u"Folha de S.Paulo", "imprensa-logos/folha.svg"),
+                              (u"Valor Econômico", "imprensa-logos/valor.svg")):
                 itens = re.findall(
-                    r'<img class="onda18-imprensa__logo" src="([^"]+)"[^>]*>'
+                    r'<img class="onda41-imprensa__logo" src="([^"]+)"[^>]*>'
                     r'<span class="onda18-imprensa__veiculo">' + re.escape(veic) + '</span>', h)
                 if not itens:
                     det.append(u"%s: nenhum item de %s" % (rel, veic))
@@ -2172,6 +2178,113 @@ def estaticas(s):
     s.check("S127", u"nenhum font-weight pede peso que a fonte não carrega (#179)",
             s127)
 
+    # S128 — onda 41 (#187): a caixinha de expertise é "Estratégia e Inovação"
+    # nas 3 homes (decisão FD+AM 05/08). A âncora é o ícone do card, para não
+    # confundir com o hero nem com o menu Práticas.
+    def s128():
+        alvo = {"pt/index.html": u"Estratégia e Inovação",
+                "en/index.html": u"Strategy &amp; Innovation",
+                "de/index.html": u"Strategie &amp; Innovation"}
+        det = []
+        for rel, txt in alvo.items():
+            if ('icon-strategy.svg"><span>%s</span>' % txt) not in s.ler(rel):
+                det.append(u"%s sem '%s'" % (rel, txt))
+        return (not det, u"; ".join(det))
+    s.check("S128", u'caixinha de expertise é "Estratégia e Inovação" nas 3 homes (#187)',
+            s128)
+
+    # S129 — onda 41: todo logo de veículo/cliente resolve para arquivo existente
+    # E todo SVG de logo declara width/height na raiz. Causa-raiz de dois bugs da
+    # onda: santos-brasil.svg sem width/height renderizava 0x0 (o navegador não
+    # deriva tamanho de viewBox em <img> com max-width/max-height auto), e o jpg
+    # antigo apontado depois de removido daria 404 silencioso.
+    def s129():
+        det = []
+        rex = re.compile(r'<img class="(?:clientes-logos__item-img|onda41-imprensa__logo)[^"]*"[^>]*src="([^"?]+)')
+        vistos = set()
+        for rel in ["pt/index.html", "en/index.html", "de/index.html",
+                    "pt/imprensa/index.html", "en/press/index.html",
+                    "de/presse/index.html"]:
+            h = s.ler(rel)
+            for m in re.finditer(r'<img [^>]*src="(/[^"?]+\.(?:svg|png|jpg))[^"]*"[^>]*>', h):
+                src = m.group(1)
+                if ("clientes/" not in src and "imprensa" not in src) or src in vistos:
+                    continue
+                vistos.add(src)
+                caminho = src.replace("/mirow-site/", "", 1)
+                fs = os.path.join(s.pub, caminho.replace("/", os.sep))
+                if not os.path.exists(fs):
+                    det.append(u"%s não existe (%s)" % (src, rel))
+                    continue
+                if src.endswith(".svg"):
+                    with io.open(fs, encoding="utf-8", errors="ignore") as f:
+                        raiz = re.search(r"<svg[^>]*>", f.read())
+                    if not raiz or "width=" not in raiz.group(0) or "height=" not in raiz.group(0):
+                        det.append(u"%s sem width/height na raiz" % src)
+        return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:4])))
+    s.check("S129", u"logos (clientes+imprensa) existem e todo SVG tem width/height",
+            s129)
+
+    # S130 — onda 41 (#65): /en/ é a home EN canônica. A duplicata /en/homepage/
+    # é stub noindex com refresh para /en/, e as 3 homes se apontam por hreflang
+    # (fecha a pendência da 33b). O sitemap sem a duplicata já é coberto pela
+    # S120, que o RECALCULA.
+    def s130():
+        det = []
+        h = s.ler("en/homepage/index.html")
+        if "onda41:home-en-canonica" not in h:
+            det.append(u"en/homepage não é o stub da onda 41")
+        else:
+            if 'content="0;url=/mirow-site/en/"' not in h:
+                det.append(u"stub não redireciona para /en/")
+            if "noindex" not in h:
+                det.append(u"stub sem noindex")
+        # As homes JÁ tinham hreflang completo do tema (pt/en/de + x-default —
+        # medido em 06/08; o registro da 33b sobre "home sem hreflang" era só a
+        # en/homepage). Aqui se cobra: o trio aponta as 3 homes, e NENHUMA
+        # página do site declara a duplicata /en/homepage/ como alternativa.
+        for rel in ["pt/index.html", "en/index.html", "de/index.html"]:
+            hh = s.ler(rel)
+            pares = re.findall(
+                r'<link rel="alternate" href="([^"]*)" hreflang="([^"]*)"', hh)
+            por_lang = {}
+            for href, lang in pares:
+                por_lang.setdefault(lang.split("-")[0], set()).add(href)
+            for lang, home in (("pt", "/mirow-site/pt/"),
+                               ("en", "/mirow-site/en/"),
+                               ("de", "/mirow-site/de/")):
+                if home not in por_lang.get(lang, set()):
+                    det.append(u"%s: hreflang %s não aponta %s" % (rel, lang, home))
+            if any("/en/homepage/" in href for href, _l in pares):
+                det.append(u"%s declara /en/homepage/ como alternativa" % rel)
+        for rel, hh in s.conteudo():
+            if 'hreflang' in hh and '/en/homepage/' in hh and \
+               re.search(r'hreflang="[^"]*"[^>]*href="[^"]*/en/homepage/|href="[^"]*/en/homepage/"[^>]*hreflang', hh):
+                det.append(u"%s aponta hreflang para a duplicata" % rel)
+        return (not det, u"; ".join(det[:4]))
+    s.check("S130", u"/en/ canônica: en/homepage é stub e as 3 homes têm hreflang (#65)",
+            s130)
+
+    # S131 — onda 41 (#190): toda linha da imprensa tem o logo grande (imagem em
+    # imprensa-logos/ ou wordmark tipográfico de fallback) nas 3 línguas.
+    def s131():
+        det = []
+        for rel in ["pt/imprensa/index.html", "en/press/index.html",
+                    "de/presse/index.html"]:
+            h = s.ler(rel)
+            itens = h.count('onda18-imprensa__item')
+            logos = h.count('onda41-imprensa__logo')  # img e --texto contam
+            sobras = h.count('class="onda18-imprensa__logo')
+            if itens == 0:
+                det.append(u"%s sem itens" % rel)
+            if logos < itens:
+                det.append(u"%s: %d itens, %d logos novos" % (rel, itens, logos))
+            if sobras:
+                det.append(u"%s: %d favicon(s) antigo(s) ainda no markup" % (rel, sobras))
+        return (not det, u"; ".join(det[:4]))
+    s.check("S131", u"imprensa com logo grande (ou wordmark de texto) em toda linha (#190)",
+            s131)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
@@ -2941,6 +3054,98 @@ def ao_vivo(s):
             return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
         s.check("V23", u"pílulas 2+2 com Instagram junto do LinkedIn, e card justo (#183/#184)",
                 v23)
+
+        # V24 — onda 41 (#187): as fotos dos Insights sem o apagado. O bug era
+        # brightness(0.38) na foto inteira (S-56); agora a foto fica quase plena
+        # e a legibilidade vem do scrim ::after. Mede o COMPUTADO da foto e a
+        # existência do scrim — não o texto do CSS (P2.1).
+        def v24():
+            nav.abrir("%s/pt/insights/" % base, 1400, 900)
+            d = nav.js(
+                "(function(){var img=document.querySelector('.page-insights__list-image');"
+                "if(!img)return 'sem card de insight';"
+                "var cs=getComputedStyle(img),ca=getComputedStyle(img,'::after');"
+                "var m=cs.filter.match(/brightness\\(([\\d.]+)\\)/);"
+                "return {b:m?parseFloat(m[1]):null,pos:cs.position,"
+                "scrim:ca.backgroundImage.indexOf('gradient')>=0&&ca.content!=='none'};})()")
+            if isinstance(d, str):
+                return (False, d)
+            det = []
+            if d["b"] is None or not (0.82 <= d["b"] <= 0.95):
+                det.append(u"brightness computado %s (esperado ~0.9)" % d["b"])
+            if not d["scrim"]:
+                det.append(u"scrim ::after ausente")
+            if d["pos"] != "relative":
+                det.append(u"imagem sem position:relative (scrim solto)")
+            return (not det, u"; ".join(det))
+        s.check("V24", u"fotos dos Insights quase plenas, com scrim de legibilidade (#187)",
+                v24)
+
+        # V25 — onda 41 (#189): o título "Nossos Líderes" visível em TODA
+        # largura, nas 3 homes. O tema o escondia de 320 a 991px (medido) e a
+        # correção devolve o display na faixa toda — o teste cobre as duas
+        # bordas da faixa e o desktop (P2.1: o escopo do teste cobre o título).
+        def v25():
+            det = []
+            for rel in HOMES:
+                url = "%s/%s" % (base, rel.replace("index.html", ""))
+                for w in (390, 900, 1400):
+                    nav.abrir(url, w, 900)
+                    d = nav.js(
+                        "(function(){var t=document.querySelector('.home-leaders__subtitle');"
+                        "if(!t)return 'sem titulo';var cs=getComputedStyle(t);"
+                        "return {d:cs.display,h:Math.round(t.getBoundingClientRect().height)};})()")
+                    if isinstance(d, str):
+                        det.append(u"%s @%d: %s" % (rel, w, d))
+                    elif d["d"] == "none" or d["h"] < 10:
+                        det.append(u"%s @%d: display %s, altura %dpx"
+                                   % (rel, w, d["d"], d["h"]))
+            return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:4])))
+        s.check("V25", u'título "Nossos Líderes" visível em 390/900/1400 nas 3 homes (#189)',
+                v25)
+
+        # V26 — onda 41 (#190): o logo do veículo é GRANDE de fato e carrega.
+        # Rola a página inteira (os logos são lazy), exige toda imagem completa
+        # com naturalWidth>0, o primeiro logo com >=90px renderizados, e a linha
+        # inteira clicável (o grid mora no <a>, S-102).
+        def v26():
+            det = []
+            for rel in ["pt/imprensa/", "en/press/", "de/presse/"]:
+                nav.abrir("%s/%s" % (base, rel), 1400, 900)
+                nav.js("window.scrollTo(0, document.body.scrollHeight)")
+                time.sleep(1.2)
+                d = nav.js(
+                    "(function(){var ruins=[],imgs=document.querySelectorAll('img.onda41-imprensa__logo');"
+                    "imgs.forEach(function(i){if(!(i.complete&&i.naturalWidth>0))ruins.push(i.src.split('/').pop());});"
+                    "var pequenos=0;imgs.forEach(function(i){var r=i.getBoundingClientRect();"
+                    "if(r.width>0&&r.width<90&&r.height<36)pequenos++;});"
+                    "var maior=0;imgs.forEach(function(i){maior=Math.max(maior,i.getBoundingClientRect().width);});"
+                    "var link=document.querySelector('a.onda26-imprensa__link');"
+                    "var lw=link?Math.round(link.getBoundingClientRect().width):0;"
+                    "return {ruins:ruins,imgs:imgs.length,pequenos:pequenos,maior:Math.round(maior),lw:lw,"
+                    "ov:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()")
+                if isinstance(d, str):
+                    det.append(u"%s: %s" % (rel, d))
+                    continue
+                if d["ruins"]:
+                    det.append(u"%s: logo(s) quebrado(s): %s" % (rel, d["ruins"][:3]))
+                if d["imgs"] < 10:
+                    det.append(u"%s: só %d imagens de logo" % (rel, d["imgs"]))
+                # "grande": todo logo tem >=90px de largura OU >=36px de altura
+                # (os quadrados como iG e E&N são altos; os wordmarks, largos —
+                # o favicon antigo era 28x28 e falha nos dois critérios), e o
+                # maior logo da página é >=140px (há wordmark de verdade).
+                if d["pequenos"] > 0:
+                    det.append(u"%s: %d logo(s) no tamanho de favicon" % (rel, d["pequenos"]))
+                if d["maior"] < 140:
+                    det.append(u"%s: maior logo com %dpx (esperado >=140)" % (rel, d["maior"]))
+                if d["lw"] < 900:
+                    det.append(u"%s: linha clicável com %dpx" % (rel, d["lw"]))
+                if d["ov"] > 0:
+                    det.append(u"%s: overflow-x de %dpx" % (rel, d["ov"]))
+            return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:4])))
+        s.check("V26", u"imprensa: logos grandes carregando nas 3 línguas, sem overflow (#190)",
+                v26)
 
 
 # ------------------------------------------------------------------- main

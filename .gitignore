@@ -7,3 +7,5 @@ node_modules/
 __pycache__/
 _qa_breakpoints/
 _qa_onda18/
+# espelho bruto do mirow.com.br antigo (~293 MB) — insumo, nao codigo do site
+_scrape-legado/

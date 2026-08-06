@@ -56,7 +56,8 @@ MESTRE_PADRAO = os.path.join(
     os.path.expanduser("~"), "OneDrive - Mirow", "Mirow & Co", "05_Marketing",
     "05_NovoMarketing", "08_Site", "2026-07-30_clients-curadoria-interna.json")
 
-HOMES = ["pt/index.html", "en/index.html", "de/index.html", "en/homepage/index.html"]
+# en/homepage/ saiu na onda 41 (S-135/#65): virou stub de redirect para /en/.
+HOMES = ["pt/index.html", "en/index.html", "de/index.html"]
 
 DIR_LOGOS = "wp-content/uploads/2026/07/clientes"
 
