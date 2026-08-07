@@ -136,6 +136,37 @@ Toda mudança é um **script Python idempotente** em `tools_onda6/`, numerado se
   incrementada **a cada onda publicada**. Estado em 30/07/2026: `VERSAO = 8`, carimbado nas 275
   páginas. Sem isso o navegador serve CSS velho e o bug parece ser de layout.
 
+## Ritmo de onda (#195 — as alavancas do aulão de tempos, 07/08)
+
+Medido nas ondas 41–42: o que estica uma onda é (a) asset externo hostil,
+(b) rodar a suíte completa várias vezes e (c) espera morta de deploy. Regras:
+
+1. **Suíte seletiva durante o desenvolvimento** — `python tools/verificacoes.py . --so=<filtro>`
+   ou `--rapido` para iterar. A suíte COMPLETA roda **uma vez, no gate do deploy**
+   (o deploy.ps1 a força — esse gate não afrouxa).
+2. **Asset externo = agentes em paralelo (R2)** — pedido com logos/imagens/dados
+   de terceiros dispara 3–5 agentes de busca simultâneos (Wikimedia, sites
+   oficiais, archive.org) ENQUANTO o fluxo principal edita código. A caça serial
+   da onda 41 custou ~50 min; não repetir.
+3. **Ondas homogêneas** — separar pedidos texto/CSS (rápidos) dos com asset ou
+   estrutura (lentos); os rápidos não esperam os lentos.
+4. **Fechamento com um comando:**
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/fechar-onda.ps1 -Paginas pt/,pt/imprensa/
+```
+
+   Encadeia cache-bust → contact sheets das páginas-alvo → deploy (suíte completa
+   no gate) → acompanhamento do build do Pages **com 1 retry automático** se vier
+   `errored` (caso real da onda 41, transitório) → verificação da versão ao vivo.
+   `-DryRun` testa a cadeia sem publicar; `-SemSheets` para onda sem layout.
+   O que fica fora de propósito: commit do main e governança no repo privado.
+
+**Nota .ps1:** os scripts PowerShell deste repo são **ASCII puro** (sem acento,
+sem travessão). Sem BOM, o PS 5.1 lê o arquivo como ANSI e um travessão UTF-8
+vira aspas curvas que FECHAM a string — parse error a dezenas de linhas de
+distância do culpado (aconteceu no fechar-onda.ps1, 07/08).
+
 ## Deploy
 
 ```powershell
