@@ -680,19 +680,28 @@ html{scroll-behavior:smooth}
 
 /* onda18:insights-colorido:ini */
 /* S-56 (onda 18): card nasce colorido, sem grayscale.
-   S-133 (onda 41, 2026-08-06): o brightness(0.38) que garantia o titulo
-   branco APAGAVA a foto (feedback FD+AM 05/08). A foto sobe para 0.9/0.78 e
-   a legibilidade passa a vir do scrim ::after abaixo. */
-.page-insights__list-image{filter:grayscale(0%) brightness(0.9) !important}
+   S-133 (onda 41): brightness 0.38 -> 0.9 + scrim.
+   S-139 (onda 42, 2026-08-06, #193): segunda rodada do "apagado" — a foto vai
+   a COR PLENA (1.0), o scrim fica so na base (atras do titulo), e o card
+   ganha acento cyan no hover. */
+.page-insights__list-image{filter:grayscale(0%) brightness(1) !important}
 .page-insights__list-item:hover .page-insights__list-image{
-  filter:grayscale(0%) brightness(0.78) !important}
-/* scrim: denso embaixo (onde mora o titulo), quase nada em cima */
+  filter:grayscale(0%) brightness(0.88) !important}
+/* scrim: denso em CIMA — e no topo do card que o tema poe o titulo
+   (medido: .page-insights__list-title rende dentro do terco superior) */
 .page-insights__list-image{position:relative}
 .page-insights__list-image::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(4,21,69,.10) 0%,rgba(4,21,69,.28) 55%,
-  rgba(4,21,69,.82) 100%)}
+  background:linear-gradient(180deg,rgba(4,21,69,.78) 0%,rgba(4,21,69,.30) 45%,
+  rgba(4,21,69,0) 75%)}
 /* o conteudo (titulo) fica acima do scrim */
 .page-insights__list-wrap-content{position:relative;z-index:2}
+/* acento de cor no vocabulario do tema: filete cyan que acende no hover */
+.page-insights__list-item{position:relative}
+.page-insights__list-item::before{content:"";position:absolute;left:0;right:0;
+  bottom:0;height:4px;background:#00ADEC;transform:scaleX(0);
+  transform-origin:left;transition:transform 260ms ease;z-index:3}
+.page-insights__list-item:hover::before{transform:scaleX(1)}
+.page-insights__list-item:hover .page-insights__list-title{color:#7FDBFF}
 /* onda18:insights-colorido:fim */
 
 /* onda18:home-lideres:ini */
@@ -763,7 +772,7 @@ html{scroll-behavior:smooth}
    branco-azulado #e9f0ff, display grande, alinhado a esquerda */
 .onda18-orbe__titulo{color:#e9f0ff;font-size:64px;font-weight:700;line-height:1.05;
   margin:0 0 30px;text-align:left}
-.onda18-orbe__cards{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;
+.onda18-orbe__cards{display:grid;grid-template-columns:repeat(3,1fr);/* onda42 (#194): 6 cards em 2 fileiras de 3; era repeat(5) p/ 5 cards */gap:16px;
   list-style:none;margin:0;padding:0}
 .onda18-const{background:#020E66;border-top:3px solid #00ADEC;
   padding:20px 18px 22px;display:flex;flex-direction:column;
@@ -1334,3 +1343,16 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   .onda18-imprensa__titulo{grid-column:1 / -1;margin-top:8px}
 }
 /* onda41:imprensa-logos:fim */
+
+/* onda42:header-fixo:ini */
+/* S-137 (#191): barra superior sempre visivel no scroll.
+   FIXED, nao sticky: o tema ja desenha o header FORA do fluxo
+   (.header{position:absolute;top:0} — ele sobrepoe o hero). Sticky o poria
+   NO fluxo e empurraria a primeira dobra em 98px (foi o que a V01 pegou).
+   Fixed mantem exatamente a geometria de carga e so muda o comportamento
+   no scroll. O tema tambem esconde o header rolado (opacity:0 via JS de
+   scroll) — os overrides abaixo mantem a barra visivel e clicavel. */
+.header{position:fixed !important;top:0;left:0;right:0;z-index:90;
+  opacity:1 !important;pointer-events:auto !important;
+  transform:none !important;visibility:visible !important}
+/* onda42:header-fixo:fim */

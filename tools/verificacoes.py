@@ -115,7 +115,8 @@ MARCADORES = [
     # onda14:rodape-menu e onda15:rodape-contatos saíram em 31/07 (decisão
     # explícita do Mario na #91: "IDENTICAS" — a nav recriada virou o clone
     # literal onda15:rodape-barra).
-    ("onda15:hero-texto", 3), ("onda15:rodape-barra", 110),
+    ("onda15:hero-texto", 3),
+    # onda15:rodape-barra saiu na onda 42 (#191) — barra do rodape aposentada.
     # onda 18: botao de voltar ao topo em todas; planeta so nas homes
     ("onda18:voltar-topo", 110), ("onda18:planeta-setores", 3),
 ]
@@ -773,35 +774,21 @@ def estaticas(s):
     s.check("S40", u"preview de link: OG absoluto; cartão do logo nas homes", s40)
 
     def s36():
-        # S-36 v2 ("IDENTICAS", Mario 31/07): a barra do rodapé é um CLONE
-        # literal do <nav class="menu"> do header — igual byte a byte, modulo
-        # os únicos ajustes permitidos (id do seletor de idioma renomeado e
-        # data-scroll-header removido). Página a página.
+        # S-36 v3 — APOSENTADA a barra do rodape (onda 42, #191, decisao
+        # explicita do Mario 06/08: "aposentar a barra inferior... gostei da
+        # ideia"). Com a barra superior fixa (S-137), o clone perdeu a funcao.
+        # A assercao INVERTE: nenhuma pagina de conteudo pode voltar a ter o
+        # clone; a linha legal (politica de privacidade) tem que continuar.
         ruins = []
         for rel, h in s.conteudo():
             if '<footer class="footer">' not in h:
                 continue
-            i = h.find('<nav class="menu"')
-            j = h.find('</nav>', i)
-            if i < 0 or j < 0:
-                continue
-            header = h[i:j + 6]
-            ini = h.find("<!-- onda15:rodape-barra -->")
-            fim = h.find("<!-- /onda15:rodape-barra -->")
-            if ini < 0 or fim < 0:
-                ruins.append("%s sem a barra clonada" % rel)
-                continue
-            bloco = h[ini:fim]
-            k = bloco.find('<nav class="menu"')
-            clone = bloco[k:bloco.rfind('</nav>') + 6] if k >= 0 else ""
-            # desfaz os ajustes de contexto e compara
-            desfeito = (clone.replace('check-rodape', 'check'))
-            original = (header.replace(' data-scroll-header=""', '')
-                        .replace(' data-scroll-header', ''))
-            if desfeito != original:
-                ruins.append("%s com clone divergente do header" % rel)
+            if 'class="rodape-barra"' in h:
+                ruins.append(u"%s com a barra do rodape de volta" % rel)
+            if 'rodape-legal' not in h:
+                ruins.append(u"%s sem a linha legal" % rel)
         return (not ruins, u"%d página(s): %s" % (len(ruins), "; ".join(ruins[:3])))
-    s.check("S36", u"barra do rodapé IDÊNTICA à superior (clone literal, por página)", s36)
+    s.check("S36", u"barra do rodapé aposentada (não volta) e linha legal presente (#191)", s36)
 
     def s41():
         # S-41 (#97): big numbers perto da borda direita do viewport (calc
@@ -920,10 +907,10 @@ def estaticas(s):
     s.check("S55", u'"Trabalhe Conosco" legível em carreiras (#113)', s55)
 
     def s56():
-        # o card de insight não pode começar em grayscale(100%). Onda 41 (#187):
-        # o brightness que apagava a foto subiu de 0.38 para 0.9 e a legibilidade
-        # veio do scrim — o efeito renderizado é a V24; aqui fica a declaração.
-        ok = (".page-insights__list-image{filter:grayscale(0%) brightness(0.9) !important}"
+        # o card de insight não pode começar em grayscale(100%). Onda 41 (#187)
+        # subiu o brightness de 0.38 para 0.9; onda 42 (#193) foi a cor plena
+        # (1.0) com scrim só na base — o efeito renderizado é a V24.
+        ok = (".page-insights__list-image{filter:grayscale(0%) brightness(1) !important}"
               in css_o18)
         return (ok, u"falta a regra que tira o grayscale inicial dos insights")
     s.check("S56", u"insights começam coloridos (#114)", s56)
@@ -1108,15 +1095,17 @@ def estaticas(s):
         # v4 (#128 / S-77): o Mario encerrou a metafora visual — "remova isso e
         # coloque ... 5 cards com cada grupo de industrias listado, sem planeta nem
         # nada disso. faca no tema do resto da pagina."
+        # v5 (onda 42, #194): recategorizados em 6 cards / 24 setores (industria
+        # pesada, energia, base florestal etc.) — os nomes exatos sao da S132.
         det = []
         for rel in HOMES:
             h = s.ler(rel)
             cards = h.count('class="onda18-const"')
             itens = h.count('class="onda18-const__item"')
-            if cards != 5:
-                det.append(u"%s com %d card(s) de grupo (esperado 5)" % (rel, cards))
-            if itens != 19:
-                det.append(u"%s com %d setor(es) (esperado 19)" % (rel, itens))
+            if cards != 6:
+                det.append(u"%s com %d card(s) de grupo (esperado 6)" % (rel, cards))
+            if itens != 24:
+                det.append(u"%s com %d setor(es) (esperado 24)" % (rel, itens))
             # nada de planeta/esfera/ceu: as 3 versoes anteriores estao aposentadas
             for morto in ("onda18-orbe__mapa", "o18hub", "onda18-orbe__ceu",
                           "onda18-orbe__planeta", "onda18-const__lista::before"):
@@ -1130,23 +1119,10 @@ def estaticas(s):
                 det.append(u'%s ainda mostra a contagem "N setores"' % rel)
             if "onda18-orbe__sub" in hh:
                 det.append(u"%s ainda tem o subtexto das 19 indústrias" % rel)
-        # a ordem publicada tem que ser a que o script calcula do FREQ
-        import importlib.util as _u
-        _s = _u.spec_from_file_location(
-            "_o71", os.path.join(os.path.dirname(AQUI), "tools_onda6",
-                                 "71_home_planeta_setores.py"))
-        _m = _u.module_from_spec(_s)
-        _s.loader.exec_module(_m)
-        esperados, ordem = _m._ordenar_por_frequencia()
-        planos = [_m.NOMES["pt"][i] for grupo in esperados for i in grupo]
-        hpt = s.ler("pt/index.html")
-        achados = re.findall(r'class="onda18-const__item">([^<]+)</li>', hpt)
-        if achados != planos:
-            det.append(u"a ordem publicada não é a de frequência (esperado começar "
-                       u"com %s, veio %s)" % (planos[:2], achados[:2]))
-        grupos_pub = re.findall(r'class="onda18-const__nome">([^<]+)</span>', hpt)
-        if grupos_pub != [_m.GRUPOS["pt"][g] for g in ordem]:
-            det.append(u"os cards não estão na ordem de frequência: %s" % grupos_pub)
+        # A checagem de "ordem por frequência" (calculada pelo script 71) foi
+        # APOSENTADA na onda 42 (#194): a taxonomia passou a ser CURADA — o
+        # Mario definiu as categorias (indústria pesada, energia, base
+        # florestal...) e a S132 crava nomes e ordem byte a byte.
         if ".onda18-orbe__titulo{color:#e9f0ff" not in css_o18:
             det.append(u'título não está no branco do estilo "Líderes"')
         if ".onda18-orbe__cards{display:grid" not in css_o18:
@@ -2285,6 +2261,62 @@ def estaticas(s):
     s.check("S131", u"imprensa com logo grande (ou wordmark de texto) em toda linha (#190)",
             s131)
 
+    # S132 — onda 42 (#194): os setores da home recategorizados — 6 cards com
+    # os nomes decididos, nas 3 homes, cobrindo o portfólio real.
+    def s132():
+        esperado = {
+            "pt/index.html": [u"Base Florestal", u"Indústria Pesada", u"Energia",
+                              u"Logística e Portos", u"Consumo e Agro",
+                              u"Serviços e Tecnologia"],
+            "en/index.html": [u"Forest-based Industry", u"Heavy Industry",
+                              u"Energy", u"Logistics & Ports",
+                              u"Consumer & Agri", u"Services & Technology"],
+            "de/index.html": [u"Forstbasierte Industrie", u"Schwerindustrie",
+                              u"Energie", u"Logistik & Häfen", u"Konsum & Agrar",
+                              u"Dienstleistungen & Technologie"],
+        }
+        det = []
+        for rel, nomes in esperado.items():
+            h = s.ler(rel)
+            seg = h[h.find('onda18-orbe__cards'):h.find('</section>',
+                                                        h.find('onda18-orbe__cards'))]
+            achado = re.findall(r'onda18-const__nome">([^<]*)<', seg)
+            achado = [a.replace("&amp;", "&") for a in achado]
+            if achado != nomes:
+                det.append(u"%s: %s" % (rel, achado))
+        return (not det, u"; ".join(det[:2]))
+    s.check("S132", u"setores da home: os 6 cards recategorizados nas 3 homes (#194)",
+            s132)
+
+    # S133 — onda 42 (#192): GEO honesto. O llms.txt existe com as práticas, e
+    # NEM ele NEM as homes nomeiam consultorias concorrentes (regra do Mario
+    # 23/07 — o pedido de texto oculto comparativo foi recusado na #192; esta
+    # asserção impede a ideia de voltar por outra porta).
+    def s133():
+        det = []
+        p = os.path.join(s.pub, "llms.txt")
+        if not os.path.exists(p):
+            det.append(u"llms.txt não existe")
+        else:
+            with io.open(p, encoding="utf-8") as f:
+                t = f.read()
+            for pratica in (u"Estratégia e Inovação", u"Go-to-market e Pricing",
+                            u"Sourcing, Compras e Estoques"):
+                if pratica not in t:
+                    det.append(u"llms.txt sem a prática '%s'" % pratica)
+            # a checagem de concorrente vale para o MATERIAL GEO (llms.txt),
+            # não para as homes: as bios dos líderes citam ex-empregadores
+            # (McKinsey etc.), o que é currículo factual e legítimo.
+            for nome in ("McKinsey", "Bain", "BCG", "Boston Consulting"):
+                if nome in t:
+                    det.append(u"concorrente '%s' citado no llms.txt" % nome)
+        for rel in ["pt/index.html", "en/index.html", "de/index.html"]:
+            if '"knowsAbout"' not in s.ler(rel):
+                det.append(u"%s sem Organization.knowsAbout" % rel)
+        return (not det, u"; ".join(sorted(set(det))[:4]))
+    s.check("S133", u"GEO honesto: llms.txt + knowsAbout, sem concorrente nomeado (#192)",
+            s133)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
@@ -3071,8 +3103,9 @@ def ao_vivo(s):
             if isinstance(d, str):
                 return (False, d)
             det = []
-            if d["b"] is None or not (0.82 <= d["b"] <= 0.95):
-                det.append(u"brightness computado %s (esperado ~0.9)" % d["b"])
+            # onda 42 (#193): cor plena — brightness 1.0 em repouso
+            if d["b"] is None or not (0.98 <= d["b"] <= 1.0):
+                det.append(u"brightness computado %s (esperado 1.0)" % d["b"])
             if not d["scrim"]:
                 det.append(u"scrim ::after ausente")
             if d["pos"] != "relative":
@@ -3146,6 +3179,44 @@ def ao_vivo(s):
             return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:4])))
         s.check("V26", u"imprensa: logos grandes carregando nas 3 línguas, sem overflow (#190)",
                 v26)
+
+        # V27 — onda 42 (#191): a barra superior fica no topo DURANTE o scroll.
+        # Mede o comportamento, não a declaração: rola 1500px e exige a barra
+        # colada no topo do viewport, com fundo navy sólido e acima do conteúdo.
+        # Cobre home e uma interna (templates diferentes) em desktop e mobile.
+        def v27():
+            det = []
+            for rel, w in [("pt/", 1400), ("pt/", 390),
+                           ("pt/imprensa/", 1400), ("de/", 1400)]:
+                nav.abrir("%s/%s" % (base, rel), w, 900)
+                d = nav.js(
+                    "(function(){var h=document.querySelector('.header');"
+                    "if(!h)return 'sem .header';"
+                    "window.scrollTo(0,1500);"
+                    "var r=h.getBoundingClientRect(),cs=getComputedStyle(h);"
+                    "var m=document.querySelector('.header nav.menu');"
+                    "var bg=m?getComputedStyle(m).backgroundColor:'';"
+                    "return {pos:cs.position,top:Math.round(r.top),op:parseFloat(cs.opacity),"
+                    "pe:cs.pointerEvents,z:parseInt(cs.zIndex)||0,bg:bg};})()")
+                if isinstance(d, str):
+                    det.append(u"%s @%d: %s" % (rel, w, d))
+                    continue
+                # FIXED, não sticky: o tema desenha o header fora do fluxo
+                # (absolute sobre o hero); sticky o poria no fluxo e empurraria
+                # a dobra em 98px. E o JS de scroll do tema o esconde
+                # (opacity:0) — a barra tem que seguir visível E clicável.
+                if d["pos"] != "fixed" or d["top"] != 0:
+                    det.append(u"%s @%d: %s, top %dpx após scroll"
+                               % (rel, w, d["pos"], d["top"]))
+                if d["op"] < 0.99 or d["pe"] == "none":
+                    det.append(u"%s @%d: opacity %s / pointer-events %s"
+                               % (rel, w, d["op"], d["pe"]))
+                if d["z"] < 50:
+                    det.append(u"%s @%d: z-index %d (conteúdo pode cobrir)"
+                               % (rel, w, d["z"]))
+            return (not det, u"; ".join(det[:4]))
+        s.check("V27", u"barra superior colada no topo após rolar, em 4 cenários (#191)",
+                v27)
 
 
 # ------------------------------------------------------------------- main

@@ -24,19 +24,28 @@ from _onda7_css import resolve_public, escrever_bloco_css
 
 CSS = """
 /* S-56 (onda 18): card nasce colorido, sem grayscale.
-   S-133 (onda 41, 2026-08-06): o brightness(0.38) que garantia o titulo
-   branco APAGAVA a foto (feedback FD+AM 05/08). A foto sobe para 0.9/0.78 e
-   a legibilidade passa a vir do scrim ::after abaixo. */
-.page-insights__list-image{filter:grayscale(0%) brightness(0.9) !important}
+   S-133 (onda 41): brightness 0.38 -> 0.9 + scrim.
+   S-139 (onda 42, 2026-08-06, #193): segunda rodada do "apagado" — a foto vai
+   a COR PLENA (1.0), o scrim fica so na base (atras do titulo), e o card
+   ganha acento cyan no hover. */
+.page-insights__list-image{filter:grayscale(0%) brightness(1) !important}
 .page-insights__list-item:hover .page-insights__list-image{
-  filter:grayscale(0%) brightness(0.78) !important}
-/* scrim: denso embaixo (onde mora o titulo), quase nada em cima */
+  filter:grayscale(0%) brightness(0.88) !important}
+/* scrim: denso em CIMA — e no topo do card que o tema poe o titulo
+   (medido: .page-insights__list-title rende dentro do terco superior) */
 .page-insights__list-image{position:relative}
 .page-insights__list-image::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(4,21,69,.10) 0%,rgba(4,21,69,.28) 55%,
-  rgba(4,21,69,.82) 100%)}
+  background:linear-gradient(180deg,rgba(4,21,69,.78) 0%,rgba(4,21,69,.30) 45%,
+  rgba(4,21,69,0) 75%)}
 /* o conteudo (titulo) fica acima do scrim */
 .page-insights__list-wrap-content{position:relative;z-index:2}
+/* acento de cor no vocabulario do tema: filete cyan que acende no hover */
+.page-insights__list-item{position:relative}
+.page-insights__list-item::before{content:"";position:absolute;left:0;right:0;
+  bottom:0;height:4px;background:#00ADEC;transform:scaleX(0);
+  transform-origin:left;transition:transform 260ms ease;z-index:3}
+.page-insights__list-item:hover::before{transform:scaleX(1)}
+.page-insights__list-item:hover .page-insights__list-title{color:#7FDBFF}
 """
 
 
