@@ -2346,6 +2346,35 @@ def estaticas(s):
     s.check("S134", u"menu Práticas com 'Estratégia e Inovação' nas 3 línguas (#199)",
             s134)
 
+    # S135 — onda 44 (#201). Botões GENÉRICOS de e-mail (pílula do hero, ícone
+    # da barra, trilho lateral) com DOIS destinatários (Andreas + Felipe); os
+    # mailtos de card/modal de líder seguem pessoais, com um destinatário só.
+    def s135():
+        generico = re.compile(
+            r'<a class="[^"]*(?:hero-contatos__link--mail|'
+            r'menu__contatos-link--mail|onda19-lateral__link--mail)[^"]*"'
+            r'[^>]*href="(mailto:[^"]*)"')
+        lider = re.compile(
+            r'class="onda26-lider__mail" href="(mailto:[^?"]*)')
+        dupla = "mailto:andreas.mirow@mirow.com.br,felipe.diniz@mirow.com.br?"
+        det = []
+        n = 0
+        for rel, h in s.conteudo():
+            for m in generico.finditer(h):
+                n += 1
+                if not m.group(1).startswith(dupla):
+                    det.append(u"%s: botão genérico sem os 2 destinatários" % rel)
+                    break
+            for m in lider.finditer(h):
+                if "," in m.group(1):
+                    det.append(u"%s: mailto de líder virou lista" % rel)
+                    break
+        if not n:
+            det.append(u"nenhum botão genérico de e-mail encontrado")
+        return (not det, u"; ".join(sorted(set(det))[:4]))
+    s.check("S135", u"botões genéricos de e-mail com Andreas E Felipe; líderes intactos (#201)",
+            s135)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
