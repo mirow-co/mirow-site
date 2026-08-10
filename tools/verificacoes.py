@@ -2317,6 +2317,35 @@ def estaticas(s):
     s.check("S133", u"GEO honesto: llms.txt + knowsAbout, sem concorrente nomeado (#192)",
             s133)
 
+    # S134 — onda 43 (#199). O submenu Práticas diz "Estratégia e Inovação",
+    # como o card da home desde a #187 — o rótulo antigo ("Estratégia" seco)
+    # não pode voltar em NENHUMA das páginas, nas 3 línguas.
+    def s134():
+        from _onda7_css import idioma_da_pagina
+        certos = {"pt": u">Estratégia e Inovação</a>",
+                  "en": u">Strategy &amp; Innovation</a>",
+                  "de": u">Strategie &amp; Innovation</a>"}
+        errados = {"pt": u">Estratégia</a>",
+                   "en": u">Strategy</a>",
+                   "de": u">Strategie</a>"}
+        det = []
+        n = 0
+        for rel, h in s.todas():
+            i = h.find("<!-- onda7:menu-praticas -->")
+            if i < 0:
+                continue
+            n += 1
+            trecho = h[i:h.find("<!-- /onda7:menu-praticas -->", i)]
+            idi = idioma_da_pagina(h)
+            if certos[idi] not in trecho or errados[idi] in trecho:
+                det.append(rel)
+        if not n:
+            det.append(u"nenhuma página com o marcador do menu")
+        return (not det, u"%d página(s) com rótulo velho: %s"
+                % (len(det), u", ".join(det[:4])))
+    s.check("S134", u"menu Práticas com 'Estratégia e Inovação' nas 3 línguas (#199)",
+            s134)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
@@ -3217,6 +3246,36 @@ def ao_vivo(s):
             return (not det, u"; ".join(det[:4]))
         s.check("V27", u"barra superior colada no topo após rolar, em 4 cenários (#191)",
                 v27)
+
+        # V28 — onda 43 (#198). "Texto em nossas áreas de expertise e setores
+        # em que atuamos está pequeno demais - precisa ser do mesmo tamanho de
+        # 'Focamos em estratégia...'" (Mario, 10/08). Sem valor gêmeo: mede o
+        # subtítulo do hero E os textos das duas seções na MESMA página e
+        # compara os computados — se o hero mudar, a régua acompanha.
+        def v28():
+            det = []
+            for rel in ["pt/", "en/", "de/"]:
+                nav.abrir("%s/%s" % (base, rel), 1400, 900)
+                d = nav.js(
+                    "(function(){function fs(sel){var e=document.querySelector(sel);"
+                    "return e?parseFloat(getComputedStyle(e).fontSize):null;}"
+                    "return {hero:fs('.hero-texto p'),"
+                    "exp_p:fs('.praticas-3__card .home-experience__list-item-content p'),"
+                    "exp_more:fs('.praticas-3__card .home-experience__list-item-more'),"
+                    "set_nome:fs('.onda18-const__nome'),"
+                    "set_item:fs('.onda18-const__item')};})()")
+                if isinstance(d, str) or d.get("hero") is None:
+                    det.append(u"%s: não mediu o subtítulo do hero" % rel)
+                    continue
+                for chave in ("exp_p", "exp_more", "set_nome", "set_item"):
+                    if d[chave] is None:
+                        det.append(u"%s: %s não encontrado" % (rel, chave))
+                    elif abs(d[chave] - d["hero"]) > 0.5:
+                        det.append(u"%s: %s em %spx, hero em %spx"
+                                   % (rel, chave, d[chave], d["hero"]))
+            return (not det, u"; ".join(det[:5]))
+        s.check("V28", u"textos de expertise e setores no tamanho do subtítulo do hero, 3 homes (#198)",
+                v28)
 
 
 # ------------------------------------------------------------------- main

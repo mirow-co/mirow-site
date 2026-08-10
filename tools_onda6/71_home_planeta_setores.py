@@ -200,14 +200,16 @@ CSS = """/* ---- S-77 (#128 v4): 5 cards de grupos de setores ------------------
   transition:transform 220ms ease,box-shadow 220ms ease}
 .onda18-const:hover{transform:translateY(-4px);
   box-shadow:0 14px 30px rgba(2,14,102,.28)}
-.onda18-const__nome{display:block;color:#fff;font-size:17px;font-weight:700;
+/* S-134 (#198, 10/08): 17px/14px -> 18px, o tamanho do subtitulo do hero
+   ("Focamos em estrategia..."); o bullet desce de 7 p/ 9px pro novo centro */
+.onda18-const__nome{display:block;color:#fff;font-size:18px;font-weight:700;
   line-height:1.25;margin:0 0 14px;padding:0 0 12px;
   border-bottom:1px solid rgba(0,173,236,.45)}
 .onda18-const__lista{list-style:none;margin:0;padding:0}
 .onda18-const__item{position:relative;padding-left:16px;margin:0 0 8px;
-  color:#fff;font-size:14px;font-weight:400;line-height:1.35}
+  color:#fff;font-size:18px;font-weight:400;line-height:1.35}
 .onda18-const__item:last-child{margin-bottom:0}
-.onda18-const__item::before{content:"";position:absolute;left:0;top:7px;
+.onda18-const__item::before{content:"";position:absolute;left:0;top:9px;
   width:6px;height:6px;background:#00ADEC}
 @media only screen and (max-width: 1200px){
   .onda18-orbe__cards{grid-template-columns:repeat(3,1fr)}
