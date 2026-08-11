@@ -45,8 +45,25 @@ PREFIXO = "/"
 
 IDIOMA_PADRAO = "pt"     # S-121: para onde a raiz do Pages aponta
 
-RAIZ_HTML = (u'<!DOCTYPE html><meta http-equiv="refresh" content="0;url=%s%s/">'
-             % (PREFIXO, IDIOMA_PADRAO))
+# Onda 47b: a raiz continua redirect, mas carrega OG completo — o WhatsApp e o
+# LinkedIn buscam o preview na URL exata colada ("mirow.com.br"), e um stub nu
+# renderiza cartão sem logo (achado do anúncio de 11/08).
+RAIZ_HTML = (
+    u'<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'
+    u'<title>Mirow &amp; Co. — Consultoria Estratégica</title>'
+    u'<meta http-equiv="refresh" content="0;url=%(pref)s%(lang)s/">'
+    u'<link rel="canonical" href="%(base)s/%(lang)s/">'
+    u'<meta property="og:type" content="website">'
+    u'<meta property="og:site_name" content="Mirow &amp; Co.">'
+    u'<meta property="og:title" content="Mirow &amp; Co. — Consultoria Estratégica">'
+    u'<meta property="og:description" content="Estratégia, inovação, go-to-market/pricing e compras. Mais de 10 anos de mercado e projetos em mais de 50 clientes.">'
+    u'<meta property="og:url" content="%(base)s/%(lang)s/">'
+    u'<meta property="og:image" content="%(base)s/wp-content/uploads/2026/07/onda6/og-mirow.png">'
+    u'<meta property="og:image:width" content="1200">'
+    u'<meta property="og:image:height" content="630">'
+    u'<meta name="twitter:card" content="summary_large_image">'
+    u'</head><body></body></html>'
+    % {"pref": PREFIXO, "lang": IDIOMA_PADRAO, "base": BASE})
 
 
 def eh_stub(rel, html):
