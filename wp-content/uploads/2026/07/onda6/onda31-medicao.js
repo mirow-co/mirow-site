@@ -5,10 +5,10 @@
  * ar mora aqui. O componente src/components/Analytics.astro cobre as rotas Astro
  * e so passa a valer quando o build do Astro virar a fonte do deploy.
  *
- * Duas propriedades durante a transicao:
- *   G-VK4QHHHS5X — herdada do WordPress (veio no espelho do mirow.com.br). Dono
- *                  ainda nao confirmado. Mantida para nao interromper a serie.
- *   G-5VTS0MZK79 — propriedade institucional Mirow, criada em 2026-08-03.
+ * Uma propriedade so (onda 50, #207): a institucional G-5VTS0MZK79, criada em
+ * 2026-08-03. A tag herdada do WordPress (dono nunca confirmado) saiu por
+ * decisao do Mario em 11/08 — desde a virada de DNS a institucional mede o
+ * trafego real. A assercao M06 garante 0 referencia a herdada em public/.
  * Measurement ID e publico por natureza, por isso vive no codigo (nao e segredo, R11).
  *
  * Consentimento: Consent Mode v2 com default 'denied', mesma postura ja decidida
@@ -21,7 +21,7 @@
 (function () {
   'use strict';
 
-  var IDS = ['G-VK4QHHHS5X', 'G-5VTS0MZK79'];
+  var IDS = ['G-5VTS0MZK79'];
   var BASE = ''; // vira '' na virada de dominio (issue #42)
 
   window.dataLayer = window.dataLayer || [];
