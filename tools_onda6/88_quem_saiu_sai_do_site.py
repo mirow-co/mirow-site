@@ -98,7 +98,7 @@ MEDICAO = (
     u'  <script src="/mirow-site/wp-content/uploads/2026/07/onda6/'
     u'onda31-medicao.js"></script>\n'
     u'  <script async src="https://www.googletagmanager.com/gtag/js?'
-    u'id=G-VK4QHHHS5X"></script>\n')
+    u'id=G-5VTS0MZK79"></script>\n')
 
 
 def stub(lang):

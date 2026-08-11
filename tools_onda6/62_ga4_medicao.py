@@ -51,7 +51,7 @@ def bloco(prefix):
     return (
         "  <!-- Medicao Mirow (GA4) - issue mirow-marketing#3. Config e eventos em %s -->\n"
         '  <script src="%s%s"></script>\n'
-        '  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VK4QHHHS5X"></script>'
+        '  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VTS0MZK79"></script>'
     ) % (ASSET, prefix, ASSET)
 
 

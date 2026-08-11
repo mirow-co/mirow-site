@@ -33,7 +33,7 @@ DESTINO = "/mirow-site/en/"
 STUB = (u'<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">\n'
         u'  <!-- Medicao Mirow (GA4) - issue mirow-marketing#3. Config e eventos em wp-content/uploads/2026/07/onda6/onda31-medicao.js -->\n'
         u'  <script src="/mirow-site/wp-content/uploads/2026/07/onda6/onda31-medicao.js?v=33"></script>\n'
-        u'  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VK4QHHHS5X"></script>\n'
+        u'  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VTS0MZK79"></script>\n'
         u'<!-- %s: uma URL por pagina — esta era duplicata da canonica (#65) -->\n'
         u'<meta http-equiv="refresh" content="0;url=%s">\n'
         u'<link rel="canonical" href="%s">\n'

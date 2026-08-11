@@ -2570,9 +2570,28 @@ def estaticas(s):
         if not os.path.exists(p):
             return (False, u"asset de medição ausente em %s" % MEDICAO)
         js = s.ler(MEDICAO)
-        falta = [pid for pid in ("G-VK4QHHHS5X", "G-5VTS0MZK79") if pid not in js]
+        # onda 50 (#207): só a institucional. A herdada saiu por decisão do Mario
+        # (11/08); a ausência dela em TODO o public/ é a M06.
+        falta = [pid for pid in ("G-5VTS0MZK79",) if pid not in js]
         return (not falta, u"propriedade(s) fora do asset: %s" % ", ".join(falta))
-    s.check("M04", u"as duas propriedades GA4 configuradas no asset", m04)
+    s.check("M04", u"a propriedade institucional configurada no asset", m04)
+
+    def m06():
+        # Onda 50 (#207): 0 referência à tag herdada em qualquer arquivo de texto
+        # de public/ — mede o efeito (grep no que o Pages serve), não a declaração.
+        herdada = "G-VK4QHHHS5X"
+        sujos = []
+        for dirpath, _dirs, files in os.walk(pub):
+            for nome in files:
+                if not nome.lower().endswith((".html", ".css", ".js", ".xml", ".txt", ".json")):
+                    continue
+                fp = os.path.join(dirpath, nome)
+                with io.open(fp, encoding="utf-8", errors="ignore") as f:
+                    if herdada in f.read():
+                        sujos.append(os.path.relpath(fp, pub).replace(os.sep, "/"))
+        return (not sujos, u"%d arquivo(s) ainda citam a tag herdada: %s"
+                % (len(sujos), ", ".join(sujos[:5])))
+    s.check("M06", u"0 referência à tag GA4 herdada (G-VK4QHHHS5X) em public/ (#207)", m06)
 
     def m05():
         js = s.ler(MEDICAO)
