@@ -1365,3 +1365,27 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 .praticas-3__card .home-experience__list-item-content p,
 .praticas-3__card .home-experience__list-item-more{font-size:18px}
 /* onda43:texto-expertise:fim */
+
+/* onda45:carreiras-form:ini (#202 — form novo de candidatura -> AWS; substitui o Formidable) */
+.mc-form{max-width:none}
+.mc-form__intro{font-size:15px;color:#444;margin:0 0 18px}
+.mc-form__intro span{color:#c0392b}
+.mc-fieldset{border:0;padding:0;margin:0 0 22px}
+.mc-fieldset legend{font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:#020E66;margin:0 0 12px;padding:0;border-bottom:2px solid #AAD5E8;width:100%;line-height:1.6}
+.mc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+@media(max-width:640px){.mc-grid{grid-template-columns:1fr}}
+.mc-field{display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:#333}
+.mc-field>span{font-weight:600}
+.mc-field.mc-req>span::after{content:" *";color:#c0392b}
+.mc-field input,.mc-field select{font-family:Arial,Helvetica,sans-serif;font-size:14px;padding:9px 11px;border:1px solid #cdd8df;border-radius:6px;background:#fff;color:#071C25;width:100%}
+.mc-field input:focus,.mc-field select:focus{outline:2px solid #00ADEC;outline-offset:1px;border-color:#00ADEC}
+.mc-field input[type=file]{padding:7px 9px;background:#f6fafc}
+.mc-hcaptcha{margin:6px 0 18px}
+.mc-actions{display:flex;flex-direction:column;gap:10px}
+.mc-submit{align-self:flex-start;background:#020E66;color:#fff;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:15px;border:0;border-radius:8px;padding:13px 30px;cursor:pointer;transition:background .15s}
+.mc-submit:hover{background:#00ADEC}
+.mc-submit:disabled{opacity:.6;cursor:default}
+.mc-status{margin:0;font-size:14px;min-height:1.2em}
+.mc-status--ok{color:#1E8A4C;font-weight:700}
+.mc-status--erro{color:#c0392b;font-weight:700}
+/* onda45:carreiras-form:fim */
