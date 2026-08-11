@@ -22,7 +22,7 @@
   'use strict';
 
   var IDS = ['G-VK4QHHHS5X', 'G-5VTS0MZK79'];
-  var BASE = '/mirow-site'; // vira '' na virada de dominio (issue #42)
+  var BASE = ''; // vira '' na virada de dominio (issue #42)
 
   window.dataLayer = window.dataLayer || [];
   function gtag() { window.dataLayer.push(arguments); }

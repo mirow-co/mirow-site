@@ -28,7 +28,7 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-# NOTA: na virada de DNS (#42), o host sai de mirow-co.github.io para
-# mirow.com.br na constante BASE de tools_onda6/90_sitemap_e_raiz.py —
-# rodar o script reescreve o sitemap.xml e esta linha juntos.
-Sitemap: https://mirow-co.github.io/mirow-site/sitemap.xml
+# Host final (onda 47/#101): mirow.com.br. A constante BASE de
+# tools_onda6/90_sitemap_e_raiz.py e a fonte; rodar o script reescreve
+# o sitemap.xml e esta linha juntos.
+Sitemap: https://mirow.com.br/sitemap.xml
