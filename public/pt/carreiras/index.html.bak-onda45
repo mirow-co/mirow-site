@@ -4,46 +4,39 @@
 <head>
 <meta charset="UTF-8">
   <!-- Medicao Mirow (GA4) - issue mirow-marketing#3. Config e eventos em wp-content/uploads/2026/07/onda6/onda31-medicao.js -->
-  <script src="/mirow-site/wp-content/uploads/2026/07/onda6/onda31-medicao.js?v=45"></script>
+  <script src="/mirow-site/wp-content/uploads/2026/07/onda6/onda31-medicao.js?v=37"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-VK4QHHHS5X"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
-<link rel="alternate" href="/mirow-site/pt/destravandopotencialbrasileiroemhidrogenioverde/" hreflang="pt" />
-<link rel="alternate" href="/mirow-site/en/green-hydrogen-unlocking-brazils-potential/" hreflang="en" />
-<link rel="alternate" href="/mirow-site/de/gruener-wasserstoff-entsperrung-des-brasilianischen-potenzials/" hreflang="de" />
+<link rel="alternate" href="/mirow-site/pt/carreiras/" hreflang="pt" />
+<link rel="alternate" href="/mirow-site/en/careers/" hreflang="en" />
+<link rel="alternate" href="/mirow-site/de/karrieren/" hreflang="de" />
 
 	<!-- This site is optimized with the Yoast SEO plugin v28.1 - https://yoast.com/product/yoast-seo-wordpress/ -->
-	<title>Green hydrogen: destravando o potencial brasileiro em hidrogênio verde - Mirow</title>
-	<link rel="canonical" href="/mirow-site/pt/destravandopotencialbrasileiroemhidrogenioverde/" />
+	<title>Carreiras - Mirow</title>
+	<link rel="canonical" href="/mirow-site/pt/carreiras/" />
 	<meta property="og:locale" content="pt_BR" />
 	<meta property="og:locale:alternate" content="en_US" />
 	<meta property="og:locale:alternate" content="de_DE" />
 	<meta property="og:type" content="article" />
-	<meta property="og:title" content="Green hydrogen: destravando o potencial brasileiro em hidrogênio verde - Mirow" />
-	<meta property="og:description" content="O hidrogênio de baixo carbono desempenha um papel crucial no alcance das metas globais de descarbonização. Este setor está vivenciando um crescimento acelerado, apresentando um potencial extraordinário de desenvolvimento. O momento atual é ideal para que empresas se posicionem como líderes nesta nova indústria. Convidamos você a explorar uma síntese do nosso estudo e obter [&hellip;]" />
-	<meta property="og:url" content="https://mirow-co.github.io/mirow-site/pt/destravandopotencialbrasileiroemhidrogenioverde/" />
+	<meta property="og:title" content="Carreiras - Mirow" />
+	<meta property="og:url" content="https://mirow-co.github.io/mirow-site/pt/carreiras/" />
 	<meta property="og:site_name" content="Mirow" />
 	<meta property="article:publisher" content="https://www.linkedin.com/company/mirow-co-" />
-	<meta property="article:published_time" content="2023-11-13T18:54:26+00:00" />
-	<meta property="article:modified_time" content="2023-11-30T02:32:06+00:00" />
-	<meta property="og:image" content="https://mirow-co.github.io/mirow-site/wp-content/uploads/2023/11/WhatsApp-Image-2023-11-13-at-15.35.57-1.jpeg" />
-	<meta property="og:image:width" content="1085" />
-	<meta property="og:image:height" content="720" />
-	<meta property="og:image:type" content="image/jpeg" />
-	<meta name="author" content="Andreas Mirow e Felipe Diniz" />
+	<meta property="article:modified_time" content="2026-01-28T18:45:07+00:00" />
+	<meta property="og:image" content="https://mirow-co.github.io/mirow-site/wp-content/uploads/2026/01/GRANDE-02-1024x683.png" />
+	<meta property="og:image:width" content="1024" />
+	<meta property="og:image:height" content="683" />
+	<meta property="og:image:type" content="image/png" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:label1" content="Written by" />
-	<meta name="twitter:data1" content="Andreas Mirow e Felipe Diniz" />
-	<meta name="twitter:label2" content="Est. reading time" />
-	<meta name="twitter:data2" content="1 minuto" />
-	<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https:\/\/schema.org","@graph":[{"@type":"Article","@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/#article","isPartOf":{"@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/"},"author":[{"name":"Andreas Mirow","@id":"/mirow-site/pt/lider/andreas-mirow/"},{"name":"Felipe Diniz","@id":"/mirow-site/pt/lider/felipe-diniz/"}],"headline":"Green hydrogen: destravando o potencial brasileiro em hidrogênio verde","datePublished":"2023-11-13T18:54:26+00:00","dateModified":"2023-11-30T02:32:06+00:00","mainEntityOfPage":{"@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/"},"wordCount":133,"commentCount":0,"publisher":{"@id":"/mirow-site\/pt\/#organization"},"image":{"@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/#primaryimage"},"thumbnailUrl":"/mirow-site\/wp-content\/uploads\/2023\/11\/WhatsApp-Image-2023-11-13-at-15.35.57-1.jpeg","articleSection":["Sem categoria"],"inLanguage":"pt-BR","potentialAction":[{"@type":"CommentAction","name":"Comment","target":["/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/#respond"]}]},{"@type":"WebPage","@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/","url":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/","name":"Green hydrogen: destravando o potencial brasileiro em hidrogênio verde - Mirow","isPartOf":{"@id":"/mirow-site\/pt\/#website"},"primaryImageOfPage":{"@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/#primaryimage"},"image":{"@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/#primaryimage"},"thumbnailUrl":"/mirow-site\/wp-content\/uploads\/2023\/11\/WhatsApp-Image-2023-11-13-at-15.35.57-1.jpeg","datePublished":"2023-11-13T18:54:26+00:00","dateModified":"2023-11-30T02:32:06+00:00","breadcrumb":{"@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/#breadcrumb"},"inLanguage":"pt-BR","potentialAction":[{"@type":"ReadAction","target":["/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/"]}]},{"@type":"ImageObject","inLanguage":"pt-BR","@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/#primaryimage","url":"/mirow-site\/wp-content\/uploads\/2023\/11\/WhatsApp-Image-2023-11-13-at-15.35.57-1.jpeg","contentUrl":"/mirow-site\/wp-content\/uploads\/2023\/11\/WhatsApp-Image-2023-11-13-at-15.35.57-1.jpeg","width":1085,"height":720},{"@type":"BreadcrumbList","@id":"/mirow-site\/pt\/destravandopotencialbrasileiroemhidrogenioverde\/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"/mirow-site\/pt\/"},{"@type":"ListItem","position":2,"name":"Green hydrogen: destravando o potencial brasileiro em hidrogênio verde"}]},{"@type":"WebSite","@id":"/mirow-site\/pt\/#website","url":"/mirow-site\/pt\/","name":"Mirow","description":"","publisher":{"@id":"/mirow-site\/pt\/#organization"},"potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"/mirow-site\/pt\/?s={search_term_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search_term_string"}}],"inLanguage":"pt-BR"},{"@type":"Organization","@id":"/mirow-site\/pt\/#organization","name":"Mirow & Co.","url":"/mirow-site\/pt\/","logo":{"@type":"ImageObject","inLanguage":"pt-BR","@id":"/mirow-site\/pt\/#\/schema\/logo\/image\/","url":"/mirow-site\/wp-content\/uploads\/2026\/07\/logo_mirow_azul_e_branco1svg.svg","contentUrl":"/mirow-site\/wp-content\/uploads\/2026\/07\/logo_mirow_azul_e_branco1svg.svg","width":210,"height":297,"caption":"Mirow & Co."},"image":{"@id":"/mirow-site\/pt\/#\/schema\/logo\/image\/"},"sameAs":["https:\/\/www.linkedin.com\/company\/mirow-co-"]},{"@type":"Person","@id":"/mirow-site/pt/lider/andreas-mirow/","name":"Andreas Mirow","url":"/mirow-site/pt/lider/andreas-mirow/"},{"@type":"Person","@id":"/mirow-site/pt/lider/felipe-diniz/","name":"Felipe Diniz","url":"/mirow-site/pt/lider/felipe-diniz/"}]}</script>
+	<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https:\/\/schema.org","@graph":[{"@type":"WebPage","@id":"/mirow-site\/pt\/carreiras\/","url":"/mirow-site\/pt\/carreiras\/","name":"Carreiras - Mirow","isPartOf":{"@id":"/mirow-site\/pt\/#website"},"primaryImageOfPage":{"@id":"/mirow-site\/pt\/carreiras\/#primaryimage"},"image":{"@id":"/mirow-site\/pt\/carreiras\/#primaryimage"},"thumbnailUrl":"/mirow-site\/wp-content\/uploads\/2026\/01\/GRANDE-02-scaled.png","datePublished":"2023-03-06T19:27:39+00:00","dateModified":"2026-01-28T18:45:07+00:00","breadcrumb":{"@id":"/mirow-site\/pt\/carreiras\/#breadcrumb"},"inLanguage":"pt-BR","potentialAction":[{"@type":"ReadAction","target":["/mirow-site\/pt\/carreiras\/"]}]},{"@type":"ImageObject","inLanguage":"pt-BR","@id":"/mirow-site\/pt\/carreiras\/#primaryimage","url":"/mirow-site\/wp-content\/uploads\/2026\/01\/GRANDE-02-scaled.png","contentUrl":"/mirow-site\/wp-content\/uploads\/2026\/01\/GRANDE-02-scaled.png","width":2560,"height":1707},{"@type":"BreadcrumbList","@id":"/mirow-site\/pt\/carreiras\/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"/mirow-site\/pt\/"},{"@type":"ListItem","position":2,"name":"Carreiras"}]},{"@type":"WebSite","@id":"/mirow-site\/pt\/#website","url":"/mirow-site\/pt\/","name":"Mirow","description":"","publisher":{"@id":"/mirow-site\/pt\/#organization"},"potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"/mirow-site\/pt\/?s={search_term_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search_term_string"}}],"inLanguage":"pt-BR"},{"@type":"Organization","@id":"/mirow-site\/pt\/#organization","name":"Mirow & Co.","url":"/mirow-site\/pt\/","logo":{"@type":"ImageObject","inLanguage":"pt-BR","@id":"/mirow-site\/pt\/#\/schema\/logo\/image\/","url":"/mirow-site\/wp-content\/uploads\/2026\/07\/logo_mirow_azul_e_branco1svg.svg","contentUrl":"/mirow-site\/wp-content\/uploads\/2026\/07\/logo_mirow_azul_e_branco1svg.svg","width":210,"height":297,"caption":"Mirow & Co."},"image":{"@id":"/mirow-site\/pt\/#\/schema\/logo\/image\/"},"sameAs":["https:\/\/www.linkedin.com\/company\/mirow-co-"]}]}</script>
 	<!-- / Yoast SEO plugin. -->
 
 
 <link rel='dns-prefetch' href='//static.addtoany.com' />
 <link rel='dns-prefetch' href='//www.googletagmanager.com' />
-<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="/mirow-site/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fmirow.com.br%2Fpt%2Fdestravandopotencialbrasileiroemhidrogenioverde%2F" />
-<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="/mirow-site/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fmirow.com.br%2Fpt%2Fdestravandopotencialbrasileiroemhidrogenioverde%2F&#038;format=xml" />
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="/mirow-site/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fmirow.com.br%2Fpt%2Fcarreiras%2F" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="/mirow-site/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fmirow.com.br%2Fpt%2Fcarreiras%2F&#038;format=xml" />
 <style id='wp-img-auto-sizes-contain-inline-css' type='text/css'>
 img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 /*# sourceURL=wp-img-auto-sizes-contain-inline-css */
@@ -68,7 +61,6 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 <link rel='stylesheet' id='ourmaincss-css' href='/mirow-site/wp-content/themes/mirow/public/bundle-css.css?ver=1' type='text/css' media='' />
 <link rel='stylesheet' id='addtoany-css' href='/mirow-site/wp-content/plugins/add-to-any/addtoany.min.css?ver=1.16' type='text/css' media='all' />
-<link rel='stylesheet' id='wp-block-paragraph-css' href='/mirow-site/wp-includes/blocks/paragraph/style.min.css?ver=d3f2499e46ad8d6c952972b6f1e30c50' type='text/css' media='all' />
 <script type="text/javascript" src="/mirow-site/wp-content/plugins/svg-support/vendor/DOMPurify/DOMPurify.min.js?ver=2.5.9" id="bodhi-dompurify-library-js"></script>
 <script type="text/javascript" id="addtoany-core-js-before">
 /* <![CDATA[ */
@@ -117,7 +109,7 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
 //# sourceURL=bodhi_svg_inline-js-after
 /* ]]> */
 </script>
-<link rel="https://api.w.org/" href="/mirow-site/wp-json/" /><link rel="alternate" title="JSON" type="application/json" href="/mirow-site/wp-json/wp/v2/posts/2845" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="/mirow-site/xmlrpc.php?rsd" />
+<link rel="https://api.w.org/" href="/mirow-site/wp-json/" /><link rel="alternate" title="JSON" type="application/json" href="/mirow-site/wp-json/wp/v2/pages/196" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="/mirow-site/xmlrpc.php?rsd" />
 <meta name="generator" content="Site Kit by Google 1.183.0" /><script>document.documentElement.className += " js";</script>
 <link rel="icon" href="/mirow-site/wp-content/uploads/2023/04/cropped-favicon-mirow-32x32.png" sizes="32x32" />
 <link rel="icon" href="/mirow-site/wp-content/uploads/2023/04/cropped-favicon-mirow-192x192.png" sizes="192x192" />
@@ -152,10 +144,10 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" id="onda6-css" href="/mirow-site/wp-content/uploads/2026/07/onda6/onda6.css?v=45" media="all" />
+<link rel="stylesheet" id="onda6-css" href="/mirow-site/wp-content/uploads/2026/07/onda6/onda6.css?v=37" media="all" />
 </head>
 
-<body id="topo" data-rsssl=1 class="wp-singular post-template-default single single-post postid-2845 single-format-standard wp-theme-mirow">
+<body id="topo" data-rsssl=1 class="wp-singular page-template page-template-templates page-template-page-careers page-template-templatespage-careers-php page page-id-196 wp-theme-mirow">
 
   <div class="header">
       <nav class="menu" role="navigation" data-scroll-header="">
@@ -181,116 +173,150 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
           <path d="M13.7071 0.792893C14.0976 1.18342 14.0976 1.81658 13.7071 2.20711L7.70711 8.20711C7.51957 8.39464 7.26522 8.5 7 8.5C6.73479 8.5 6.48043 8.39464 6.29289 8.20711L0.292893 2.20711C-0.097631 1.81659 -0.0976311 1.18342 0.292893 0.792896C0.683417 0.402371 1.31658 0.402371 1.70711 0.792895L7 6.08579L12.2929 0.792893C12.6834 0.402369 13.3166 0.402369 13.7071 0.792893Z" fill="#0E41A7"/>
           </svg></a><div class="menu__nav-submenu"><div><div class="container"><div class="row"><div class="col"><h5>Práticas</h5><!-- onda7:menu-praticas --><ul class="menu__nav-sublinks menu__nav-sublinks--col1 onda18-praticas"><li class="menu__nav-sublinkitem tab_"><a class="menu__nav-sublink" href="/mirow-site/pt/pratica/estrategia/">Estratégia e Inovação</a></li><li class="menu__nav-sublinkitem tab_"><a class="menu__nav-sublink" href="/mirow-site/pt/pratica/marketing-vendas-e-pricing/">Go-to-market e Pricing</a></li><li class="menu__nav-sublinkitem tab_"><a class="menu__nav-sublink" href="/mirow-site/pt/pratica/operacoes/">Sourcing, Compras e Estoques</a></li></ul><!-- /onda7:menu-praticas --></div></div></div></div></div></div><div class="menu__nav-item"><a class="menu__nav-link " href="/mirow-site/pt/insights/" target="_self">Insights</a></div><div class="menu__nav-item"><a class="menu__nav-link " href="/mirow-site/pt/imprensa/" target="_self">Imprensa</a></div><!-- onda7:menu-carreiras --><div class="menu__nav-item"><a class="menu__nav-link " href="/mirow-site/pt/carreiras/" target="_self">Carreiras</a></div><!-- /onda7:menu-carreiras --><div class="menu__nav-item"><a class="menu__nav-link " href="/mirow-site/pt/contato/" target="_self">Contato</a></div></div><!-- onda8:menu-contatos --><div class="menu__contatos" aria-label="Contatos diretos"><a class="menu__contatos-link menu__contatos-link--wa" href="https://wa.me/5521999947429?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Mirow%20%26%20Co.%20e%20gostaria%20de%20conversar." target="_blank" rel="noopener noreferrer" title="Falar no WhatsApp" aria-label="Falar no WhatsApp"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.74.46 3.44 1.32 4.94L2.1 22l5.36-1.4a9.8 9.8 0 0 0 4.58 1.15h.01c5.43 0 9.84-4.4 9.84-9.84C21.89 6.4 17.47 2 12.04 2Zm0 17.9h-.01a8.2 8.2 0 0 1-4.16-1.14l-.3-.18-3.1.81.83-3.02-.2-.31a8.14 8.14 0 0 1-1.25-4.35c0-4.5 3.68-8.17 8.2-8.17 2.19 0 4.24.85 5.79 2.4a8.1 8.1 0 0 1 2.4 5.78c0 4.51-3.68 8.18-8.2 8.18Zm4.5-6.12c-.25-.12-1.46-.72-1.68-.8-.23-.09-.39-.13-.55.12-.16.24-.63.79-.78.95-.14.17-.29.19-.53.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.7-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.44.12-.15.16-.25.25-.42.08-.16.04-.31-.02-.43-.06-.12-.55-1.34-.76-1.83-.2-.48-.4-.41-.55-.42l-.47-.01c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.05s.87 2.37.99 2.53c.12.17 1.71 2.62 4.15 3.67.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.66-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg></a><a class="menu__contatos-link menu__contatos-link--mail" href="mailto:andreas.mirow@mirow.com.br,felipe.diniz@mirow.com.br?subject=Contato%20pelo%20site%20da%20Mirow%20%26%20Co.&amp;body=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Mirow%20%26%20Co.%20e%20gostaria%20de%20conversar%20sobre%20um%20desafio%20da%20minha%20empresa." title="E-mail" aria-label="E-mail"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1.6 2L12 12.3 19.4 7H4.6ZM20 8.9l-7.4 5.3a1 1 0 0 1-1.2 0L4 8.9V17h16V8.9Z"/></svg></a><a class="menu__contatos-link menu__contatos-link--in" href="https://www.linkedin.com/company/mirow-co-/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm6 0h3.8v1.7h.05c.53-.95 1.83-1.95 3.76-1.95 4.02 0 4.76 2.5 4.76 5.75V21h-4v-5.6c0-1.34-.02-3.06-1.9-3.06-1.9 0-2.19 1.45-2.19 2.96V21H9V9Z"/></svg></a><a class="menu__contatos-link menu__contatos-link--ig" href="https://www.instagram.com/mirowandco" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Zm0 2A3.8 3.8 0 0 0 4 7.8v8.4A3.8 3.8 0 0 0 7.8 20h8.4a3.8 3.8 0 0 0 3.8-3.8V7.8A3.8 3.8 0 0 0 16.2 4H7.8ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm5.4-2.6a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2Z"/></svg></a></div><!-- /onda8:menu-contatos --><div class="menu__languages"><button class="menu__languages-button"><svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 3.5C11.5654 3.5 11.138 3.5308 10.7199 3.59035C10.5854 4.0785 10.4075 4.77861 10.2293 5.64011C10.0588 6.46392 9.8888 7.4317 9.75585 8.5H14.2441C14.1112 7.4317 13.9412 6.46392 13.7707 5.64011C13.5925 4.77861 13.4146 4.0785 13.2801 3.59035C12.862 3.5308 12.4346 3.5 12 3.5ZM8.27074 5.23489C8.34768 4.86303 8.42468 4.51904 8.4987 4.20646C6.51262 5.04596 4.89065 6.57805 3.93552 8.5H7.74127C7.8859 7.2707 8.07856 6.16374 8.27074 5.23489ZM7.56198 10.5H3.22302C3.07706 11.1432 3 11.8126 3 12.5C3 13.1874 3.07706 13.8568 3.22302 14.5H7.56198C7.52248 13.853 7.5 13.1843 7.5 12.5C7.5 11.8157 7.52248 11.147 7.56198 10.5ZM7.74127 16.5H3.93552C4.89065 18.422 6.51262 19.954 8.4987 20.7935C8.42468 20.481 8.34768 20.137 8.27074 19.7651C8.07856 18.8363 7.8859 17.7293 7.74127 16.5ZM9.75585 16.5C9.8888 17.5683 10.0588 18.5361 10.2293 19.3599C10.4075 20.2214 10.5854 20.9215 10.7199 21.4097C11.138 21.4692 11.5654 21.5 12 21.5C12.4346 21.5 12.862 21.4692 13.2801 21.4097C13.4146 20.9215 13.5925 20.2214 13.7707 19.3599C13.9412 18.5361 14.1112 17.5683 14.2441 16.5H9.75585ZM14.4341 14.5C14.476 13.8536 14.5 13.1845 14.5 12.5C14.5 11.8155 14.476 11.1464 14.4341 10.5H9.56593C9.52402 11.1464 9.5 11.8155 9.5 12.5C9.5 13.1845 9.52402 13.8536 9.56593 14.5H14.4341ZM16.2587 16.5C16.1141 17.7293 15.9214 18.8363 15.7293 19.7651C15.6523 20.137 15.5753 20.481 15.5013 20.7935C17.4874 19.954 19.1094 18.422 20.0645 16.5H16.2587ZM20.777 14.5C20.9229 13.8568 21 13.1874 21 12.5C21 11.8126 20.9229 11.1432 20.777 10.5H16.438C16.4775 11.147 16.5 11.8157 16.5 12.5C16.5 13.1843 16.4775 13.853 16.438 14.5H20.777ZM15.5013 4.20646C15.5753 4.51904 15.6523 4.86303 15.7293 5.23489C15.9214 6.16374 16.1141 7.2707 16.2587 8.5H20.0645C19.1094 6.57805 17.4874 5.04596 15.5013 4.20646ZM1 12.5C1 6.42487 5.92487 1.5 12 1.5C18.0751 1.5 23 6.42487 23 12.5C23 18.5751 18.0751 23.5 12 23.5C5.92487 23.5 1 18.5751 1 12.5Z" fill="white"/>
-              </svg><ul class="menu__languages-list"><li class="menu__languages-list-current"><a href="/mirow-site/pt/destravandopotencialbrasileiroemhidrogenioverde/"><span style="white-space:nowrap"><svg data-onda7-flag="br" viewBox="0 0 20 14" width="17" height="12" aria-hidden="true" style="width:17px;height:auto;display:inline-block;vertical-align:-3px;margin-right:8px;flex:none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#009B3A"/><polygon points="10,1.6 18.2,7 10,12.4 1.8,7" fill="#FEDF00"/><circle cx="10" cy="7" r="3" fill="#002776"/></svg>Português</span></a></li><li><a href="/mirow-site/en/green-hydrogen-unlocking-brazils-potential/"><span style="white-space:nowrap"><svg data-onda7-flag="gb" viewBox="0 0 60 40" width="17" height="11" aria-hidden="true" style="width:17px;height:auto;display:inline-block;vertical-align:-3px;margin-right:8px;flex:none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="40" fill="#012169"/><g stroke="#FFFFFF" stroke-width="9"><line x1="0" y1="0" x2="60" y2="40"/><line x1="60" y1="0" x2="0" y2="40"/></g><g stroke="#C8102E" stroke-width="4"><line x1="0" y1="0" x2="60" y2="40"/><line x1="60" y1="0" x2="0" y2="40"/></g><g stroke="#FFFFFF" stroke-width="14"><line x1="30" y1="0" x2="30" y2="40"/><line x1="0" y1="20" x2="60" y2="20"/></g><g stroke="#C8102E" stroke-width="8"><line x1="30" y1="0" x2="30" y2="40"/><line x1="0" y1="20" x2="60" y2="20"/></g></svg>English</span></a></li><li><a href="/mirow-site/de/gruener-wasserstoff-entsperrung-des-brasilianischen-potenzials/"><span style="white-space:nowrap"><svg data-onda7-flag="de" viewBox="0 0 5 3" width="17" height="11" aria-hidden="true" style="width:17px;height:auto;display:inline-block;vertical-align:-3px;margin-right:8px;flex:none" xmlns="http://www.w3.org/2000/svg"><rect width="5" height="3" fill="#000000"/><rect y="1" width="5" height="1" fill="#DD0000"/><rect y="2" width="5" height="1" fill="#FFCE00"/></svg>Deutsch</span></a></li></ul></button></div>    </div>
+              </svg><ul class="menu__languages-list"><li class="menu__languages-list-current"><a href="/mirow-site/pt/carreiras/"><span style="white-space:nowrap"><svg data-onda7-flag="br" viewBox="0 0 20 14" width="17" height="12" aria-hidden="true" style="width:17px;height:auto;display:inline-block;vertical-align:-3px;margin-right:8px;flex:none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#009B3A"/><polygon points="10,1.6 18.2,7 10,12.4 1.8,7" fill="#FEDF00"/><circle cx="10" cy="7" r="3" fill="#002776"/></svg>Português</span></a></li><li><a href="/mirow-site/en/careers/"><span style="white-space:nowrap"><svg data-onda7-flag="gb" viewBox="0 0 60 40" width="17" height="11" aria-hidden="true" style="width:17px;height:auto;display:inline-block;vertical-align:-3px;margin-right:8px;flex:none" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="40" fill="#012169"/><g stroke="#FFFFFF" stroke-width="9"><line x1="0" y1="0" x2="60" y2="40"/><line x1="60" y1="0" x2="0" y2="40"/></g><g stroke="#C8102E" stroke-width="4"><line x1="0" y1="0" x2="60" y2="40"/><line x1="60" y1="0" x2="0" y2="40"/></g><g stroke="#FFFFFF" stroke-width="14"><line x1="30" y1="0" x2="30" y2="40"/><line x1="0" y1="20" x2="60" y2="20"/></g><g stroke="#C8102E" stroke-width="8"><line x1="30" y1="0" x2="30" y2="40"/><line x1="0" y1="20" x2="60" y2="20"/></g></svg>English</span></a></li><li><a href="/mirow-site/de/karrieren/"><span style="white-space:nowrap"><svg data-onda7-flag="de" viewBox="0 0 5 3" width="17" height="11" aria-hidden="true" style="width:17px;height:auto;display:inline-block;vertical-align:-3px;margin-right:8px;flex:none" xmlns="http://www.w3.org/2000/svg"><rect width="5" height="3" fill="#000000"/><rect y="1" width="5" height="1" fill="#DD0000"/><rect y="2" width="5" height="1" fill="#FFCE00"/></svg>Deutsch</span></a></li></ul></button></div>    </div>
   </nav>
   </div>
 
-  <main class="">
-<div class="blog-single">
-        <div class="blog-single__banner" style="background-image: url('/mirow-site/wp-content/uploads/2023/11/WhatsApp-Image-2023-11-13-at-15.35.57-1.jpeg')"></div>
-    <div class="blog-single__content">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col col-md-9 col-lg-9">
-                    <span class="blog-single__date">13/11/2023</span>
-                    <h1 class="blog-single__title">Green hydrogen: destravando o potencial brasileiro em hidrogênio verde</h1>
-                    <div class="blog-single__text">
-                        
-<p>O hidrogênio de baixo carbono desempenha um papel crucial no alcance das metas globais de descarbonização. Este setor está vivenciando um crescimento acelerado, apresentando um potencial extraordinário de desenvolvimento. O momento atual é ideal para que empresas se posicionem como líderes nesta nova indústria.</p>
+  <main class=""><div class="page-careers"><div class="wrap-gradient-1">    
 
+<section class="internal-banner" style="background-image:url('/mirow-site/wp-content/uploads/2026/01/GRANDE-02-scaled.png');">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="internal-banner__title" data-aos="fade-right">Trabalhe na Mirow</h1>
+                <h2 class="internal-banner__subtitle" data-aos="fade-right">Oferecemos oportunidades de crescimento acelerado em um ambiente de trabalho gentil e empreendedor</h2>
+                <div class="internal-banner__text">
+                                    </div>
+                            </div>
+        </div>
+    </div>
 
+    <a class="internal-banner__anchor" href="#mainContent">
+        <svg width="23" height="13" viewBox="0 0 23 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21.7029 0.463747C22.3213 1.08208 22.3213 2.08459 21.7029 2.70292L12.2029 12.2029C11.906 12.4999 11.5033 12.6667 11.0833 12.6667C10.6634 12.6667 10.2607 12.4999 9.96375 12.2029L0.463748 2.70292C-0.154582 2.08459 -0.154583 1.08208 0.463747 0.463752C1.08208 -0.154579 2.08459 -0.154579 2.70292 0.463751L11.0833 8.84416L19.4637 0.463748C20.0821 -0.154582 21.0846 -0.154583 21.7029 0.463747Z" fill="white"/>
+        </svg>
+    </a>
+</section>
 
-<p>Convidamos você a explorar uma síntese do nosso estudo e obter insights sobre o cenário global do hidrogênio verde, além de oportunidades específicas para o mercado brasileiro. Para uma discussão mais aprofundada sobre o mercado de H2V, suas potencialidades, desafios e impactos específicos na sua companhia, entre em contato conosco pelo email <a href="mailto:xxxx@mirow.com.br">contato@mirow.com.br</a> para agendarmos uma conversa.</p>
-
-
-
-<p><a href="/mirow-site/wp-content/uploads/2023/11/Green-hydrogen_Destravando-o-potencial-brasileiro-em-hidrogenio-verde_.pdf">Clique aqui para baixar o arquivo completo</a></p>
-
-
-                    </div>
-                    <div class="blog-single__share">
-                        <p>Gostou? Compartilhe</p>
-                        <div class="addtoany_shortcode"><div class="a2a_kit a2a_kit_size_32 addtoany_list" data-a2a-url="/mirow-site/pt/destravandopotencialbrasileiroemhidrogenioverde/" data-a2a-title="Green hydrogen: destravando o potencial brasileiro em hidrogênio verde"><a class="a2a_button_email" href="https://www.addtoany.com/add_to/email?linkurl=https%3A%2F%2Fmirow.com.br%2Fpt%2Fdestravandopotencialbrasileiroemhidrogenioverde%2F&amp;linkname=Green%20hydrogen%3A%20destravando%20o%20potencial%20brasileiro%20em%20hidrog%C3%AAnio%20verde" title="Email" rel="nofollow noopener" target="_blank"></a><a class="a2a_button_whatsapp" href="https://www.addtoany.com/add_to/whatsapp?linkurl=https%3A%2F%2Fmirow.com.br%2Fpt%2Fdestravandopotencialbrasileiroemhidrogenioverde%2F&amp;linkname=Green%20hydrogen%3A%20destravando%20o%20potencial%20brasileiro%20em%20hidrog%C3%AAnio%20verde" title="WhatsApp" rel="nofollow noopener" target="_blank"></a><a class="a2a_button_linkedin" href="https://www.addtoany.com/add_to/linkedin?linkurl=https%3A%2F%2Fmirow.com.br%2Fpt%2Fdestravandopotencialbrasileiroemhidrogenioverde%2F&amp;linkname=Green%20hydrogen%3A%20destravando%20o%20potencial%20brasileiro%20em%20hidrog%C3%AAnio%20verde" title="LinkedIn" rel="nofollow noopener" target="_blank"></a></div></div>                    </div>
-                </div>
-            </div>
-                    </div>
-
-            
-
-<section class="contact">
+<div id="mainContent">
+<section class="job-contact job-contact--topo" id="inscricao">
     <div class="container">
         <div class="row">
             <div class="col-12 col-lg-6 col__title">
-                <h2 class="contact__title">Fale<br> Conosco</h2>
+                <h2 class="job-contact__title">Trabalhe<br> Conosco</h2>
             </div>
             <div class="col-12 col-lg-6">
-                <div class="contact__form">
-                    <div class="frm_forms  with_frm_style frm_style_formidable-style frm_full_submit" id="frm_form_1_container" data-token="7a630d8233fd1e5e0aa1dabd8ffc3c75">
-<form enctype="multipart/form-data" method="post" class="frm-show-form  frm_js_validate  frm_ajax_submit  frm_pro_form " id="form_contact-form" data-token="7a630d8233fd1e5e0aa1dabd8ffc3c75">
-<div class="frm_form_fields ">
+                <div class="job-contact__form">
+                    <div class="frm_forms  with_frm_style frm_style_formidable-style frm_full_submit" id="frm_form_2_container" data-token="7a630d8233fd1e5e0aa1dabd8ffc3c75">
+<form enctype="multipart/form-data" method="post" class="frm-show-form  frm_js_validate  frm_ajax_submit  frm_pro_form " id="form_work-with-us" data-token="7a630d8233fd1e5e0aa1dabd8ffc3c75">
+<div class="frm_form_fields  frm_page_num_1">
 <fieldset>
-<legend class="frm_screen_reader">Fale Conosco</legend>
+<legend class="frm_screen_reader">Trabalhe Conosco</legend>
 
 <div class="frm_fields_container">
-<input type="hidden" name="frm_action" value="create" />
-<input type="hidden" name="form_id" value="1" />
-<input type="hidden" name="frm_hide_fields_1" id="frm_hide_fields_1" value="" />
-<input type="hidden" name="form_key" value="contact-form" />
+<div class="frm_rootline_group" role="group" tabindex="0" aria-label="Page 1 of 4" ><ul class="frm_page_bar frm_rootline_4 frm_rootline frm_rootline_line   frm_show_titles"><li class="frm_rootline_single frm_current_page"><input type="button" value="1" data-page="" class=" frm_page_1" aria-disabled="true" data-field="0" aria-label="Dados"  /><span class="frm_rootline_title">Dados</span></li><li class="frm_rootline_single"><input type="button" value="2" data-page="13" class="frm_page_skip frm_page_2" data-field="17" aria-label="Qualificação"  /><span class="frm_rootline_title">Qualificação</span></li><li class="frm_rootline_single"><input type="button" value="3" data-page="30" class="frm_page_skip frm_page_3" data-field="24" aria-label="Experiência"  /><span class="frm_rootline_title">Experiência</span></li>		<li class="frm_rootline_single frm_rootline_show_hidden_steps_btn frm_hidden">
+			<input type="button" class="frm_rootline_show_more_btn" value="···" />
+			<ul class="frm_rootline_hidden_steps frm_hidden"></ul>
+		</li>
+		<li class="frm_rootline_single"><input type="button" value="4" data-page="56" class="frm_page_skip frm_page_4" data-field="31" aria-label="Finalização"  /><span class="frm_rootline_title">Finalização</span></li></ul><div class="frm_clearfix"></div></div><input type="hidden" name="frm_action" value="create" />
+<input type="hidden" name="form_id" value="2" />
+<input type="hidden" name="frm_hide_fields_2" id="frm_hide_fields_2" value="" />
+<input type="hidden" name="form_key" value="work-with-us" />
 <input type="hidden" name="item_meta[0]" value="" />
-<input type="hidden" id="frm_submit_entry_1" name="frm_submit_entry_1" value="7881b94a57" /><input type="hidden" name="_wp_http_referer" value="/pt/destravandopotencialbrasileiroemhidrogenioverde/" /><div id="frm_field_1_container" class="frm_form_field form-field  frm_required_field frm_top_container frm6 frm_first">
-    <label for="field_qh4icy" id="field_qh4icy_label" class="frm_primary_label">Nome
+<input type="hidden" id="frm_submit_entry_2" name="frm_submit_entry_2" value="7881b94a57" /><input type="hidden" name="_wp_http_referer" value="/pt/carreiras/" /><div id="frm_field_7_container" class="frm_form_field form-field  frm_required_field frm_top_container">
+    <label for="field_ynxp2" id="field_ynxp2_label" class="frm_primary_label">Email
         <span class="frm_required" aria-hidden="true">*</span>
     </label>
-    <input  type="text" id="field_qh4icy" name="item_meta[1]" value=""  data-reqmsg="Este campo é obrigatório." aria-required="true" data-invmsg="Name is invalid" aria-invalid="false"   />
+    <input type="email" id="field_ynxp2" name="item_meta[7]" value=""  data-reqmsg="Email cannot be blank." aria-required="true" data-invmsg="Email is invalid" aria-invalid="false"  />
     
     
 </div>
-<div id="frm_field_3_container" class="frm_form_field form-field  frm_required_field frm_top_container frm6">
-    <label for="field_29yf4d" id="field_29yf4d_label" class="frm_primary_label">Email
+<div id="frm_field_9_container" class="frm_form_field form-field  frm_required_field frm_top_container frm6 frm_first">
+    <label for="field_1wyjg" id="field_1wyjg_label" class="frm_primary_label">Nome Completo
         <span class="frm_required" aria-hidden="true">*</span>
     </label>
-    <input type="email" id="field_29yf4d" name="item_meta[3]" value=""  data-reqmsg="Este campo é obrigatório." aria-required="true" data-invmsg="Email inválido." aria-invalid="false"  />
+    <input  type="text" id="field_1wyjg" name="item_meta[9]" value=""  data-reqmsg="Nome Completo cannot be blank." aria-required="true" data-invmsg="Text is invalid" aria-invalid="false"   />
     
     
 </div>
-<div id="frm_field_6_container" class="frm_form_field form-field  frm_top_container frm6 frm_first">
-    <label for="field_q1ajd" id="field_q1ajd_label" class="frm_primary_label">Telefone
-    </label>
-    <input type="tel" id="field_q1ajd" name="item_meta[6]" value=""  data-frmmask="(00) 00000000[0]" data-invmsg="Telefone inválido" aria-invalid="false" pattern="\(\d\d\) \d\d\d\d\d\d\d\d(\d)?$"  />
-    
-    
-</div>
-<div id="frm_field_4_container" class="frm_form_field form-field  frm_top_container frm6">
-    <label for="field_e6lis6" id="field_e6lis6_label" class="frm_primary_label">Empresa
+<div id="frm_field_10_container" class="frm_form_field form-field  frm_top_container frm6">
+    <label for="field_wj1ww" id="field_wj1ww_label" class="frm_primary_label">Como quer ser chamado?
         <span class="frm_required" aria-hidden="true"></span>
     </label>
-    <input  type="text" id="field_e6lis6" name="item_meta[4]" value=""  data-invmsg="Subject is invalid" aria-invalid="false"   />
+    <input  type="text" id="field_wj1ww" name="item_meta[10]" value=""  data-invmsg="Text is invalid" aria-invalid="false"   />
     
     
 </div>
-<div id="frm_field_5_container" class="frm_form_field form-field  frm_required_field frm_top_container frm_full">
-    <label for="field_9jv0r1" id="field_9jv0r1_label" class="frm_primary_label">Mensagem
+<div id="frm_field_11_container" class="frm_form_field form-field  frm_required_field frm_top_container frm6 frm_first">
+    <label for="field_8tzw8" id="field_8tzw8_label" class="frm_primary_label">CPF
         <span class="frm_required" aria-hidden="true">*</span>
     </label>
-    <textarea name="item_meta[5]" id="field_9jv0r1" rows="5"  data-reqmsg="Este campo é obrigatório." aria-required="true" data-invmsg="Mensagem inválida." aria-invalid="false"  >Olá! Vim pelo site da Mirow & Co. e gostaria de conversar sobre um desafio da minha empresa.</textarea>
+    <input  type="text" id="field_8tzw8" name="item_meta[11]" value=""  data-reqmsg="CPF cannot be blank." aria-required="true" data-invmsg="Text is invalid" aria-invalid="false"   />
     
     
 </div>
-<div id="frm_field_181_container" class="frm_form_field form-field ">
-	<div class="frm_submit">
-
-<button class="frm_button_submit frm_final_submit" type="submit"   formnovalidate="formnovalidate">Enviar mensagem</button>
-
-
+<div id="frm_field_12_container" class="frm_form_field form-field  frm_required_field frm_top_container frm6">
+    <label for="field_5logf" id="field_5logf_label" class="frm_primary_label">Telefone
+        <span class="frm_required" aria-hidden="true">*</span>
+    </label>
+    <input type="tel" id="field_5logf" name="item_meta[12]" value=""  data-reqmsg="Este campo é obrigatório" aria-required="true" data-invmsg="Telefone inválido" aria-invalid="false" pattern="((\+\d{1,3}(-|.| )?\(?\d\)?(-| |.)?\d{1,5})|(\(?\d{2,6}\)?))(-|.| )?(\d{3,4})(-|.| )?(\d{4})(( x| ext)\d{1,5}){0,1}$"  />
+    
+    
 </div>
+<div id="frm_field_13_container" class="frm_form_field form-field  frm_required_field frm_top_container frm6 frm_first">
+    <label for="field_j40o1" id="field_j40o1_label" class="frm_primary_label">Com qual gênero você se identifica?
+        <span class="frm_required" aria-hidden="true">*</span>
+    </label>
+    		<select name="item_meta[13]" id="field_j40o1"  data-reqmsg="Com qual gênero você se identifica? cannot be blank." aria-required="true" data-invmsg="Com qual gênero você se identifica? is invalid" aria-invalid="false"  >
+		<option  value="" selected='selected'> </option><option  value="Feminino">Feminino</option><option  value="Masculino">Masculino</option><option  value="Outro">Outro</option>	</select>
+	
+    
+    
 </div>
-	<input type="hidden" name="item_key" value="" />
+<div id="frm_field_14_container" class="frm_form_field form-field  frm_required_field frm_top_container frm6">
+    <label for="field_abkzx" id="field_abkzx_label" class="frm_primary_label">Cidade / Estado de Residência
+        <span class="frm_required" aria-hidden="true">*</span>
+    </label>
+    <input  type="text" id="field_abkzx" name="item_meta[14]" value=""  data-reqmsg="Este campo é obrigatório" aria-required="true" data-invmsg="Text is invalid" aria-invalid="false"   />
+    
+    
+</div>
+<input type="hidden" name="frm_page_order_2" id="frm_page_order_2" value="13" />		<input  type="hidden" name="item_meta[42]" id="field_wmmpf" value=""     />
+				<input  type="hidden" name="item_meta[43]" id="field_d9hgq" value=""     />
+				<input  type="hidden" name="item_meta[52]" id="field_ha1n0" value=""     />
+				<input  type="hidden" name="item_meta[15]" id="field_ca64n" value=""     />
+				<input  type="hidden" name="item_meta[16]" id="field_95kdc" value=""     />
+				<input  type="hidden" name="item_meta[18]" id="field_he7yp" value=""     />
+				<input  type="hidden" name="item_meta[19]" id="field_pzofk" value=""     />
+				<input  type="hidden" name="item_meta[59]" id="field_sitij" value=""     />
+				<input  type="hidden" name="item_meta[34]" id="field_yk7yn" value=""     />
+				<input  type="hidden" name="item_meta[20]" id="field_yh94x" value=""     />
+				<input  type="hidden" name="item_meta[24]" id="field_2j5ma" value=""     />
+				<input  type="hidden" name="item_meta[21]" id="field_zhpch" value=""     />
+				<input  type="hidden" name="item_meta[22]" id="field_b0jyh" value=""     />
+				<input  type="hidden" name="item_meta[23]" id="field_1ukcq" value="Intern"  data-frmval="Intern"   />
+				<input  type="hidden" name="item_meta[44]" id="field_qjzij" value=""     />
+				<input  type="hidden" name="item_meta[25]" id="field_h9wsu" value=""     />
+				<input  type="hidden" name="item_meta[26]" id="field_xexf2" value=""     />
+				<input  type="hidden" name="item_meta[31]" id="field_dw1mp" value=""     />
+				<input  type="hidden" name="item_meta[33]" id="field_rvcez-0" value=""     />
+				<input  type="hidden" name="item_meta[28]" id="field_nnmza" value=""     />
+				<input  type="hidden" name="item_meta[29]" id="field_tcc3o" value=""     />
+				<input  type="hidden" name="item_meta[51]" id="field_6hxzl" value=""     />
+				<input  type="hidden" name="item_meta[30]" id="field_lymr3" value=""     />
+				<input  type="hidden" name="item_meta[147]" id="field_plk6q" value=""     />
+			<input type="hidden" name="item_key" value="" />
 			<div id="frm_field_228_container">
-			<label for="field_j12yz" >
+			<label for="field_q55sf" >
 				If you are human, leave this field blank.			</label>
-			<input  id="field_j12yz" type="text" class="frm_form_field form-field frm_verify" name="item_meta[228]" value=""  />
+			<input  id="field_q55sf" type="text" class="frm_form_field form-field frm_verify" name="item_meta[228]" value=""  />
 		</div>
-		<input name="frm_state" type="hidden" value="2HtJRm6pkB98gZHMmZFEtHrAntf73WWXkgiWzmVlPqBF/ViD6vRPF6RAVTKuA/vw" /></div>
+		<input name="frm_state" type="hidden" value="2HtJRm6pkB98gZHMmZFEtJ85AU91Cnuve9bCY3PYsWd79nku3kYMwNWhav8Qe8/g" /><div class="frm_submit">
+
+<button class="frm_button_submit" type="submit"   formnovalidate="formnovalidate">Proximo</button>
+
+
+</div></div>
 </fieldset>
 </div>
 
@@ -301,13 +327,171 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
         </div>
     </div>
 </section>
+  
 
+<!-- onda18:s63-cta-cliente-removido -->
+
+  
+
+<section class="value-offer">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                                    <h2 data-aos="fade-up" class="value-offer__title">Temos uma proposta de valor única</h2>
+                            </div>
+        </div>
+                    <div class="row">
+                <div class="col">
+                                            <span class="value-offer__subtitle">Valor</span>
+                                        <div class="value-offer__wrap">
+                        <div class="value-offer__cards">
+                            <div class="value-offer__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="300"><div class="value-offer__item-header mirow-card__header"><img src="/mirow-site/wp-content/uploads/2023/03/icon-payment.svg" /><h4>Remuneração e carreira atraentes</h4></div><div class="value-offer__item-content mirow-card__content"><ul>
+<li>Remuneração muito competitiva</li>
+<li>Plano de carreira acelerado e transparente</li>
+</ul>
+</div><div class="value-offer__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div><div class="value-offer__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="600"><div class="value-offer__item-header mirow-card__header"><img src="/mirow-site/wp-content/uploads/2023/03/icon-lifestyle.svg" /><h4>Work-Life Balance Priorizado</h4></div><div class="value-offer__item-content mirow-card__content"><ul>
+<li>Viva um estilo de vida saudável mesmo em projetos desafiadores</li>
+<li>Incentivamos o equilíbrio da saúde física e mental para enfrentar os desafios de forma renovada</li>
+</ul>
+</div><div class="value-offer__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div><div class="value-offer__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="900"><div class="value-offer__item-header mirow-card__header"><img src="/mirow-site/wp-content/uploads/2023/03/icon-environment.svg" /><h4>Ambiente excepcional  e empreendedor</h4></div><div class="value-offer__item-content mirow-card__content"><ul>
+<li>Oportunidade de empreender em uma empresa em rápido crescimento</li>
+<li>Ambiente leve, participativo e meritocrático</li>
+<li>Curva acelerada de aprendizado e desenvolvimento</li>
+</ul>
+</div><div class="value-offer__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div>                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+</section>
+
+  
+
+<section class="career-path">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                                    <h2 data-aos="fade-up" class="career-path__title">Nosso plano de carreira</h2>
+                            </div>
+        </div>
+                    <div class="row">
+                <div class="col">
+                    <div class="career-path__wrap">
+                        <div class="career-path__line">
+                            <span class="career-path__line-step" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="300"><i></i></span><span class="career-path__line-step" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="600"><i></i></span><span class="career-path__line-step" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="900"><i></i></span><span class="career-path__line-step" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="1200"><i></i></span><span class="career-path__line-step" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="1500"><i></i></span>                        </div>
+                        <div class="career-path__cards">
+                            <div class="career-path__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="300"><div class="career-path__item-header mirow-card__header"><h4><span>1.</span>BUSINESS ANALYST</h4></div><div class="career-path__item-content mirow-card__content"><ul>
+<li>Realizar análises para uma ou mais frentes de trabalho</li>
+<li>Participar ativamente dos problem solvings</li>
+<li>Interagir com cliente</li>
+</ul>
+<p>Duração: 2 a 3 anos</p>
+</div><div class="career-path__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div><div class="career-path__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="600"><div class="career-path__item-header mirow-card__header"><h4><span>2.</span>ASSOCIATE</h4></div><div class="career-path__item-content mirow-card__content"><ul>
+<li>Conduzir frentes de trabalho complexas e/ou simultâneas</li>
+<li>Coordenar e atuar no desenvolvimento de consultores Júnior</li>
+<li>Liderar discussões com clientes</li>
+</ul>
+<p>Duração: 2 a 3 anos</p>
+</div><div class="career-path__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div><div class="career-path__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="900"><div class="career-path__item-header mirow-card__header"><h4><span>3.</span>ENGAGAMENT MANAGER</h4></div><div class="career-path__item-content mirow-card__content"><ul>
+<li>Mediar interações com líderes dos clientes</li>
+<li>Comunicar avanços e barreiras a AP/sócios</li>
+<li>Coordenar os esforços da equipe e atuar pelo seu desenvolvimento</li>
+</ul>
+<p>Duração: 2 a 3 anos</p>
+</div><div class="career-path__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div><div class="career-path__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="1200"><div class="career-path__item-header mirow-card__header"><h4><span>4.</span>ASSOCIATE PARTNER</h4></div><div class="career-path__item-content mirow-card__content"><ul>
+<li>Liderar projetos complexos e/ou simultâneos</li>
+<li>Ser percebido como referência em temas relevantes por clientes</li>
+<li>Liderar iniciativas internas</li>
+<li>Gerar followership no time</li>
+</ul>
+<p>Duração: 2 a 3 anos</p>
+</div><div class="career-path__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div><div class="career-path__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="1500"><div class="career-path__item-header mirow-card__header"><h4><span>5.</span>PARTNER</h4></div><div class="career-path__item-content mirow-card__content"><ul>
+<li>Nutrir relacionamentos profundos e de confiança com cliente</li>
+<li>Liderar temas estratégicos</li>
+<li>Guiar múltiplas equipes em projetos</li>
+<li>Contribuir para formação de novos líderes na Mirow</li>
+</ul>
+</div><div class="career-path__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div>                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="career-path__background">
+            <video autoplay="true" muted="true" loop="true">
+                <source src="/mirow-site/wp-content/uploads/2023/04/video-bg-carreiras.mp4" type="video/mp4">
+                Your browser does not support the video tag.    
+            </video>
+        </div>
+    </section>
+
+    
+
+<section class="consultants">
+    <div class="container">
+        <div class="row">
+            <div data-aos="fade-up" class="col col-lg-1">
+                            </div>
+            <div class="col col-lg-11">
+                            </div>
+        </div>
     </div>
-    </div>
+</section>
+
+  
+
+<section class="hire-steps">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                                    <h2 data-aos="fade-up" class="hire-steps__title">Etapas</h2>
+                                                    <h3 data-aos="fade-up" class="hire-steps__subtitle">Processo Seletivo</h3>
+                            </div>
+        </div>
+                    <div class="row">
+                <div class="col">
+                    <div class="hire-steps__wrap">
+                        <div class="hire-steps__line">
+                            <span class="hire-steps__bullet hire-steps__bullet--step1" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="300"><i></i></span><span class="hire-steps__bullet hire-steps__bullet--step2" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="600"><i></i></span><span class="hire-steps__bullet hire-steps__bullet--step3" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="900"><i></i></span>                        </div>
+                        <div class="hire-steps__cards">
+                            <div class="hire-steps__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="300"><div class="hire-steps__item-header mirow-card__header"><h4><span>1.</span>Inscrição e GMAT</h4></div><div class="hire-steps__item-content mirow-card__content"><p>Após <strong>inscrição pelo site</strong>, o candidato recebe instruções para realizar o <strong>GMAT online</strong> com prazo de 7 dias para realização.</p>
+</div><div class="hire-steps__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div><div class="hire-steps__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="600"><div class="hire-steps__item-header mirow-card__header"><h4><span>2.</span>Vídeos</h4></div><div class="hire-steps__item-content mirow-card__content"><p><strong>Respostas de 1 minuto para 2 perguntas</strong> estruturadas a serem enviadas por vídeo.</p>
+</div><div class="hire-steps__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div><div class="hire-steps__item mirow-card" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="900"><div class="hire-steps__item-header mirow-card__header"><h4><span>3.</span>Resolução de Casos</h4></div><div class="hire-steps__item-content mirow-card__content"><p><strong>Até 4 entrevistas</strong> baseadas em business cases com <strong>Associate, Engagement Manager, Associate Partner e Partner.</strong></p>
+</div><div class="hire-steps__item-footer mirow-card__footer"><svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13.228 0.261773C13.5907 0.610804 13.5907 1.1767 13.228 1.52573L7.6566 6.88823C7.48246 7.05584 7.24627 7.15 7 7.15C6.75373 7.15 6.51754 7.05584 6.3434 6.88823L0.771972 1.52573C0.409343 1.1767 0.409343 0.610807 0.771972 0.261776C1.1346 -0.0872556 1.72254 -0.0872557 2.08517 0.261775L7 4.9923L11.9148 0.261773C12.2775 -0.0872577 12.8654 -0.0872578 13.228 0.261773Z" fill="white"/>
+                                            </svg></div></div>                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+</section>
+
+    
 
 
 
-</main>
+</div></div></div><!-- onda18:inscrever-fim --><section class="onda18-inscrever"><div class="container"><div class="row"><div class="col"><a class="onda18-inscrever__link" href="#inscricao">Quero me inscrever</a></div></div></div></section><!-- /onda18:inscrever-fim -->
+    </main>
     <footer class="footer">
         <div class="container">
             <!-- onda42:rodape-barra-aposentada (#191) -->
@@ -362,7 +546,9 @@ window.frm_js.datepickerLibrary = "default";
 </script>
 <script>
 /*<![CDATA[*/
-/*]]>*/
+var frmrules={"42":{"fieldId":"42","fieldKey":"wmmpf","fieldType":"select","inputType":"select","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":["52"],"showHide":"show","anyAll":"any","conditions":[]},"52":{"fieldId":"52","fieldKey":"ha1n0","fieldType":"text","inputType":"text","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"42","operator":"==","value":"Outras"}],"status":"complete"},"23":{"fieldId":"23","fieldKey":"1ukcq","fieldType":"select","inputType":"select","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":["48","49","53","54","55","56","57","25","25","25"],"showHide":"show","anyAll":"any","conditions":[]},"48":{"fieldId":"48","fieldKey":"hg5m2","fieldType":"html","inputType":"html","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"23","operator":"==","value":""}],"status":"complete"},"49":{"fieldId":"49","fieldKey":"sii2s","fieldType":"html","inputType":"html","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"23","operator":"==","value":"Intern"}],"status":"complete"},"53":{"fieldId":"53","fieldKey":"o1mtg","fieldType":"html","inputType":"html","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"23","operator":"==","value":"Business Analyst"}],"status":"complete"},"54":{"fieldId":"54","fieldKey":"2adva","fieldType":"html","inputType":"html","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"23","operator":"==","value":"Associate"}],"status":"complete"},"55":{"fieldId":"55","fieldKey":"vf9im","fieldType":"html","inputType":"html","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"23","operator":"==","value":""}],"status":"complete"},"56":{"fieldId":"56","fieldKey":"1cibr","fieldType":"html","inputType":"html","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"23","operator":"==","value":"Engagement Manager"}],"status":"complete"},"57":{"fieldId":"57","fieldKey":"klgi6","fieldType":"html","inputType":"html","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"23","operator":"==","value":"Associate Partner"}],"status":"complete"},"25":{"fieldId":"25","fieldKey":"h9wsu","fieldType":"file","inputType":"file","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"23","operator":"==","value":"Intern"},{"fieldId":"23","operator":"==","value":"Business Analyst"},{"fieldId":"23","operator":"==","value":""}],"status":"complete"},"33":{"fieldId":"33","fieldKey":"rvcez","fieldType":"checkbox","inputType":"checkbox","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":["51","51","51","51"],"showHide":"show","anyAll":"any","conditions":[]},"13":{"fieldId":"13","fieldKey":"j40o1","fieldType":"select","inputType":"select","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":["51"],"showHide":"show","anyAll":"any","conditions":[]},"51":{"fieldId":"51","fieldKey":"6hxzl","fieldType":"select","inputType":"select","isMultiSelect":false,"formId":"2","inSection":"0","inEmbedForm":"0","isRepeating":false,"dependents":[],"showHide":"show","anyAll":"any","conditions":[{"fieldId":"33","operator":"==","value":"LGBTQIAP+"},{"fieldId":"33","operator":"==","value":"Preto"},{"fieldId":"33","operator":"==","value":"Pardo"},{"fieldId":"33","operator":"==","value":"Ind\u00edgena"},{"fieldId":"13","operator":"==","value":"Feminino"}],"status":"complete"}};
+if(typeof __FRMRULES === 'undefined'){__FRMRULES=frmrules;}
+else{__FRMRULES=jQuery.extend({},__FRMRULES,frmrules);}var frmHide=["52","48","49","53","54","55","56","57","25","51"];if(typeof __frmHideOrShowFields == "undefined"){__frmHideOrShowFields=frmHide;}else{__frmHideOrShowFields=__frmHideOrShowFields.concat(frmHide);}/*]]>*/
 </script>
 		<script id="kama-click-counter">!function(){var e={kcckey:"kcccount",pidkey:"kccpid",urlpatt:"/mirow-site?download={download}&kccpid={in_post}&kcccount={url}",aclass:"count",questSymbol:"__QUESTION__",ampSymbol:"__AMPERSAND__"};function a(a){var c=a.target.closest("a");if(c)if(c.dataset.kccurl)c.href=c.dataset.kccurl;else{var r=c.href;if(-1!==r.indexOf(e.kcckey)){var n=r.match(new RegExp(e.kcckey+"=(.*)"));if(n&&n[1]){var l=n[1];parseInt(l)&&(l="/#download"+l),c.dataset.kccurl=r.replace(l,t(l))}}else c.classList.contains(e.aclass)&&(c.dataset.kccurl=e.urlpatt.replace("{in_post}",c.dataset[e.pidkey]||"").replace("{download}",c.dataset.kccdownload?1:"").replace("{url}",t(r)));c.dataset.kccurl&&(c.href=c.dataset.kccurl)}}function t(a){return a.replace(/[?]/g,e.questSymbol).replace(/[&]/g,e.ampSymbol)}document.addEventListener("click",a),document.addEventListener("mousedown",a),document.addEventListener("contextmenu ",a),document.addEventListener("mouseover",function(a){var c=a.target;if("A"!==c.tagName||-1===c.href.indexOf(e.kcckey))return;var r=c.href.match(new RegExp(e.kcckey+"=(.+)"))[1]||"";if(!r)return;parseInt(r)&&(r="/#download"+r);c.dataset.kccurl=c.href.replace(r,t(r)),c.href=r})}();</script>
 		<!-- onda18:voltar-topo --><div class="onda19-lateral" aria-label="Atalhos de contato"><a class="onda19-lateral__link onda19-lateral__link--wa" href="https://wa.me/5521999947429?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Mirow%20%26%20Co.%20e%20gostaria%20de%20conversar." target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp" title="Falar no WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.74.46 3.44 1.32 4.94L2.1 22l5.36-1.4a9.8 9.8 0 0 0 4.58 1.15h.01c5.43 0 9.84-4.4 9.84-9.84C21.89 6.4 17.47 2 12.04 2Zm0 17.9h-.01a8.2 8.2 0 0 1-4.16-1.14l-.3-.18-3.1.81.83-3.02-.2-.31a8.14 8.14 0 0 1-1.25-4.35c0-4.5 3.68-8.17 8.2-8.17 2.19 0 4.24.85 5.79 2.4a8.1 8.1 0 0 1 2.4 5.78c0 4.51-3.68 8.18-8.2 8.18Zm4.5-6.12c-.25-.12-1.46-.72-1.68-.8-.23-.09-.39-.13-.55.12-.16.24-.63.79-.78.95-.14.17-.29.19-.53.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.7-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.44.12-.15.16-.25.25-.42.08-.16.04-.31-.02-.43-.06-.12-.55-1.34-.76-1.83-.2-.48-.4-.41-.55-.42l-.47-.01c-.16 0-.43.06-.65.3-.22.25-.85.84-.85 2.05s.87 2.37.99 2.53c.12.17 1.71 2.62 4.15 3.67.58.25 1.03.4 1.39.51.58.19 1.11.16 1.53.1.47-.07 1.46-.6 1.66-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg></a><a class="onda19-lateral__link onda19-lateral__link--mail" href="mailto:andreas.mirow@mirow.com.br,felipe.diniz@mirow.com.br?subject=Contato%20pelo%20site%20da%20Mirow%20%26%20Co.&amp;body=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Mirow%20%26%20Co.%20e%20gostaria%20de%20conversar%20sobre%20um%20desafio%20da%20minha%20empresa." aria-label="Enviar e-mail" title="Enviar e-mail"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1.6 2L12 12.3 19.4 7H4.6ZM20 8.9l-7.4 5.3a1 1 0 0 1-1.2 0L4 8.9V17h16V8.9Z"/></svg></a><a class="onda19-lateral__link onda19-lateral__link--topo" href="#topo" aria-label="Voltar ao início da página" title="Voltar ao início da página"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 4.6l8.2 8.2-2.1 2.1L13.5 10.3V19.4h-3V10.3l-4.6 4.6-2.1-2.1z"/></svg></a></div><script>(function(){var b=document.querySelector('.onda19-lateral__link--topo');if(!b)return;function t(){if(window.pageYOffset>400){b.classList.add('is-visivel');}else{b.classList.remove('is-visivel');}}window.addEventListener('scroll',t,{passive:true});t();})();</script><!-- /onda18:voltar-topo -->

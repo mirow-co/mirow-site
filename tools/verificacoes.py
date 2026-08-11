@@ -635,6 +635,90 @@ def estaticas(s):
         return (not ruins, u"; ".join(ruins))
     s.check("S13", u"formulário de carreiras na 1ª dobra (antes das outras seções)", s13)
 
+    # --- Formulário de candidatura novo -> AWS (onda 45, #202) --------------
+    CARGOS_VALIDOS = set([
+        u"Summer Intern (Dez-Fev do penúltimo a último ano de formação)",
+        u"Summer Intern (Dez-Fev - formandos até 2022)",
+        u"Summer Intern (Dez-Fev - formandos até 2023)",
+        u"Summer Intern (Dez-Fev - formandos até 2024)",
+        u"Summer Intern",
+        u"Summer Intern (Dec-Feb - expected graduation until 2022)",
+        u"Summer Intern (Dec-Feb - expected graduation until 2023)",
+        u"Summer Intern (Dec-Feb - expected graduation until 2024)",
+        u"Summer Intern (Dec-Feb at second-to-last or last year of graduation)",
+        u"Intern (penúltimo a último ano de formação)",
+        u"Intern (second-to-last or last year of graduation)",
+        u"Intern",
+        u"Business Analyst (recém formado até 3 anos)",
+        u"Business Analyst (recém formado até 4 anos)",
+        u"Business Analyst (recently graduated - up to 3yrs)",
+        u"Business Analyst (recently graduated - up to 4 yrs)",
+        u"Business Analyst", u"Fellow Associate", u"Associate",
+        u"Summer Associate (MBA)", u"Engagement Manager", u"Associate Partner",
+        u"Fellow BA",
+    ])
+
+    def s135():
+        # As 3 páginas de carreiras têm o form novo e ZERO resquício do Formidable
+        # do WordPress (o cutover não pode deixar um form que posta pro WP morto).
+        ruins = []
+        for rel in CARREIRAS:
+            h = s.ler(rel)
+            if 'id="mirow-carreiras-form"' not in h:
+                ruins.append("%s sem form novo" % rel)
+            if re.search(r'id="frm_form_\d+_container"', h) or "frm_ajax_submit" in h:
+                ruins.append("%s ainda tem Formidable" % rel)
+        return (not ruins, u"; ".join(ruins))
+    s.check("S139", u"carreiras: form novo presente e Formidable do WP removido (3 idiomas)", s135)
+
+    def s136():
+        # O form posta no API Gateway (assinador) e tem o gate hCaptcha.
+        ruins = []
+        for rel in CARREIRAS:
+            h = s.ler(rel)
+            if "execute-api" not in h or "data-endpoint" not in h:
+                ruins.append("%s sem endpoint do API Gateway" % rel)
+            if 'class="h-captcha"' not in h and "h-captcha" not in h:
+                ruins.append("%s sem widget hCaptcha" % rel)
+            if "js.hcaptcha.com" not in h:
+                ruins.append("%s sem script hCaptcha" % rel)
+            if "X-Captcha-Token" not in h:
+                ruins.append("%s sem header do captcha no submit" % rel)
+        return (not ruins, u"; ".join(ruins))
+    s.check("S140", u"carreiras: posta no API Gateway + gate hCaptcha (token em header)", s136)
+
+    def s137():
+        # MEDE O EFEITO: todo <option> de pretended_position tem que ser um cargo
+        # que o /webhook/.../start aceita (cargos_corretos) — senão o candidato é
+        # rejeitado com 400 e a candidatura some sem ninguém ver.
+        ruins = []
+        for rel in CARREIRAS:
+            h = s.ler(rel)
+            m = re.search(r'name="pretended_position"[^>]*>(.*?)</select>', h, re.S)
+            if not m:
+                ruins.append("%s sem select de cargo" % rel); continue
+            for om in re.finditer(r'<option(?:\s+value="([^"]*)")?[^>]*>(.*?)</option>', m.group(1), re.S):
+                val = om.group(1) if om.group(1) is not None else om.group(2).strip()
+                val = val.strip()
+                if val == "":
+                    continue  # placeholder "Selecione"
+                if val not in CARGOS_VALIDOS:
+                    ruins.append("%s: cargo inválido %r" % (rel, val[:40]))
+        return (not ruins, u"; ".join(ruins[:4]))
+    s.check("S141", u"carreiras: todo cargo do select é aceito pelo /start (mede o efeito)", s137)
+
+    def s138():
+        # CSS do form existe no onda6.css (o cache-bust em si é invariante da C02).
+        css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
+        det = []
+        if "onda45:carreiras-form" not in css:
+            det.append("bloco onda45 ausente no onda6.css")
+        for rel in CARREIRAS:
+            if "onda6.css?v=" not in s.ler(rel):
+                det.append("%s sem referência versionada ao onda6.css" % rel)
+        return (not det, u"; ".join(det))
+    s.check("S142", u"carreiras: CSS do form presente no onda6.css (bloco onda45)", s138)
+
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
         # privado) e não pode aparecer em página nenhuma; o Elmar é Senior
