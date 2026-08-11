@@ -40,8 +40,8 @@ from _onda7_css import ler, resolve_public  # noqa: E402
 
 # Host do site. Na virada de DNS (#42) vira "https://mirow.com.br" e o PREFIXO
 # do espelho vira "" — os dois trocam juntos, aqui.
-BASE = "https://mirow-co.github.io"
-PREFIXO = "/mirow-site/"
+BASE = "https://mirow.com.br"
+PREFIXO = "/"
 
 IDIOMA_PADRAO = "pt"     # S-121: para onde a raiz do Pages aponta
 
@@ -80,6 +80,9 @@ def urls_do_sitemap(pub):
             print("  AVISO: sem canonical, fora do sitemap: %s" % rel)
             continue
         can = m.group(1)
+        # onda 47: canonical passou a ser absoluto no dominio final
+        if can.startswith(BASE):
+            can = can[len(BASE):] or "/"
         if not can.startswith(PREFIXO):
             print("  AVISO: canonical fora do espelho (%s) em %s" % (can, rel))
             continue
@@ -113,13 +116,14 @@ def xml_do_sitemap(itens):
 def robots_apontando_pro_sitemap(atual, url_sitemap):
     """Troca a linha Sitemap: e a NOTA de virada de DNS que ficou obsoleta."""
     novo = re.sub(r'^Sitemap:.*$', u'Sitemap: %s' % url_sitemap, atual, flags=re.M)
-    # a nota citava sitemap-index.xml, que nunca existiu
+    # a nota de virada ficou obsoleta na onda 47 (#101): o host JÁ é o final
     novo = novo.replace(
-        u"# NOTA: trocar o host abaixo para https://mirow.com.br/sitemap-index.xml\n"
-        u"# na virada de DNS (junto com site/base do astro.config.mjs — Onda 3).",
         u"# NOTA: na virada de DNS (#42), o host sai de mirow-co.github.io para\n"
         u"# mirow.com.br na constante BASE de tools_onda6/90_sitemap_e_raiz.py —\n"
-        u"# rodar o script reescreve o sitemap.xml e esta linha juntos.")
+        u"# rodar o script reescreve o sitemap.xml e esta linha juntos.",
+        u"# Host final (onda 47/#101): mirow.com.br. A constante BASE de\n"
+        u"# tools_onda6/90_sitemap_e_raiz.py e a fonte; rodar o script reescreve\n"
+        u"# o sitemap.xml e esta linha juntos.")
     return novo
 
 

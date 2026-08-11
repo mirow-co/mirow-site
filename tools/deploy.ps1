@@ -156,7 +156,7 @@ try {
         # e espera de novo. Nao substitui a conferencia ao vivo -- a encurta.
         if ($SemEspera) {
             Write-Host 'CONFIRME AO VIVO antes de dizer NO AR:' -ForegroundColor Green
-            Write-Host '  https://mirow-co.github.io/mirow-site/pt/' -ForegroundColor Green
+            Write-Host '  https://mirow.com.br/pt/ (dominio custom; staging github.io redireciona)' -ForegroundColor Green
             return
         }
         Passo '7/7 acompanhar o build do GitHub Pages'
@@ -187,7 +187,7 @@ try {
             }
         }
         Write-Host 'CONFIRME AO VIVO antes de dizer NO AR:' -ForegroundColor Green
-        Write-Host '  https://mirow-co.github.io/mirow-site/pt/' -ForegroundColor Green
+        Write-Host '  https://mirow.com.br/pt/ (dominio custom; staging github.io redireciona)' -ForegroundColor Green
     }
     finally {
         Remove-Item Env:\GIT_INDEX_FILE -ErrorAction SilentlyContinue

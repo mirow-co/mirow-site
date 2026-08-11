@@ -30,8 +30,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
-HOST = "https://mirow-co.github.io"
-CARTAO = HOST + "/mirow-site/wp-content/uploads/2026/07/onda6/og-mirow.png"
+HOST = "https://mirow.com.br"
+CARTAO = HOST + "/wp-content/uploads/2026/07/onda6/og-mirow.png"
 
 REX_META = re.compile(
     r'(<meta (?:property|name)="(og:image|og:image:secure_url|og:url|twitter:image)" '

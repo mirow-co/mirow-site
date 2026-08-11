@@ -53,11 +53,11 @@ ALVOS = [
 ]
 
 URLS = {
-    "pt": "/mirow-site/pt/imprensa/",
-    "en": "/mirow-site/en/press/",
-    "de": "/mirow-site/de/presse/",
+    "pt": "/pt/imprensa/",
+    "en": "/en/press/",
+    "de": "/de/presse/",
 }
-BASE = "https://mirow-co.github.io"
+BASE = "https://mirow.com.br"
 
 MARK = "<!-- onda29:imprensa-%s -->"
 

@@ -41,7 +41,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
-PREFIXO = "/mirow-site/"
+PREFIXO = "/"
 
 # S-123: o src errado -> o certo. Restrito ao asset de medicao para nao tocar em
 # mais nada por acidente.

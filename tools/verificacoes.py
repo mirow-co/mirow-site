@@ -49,6 +49,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "tools_onda6", "qa"))
 
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 
+# Onda 47 (#101/#42): o site e servido na RAIZ de mirow.com.br.
+HOST = "https://mirow.com.br"
+
 # ---------------------------------------------------------------- constantes
 
 # As 3 homes do site (pt, en, de). A duplicata /en/homepage/ virou stub de
@@ -235,6 +238,8 @@ class Suite(object):
                     if not n.endswith(".html"):
                         continue
                     rel = os.path.relpath(os.path.join(dp, n), self.pub).replace(os.sep, "/")
+                    if rel == "404.html":
+                        continue  # pagina especial do Pages, sem tema (S143 cobre)
                     out.append((rel, self.ler(rel)))
             out.sort()
             self._htmls = out
@@ -718,6 +723,43 @@ def estaticas(s):
                 det.append("%s sem referência versionada ao onda6.css" % rel)
         return (not det, u"; ".join(det))
     s.check("S142", u"carreiras: CSS do form presente no onda6.css (bloco onda45)", s138)
+
+    def s143():
+        # Onda 47 (#101/#42): o site é servido na raiz de mirow.com.br.
+        # (a) CNAME liga o domínio custom no Pages; (b) 404.html com a marca;
+        # (c) NENHUM resquício do staging (/mirow-site/ ou github.io) em nenhum
+        # arquivo de texto de public/; (d) canonical absoluto no host final.
+        det = []
+        p_cname = os.path.join(pub, "CNAME")
+        if not os.path.exists(p_cname):
+            det.append("public/CNAME ausente")
+        elif s.ler("CNAME").strip() != "mirow.com.br":
+            det.append("CNAME != mirow.com.br")
+        p404 = os.path.join(pub, "404.html")
+        if not os.path.exists(p404):
+            det.append("public/404.html ausente")
+        elif "MIROW" not in s.ler("404.html"):
+            det.append("404.html sem a marca")
+        sujos = 0
+        exemplo = None
+        for dirpath, _dirs, files in os.walk(pub):
+            for nome in files:
+                if not nome.lower().endswith((".html", ".css", ".js", ".xml", ".txt", ".json")):
+                    continue
+                fp = os.path.join(dirpath, nome)
+                with io.open(fp, encoding="utf-8", errors="ignore") as f:
+                    conteudo = f.read()
+                if "mirow-site" in conteudo or "mirow-co.github.io" in conteudo:
+                    sujos += 1
+                    exemplo = exemplo or os.path.relpath(fp, pub)
+        if sujos:
+            det.append(u"%d arquivo(s) ainda citam o staging (ex.: %s)" % (sujos, exemplo))
+        for rel in HOMES:
+            can = re.search(r'rel="canonical" href="([^"]+)"', s.ler(rel))
+            if not can or not can.group(1).startswith(HOST):
+                det.append(u"%s: canonical não é absoluto em %s" % (rel, HOST))
+        return (not det, u"; ".join(det[:4]))
+    s.check("S143", u"domínio custom: CNAME + 404 + 0 resquício do staging (#101)", s143)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
@@ -1767,13 +1809,12 @@ def estaticas(s):
             if n < 20:
                 det.append(u"%s com só %d itens de imprensa" % (rel, n))
             can = re.search(r'rel="canonical" href="([^"]+)"', hh)
-            propria = "/mirow-site/" + rel[:-len("index.html")]
+            propria = HOST + "/" + rel[:-len("index.html")]
             if not can or can.group(1).rstrip("/") + "/" != propria:
                 det.append(u"%s com canonical errado: %s"
                            % (rel, can.group(1) if can else "-"))
         # o seletor de idiomas das três aponta uma para a outra (era home antes)
-        urls = ["/mirow-site/pt/imprensa/", "/mirow-site/en/press/",
-                "/mirow-site/de/presse/"]
+        urls = ["/pt/imprensa/", "/en/press/", "/de/presse/"]
         for rel in IMPRENSA:
             hh = s.ler(rel)
             m = re.search(r'<ul class="menu__languages-list">(.*?)</ul>', hh, re.S)
@@ -1795,20 +1836,20 @@ def estaticas(s):
                 continue
             if "menu__nav-item" not in hh:            # é stub de redirect
                 if rel != "index.html":
-                    stubs.add("/mirow-site/" + rel[:-len("index.html")])
+                    stubs.add("/" + rel[:-len("index.html")])
                 continue
             conteudo.append((rel, hh))
             if rel == "en/homepage/index.html":
                 continue          # home duplicada declarada (S-16)
             can = re.search(r'rel="canonical" href="([^"]+)"', hh)
-            propria = "/mirow-site/" + rel[:-len("index.html")]
+            propria = HOST + "/" + rel[:-len("index.html")]
             if not can or can.group(1).rstrip("/") + "/" != propria:
                 det.append(u"%s não é a própria canônica (%s)"
                            % (rel, can.group(1) if can else "-"))
         if len(stubs) < 140:
             det.append(u"só %d stubs de redirect (esperado >= 140)" % len(stubs))
         for rel, hh in conteudo:
-            for url in re.findall(r'href="(/mirow-site/[^"#?]*/)"', hh):
+            for url in re.findall(r'href="(/[^"#?]*/)"', hh):
                 if url in stubs:
                     det.append(u"%s ainda linka para o stub %s" % (rel, url))
                     break
@@ -2087,7 +2128,7 @@ def estaticas(s):
                        % len(itens))
         # nenhuma URL do sitemap pode ser noindex nem faltar no disco
         for loc, _lastmod in itens:
-            caminho = loc.split(gen.PREFIXO, 1)[1] if gen.PREFIXO in loc else None
+            caminho = loc[len(gen.BASE):].lstrip("/") if loc.startswith(gen.BASE) else None
             if caminho is None:
                 det.append(u"URL fora do espelho: %s" % loc)
                 continue
@@ -2146,24 +2187,24 @@ def estaticas(s):
                 caminho = m.group(1)
                 if not caminho.startswith("/"):
                     continue
-                if not caminho.startswith("/mirow-site/"):
-                    det.append(u"%s: %s sem o prefixo /mirow-site/" % (rel, caminho))
+                if caminho.startswith("/mirow-site/"):
+                    det.append(u"%s: %s ainda com o prefixo do staging" % (rel, caminho))
                     continue
-                fp = os.path.join(pub, caminho[len("/mirow-site/"):].replace("/", os.sep))
+                fp = os.path.join(pub, caminho.lstrip("/").replace("/", os.sep))
                 if not os.path.exists(fp):
                     det.append(u"%s: %s não existe no disco" % (rel, caminho))
         return (not det, u"%d referência(s) quebrada(s): %s"
                 % (len(det), "; ".join(det[:3])))
-    s.check("S123", u"asset próprio sempre com o prefixo do espelho e existente", s123)
+    s.check("S123", u"asset próprio root-relative e existente no disco", s123)
 
     def s124():
         # Achado da própria onda 33: a S-106 criou en/press e de/presse a partir de
         # outro molde e o hreflang veio com ele — as duas declaravam a POLÍTICA DE
         # PRIVACIDADE como sua versão nos outros idiomas, e pt/imprensa não tinha
         # nenhum. As três têm de apontar umas para as outras.
-        esperado = {"pt": "/mirow-site/pt/imprensa/",
-                    "en": "/mirow-site/en/press/",
-                    "de": "/mirow-site/de/presse/"}
+        esperado = {"pt": HOST + "/pt/imprensa/",
+                    "en": HOST + "/en/press/",
+                    "de": HOST + "/de/presse/"}
         det = []
         for rel in IMPRENSA:
             h = s.ler(rel)
@@ -2271,7 +2312,7 @@ def estaticas(s):
                 if ("clientes/" not in src and "imprensa" not in src) or src in vistos:
                     continue
                 vistos.add(src)
-                caminho = src.replace("/mirow-site/", "", 1)
+                caminho = src.lstrip("/")
                 fs = os.path.join(s.pub, caminho.replace("/", os.sep))
                 if not os.path.exists(fs):
                     det.append(u"%s não existe (%s)" % (src, rel))
@@ -2295,7 +2336,7 @@ def estaticas(s):
         if "onda41:home-en-canonica" not in h:
             det.append(u"en/homepage não é o stub da onda 41")
         else:
-            if 'content="0;url=/mirow-site/en/"' not in h:
+            if 'content="0;url=/en/"' not in h:
                 det.append(u"stub não redireciona para /en/")
             if "noindex" not in h:
                 det.append(u"stub sem noindex")
@@ -2310,9 +2351,9 @@ def estaticas(s):
             por_lang = {}
             for href, lang in pares:
                 por_lang.setdefault(lang.split("-")[0], set()).add(href)
-            for lang, home in (("pt", "/mirow-site/pt/"),
-                               ("en", "/mirow-site/en/"),
-                               ("de", "/mirow-site/de/")):
+            for lang, home in (("pt", HOST + "/pt/"),
+                               ("en", HOST + "/en/"),
+                               ("de", HOST + "/de/")):
                 if home not in por_lang.get(lang, set()):
                     det.append(u"%s: hreflang %s não aponta %s" % (rel, lang, home))
             if any("/en/homepage/" in href for href, _l in pares):
@@ -2522,27 +2563,20 @@ class ServidorLocal(object):
         self.porta = None
         self.proc = None
 
-    PREFIXO = "mirow-site"   # as páginas referenciam /mirow-site/... (base do Pages)
-
     def __enter__(self):
         srv = socket.socket()
         srv.bind(("127.0.0.1", 0))
         self.porta = srv.getsockname()[1]
         srv.close()
-        # As URLs das páginas são absolutas em /mirow-site/. Servir public/ na raiz
-        # daria 404 em todo CSS/JS e a medição de dobra sairia errada. Então serve-se
-        # um diretório temporário com uma junction mirow-site -> public.
-        self.tmp = tempfile.mkdtemp(prefix="verif-serve")
-        alvo = os.path.join(self.tmp, self.PREFIXO)
-        subprocess.check_call(["cmd", "/c", "mklink", "/J", alvo, self.pub],
-                              stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        # Onda 47 (#101): as URLs das páginas são root-relative (/pt/, /wp-content/...)
+        # como no domínio final — public/ é servido direto na raiz.
         self.proc = subprocess.Popen(
             [sys.executable, "-m", "http.server", str(self.porta), "--bind", "127.0.0.1",
-             "--directory", self.tmp],
+             "--directory", self.pub],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         for _ in range(40):
             try:
-                urllib.request.urlopen("http://127.0.0.1:%d/%s/pt/" % (self.porta, self.PREFIXO),
+                urllib.request.urlopen("http://127.0.0.1:%d/pt/" % self.porta,
                                        timeout=2).read(1)
                 return self
             except Exception:
@@ -2550,18 +2584,11 @@ class ServidorLocal(object):
         raise RuntimeError("servidor local não subiu na porta %d" % self.porta)
 
     def base(self):
-        return "http://127.0.0.1:%d/%s" % (self.porta, self.PREFIXO)
+        return "http://127.0.0.1:%d" % self.porta
 
     def __exit__(self, *a):
         if self.proc:
             self.proc.terminate()
-        try:
-            # remove a junction (não o alvo) e o temp
-            subprocess.call(["cmd", "/c", "rmdir", os.path.join(self.tmp, self.PREFIXO)],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-            os.rmdir(self.tmp)
-        except Exception:
-            pass
 
 
 class Navegador(object):

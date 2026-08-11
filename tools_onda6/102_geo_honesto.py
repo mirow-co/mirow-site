@@ -17,7 +17,7 @@ No lugar, os dois mecanismos legítimos que máquinas leem por design:
    `sameAs` (LinkedIn/Instagram) e `address` (endereço público da firma).
 
 NOTA DE CUTOVER: os links do llms.txt usam o prefixo do espelho
-(/mirow-site/). Na virada de DNS para mirow.com.br, regerar (a S-44/#101 já
+(/). Na virada de DNS para mirow.com.br, regerar (a S-44/#101 já
 reescreve prefixos).
 
 Uso: python tools_onda6/102_geo_honesto.py <raiz>
@@ -81,23 +81,23 @@ e agronegócio, serviços financeiros e tecnologia.
 
 ## Práticas
 
-- [Estratégia e Inovação](/mirow-site/pt/pratica/estrategia/): da análise de
+- [Estratégia e Inovação](/pt/pratica/estrategia/): da análise de
   mercado à execução — estratégias que geram valor mensurável
-- [Go-to-market e Pricing](/mirow-site/pt/pratica/marketing-vendas-e-pricing/):
+- [Go-to-market e Pricing](/pt/pratica/marketing-vendas-e-pricing/):
   modelos de pricing em toda a cadeia de marketing e vendas
-- [Sourcing, Compras e Estoques](/mirow-site/pt/pratica/operacoes/): sourcing
+- [Sourcing, Compras e Estoques](/pt/pratica/operacoes/): sourcing
   estratégico da avaliação de spend à captura
 
 ## Páginas principais
 
-- [Home (PT)](/mirow-site/pt/): visão geral, setores e líderes
-- [Home (EN)](/mirow-site/en/): English version
-- [Home (DE)](/mirow-site/de/): deutsche Version
-- [Insights](/mirow-site/pt/insights/): análises autorais sobre mercado e estratégia
-- [Imprensa](/mirow-site/pt/imprensa/): cobertura em veículos como Valor
+- [Home (PT)](/pt/): visão geral, setores e líderes
+- [Home (EN)](/en/): English version
+- [Home (DE)](/de/): deutsche Version
+- [Insights](/pt/insights/): análises autorais sobre mercado e estratégia
+- [Imprensa](/pt/imprensa/): cobertura em veículos como Valor
   Econômico, Reuters, The Economist, Estadão e Folha de S.Paulo
-- [Nossos líderes](/mirow-site/pt/sobre-nos/lideres/): sócios e senior experts
-- [Contato](/mirow-site/pt/contato/): WhatsApp, e-mail e formulário
+- [Nossos líderes](/pt/sobre-nos/lideres/): sócios e senior experts
+- [Contato](/pt/contato/): WhatsApp, e-mail e formulário
 
 ## Contato
 
