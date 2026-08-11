@@ -1366,26 +1366,44 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 .praticas-3__card .home-experience__list-item-more{font-size:18px}
 /* onda43:texto-expertise:fim */
 
-/* onda45:carreiras-form:ini (#202 — form novo de candidatura -> AWS; substitui o Formidable) */
-.mc-form{max-width:none}
-.mc-form__intro{font-size:15px;color:#444;margin:0 0 18px}
-.mc-form__intro span{color:#c0392b}
-.mc-fieldset{border:0;padding:0;margin:0 0 22px}
-.mc-fieldset legend{font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:#020E66;margin:0 0 12px;padding:0;border-bottom:2px solid #AAD5E8;width:100%;line-height:1.6}
-.mc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+/* onda45:carreiras-form:ini (#202/#203 — form de candidatura -> AWS; cartao claro sobre o fundo escuro) */
+/* O form vive numa secao de fundo navy: renderiza como CARTAO CLARO para legibilidade. */
+.mc-form{background:#fff;border-radius:14px;padding:30px 32px;box-shadow:0 18px 44px rgba(2,14,102,.28);color:#0f2933}
+@media(max-width:640px){.mc-form{padding:22px 18px}}
+.mc-form__intro{font-size:15px;line-height:1.5;color:#3a4a54;margin:0 0 22px}
+.mc-form__intro .mc-star{color:#d23f31;font-weight:700}
+.mc-fieldset{border:0;padding:0;margin:0 0 26px;min-width:0}
+.mc-fieldset legend{font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:#020E66;margin:0 0 14px;padding:0 0 8px;border-bottom:2px solid #00ADEC;width:100%;line-height:1.4}
+.mc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px}
 @media(max-width:640px){.mc-grid{grid-template-columns:1fr}}
-.mc-field{display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:#333}
-.mc-field>span{font-weight:600}
-.mc-field.mc-req>span::after{content:" *";color:#c0392b}
-.mc-field input,.mc-field select{font-family:Arial,Helvetica,sans-serif;font-size:14px;padding:9px 11px;border:1px solid #cdd8df;border-radius:6px;background:#fff;color:#071C25;width:100%}
-.mc-field input:focus,.mc-field select:focus{outline:2px solid #00ADEC;outline-offset:1px;border-color:#00ADEC}
-.mc-field input[type=file]{padding:7px 9px;background:#f6fafc}
-.mc-hcaptcha{margin:6px 0 18px}
-.mc-actions{display:flex;flex-direction:column;gap:10px}
-.mc-submit{align-self:flex-start;background:#020E66;color:#fff;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:15px;border:0;border-radius:8px;padding:13px 30px;cursor:pointer;transition:background .15s}
-.mc-submit:hover{background:#00ADEC}
-.mc-submit:disabled{opacity:.6;cursor:default}
-.mc-status{margin:0;font-size:14px;min-height:1.2em}
-.mc-status--ok{color:#1E8A4C;font-weight:700}
-.mc-status--erro{color:#c0392b;font-weight:700}
+.mc-field{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.mc-field>span{font-weight:700;color:#12333f}
+.mc-field.mc-req>span::after{content:" *";color:#d23f31}
+.mc-field input,.mc-field select{font-family:Arial,Helvetica,sans-serif;font-size:15px;padding:11px 12px;border:1.5px solid #b8c6d0;border-radius:7px;background:#fff;color:#071C25;width:100%}
+.mc-field input::placeholder{color:#8aa0ac}
+.mc-field input:hover,.mc-field select:hover{border-color:#7fa8bd}
+.mc-field input:focus,.mc-field select:focus{outline:none;border-color:#00ADEC;box-shadow:0 0 0 3px rgba(0,173,236,.25)}
+.mc-field input[type=file]{padding:9px 10px;background:#f2f8fb;font-size:14px}
+/* estado invalido: borda vermelha + label vermelho + dica */
+.mc-field.mc-invalid input,.mc-field.mc-invalid select{border-color:#d23f31;box-shadow:0 0 0 3px rgba(210,63,49,.18)}
+.mc-field.mc-invalid>span{color:#d23f31}
+.mc-hint{display:none;font-size:12.5px;color:#d23f31;font-weight:700}
+.mc-field.mc-invalid .mc-hint{display:block}
+.mc-hcaptcha{margin:8px 0 20px}
+.mc-actions{display:flex;flex-direction:column;gap:14px}
+/* banner de erros: lista os campos que faltam */
+.mc-errors{display:none;background:#fdecea;border:1.5px solid #f0b7af;border-left:5px solid #d23f31;border-radius:8px;padding:12px 16px;color:#8f271b;font-size:14px}
+.mc-errors.mc-show{display:block}
+.mc-errors b{color:#8f271b}
+.mc-submit{background:#00ADEC;color:#fff;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;letter-spacing:.01em;border:0;border-radius:9px;padding:15px 40px;cursor:pointer;transition:background .15s,transform .05s;align-self:flex-start}
+.mc-submit:hover{background:#020E66}
+.mc-submit:active{transform:translateY(1px)}
+.mc-submit:disabled{background:#9fb4c0;cursor:default}
+@media(max-width:640px){.mc-submit{width:100%;text-align:center}}
+/* banners de status */
+.mc-status{margin:0;font-size:14.5px;line-height:1.5}
+.mc-status:empty{display:none}
+.mc-status--info{color:#3a4a54}
+.mc-status--ok{background:#e7f7ee;border:1.5px solid #a9dcbe;border-left:5px solid #1E8A4C;border-radius:8px;padding:14px 18px;color:#12603a;font-weight:600}
+.mc-status--erro{background:#fdecea;border:1.5px solid #f0b7af;border-left:5px solid #d23f31;border-radius:8px;padding:14px 18px;color:#8f271b;font-weight:600}
 /* onda45:carreiras-form:fim */
