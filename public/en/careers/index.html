@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
   <!-- Medicao Mirow (GA4) - issue mirow-marketing#3. Config e eventos em wp-content/uploads/2026/07/onda6/onda31-medicao.js -->
-  <script src="/mirow-site/wp-content/uploads/2026/07/onda6/onda31-medicao.js?v=45"></script>
+  <script src="/mirow-site/wp-content/uploads/2026/07/onda6/onda31-medicao.js?v=46"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-VK4QHHHS5X"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
@@ -122,7 +122,7 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" id="onda6-css" href="/mirow-site/wp-content/uploads/2026/07/onda6/onda6.css?v=45" media="all" />
+<link rel="stylesheet" id="onda6-css" href="/mirow-site/wp-content/uploads/2026/07/onda6/onda6.css?v=46" media="all" />
 </head>
 
 <body id="topo" data-rsssl=1 class="wp-singular page-template page-template-templates page-template-page-careers page-template-templatespage-careers-php page page-id-3137 wp-theme-mirow">
@@ -185,11 +185,11 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
             </div>
             <div class="col-12 col-lg-6">
                 <div class="job-contact__form">
-                    <!-- onda45:carreiras-form:ini (new form -> API Gateway -> /start; replaces WP Formidable) -->
+                    <!-- onda45:carreiras-form:ini (form -> API Gateway -> /start; visual onda46) -->
 <form id="mirow-carreiras-form" class="mc-form" enctype="multipart/form-data" novalidate
       data-endpoint="https://hp813geae7.execute-api.sa-east-1.amazonaws.com/"
       data-hcaptcha-sitekey="e7405516-73e8-4a36-a43c-f2d685c40648">
-  <p class="mc-form__intro">Fill in your details to apply. Fields marked <span aria-hidden="true">*</span> are required.</p>
+  <p class="mc-form__intro">Fill in your details to apply. Fields marked <span class="mc-star">*</span> are required.</p>
 
   <fieldset class="mc-fieldset"><legend>Personal details</legend>
     <div class="mc-grid">
@@ -210,7 +210,7 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
       <label class="mc-field mc-req"><span>City / State of residence</span>
         <input type="text" name="city_and_state" required></label>
       <label class="mc-field"><span>LinkedIn</span>
-        <input type="url" name="linkedin_url" placeholder="https://linkedin.com/in/..."></label>
+        <input type="url" name="linkedin_url"></label>
     </div>
   </fieldset>
 
@@ -228,7 +228,7 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
       <label class="mc-field"><span>Current semester</span>
         <input type="text" name="current_semester"></label>
       <label class="mc-field"><span>GPA</span>
-        <input type="text" name="gpa" placeholder="8.5"></label>
+        <input type="text" name="gpa"></label>
       <label class="mc-field"><span>MBA / Postgraduate</span>
         <input type="text" name="post_graduation"></label>
     </div>
@@ -281,6 +281,7 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
   <div class="mc-hcaptcha h-captcha" data-sitekey="e7405516-73e8-4a36-a43c-f2d685c40648"></div>
 
   <div class="mc-actions">
+    <div class="mc-errors" role="alert"></div>
     <button type="submit" class="mc-submit">Submit application</button>
     <p class="mc-status" role="status" aria-live="polite"></p>
   </div>
@@ -288,36 +289,26 @@ cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGA
 <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 <script>
 (function(){
-  var form = document.getElementById('mirow-carreiras-form');
-  if(!form) return;
-  var status = form.querySelector('.mc-status');
-  var btn = form.querySelector('.mc-submit');
-  var endpoint = form.getAttribute('data-endpoint');
-  function msg(t, kind){ status.textContent = t; status.className = 'mc-status' + (kind ? ' mc-status--' + kind : ''); }
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    if(!form.checkValidity()){ form.reportValidity(); return; }
-    var el = form.querySelector('.h-captcha [name="h-captcha-response"]');
-    var token = el ? el.value : '';
-    if(!token){ msg('Please confirm you are not a robot (hCaptcha) before submitting.', 'erro'); return; }
-    var fd = new FormData(form);
-    fd.delete('h-captcha-response'); fd.delete('g-recaptcha-response');
-    btn.disabled = true; msg('Submitting your application…');
-    fetch(endpoint, { method:'POST', headers:{ 'X-Captcha-Token': token }, body: fd })
-      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {ok:r.ok, j:j}; }); })
-      .then(function(res){
-        if(res.ok && res.j && res.j.ok){
-          form.reset(); if(window.hcaptcha){ try{ hcaptcha.reset(); }catch(e){} }
-          msg('Application submitted successfully. Thank you! We will contact you by e-mail.', 'ok');
-        } else {
-          btn.disabled = false; if(window.hcaptcha){ try{ hcaptcha.reset(); }catch(e){} }
-          msg('Could not submit. Please check your data and try again, or write to careers@mirow.com.br.', 'erro');
-        }
-      })
-      .catch(function(){
-        btn.disabled = false; if(window.hcaptcha){ try{ hcaptcha.reset(); }catch(e){} }
-        msg('Connection error while submitting. Please check your internet and try again.', 'erro');
-      });
+  var form=document.getElementById('mirow-carreiras-form'); if(!form)return;
+  var status=form.querySelector('.mc-status'), errbox=form.querySelector('.mc-errors');
+  var btn=form.querySelector('.mc-submit'), endpoint=form.getAttribute('data-endpoint');
+  function msg(t,kind){status.textContent=t;status.className='mc-status'+(kind?' mc-status--'+kind:'');}
+  function labelOf(el){var f=el.closest('.mc-field'),s=f&&f.querySelector('span');return s?s.textContent.trim():el.name;}
+  function clearErr(){form.querySelectorAll('.mc-field.mc-invalid').forEach(function(f){f.classList.remove('mc-invalid');});errbox.classList.remove('mc-show');errbox.innerHTML='';}
+  form.addEventListener('input',function(e){var f=e.target.closest('.mc-field');if(f&&f.classList.contains('mc-invalid')&&e.target.checkValidity())f.classList.remove('mc-invalid');});
+  form.addEventListener('submit',function(e){
+    e.preventDefault(); clearErr();
+    var missing=[];
+    form.querySelectorAll('[required]').forEach(function(el){if(!el.checkValidity()){var f=el.closest('.mc-field');if(f)f.classList.add('mc-invalid');missing.push(labelOf(el));}});
+    if(missing.length){errbox.innerHTML='<b>Please fill in:</b> '+missing.join(', ');errbox.classList.add('mc-show');var first=form.querySelector('.mc-field.mc-invalid input,.mc-field.mc-invalid select');if(first)first.focus();msg('','');return;}
+    var el=form.querySelector('.h-captcha [name="h-captcha-response"]'),token=el?el.value:'';
+    if(!token){msg('Please confirm you are not a robot (hCaptcha) before submitting.','erro');return;}
+    var fd=new FormData(form);fd.delete('h-captcha-response');fd.delete('g-recaptcha-response');
+    btn.disabled=true;msg('Submitting your application…','info');
+    fetch(endpoint,{method:'POST',headers:{'X-Captcha-Token':token},body:fd})
+      .then(function(r){return r.json().catch(function(){return{};}).then(function(j){return{ok:r.ok,j:j};});})
+      .then(function(res){if(res.ok&&res.j&&res.j.ok){form.reset();if(window.hcaptcha){try{hcaptcha.reset();}catch(e){}}msg('Application submitted successfully. We will be in touch by e-mail soon.','ok');}else{btn.disabled=false;if(window.hcaptcha){try{hcaptcha.reset();}catch(e){}}msg('Could not submit right now. Check your data and try again — if it persists, write to careers@mirow.com.br.','erro');}})
+      .catch(function(){btn.disabled=false;if(window.hcaptcha){try{hcaptcha.reset();}catch(e){}}msg('Connection error while submitting. Please check your internet and try again.','erro');});
   });
 })();
 </script>
