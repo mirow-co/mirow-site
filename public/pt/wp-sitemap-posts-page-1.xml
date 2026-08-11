@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Shim da onda 49 (S-144, #102): este caminho era um sitemap do
+     WordPress; o mapa canonico agora e https://mirow.com.br/sitemap.xml .
+     Gerado por tools_onda6/100_wp_sitemap_shims.py — nao editar a mao. -->
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://mirow.com.br/sitemap.xml</loc>
+  </sitemap>
+</sitemapindex>

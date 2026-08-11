@@ -762,6 +762,44 @@ def estaticas(s):
         return (not det, u"; ".join(det[:4]))
     s.check("S143", u"domínio custom: CNAME + 404 + 0 resquício do staging (#101)", s143)
 
+    def s144():
+        # Onda 49 (#102): os caminhos de sitemap do WP antigo (que os crawlers
+        # ainda pedem aos milhares/mês, ver AWStats 2026 no repo privado) servem
+        # um <sitemapindex> apontando para o sitemap canônico. Padrão S120: a
+        # asserção RECALCULA via gerador e compara byte a byte — shim editado à
+        # mão, caminho faltando ou host divergente do 90 quebram aqui.
+        import importlib.util
+        det = []
+        raiz = os.path.dirname(pub)
+        def carrega(nome_mod, arq):
+            p = os.path.join(raiz, "tools_onda6", arq)
+            spec = importlib.util.spec_from_file_location(nome_mod, p)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod
+        gen = carrega("gen100", "100_wp_sitemap_shims.py")
+        gen90 = carrega("gen90_s144", "90_sitemap_e_raiz.py")
+        if gen.BASE != gen90.BASE:
+            det.append(u"BASE do 100 (%s) diverge do 90 (%s)" % (gen.BASE, gen90.BASE))
+        esperado = gen.xml_do_shim()
+        faltam, divergem = [], []
+        for rel in gen.caminhos_legados():
+            fp = os.path.join(pub, rel.replace("/", os.sep))
+            if not os.path.exists(fp):
+                faltam.append(rel)
+            elif s.ler(rel) != esperado:
+                divergem.append(rel)
+        if faltam:
+            det.append(u"%d shim(s) ausente(s): %s" % (len(faltam), "; ".join(faltam[:3])))
+        if divergem:
+            det.append(u"%d shim(s) divergem do gerador: %s" % (len(divergem), "; ".join(divergem[:3])))
+        # o alvo dos shims tem de ser o mesmo sitemap que o robots anuncia
+        if (u"Sitemap: %s" % gen.SITEMAP_CANONICO) not in s.ler("robots.txt"):
+            det.append(u"robots.txt não aponta para %s" % gen.SITEMAP_CANONICO)
+        return (not det, u"%d caminho(s) legado(s); %s"
+                % (len(gen.caminhos_legados()), "; ".join(det[:3]) or u"todos batem"))
+    s.check("S144", u"sitemaps antigos do WP servem index p/ o sitemap canônico (#102)", s144)
+
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
         # privado) e não pode aparecer em página nenhuma; o Elmar é Senior
