@@ -77,6 +77,7 @@ BLOCOS_CSS = [
     "onda14:hero-malha-cheia", "onda14:menu-executivo", "onda14:fundo-sem-sobras",
     "onda15:hero-scrims", "onda15:barras-gemeas", "onda15:rodape-barra",
     "onda16:hero-layout-s41", "onda16:hover-marcas-s42",
+    "onda47:hero-respiro",
     "onda17:hero-horizonte-s49",
     # onda 18 (S-50..S-71, pedidos do Mario de 03/08)
     "onda18:contato-botao", "onda18:barras", "onda18:voltar-topo",
@@ -2693,8 +2694,45 @@ def ao_vivo(s):
         for i, rel in enumerate(HOMES, 1):
             s.check("V%02d" % i, u"primeira dobra exata em %s (1400x900)" % rel,
                     faz_dobra(rel, 1400, 900))
-        s.check("V05", u"primeira dobra exata em pt (1366x768)",
-                faz_dobra("pt/index.html", 1366, 768))
+        # V05 — onda 47: em viewport baixo o banner pode CRESCER (o conteudo
+        # nao cabe na dobra) — o que nao pode e sobrar buraco (sobra negativa)
+        # nem o titulo sumir sob o menu fixo (V29 cobre o titulo).
+        def dobra_sem_buraco(rel, largura, altura):
+            def f():
+                url = "%s/%s" % (base, rel.replace("index.html", ""))
+                nav.abrir(url, largura, altura)
+                v = nav.js(
+                    "(function(){var f=document.querySelector('.clientes-logos');"
+                    "if(!f)return 'sem faixa de logos';"
+                    "var b=Math.round(f.getBoundingClientRect().bottom);"
+                    "return b - window.innerHeight;})()")
+                if isinstance(v, str):
+                    return (False, v)
+                return (v >= -4, u"buraco de %dpx abaixo dos logos em %dx%d" % (-(v or 0), largura, altura))
+            return f
+        s.check("V05", u"dobra sem buraco em pt (1366x768; banner pode crescer — onda47)",
+                dobra_sem_buraco("pt/index.html", 1366, 768))
+
+        # V29 — onda 47 (achado 11/08): o titulo do hero NUNCA fica sob o menu
+        # fixo, em nenhuma altura de viewport. Antes, com height fixo +
+        # align-items:center, a 1280x620 o "Estratégia" perdia 82px sob o menu.
+        def titulo_livre():
+            det = []
+            for w, h in [(1920, 730), (1366, 768), (1280, 620)]:
+                nav.abrir(base + "/pt/", w, h)
+                v = nav.js(
+                    "(function(){var t=document.querySelector('.hero-texto h2');"
+                    "var m=document.querySelector('.menu, nav, .header');"
+                    "if(!t||!m)return 'seletor sumiu';"
+                    "return Math.round(t.getBoundingClientRect().top -"
+                    " m.getBoundingClientRect().bottom);})()")
+                if isinstance(v, str):
+                    det.append(u"%dx%d: %s" % (w, h, v))
+                elif v is None or v < 4:
+                    det.append(u"%dx%d: titulo a %spx do menu (minimo 4)" % (w, h, v))
+            return (not det, u"; ".join(det))
+        s.check("V29", u"titulo do hero livre do menu fixo em 3 alturas de tela (onda47)",
+                titulo_livre)
 
         # V06 — os 4 contatos do hero recebem o clique de verdade. O bug da
         # onda 8.1 foi exatamente isto: o .banner__background (absolute) ficava

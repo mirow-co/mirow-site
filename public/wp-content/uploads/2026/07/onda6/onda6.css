@@ -1407,3 +1407,24 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 .mc-status--ok{background:#e7f7ee;border:1.5px solid #a9dcbe;border-left:5px solid #1E8A4C;border-radius:8px;padding:14px 18px;color:#12603a;font-weight:600}
 .mc-status--erro{background:#fdecea;border:1.5px solid #f0b7af;border-left:5px solid #d23f31;border-radius:8px;padding:14px 18px;color:#8f271b;font-weight:600}
 /* onda45:carreiras-form:fim */
+
+/* onda47:hero-respiro:ini */
+/* Achado de 11/08 (colega do Mario, tela ~1920x730): em viewport BAIXO o
+   conteudo do hero fica maior que o banner (height = 100svh - logos) e, com
+   align-items:center, vaza por CIMA — o "Estratégia" some embaixo do menu
+   fixo (98px). Medido: t=16px a 1280x620; ate o 1366x768 da suite tinha 8px
+   encobertos. Conserto: min-height em vez de height — a dobra segue exata
+   sempre que o conteudo cabe (todo o caso comum), e em tela baixa o banner
+   CRESCE (rola um pouco) em vez de decapitar o titulo. O padding-top de
+   118px do onda8 volta a valer como folga real acima do menu. */
+@media only screen and (min-width: 992px){
+  .homepage .banner{
+    height:auto;
+    min-height:max(430px, calc(100vh - var(--onda8-logos-h)));
+    min-height:max(430px, calc(100svh - var(--onda8-logos-h)));
+    /* 118/20 do onda8 viravam altura minima real neste modelo e estouravam
+       25px a 1400x900; 108 = 98px do menu + 10 de respiro. */
+    padding:108px 0 4px;
+  }
+}
+/* onda47:hero-respiro:fim */
