@@ -29,21 +29,30 @@ START_URL = os.environ.get(
     "https://recruiting-platform.mirow.com.br/webhook/import/cadidates/start",
 )
 HCAPTCHA_VERIFY = "https://api.hcaptcha.com/siteverify"
-ALLOW_ORIGIN = os.environ.get("ALLOW_ORIGIN", "*")
+# Lista de origens permitidas (CORS). Ecoa a origem do request se estiver na lista.
+ALLOWED_ORIGINS = [
+    o.strip() for o in os.environ.get("ALLOW_ORIGINS", "*").split(",") if o.strip()
+]
 
 
-def _cors():
+def _cors(origin):
+    if "*" in ALLOWED_ORIGINS:
+        allow = "*"
+    elif origin and origin in ALLOWED_ORIGINS:
+        allow = origin
+    else:
+        allow = ALLOWED_ORIGINS[0] if ALLOWED_ORIGINS else "null"
     return {
-        "Access-Control-Allow-Origin": ALLOW_ORIGIN,
+        "Access-Control-Allow-Origin": allow,
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, X-Captcha-Token",
         "Vary": "Origin",
     }
 
 
-def _resp(status, body, extra=None):
+def _resp(status, body, origin=None, extra=None):
     h = {"Content-Type": "application/json"}
-    h.update(_cors())
+    h.update(_cors(origin))
     if extra:
         h.update(extra)
     return {"statusCode": status, "headers": h, "body": json.dumps(body)}
@@ -67,27 +76,26 @@ def _verify_captcha(token, remoteip=None):
 
 
 def handler(event, context):
+    headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
+    origin = headers.get("origin")
     method = (
         event.get("requestContext", {}).get("http", {}).get("method")
         or event.get("httpMethod")
         or "POST"
     )
     if method == "OPTIONS":
-        return _resp(204, {})
+        return _resp(204, {}, origin)
     if method != "POST":
-        return _resp(405, {"error": "method_not_allowed"})
+        return _resp(405, {"error": "method_not_allowed"}, origin)
 
     secret = os.environ.get("START_HMAC_SECRET")
     if not secret:
-        return _resp(500, {"error": "server_misconfigured"})
+        return _resp(500, {"error": "server_misconfigured"}, origin)
 
-    headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
-    remoteip = (
-        event.get("requestContext", {}).get("http", {}).get("sourceIp")
-    )
+    remoteip = event.get("requestContext", {}).get("http", {}).get("sourceIp")
     ok, why = _verify_captcha(headers.get("x-captcha-token"), remoteip)
     if not ok:
-        return _resp(403, {"error": "captcha_failed", "detail": why})
+        return _resp(403, {"error": "captcha_failed", "detail": why}, origin)
 
     body = event.get("body") or ""
     raw = base64.b64decode(body) if event.get("isBase64Encoded") else body.encode("utf-8")
@@ -106,12 +114,13 @@ def handler(event, context):
     except urllib.error.HTTPError as e:
         upstream_status, upstream_body = e.code, e.read(500).decode("utf-8", "replace")
     except Exception as e:  # noqa: BLE001
-        return _resp(502, {"error": "upstream_unreachable", "detail": str(e)[:120]})
+        return _resp(502, {"error": "upstream_unreachable", "detail": str(e)[:120]}, origin)
 
     if upstream_status == 200:
-        return _resp(200, {"ok": True})
+        return _resp(200, {"ok": True}, origin)
     return _resp(
         502 if upstream_status >= 500 else 400,
         {"error": "upstream_rejected", "upstream_status": upstream_status,
          "upstream_body": upstream_body[:200]},
+        origin,
     )

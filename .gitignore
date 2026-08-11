@@ -9,3 +9,6 @@ _qa_breakpoints/
 _qa_onda18/
 # espelho bruto do mirow.com.br antigo (~293 MB) — insumo, nao codigo do site
 _scrape-legado/
+
+# Segredos locais — NUNCA versionar (R11)
+access.txt
