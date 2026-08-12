@@ -2599,13 +2599,19 @@ def estaticas(s):
         i_config = js.find("'config'")
         if i_consent < 0:
             return (False, u"sem Consent Mode: o site passaria a gravar cookie sem base legal")
-        if "analytics_storage: 'denied'" not in js:
-            return (False, u"analytics_storage não está negado por padrão")
+        # Opcao C (decisao Mario 2026-08-12, mirow-marketing#209): analytics
+        # liberado por default, TODO o eixo de ads negado. A assercao anterior
+        # exigia analytics_storage 'denied'; mudou por decisao explicita.
+        if "analytics_storage: 'granted'" not in js:
+            return (False, u"analytics_storage não está 'granted' por padrão (opção C, #209)")
+        for chave in ("ad_storage", "ad_user_data", "ad_personalization"):
+            if "%s: 'denied'" % chave not in js:
+                return (False, u"%s não está negado — a opção C proíbe qualquer eixo de ads" % chave)
         if i_config >= 0 and i_consent > i_config:
             return (False, u"consent default vem DEPOIS do config — o GA4 processa a fila "
                     u"na ordem e o consentimento chegaria tarde")
         return (True, u"")
-    s.check("M05", u"Consent Mode v2 negado por padrão, antes de qualquer config", m05)
+    s.check("M05", u"Consent Mode v2 opção C: analytics granted, ads negado, antes do config (#209)", m05)
 
 
 # ------------------------------------------------------- asserções ao vivo
