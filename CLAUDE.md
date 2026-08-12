@@ -10,12 +10,15 @@
 Espelho estático do site `mirow.com.br` (que era WordPress), servido pelo GitHub Pages.
 **O cutover já aconteceu** (DNS virado em 11/08/2026, onda 47): o endereço de produção é
 **https://mirow.com.br/pt/** — medido em 12/08/2026, responde `200` com `Server: GitHub.com`.
-**Não existe staging hoje** — o antigo `mirow-co.github.io/mirow-site/` responde 301 para
-`mirow.com.br` (efeito do domínio custom no Pages; medido em 12/08/2026), e as páginas
-referenciam assets pela raiz, então staging exige um host próprio na raiz (proposta em
-avaliação: repo `mirow-site-staging` + `staging.mirow.com.br` com noindex). O WordPress
-fica só como rollback (issue #204, até ~25/08). 286 páginas HTML em `public/`, 3 idiomas
-(pt/en/de).
+**Staging: https://staging.mirow.com.br/pt/** (desde 12/08/2026) — repo
+`mirow-co/mirow-site-staging`, publicado por `tools/deploy-staging.ps1` (copia `public/`,
+injeta `noindex, nofollow` em toda página, `robots.txt` com `Disallow: /`, sem sitemap;
+o branch `main` de lá é artefato de build, força-push a cada publicação, nunca editar).
+O antigo `mirow-co.github.io/mirow-site/` NÃO serve de staging: responde 301 para
+`mirow.com.br` (efeito do domínio custom no Pages). **Fluxo de validação do Andreas:**
+mudança de posicionamento publica primeiro no staging → OK do Andreas → deploy normal
+na produção. O WordPress fica só como rollback (issue #204, até ~25/08). 286 páginas
+HTML em `public/`, 3 idiomas (pt/en/de).
 
 ## REGRA Nº ZERO — o tema é intocável
 
