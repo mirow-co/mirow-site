@@ -739,8 +739,10 @@ def estaticas(s):
         p404 = os.path.join(pub, "404.html")
         if not os.path.exists(p404):
             det.append("public/404.html ausente")
-        elif "MIROW" not in s.ler("404.html"):
-            det.append("404.html sem a marca")
+        # 2026-08-12 (#210): a marca na 404 deixou de ser wordmark em texto e
+        # virou o logo SVG oficial (a S145 confere que o arquivo existe).
+        elif not re.search(r'<img[^>]*class="logo"|MIROW', s.ler("404.html")):
+            det.append("404.html sem a marca (nem logo, nem wordmark)")
         sujos = 0
         exemplo = None
         for dirpath, _dirs, files in os.walk(pub):
@@ -799,6 +801,32 @@ def estaticas(s):
         return (not det, u"%d caminho(s) legado(s); %s"
                 % (len(gen.caminhos_legados()), "; ".join(det[:3]) or u"todos batem"))
     s.check("S144", u"sitemaps antigos do WP servem index p/ o sitemap canônico (#102)", s144)
+
+    def s145():
+        # #210: 404 destacada com logo Mirow e medição. Mede o efeito: cada
+        # referência resolve para arquivo que EXISTE no disco (lição da M01/S123),
+        # e os destinos dos links de idioma existem como páginas.
+        html = s.ler("404.html")
+        det = []
+        m = re.search(r'<img[^>]*class="logo"[^>]*src="([^"?]+)', html)
+        if not m:
+            det.append(u"sem <img class=\"logo\"> na 404")
+        elif not os.path.exists(os.path.join(pub, m.group(1).lstrip("/").replace("/", os.sep))):
+            det.append(u"logo aponta p/ arquivo inexistente: %s" % m.group(1))
+        m = re.search(r'<script src="([^"?]*onda31-medicao\.js)[^"]*"', html)
+        if not m:
+            det.append(u"404 sem onda31-medicao.js (page_view de 404 não conta)")
+        elif not os.path.exists(os.path.join(pub, m.group(1).lstrip("/").replace("/", os.sep))):
+            det.append(u"medição aponta p/ arquivo inexistente: %s" % m.group(1))
+        if "googletagmanager.com/gtag/js?id=G-5VTS0MZK79" not in html:
+            det.append(u"404 sem o loader gtag da propriedade institucional")
+        for rota in ("pt", "en", "de"):
+            if ('href="/%s/"' % rota) not in html:
+                det.append(u"404 sem link para /%s/" % rota)
+            elif not os.path.exists(os.path.join(pub, rota, "index.html")):
+                det.append(u"/%s/ não existe no disco" % rota)
+        return (not det, u"; ".join(det[:4]))
+    s.check("S145", u"404 com logo Mirow real, medição GA4 e links pt/en/de resolvendo (#210)", s145)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
