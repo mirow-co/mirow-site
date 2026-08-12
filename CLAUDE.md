@@ -7,9 +7,11 @@
 
 ## O que é este repo
 
-Espelho estático do site `mirow.com.br` (que era WordPress), servido pelo GitHub Pages em
-https://mirow-co.github.io/mirow-site/pt/ . O WordPress vai ser **desligado**; este repo é o site.
-275 páginas HTML em `public/`, 3 idiomas (pt/en/de).
+Espelho estático do site `mirow.com.br` (que era WordPress), servido pelo GitHub Pages.
+**O cutover já aconteceu** (DNS virado em 11/08/2026, onda 47): o endereço de produção é
+**https://mirow.com.br/pt/** — medido em 12/08/2026, responde `200` com `Server: GitHub.com`.
+O antigo `mirow-co.github.io/mirow-site/` vira staging; o WordPress fica só como rollback
+(issue #204, até ~25/08). 286 páginas HTML em `public/`, 3 idiomas (pt/en/de).
 
 ## REGRA Nº ZERO — o tema é intocável
 
