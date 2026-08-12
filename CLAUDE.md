@@ -10,8 +10,12 @@
 Espelho estático do site `mirow.com.br` (que era WordPress), servido pelo GitHub Pages.
 **O cutover já aconteceu** (DNS virado em 11/08/2026, onda 47): o endereço de produção é
 **https://mirow.com.br/pt/** — medido em 12/08/2026, responde `200` com `Server: GitHub.com`.
-O antigo `mirow-co.github.io/mirow-site/` vira staging; o WordPress fica só como rollback
-(issue #204, até ~25/08). 286 páginas HTML em `public/`, 3 idiomas (pt/en/de).
+**Não existe staging hoje** — o antigo `mirow-co.github.io/mirow-site/` responde 301 para
+`mirow.com.br` (efeito do domínio custom no Pages; medido em 12/08/2026), e as páginas
+referenciam assets pela raiz, então staging exige um host próprio na raiz (proposta em
+avaliação: repo `mirow-site-staging` + `staging.mirow.com.br` com noindex). O WordPress
+fica só como rollback (issue #204, até ~25/08). 286 páginas HTML em `public/`, 3 idiomas
+(pt/en/de).
 
 ## REGRA Nº ZERO — o tema é intocável
 
