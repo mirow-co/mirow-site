@@ -11,12 +11,13 @@
  * trafego real. A assercao M06 garante 0 referencia a herdada em public/.
  * Measurement ID e publico por natureza, por isso vive no codigo (nao e segredo, R11).
  *
- * Consentimento: Consent Mode v2 com default 'denied', mesma postura ja decidida
- * no PR #6 deste repo. Com analytics_storage negado o GA4 roda cookieless: os
- * eventos chegam, mas sem identificacao persistente do visitante, o que degrada
- * usuarios unicos e atribuicao. Passar para 'granted' depende do banner de
- * cookies, que segue como decisao aberta do Mario na #3. Quando o banner existir,
- * ele chama: gtag('consent', 'update', { analytics_storage: 'granted' }).
+ * Consentimento: Consent Mode v2, "opcao C" (decisao do Mario em 2026-08-12,
+ * issue mirow-marketing#209): analytics_storage 'granted' por default — medicao
+ * estatistica completa (usuarios unicos, recorrencia, atribuicao) — e TODO o
+ * eixo de anuncios ('ad_storage', 'ad_user_data', 'ad_personalization') segue
+ * 'denied': a Mirow nao roda ads e nenhum dado alimenta personalizacao. A
+ * assercao M05 mede essa combinacao. Se um dia houver banner de cookies, ele
+ * pode rebaixar via gtag('consent', 'update', ...).
  */
 (function () {
   'use strict';
@@ -32,7 +33,7 @@
     ad_storage: 'denied',
     ad_user_data: 'denied',
     ad_personalization: 'denied',
-    analytics_storage: 'denied',
+    analytics_storage: 'granted', /* opcao C, Mario 2026-08-12 (#209) */
     wait_for_update: 500
   });
   gtag('js', new Date());
