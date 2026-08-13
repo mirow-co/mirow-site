@@ -106,7 +106,7 @@
 
 /* onda8:hero-contatos-v2:ini */
 /* onda8.1 — pills do hero maiores, texto branco travado e clique garantido */
-.hero-contatos{gap:12px;margin-top:26px;position:relative;z-index:6}
+.hero-contatos{gap:12px;margin-top:16px;position:relative;z-index:6}/* onda53 (13/08): 26 -> 16, o resto do respiro que o subtitulo mais longo pediu. */
 .hero-contatos__link{
   padding:11px 20px;
   font-size:17px;
@@ -164,7 +164,7 @@
   .homepage .banner h2{
     line-height:160%;
     margin-top:-68.6px;
-    margin-bottom:12.8px;
+    margin-bottom:6px;/* onda53: 12,8 -> 6. O line-height de 160% e o margin-top da onda 8.2 (pedido do Mario: slogan alto e espacado) ficam INTACTOS. */
   }
 }
 @media only screen and (min-width: 992px) and (max-height: 839px){
@@ -459,10 +459,10 @@
    Mario: "ficou muito larga a caixa transparente dos lados, sobra pouco espaco
    para o M no centro". Vao em 1400px: 140px -> ~320px. */
 .hero-texto{
-  display:inline-block;max-width:580px;
+  display:inline-block;max-width:640px;/* onda53 (13/08): 580 -> 640. O subtitulo novo ("...tradicional que utiliza IA...", pedido do Mario) ia a 4 LINHAS em 580px e quebrava a dobra exata da onda 8 em 56px. Medido: 640px devolve 3 linhas e sobra 0, e o M so cai de 192 -> 186px em 1400 (folga 62px, teto de 300px em >=1600 intacto). */
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  border-radius:14px;padding:26px 30px;margin-left:-30px}
+  border-radius:14px;padding:20px 30px;margin-left:-30px}/* onda53: 26 -> 20 no eixo vertical; parte dos 57px que o subtitulo novo pediu emprestado. */
 /* a onda 8.2 subia o slogan com margin-top negativa — dentro do painel isso
    jogava o "Estratégia" para FORA da caixinha (achado do Mario, 31/07). O
    painel contem o h2; a dobra exata e re-medida pelo onda8-dobra.js. */
@@ -1428,3 +1428,65 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   }
 }
 /* onda47:hero-respiro:fim */
+
+/* /* onda53 (#211) — a home diz que a consultoria e tradicional mas usa IA.
+   Selo "AI Powered" ao lado do slogan + IA como faixa TRANSVERSAL sob as 3
+   praticas. Nada aqui toca no tema: sao classes proprias. */
+
+/* 1. selo ao lado de Estrategia/Confianca/Resultados. O h2 e o selo num flex
+   row; em caixa estreita o selo desce sozinho (sem media query com numero
+   magico — quem decide e o proprio flex-wrap). */
+.onda53-slogan{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.onda53-slogan h2{margin-bottom:0}
+.onda53-selo-ia{display:inline-block;background:#00ADEC;color:#fff;
+  font-weight:700;font-size:15px;line-height:1;letter-spacing:.02em;
+  padding:9px 15px;border-radius:14px;white-space:nowrap;
+  box-shadow:0 2px 10px rgba(2,14,102,.18)}
+
+/* 2. faixa transversal de IA. Ela e filha do .praticas-3 (flex-wrap), entao o
+   flex-basis 100% ja a faz atravessar as 3 colunas — a "transversalidade" e
+   estrutural, nao um posicionamento a mao. */
+.praticas-3__transversal{flex:1 1 100%;display:flex;align-items:flex-start;
+  gap:18px;margin-top:4px;padding:22px 26px;background:#F2F7FB;
+  border-left:4px solid #00ADEC;box-sizing:border-box}
+.onda53-ia__glifo{flex:0 0 auto;margin-top:4px}
+.onda53-ia__texto{flex:1 1 auto;min-width:0}
+.onda53-ia__tag{display:block;color:#00ADEC;font-weight:700;font-size:13px;
+  letter-spacing:.04em;margin-bottom:4px}
+.onda53-ia__titulo{color:#020E66;font-weight:700;margin:0 0 8px}
+.onda53-ia__desc{color:#071C25;margin:0}
+@media only screen and (max-width: 767px){
+  .praticas-3__transversal{padding:18px 18px;gap:14px}
+  .onda53-selo-ia{font-size:14px;padding:8px 13px}
+}:onda53:ini */
+home-ia
+/* /* onda53 (#211) — a home diz que a consultoria e tradicional mas usa IA.
+   Selo "AI Powered" ao lado do slogan + IA como faixa TRANSVERSAL sob as 3
+   praticas. Nada aqui toca no tema: sao classes proprias. */
+
+/* 1. selo ao lado de Estrategia/Confianca/Resultados. O h2 e o selo num flex
+   row; em caixa estreita o selo desce sozinho (sem media query com numero
+   magico — quem decide e o proprio flex-wrap). */
+.onda53-slogan{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.onda53-slogan h2{margin-bottom:0}
+.onda53-selo-ia{display:inline-block;background:#00ADEC;color:#fff;
+  font-weight:700;font-size:15px;line-height:1;letter-spacing:.02em;
+  padding:9px 15px;border-radius:14px;white-space:nowrap;
+  box-shadow:0 2px 10px rgba(2,14,102,.18)}
+
+/* 2. faixa transversal de IA. Ela e filha do .praticas-3 (flex-wrap), entao o
+   flex-basis 100% ja a faz atravessar as 3 colunas — a "transversalidade" e
+   estrutural, nao um posicionamento a mao. */
+.praticas-3__transversal{flex:1 1 100%;display:flex;align-items:flex-start;
+  gap:18px;margin-top:4px;padding:22px 26px;background:#F2F7FB;
+  border-left:4px solid #00ADEC;box-sizing:border-box}
+.onda53-ia__glifo{flex:0 0 auto;margin-top:4px}
+.onda53-ia__texto{flex:1 1 auto;min-width:0}
+.onda53-ia__tag{display:block;color:#00ADEC;font-weight:700;font-size:13px;
+  letter-spacing:.04em;margin-bottom:4px}
+.onda53-ia__titulo{color:#020E66;font-weight:700;margin:0 0 8px}
+.onda53-ia__desc{color:#071C25;margin:0}
+@media only screen and (max-width: 767px){
+  .praticas-3__transversal{padding:18px 18px;gap:14px}
+  .onda53-selo-ia{font-size:14px;padding:8px 13px}
+}:onda53:fim */

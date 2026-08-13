@@ -865,6 +865,43 @@ def estaticas(s):
         return (not det, u"; ".join(det[:4]))
     s.check("S146", u"coluna Vaivém/Folha (10/02/2026, Andreas) no topo da imprensa pt/en/de (#220)", s146)
 
+    def s147():
+        # #211 (onda 53): a home diz que a consultoria é tradicional mas usa IA.
+        # Mede o que o pedido do Mario tem de verificável no HTML; o EFEITO
+        # renderizado (selo AO LADO do slogan, faixa ATRAVESSANDO as 3 práticas,
+        # subtítulo sem estourar a dobra) é da V30.
+        marcas = {
+            "pt/index.html": (u"consultoria estratégica tradicional que utiliza IA",
+                              u"Inteligência Artificial", u"Transversal às três práticas"),
+            "en/index.html": (u"traditional strategy consulting that uses AI",
+                              u"Artificial Intelligence", u"Cutting across all three practices"),
+            "de/index.html": (u"klassische Strategieberatung, die KI",
+                              u"Künstliche Intelligenz", u"Übergreifend über alle drei Practices"),
+        }
+        det = []
+        for rel, (subt, titulo, tag) in marcas.items():
+            html = s.ler(rel)
+            if subt not in html:
+                det.append(u"%s: subtítulo não fala de IA" % rel)
+            if u'class="onda53-selo-ia">AI Powered<' not in html:
+                det.append(u"%s: sem o selo AI Powered" % rel)
+            # o selo tem de estar DENTRO do wrapper que o põe ao lado do slogan
+            if not re.search(r'<div class="onda53-slogan"><h2[^>]*>.*?</h2>'
+                             r'<span class="onda53-selo-ia">', html, re.S):
+                det.append(u"%s: selo fora do wrapper do slogan" % rel)
+            bloco = re.search(r'<div class="praticas-3">(.*?)<!-- /onda6:praticas', html, re.S)
+            if not bloco:
+                bloco = re.search(r'<div class="praticas-3">(.*)', html, re.S)
+            if not bloco or "onda53-ia" not in bloco.group(1):
+                det.append(u"%s: faixa de IA fora do bloco das práticas" % rel)
+            elif bloco.group(1).find("onda53-ia") < bloco.group(1).rfind("praticas-3__card"):
+                det.append(u"%s: faixa de IA antes do último card (tem de vir ABAIXO das 3)" % rel)
+            for t in (titulo, tag):
+                if t not in html:
+                    det.append(u"%s: falta \"%s\"" % (rel, t[:28]))
+        return (not det, u"; ".join(det[:4]))
+    s.check("S147", u'home "AI Powered": selo no slogan e IA transversal sob as 3 práticas (#211)', s147)
+
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
         # privado) e não pode aparecer em página nenhuma; o Elmar é Senior
@@ -3582,6 +3619,56 @@ def ao_vivo(s):
             return (not det, u"; ".join(det[:5]))
         s.check("V28", u"textos de expertise e setores no tamanho do subtítulo do hero, 3 homes (#198)",
                 v28)
+
+        # V30 — onda 53 (#211). Mede o EFEITO dos 3 pedidos do Mario, não o
+        # HTML (isso é da S147): o selo tem de estar À DIREITA do slogan e na
+        # mesma faixa vertical; a faixa de IA tem de ATRAVESSAR as 3 colunas e
+        # ficar abaixo delas; e o subtítulo mais longo não pode voltar a
+        # estourar a primeira dobra — foi o que ele quebrou ao entrar (4 linhas
+        # em 580px, 56px de sobra) e o que o alargamento p/ 640px consertou.
+        def v30():
+            det = []
+            js = """(function(){
+              var s=document.querySelector('.onda53-selo-ia');
+              var h2=document.querySelector('.hero-texto h2');
+              var ia=document.querySelector('.onda53-ia');
+              var cards=[].slice.call(document.querySelectorAll('.praticas-3__card'));
+              var f=document.querySelector('.clientes-logos');
+              if(!s||!h2||!ia||!cards.length||!f) return 'faltou elemento no DOM';
+              var r=function(e){return e.getBoundingClientRect()};
+              var rs=r(s), rh=r(h2), ri=r(ia);
+              var esq=r(cards[0]).left, dir=r(cards[cards.length-1]).right;
+              var baixo=Math.max.apply(null,cards.map(function(c){return r(c).bottom}));
+              return {aoLado: rs.left>=rh.left && rs.top<rh.bottom && rs.bottom>rh.top,
+                      seloVisivel: rs.width>0 && rs.height>0,
+                      atravessa: Math.round(ri.width) >= Math.round(dir-esq)-2,
+                      abaixo: ri.top >= baixo-2,
+                      sobra: Math.round(r(f).bottom)-window.innerHeight,
+                      overflowX: document.documentElement.scrollWidth-document.documentElement.clientWidth};
+            })()"""
+            for rel in ("pt/index.html", "en/index.html", "de/index.html"):
+                for larg in (1920, 1400, 1200):
+                    nav.abrir("%s/%s" % (base, rel.replace("index.html", "")), larg, 900)
+                    d = nav.js(js)
+                    if isinstance(d, str):
+                        det.append(u"%s @%d: %s" % (rel, larg, d))
+                        continue
+                    if not d.get("seloVisivel"):
+                        det.append(u"%s @%d: selo invisível" % (rel, larg))
+                    if not d.get("aoLado"):
+                        det.append(u"%s @%d: selo não está ao lado do slogan" % (rel, larg))
+                    if not d.get("atravessa"):
+                        det.append(u"%s @%d: faixa de IA não atravessa as 3 práticas" % (rel, larg))
+                    if not d.get("abaixo"):
+                        det.append(u"%s @%d: faixa de IA não está abaixo dos cards" % (rel, larg))
+                    if abs(d.get("sobra", 99)) > 4:
+                        det.append(u"%s @%d: subtítulo estourou a dobra (sobra %dpx)"
+                                   % (rel, larg, d["sobra"]))
+                    if d.get("overflowX", 0) > 0:
+                        det.append(u"%s @%d: overflow-x de %dpx" % (rel, larg, d["overflowX"]))
+            return (not det, u"; ".join(det[:4]))
+        s.check("V30", u"selo AI Powered ao lado do slogan e IA transversal, sem estourar a dobra (#211)",
+                v30)
 
 
 # ------------------------------------------------------------------- main
