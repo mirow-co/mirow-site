@@ -2567,6 +2567,57 @@ def estaticas(s):
     s.check("S135", u"botões genéricos de e-mail com Andreas E Felipe; líderes intactos (#201)",
             s135)
 
+    # S146 — onda 48 (#212/#213/#214). Seção "Como usamos IA" nas 3 práticas
+    # core, nos 3 idiomas. Mede a POSIÇÃO no documento (dentro do corpo da
+    # prática, antes do bloco de Cases — é isso que determina onde renderiza),
+    # o idioma do título por página, e que o bloco não vazou para nenhuma
+    # outra página (controle de escopo).
+    IA_PRATICAS = {
+        "pt/pratica/estrategia/index.html":
+            u"Como usamos IA em projetos de estratégia",
+        "pt/pratica/operacoes/index.html":
+            u"Como usamos IA em projetos de sourcing e compras",
+        "pt/pratica/marketing-vendas-e-pricing/index.html":
+            u"Como usamos IA em projetos de go-to-market e pricing",
+        "en/practice/strategy/index.html":
+            u"How we use AI in strategy projects",
+        "en/practice/operations/index.html":
+            u"How we use AI in sourcing and procurement projects",
+        "en/practice/marketing-sales-and-pricing/index.html":
+            u"How we use AI in go-to-market and pricing projects",
+        "de/branchen/strategie/index.html":
+            u"Wie wir KI in Strategieprojekten einsetzen",
+        "de/branchen/betrieb/index.html":
+            u"Wie wir KI in Sourcing- und Einkaufsprojekten einsetzen",
+        "de/branchen/marketing-vertrieb-und-preisgestaltung/index.html":
+            u"Wie wir KI in Go-to-market- und Pricing-Projekten einsetzen",
+    }
+    IA_INI = "<!-- onda48:ia-pratica:ini -->"
+
+    def s141():
+        det = []
+        for rel, titulo in sorted(IA_PRATICAS.items()):
+            h = s.ler(rel)
+            if h.count(IA_INI) != 1:
+                det.append(u"%s: bloco IA ausente ou duplicado" % rel)
+                continue
+            ini = h.find(IA_INI)
+            corpo = h.find('experience-single__content')
+            cases = h.find('experience-single__cases"')
+            if not (0 <= corpo < ini < cases):
+                det.append(u"%s: bloco IA fora do corpo da prática" % rel)
+            trecho = h[ini:cases]
+            if ('id="como-usamos-ia"' not in trecho) or (titulo not in trecho):
+                det.append(u"%s: título/âncora errados para o idioma" % rel)
+            if trecho.count("<strong>") < 3:
+                det.append(u"%s: menos de 3 itens na seção IA" % rel)
+        for rel, h in s.conteudo():
+            if rel.replace(os.sep, "/") not in IA_PRATICAS and IA_INI in h:
+                det.append(u"%s: bloco IA vazou para fora do escopo" % rel)
+        return (not det, u"; ".join(sorted(set(det))[:4]))
+    s.check("S146", u"seção 'Como usamos IA' nas 3 práticas core, 3 idiomas (#212-#214)",
+            s141)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
