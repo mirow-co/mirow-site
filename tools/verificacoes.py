@@ -828,6 +828,43 @@ def estaticas(s):
         return (not det, u"; ".join(det[:4]))
     s.check("S145", u"404 com logo Mirow real, medição GA4 e links pt/en/de resolvendo (#210)", s145)
 
+    def s146():
+        # #220: a coluna Vaivém (Folha, 10/02/2026) com o alerta do Andreas sobre
+        # celulose entra na lista de imprensa das 3 páginas. Mede o EFEITO (P2.1):
+        # não basta a URL aparecer — o item tem de ser o PRIMEIRO da lista (é o
+        # mais recente do acervo), a data em <time datetime> tem de bater com a
+        # que a Folha publica, e o logo tem de resolver para arquivo no disco.
+        # A ordem é o que o leitor vê primeiro; foi por isso que o pedido existiu.
+        URL_VAIVEM = ("https://www1.folha.uol.com.br/colunas/vaivem/2026/02/"
+                      "exportacao-de-celulose-cresce-mas-setor-pode-ter-desequilibrio.shtml")
+        alvos = ["pt/imprensa/index.html", "en/press/index.html", "de/presse/index.html"]
+        det = []
+        for rel in alvos:
+            html = s.ler(rel)
+            itens = re.findall(r'<li class="onda18-imprensa__item">.*?</li>', html, re.S)
+            if not itens:
+                det.append(u"%s sem lista de imprensa" % rel)
+                continue
+            if URL_VAIVEM not in html:
+                det.append(u"%s sem a coluna Vaivém" % rel)
+                continue
+            if URL_VAIVEM not in itens[0]:
+                pos = next((i for i, it in enumerate(itens) if URL_VAIVEM in it), -1)
+                det.append(u"%s: Vaivém em %dº, não no topo" % (rel, pos + 1))
+            if 'datetime="2026-02-10"' not in itens[0]:
+                det.append(u"%s: data do topo não é 2026-02-10 (a que a Folha publica)" % rel)
+            # a lista inteira tem de seguir em ordem decrescente de data
+            datas = re.findall(r'datetime="([^"]+)"', html)
+            if datas != sorted(datas, reverse=True):
+                det.append(u"%s: lista fora de ordem cronológica" % rel)
+            m = re.search(r'<img[^>]*class="onda41-imprensa__logo"[^>]*src="([^"?]+)', itens[0])
+            if not m:
+                det.append(u"%s: item do topo sem logo" % rel)
+            elif not os.path.exists(os.path.join(pub, m.group(1).lstrip("/").replace("/", os.sep))):
+                det.append(u"%s: logo aponta p/ inexistente %s" % (rel, m.group(1)))
+        return (not det, u"; ".join(det[:4]))
+    s.check("S146", u"coluna Vaivém/Folha (10/02/2026, Andreas) no topo da imprensa pt/en/de (#220)", s146)
+
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
         # privado) e não pode aparecer em página nenhuma; o Elmar é Senior
