@@ -106,7 +106,7 @@
 
 /* onda8:hero-contatos-v2:ini */
 /* onda8.1 — pills do hero maiores, texto branco travado e clique garantido */
-.hero-contatos{gap:12px;margin-top:26px;position:relative;z-index:6}
+.hero-contatos{gap:12px;margin-top:6px;position:relative;z-index:6}/* onda53 v4: 16 -> 6, os 12px que faltavam para a dobra fechar com o eyebrow acima do slogan. *//* onda53 (13/08): 26 -> 16, o resto do respiro que o subtitulo mais longo pediu. */
 .hero-contatos__link{
   padding:11px 20px;
   font-size:17px;
@@ -164,7 +164,7 @@
   .homepage .banner h2{
     line-height:160%;
     margin-top:-68.6px;
-    margin-bottom:12.8px;
+    margin-bottom:7px;/* onda53 v4 (13/08): 6 -> -20. Pedido do Mario: o espaco entre as 3 palavras e a frase 'igualmente distribuido'. Medido NA TINTA (analise de pixel, porque a caixa de linha mente com line-height 160%): gap entre as palavras 20px, gap ate a frase 46px. O -20 desconta a entrelinha morta e iguala os tres. Editado NO LUGAR (valor gemeo). *//* onda53: 12,8 -> 6. O line-height de 160% e o margin-top da onda 8.2 (pedido do Mario: slogan alto e espacado) ficam INTACTOS. */
   }
 }
 @media only screen and (min-width: 992px) and (max-height: 839px){
@@ -172,7 +172,7 @@
   .homepage .banner h2{
     line-height:126%;
     margin-top:-15.8px;
-    margin-bottom:23.4px;
+    margin-bottom:-3.6px;/* onda53 v4: 23,4 -> -3,6. Mesmo pedido de ritmo igual, agora na regra de tela BAIXA (<=839px de altura), que e a que o navegador do Mario provavelmente usa. Medido na tinta em 760px: gap entre palavras 19px, gap ate a frase 46px; -3,6 desconta os 27px de diferenca. */
   }
 }
 /* onda8:hero-slogan-alto:fim */
@@ -459,10 +459,11 @@
    Mario: "ficou muito larga a caixa transparente dos lados, sobra pouco espaco
    para o M no centro". Vao em 1400px: 140px -> ~320px. */
 .hero-texto{
-  display:inline-block;max-width:580px;
+  display:inline-block;max-width:640px;/* onda53 (13/08): 580 -> 640. O subtitulo novo ("...tradicional que utiliza IA...", pedido do Mario) ia a 4 LINHAS em 580px e quebrava a dobra exata da onda 8 em 56px. Medido: 640px devolve 3 linhas e sobra 0, e o M so cai de 192 -> 186px em 1400 (folga 62px, teto de 300px em >=1600 intacto). */
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  border-radius:14px;padding:26px 30px;margin-left:-30px}
+  border-radius:14px;padding:13px 30px;margin-left:-30px}
+.hero-texto p{margin-bottom:4px}/* onda53 v4: o tema deixa 16px entre a frase e as pilulas; 4px sao os ultimos 12px que a dobra precisava com o eyebrow acima. *//* onda53 v4: 20 -> 13, o resto dos 34px que o eyebrow acima do slogan custou à dobra. *//* onda53: 26 -> 20 no eixo vertical; parte dos 57px que o subtitulo novo pediu emprestado. */
 /* a onda 8.2 subia o slogan com margin-top negativa — dentro do painel isso
    jogava o "Estratégia" para FORA da caixinha (achado do Mario, 31/07). O
    painel contem o h2; a dobra exata e re-medida pelo onda8-dobra.js. */
@@ -1428,3 +1429,65 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   }
 }
 /* onda47:hero-respiro:fim */
+
+/* onda53:home-ia:ini */
+/* onda53 (#211) — a home diz que a consultoria e tradicional mas usa IA.
+   Selo "AI Powered" ao lado do slogan + IA como faixa TRANSVERSAL sob as 3
+   praticas. Nada aqui toca no tema: sao classes proprias. */
+
+/* 1. selo ao lado de Estrategia/Confianca/Resultados. O h2 e o selo num flex
+   row; em caixa estreita o selo desce sozinho (sem media query com numero
+   magico — quem decide e o proprio flex-wrap). */
+/* onda53 v4: o selo e EYEBROW ACIMA do slogan (era ao lado, e flutuava sem
+   ancora na altura do "Confianca"). Coluna, nao linha. */
+.onda53-slogan{display:block}
+/* ritmo do card, medido NA TINTA por analise de pixel (a caixa de linha mente:
+   o line-height de 160% do slogan enche a caixa de entrelinha). Gap de tinta
+   entre as 3 palavras: 20px. O gap ate a frase era 46px — mais que o dobro —
+   e o Mario pediu "igualmente distribuido". As margens abaixo sao o que faz os
+   tres gaps darem ~20px; o -20 no h2 desconta a entrelinha morta do line-height. */
+.onda53-selo-ia{margin-bottom:-6px}/* onda53 v4: negativo de proposito — o
+   slogan tem ~25px de entrelinha morta acima da tinta, entao puxar 20px nao
+   encosta em nada e devolve à dobra o que o eyebrow custou (34px medidos). */
+.onda53-slogan h2{margin-bottom:-20px}
+/* onda53 v2 (13/08) — a 1a versao era pilula ciano solida com canto 14px: lia
+   como etiqueta de e-commerce ("o ai powered precisa melhorar", Mario). Agora
+   segue o STICKER dos nossos decks (R15: caixa alta, tique vertical colado a
+   esquerda, sem preenchimento) — mesmo registro do eyebrow que o horizonte3.com
+   usa no hero (medido: 12px, peso 600, letter-spacing 2,2px, regua de 22x1px),
+   que foi a referencia que o Andreas citou. Selo ANOTA o slogan, nao compete.
+   Peso 500 / tracking .12em, nao 700 / .18em da 1a tentativa: o sticker da R15 e
+   "Arial 12pt REGULAR caixa alta" — bold contraria o padrao da propria casa — e
+   os pares medidos ficam em 400-500 com tracking quase nulo (Accenture 12px/500
+   ls .02em; McKinsey 14px/300 ls normal; Bain 13px/500). Tracking largo e
+   convencao de DOC de design system, nao do que os grandes renderizam.
+   PESO 600, nao 500: a S127 barrou o 500 — ele NAO esta entre os pesos que o
+   <head> carrega (200/300/400/600/700/900) e o navegador o sintetizaria, que e
+   a classe de bug da onda 35. Dos pesos reais, 600 e o mais proximo do registro
+   "medium" dos pares; 400 (o regular da R15) esmaece sobre a foto do hero. */
+.onda53-selo-ia{display:inline-flex;align-items:center;gap:11px;
+  color:#00ADEC;font-weight:600;font-size:13px;line-height:1;
+  letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+  background:none;padding:0;border-radius:0;box-shadow:none}
+.onda53-selo-ia::before{content:"";flex:0 0 auto;width:2px;height:1.55em;
+  background:#00ADEC}
+
+/* 2. faixa transversal de IA. Ela e filha do .praticas-3 (flex-wrap), entao o
+   flex-basis 100% ja a faz atravessar as 3 colunas — a "transversalidade" e
+   estrutural, nao um posicionamento a mao. */
+.praticas-3__transversal{flex:1 1 100%;display:flex;align-items:flex-start;
+  gap:18px;margin-top:4px;padding:22px 26px;background:#F2F7FB;
+  border-left:4px solid #00ADEC;box-sizing:border-box}
+.onda53-ia__glifo{flex:0 0 auto;margin-top:4px}
+.onda53-ia__texto{flex:1 1 auto;min-width:0}
+.onda53-ia__tag{display:block;color:#00ADEC;font-weight:700;font-size:13px;
+  letter-spacing:.04em;margin-bottom:4px}
+.onda53-ia__titulo{color:#020E66;font-weight:700;margin:0 0 8px}
+.onda53-ia__desc{color:#071C25;margin:0}
+@media only screen and (max-width: 767px){
+  .praticas-3__transversal{padding:18px 18px;gap:14px}
+  /* onda53 v2: o padding/font-size daqui era da pilula antiga — valor gemeo
+     morto. O sticker encolhe so o corpo, o tique acompanha via em. */
+  .onda53-selo-ia{font-size:12px;letter-spacing:.10em}
+}
+/* onda53:home-ia:fim */
