@@ -121,10 +121,19 @@ CSS = u"""/* onda53 (#211) — a home diz que a consultoria e tradicional mas us
    segue o STICKER dos nossos decks (R15: caixa alta, tique vertical colado a
    esquerda, sem preenchimento) — mesmo registro do eyebrow que o horizonte3.com
    usa no hero (medido: 12px, peso 600, letter-spacing 2,2px, regua de 22x1px),
-   que foi a referencia que o Andreas citou. Selo ANOTA o slogan, nao compete. */
+   que foi a referencia que o Andreas citou. Selo ANOTA o slogan, nao compete.
+   Peso 500 / tracking .12em, nao 700 / .18em da 1a tentativa: o sticker da R15 e
+   "Arial 12pt REGULAR caixa alta" — bold contraria o padrao da propria casa — e
+   os pares medidos ficam em 400-500 com tracking quase nulo (Accenture 12px/500
+   ls .02em; McKinsey 14px/300 ls normal; Bain 13px/500). Tracking largo e
+   convencao de DOC de design system, nao do que os grandes renderizam.
+   PESO 600, nao 500: a S127 barrou o 500 — ele NAO esta entre os pesos que o
+   <head> carrega (200/300/400/600/700/900) e o navegador o sintetizaria, que e
+   a classe de bug da onda 35. Dos pesos reais, 600 e o mais proximo do registro
+   "medium" dos pares; 400 (o regular da R15) esmaece sobre a foto do hero. */
 .onda53-selo-ia{display:inline-flex;align-items:center;gap:11px;
-  color:#00ADEC;font-weight:700;font-size:13px;line-height:1;
-  letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;
+  color:#00ADEC;font-weight:600;font-size:13px;line-height:1;
+  letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
   background:none;padding:0;border-radius:0;box-shadow:none}
 .onda53-selo-ia::before{content:"";flex:0 0 auto;width:2px;height:1.55em;
   background:#00ADEC}
@@ -145,7 +154,7 @@ CSS = u"""/* onda53 (#211) — a home diz que a consultoria e tradicional mas us
   .praticas-3__transversal{padding:18px 18px;gap:14px}
   /* onda53 v2: o padding/font-size daqui era da pilula antiga — valor gemeo
      morto. O sticker encolhe so o corpo, o tique acompanha via em. */
-  .onda53-selo-ia{font-size:12px;letter-spacing:.16em}
+  .onda53-selo-ia{font-size:12px;letter-spacing:.10em}
 }"""
 
 
@@ -217,7 +226,11 @@ def main():
     pub = resolve_public(sys.argv[1])
     print(u"107 — onda 53: home AI Powered (#211)")
     mud = aplicar(pub)
-    escrever_bloco_css(pub, "onda53", "home-ia", CSS)
+    escrever_bloco_css(pub, "home-ia", CSS, onda="onda53")
+    # a assinatura e (pub, chave, css, onda=...). Chamar fora de ordem punha o
+    # CSS INTEIRO dentro do marcador; como o marcador mudava a cada edicao, o
+    # helper nunca reconhecia o bloco e ANEXAVA outro — 5 blocos, 20 copias de
+    # cada regra, e a S127 lendo font-weight velho das copias mortas.
     print(u"  subtitulo: %(subtitulo)d · selo: %(selo)d · faixa IA: %(ia)d" % mud)
     return 0
 

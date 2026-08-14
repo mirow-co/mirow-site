@@ -902,6 +902,43 @@ def estaticas(s):
         return (not det, u"; ".join(det[:4]))
     s.check("S147", u'home "AI Powered": selo no slogan e IA transversal sob as 3 práticas (#211)', s147)
 
+    def s148():
+        # Causa-raiz de um defeito real da onda 53: escrever_bloco_css tem a
+        # assinatura (pub, chave, css, onda=...) e foi chamada fora de ordem —
+        # o CSS INTEIRO virou o nome do marcador. Como o nome mudava a cada
+        # edicao, o helper nunca reconhecia o bloco e ANEXAVA outro: 5 blocos,
+        # 20 copias de cada regra, e font-weight morto que a S127 acusava.
+        # Esta asserção pega a CLASSE: marcador tem de ser curto e de uma linha,
+        # todo :ini tem o seu :fim, e nenhuma chave pode aparecer duas vezes.
+        css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
+        det = []
+        # o marcador aceita anotacao depois do :ini (ex.: a onda45 escreve
+        # "/* onda45:carreiras-form:ini (#202/#203 — ...) */"), entao o que
+        # importa e a CHAVE antes do :ini/:fim
+        rex = re.compile(r'/\*([^*]{0,400}?):(ini|fim)\b[^*]{0,300}?\*/', re.S)
+        marcas = rex.findall(css)
+        inis = [n for n, k in marcas if k == "ini"]
+        fims = [n for n, k in marcas if k == "fim"]
+        for nome in inis:
+            n = nome.strip()
+            if "\n" in n or len(n) > 60:
+                det.append(u"marcador gigante (%d chars, %d linha[s]) — CSS dentro"
+                           u" do nome? começa com \"%s…\""
+                           % (len(n), n.count("\n") + 1, n[:34].replace("\n", " ")))
+            elif not re.match(r'^onda[\d.]+:[a-z0-9_-]+$', n):
+                det.append(u"marcador fora do padrão onda<N>:<chave>: \"%s\"" % n[:40])
+        vistos = {}
+        for nome in inis:
+            n = nome.strip()
+            vistos[n] = vistos.get(n, 0) + 1
+        dup = [n for n, c in vistos.items() if c > 1]
+        if dup:
+            det.append(u"bloco(s) duplicado(s): %s" % ", ".join(d[:30] for d in dup[:3]))
+        if len(inis) != len(fims):
+            det.append(u"%d :ini para %d :fim" % (len(inis), len(fims)))
+        return (not det, u"%d bloco(s); %s" % (len(inis), "; ".join(det[:3]) or u"todos bem formados"))
+    s.check("S148", u"blocos marcados do onda6.css bem formados e sem duplicata", s148)
+
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
         # privado) e não pode aparecer em página nenhuma; o Elmar é Senior
