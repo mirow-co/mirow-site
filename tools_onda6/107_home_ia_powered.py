@@ -70,17 +70,14 @@ SELO = u'<span class="onda53-selo-ia">AI Powered</span>'
 # bloco transversal de IA sob as 3 praticas
 IA = {
     "pt": (u"Transversal às três práticas", u"Inteligência Artificial",
-           u"Ferramental próprio de IA amplia o alcance da análise — radar de "
-           u"tendências, leitura integral de bases de contratos e spend e "
-           u"benchmark de preço — com a recomendação sempre assinada por sócios"),
+           u"Fazemos nossos projetos com forte uso de IA para ampliar o alcance "
+           u"do nosso trabalho em qualquer uma das áreas de expertise"),
     "en": (u"Cutting across all three practices", u"Artificial Intelligence",
-           u"Our own AI tooling widens the reach of the analysis — trend radar, "
-           u"full reading of contract and spend bases and price benchmarking — "
-           u"with the recommendation always signed by partners"),
+           u"We run our projects with heavy use of AI to widen the reach of our "
+           u"work in any of our areas of expertise"),
     "de": (u"Übergreifend über alle drei Practices", u"Künstliche Intelligenz",
-           u"Eigene KI-Werkzeuge erweitern die Reichweite der Analyse — "
-           u"Trendradar, vollständige Auswertung von Vertrags- und Spend-Daten "
-           u"sowie Preis-Benchmarking — die Empfehlung tragen stets die Partner"),
+           u"Wir führen unsere Projekte mit starkem KI-Einsatz durch, um die "
+           u"Reichweite unserer Arbeit in allen Expertisebereichen zu erweitern"),
 }
 
 # glifo de 3 nos ligados: os 3 cards acima, atravessados. Inline (sem asset novo).
@@ -114,8 +111,18 @@ CSS = u"""/* onda53 (#211) — a home diz que a consultoria e tradicional mas us
 /* 1. selo ao lado de Estrategia/Confianca/Resultados. O h2 e o selo num flex
    row; em caixa estreita o selo desce sozinho (sem media query com numero
    magico — quem decide e o proprio flex-wrap). */
-.onda53-slogan{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.onda53-slogan h2{margin-bottom:0}
+/* onda53 v4: o selo e EYEBROW ACIMA do slogan (era ao lado, e flutuava sem
+   ancora na altura do "Confianca"). Coluna, nao linha. */
+.onda53-slogan{display:block}
+/* ritmo do card, medido NA TINTA por analise de pixel (a caixa de linha mente:
+   o line-height de 160% do slogan enche a caixa de entrelinha). Gap de tinta
+   entre as 3 palavras: 20px. O gap ate a frase era 46px — mais que o dobro —
+   e o Mario pediu "igualmente distribuido". As margens abaixo sao o que faz os
+   tres gaps darem ~20px; o -20 no h2 desconta a entrelinha morta do line-height. */
+.onda53-selo-ia{margin-bottom:-6px}/* onda53 v4: negativo de proposito — o
+   slogan tem ~25px de entrelinha morta acima da tinta, entao puxar 20px nao
+   encosta em nada e devolve à dobra o que o eyebrow custou (34px medidos). */
+.onda53-slogan h2{margin-bottom:-20px}
 /* onda53 v2 (13/08) — a 1a versao era pilula ciano solida com canto 14px: lia
    como etiqueta de e-commerce ("o ai powered precisa melhorar", Mario). Agora
    segue o STICKER dos nossos decks (R15: caixa alta, tique vertical colado a
@@ -189,8 +196,13 @@ def aplicar(pub):
         if "onda53-selo-ia" not in h:
             m = re.search(r'<h2 data-aos="fade-right">.*?</h2>', h, re.S)
             if m:
-                h = (h[:m.start()] + u'<div class="onda53-slogan">' + m.group(0)
-                     + SELO + u'</div>' + h[m.end():])
+                # onda53 v4 (13/08): o selo sai de AO LADO e vira EYEBROW ACIMA
+                # do slogan ("so ali ai powered nao ficou bom", Mario). E a
+                # posicao que a pesquisa mediu como padrao — horizonte3.com poe
+                # "— AI TRANSFORMATION" acima do titulo, e a Deloitte usa kicker.
+                # Ao lado, o selo flutuava sem ancora na altura do "Confianca".
+                h = (h[:m.start()] + u'<div class="onda53-slogan">' + SELO
+                     + m.group(0) + u'</div>' + h[m.end():])
                 mud["selo"] += 1
             else:
                 print(u"  ! %s: slogan do hero nao encontrado" % rel)

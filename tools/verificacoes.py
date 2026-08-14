@@ -886,9 +886,9 @@ def estaticas(s):
             if u'class="onda53-selo-ia">AI Powered<' not in html:
                 det.append(u"%s: sem o selo AI Powered" % rel)
             # o selo tem de estar DENTRO do wrapper que o põe ao lado do slogan
-            if not re.search(r'<div class="onda53-slogan"><h2[^>]*>.*?</h2>'
-                             r'<span class="onda53-selo-ia">', html, re.S):
-                det.append(u"%s: selo fora do wrapper do slogan" % rel)
+            if not re.search(r'<div class="onda53-slogan">'
+                             r'<span class="onda53-selo-ia">AI Powered</span><h2', html):
+                det.append(u"%s: selo não precede o slogan (eyebrow)" % rel)
             bloco = re.search(r'<div class="praticas-3">(.*?)<!-- /onda6:praticas', html, re.S)
             if not bloco:
                 bloco = re.search(r'<div class="praticas-3">(.*)', html, re.S)
@@ -3676,7 +3676,7 @@ def ao_vivo(s):
               var rs=r(s), rh=r(h2), ri=r(ia);
               var esq=r(cards[0]).left, dir=r(cards[cards.length-1]).right;
               var baixo=Math.max.apply(null,cards.map(function(c){return r(c).bottom}));
-              return {aoLado: rs.left>=rh.left && rs.top<rh.bottom && rs.bottom>rh.top,
+              return {acima: rs.bottom<=rh.top+2 && rs.left<=rh.left+4,
                       seloVisivel: rs.width>0 && rs.height>0,
                       atravessa: Math.round(ri.width) >= Math.round(dir-esq)-2,
                       abaixo: ri.top >= baixo-2,
@@ -3692,8 +3692,9 @@ def ao_vivo(s):
                         continue
                     if not d.get("seloVisivel"):
                         det.append(u"%s @%d: selo invisível" % (rel, larg))
-                    if not d.get("aoLado"):
-                        det.append(u"%s @%d: selo não está ao lado do slogan" % (rel, larg))
+                    if not d.get("acima"):
+                        det.append(u"%s @%d: selo não está ACIMA do slogan, alinhado à esquerda"
+                                   % (rel, larg))
                     if not d.get("atravessa"):
                         det.append(u"%s @%d: faixa de IA não atravessa as 3 práticas" % (rel, larg))
                     if not d.get("abaixo"):
@@ -3704,7 +3705,7 @@ def ao_vivo(s):
                     if d.get("overflowX", 0) > 0:
                         det.append(u"%s @%d: overflow-x de %dpx" % (rel, larg, d["overflowX"]))
             return (not det, u"; ".join(det[:4]))
-        s.check("V30", u"selo AI Powered ao lado do slogan e IA transversal, sem estourar a dobra (#211)",
+        s.check("V30", u"selo AI Powered acima do slogan e IA transversal, sem estourar a dobra (#211)",
                 v30)
 
         # V31 — #221: "dessa pagina, retirar qualquer full stop nos textos".

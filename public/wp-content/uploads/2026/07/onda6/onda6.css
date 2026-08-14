@@ -106,7 +106,7 @@
 
 /* onda8:hero-contatos-v2:ini */
 /* onda8.1 — pills do hero maiores, texto branco travado e clique garantido */
-.hero-contatos{gap:12px;margin-top:16px;position:relative;z-index:6}/* onda53 (13/08): 26 -> 16, o resto do respiro que o subtitulo mais longo pediu. */
+.hero-contatos{gap:12px;margin-top:6px;position:relative;z-index:6}/* onda53 v4: 16 -> 6, os 12px que faltavam para a dobra fechar com o eyebrow acima do slogan. *//* onda53 (13/08): 26 -> 16, o resto do respiro que o subtitulo mais longo pediu. */
 .hero-contatos__link{
   padding:11px 20px;
   font-size:17px;
@@ -164,7 +164,7 @@
   .homepage .banner h2{
     line-height:160%;
     margin-top:-68.6px;
-    margin-bottom:6px;/* onda53: 12,8 -> 6. O line-height de 160% e o margin-top da onda 8.2 (pedido do Mario: slogan alto e espacado) ficam INTACTOS. */
+    margin-bottom:7px;/* onda53 v4 (13/08): 6 -> -20. Pedido do Mario: o espaco entre as 3 palavras e a frase 'igualmente distribuido'. Medido NA TINTA (analise de pixel, porque a caixa de linha mente com line-height 160%): gap entre as palavras 20px, gap ate a frase 46px. O -20 desconta a entrelinha morta e iguala os tres. Editado NO LUGAR (valor gemeo). *//* onda53: 12,8 -> 6. O line-height de 160% e o margin-top da onda 8.2 (pedido do Mario: slogan alto e espacado) ficam INTACTOS. */
   }
 }
 @media only screen and (min-width: 992px) and (max-height: 839px){
@@ -172,7 +172,7 @@
   .homepage .banner h2{
     line-height:126%;
     margin-top:-15.8px;
-    margin-bottom:23.4px;
+    margin-bottom:-3.6px;/* onda53 v4: 23,4 -> -3,6. Mesmo pedido de ritmo igual, agora na regra de tela BAIXA (<=839px de altura), que e a que o navegador do Mario provavelmente usa. Medido na tinta em 760px: gap entre palavras 19px, gap ate a frase 46px; -3,6 desconta os 27px de diferenca. */
   }
 }
 /* onda8:hero-slogan-alto:fim */
@@ -462,7 +462,8 @@
   display:inline-block;max-width:640px;/* onda53 (13/08): 580 -> 640. O subtitulo novo ("...tradicional que utiliza IA...", pedido do Mario) ia a 4 LINHAS em 580px e quebrava a dobra exata da onda 8 em 56px. Medido: 640px devolve 3 linhas e sobra 0, e o M so cai de 192 -> 186px em 1400 (folga 62px, teto de 300px em >=1600 intacto). */
   background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  border-radius:14px;padding:20px 30px;margin-left:-30px}/* onda53: 26 -> 20 no eixo vertical; parte dos 57px que o subtitulo novo pediu emprestado. */
+  border-radius:14px;padding:13px 30px;margin-left:-30px}
+.hero-texto p{margin-bottom:4px}/* onda53 v4: o tema deixa 16px entre a frase e as pilulas; 4px sao os ultimos 12px que a dobra precisava com o eyebrow acima. *//* onda53 v4: 20 -> 13, o resto dos 34px que o eyebrow acima do slogan custou à dobra. *//* onda53: 26 -> 20 no eixo vertical; parte dos 57px que o subtitulo novo pediu emprestado. */
 /* a onda 8.2 subia o slogan com margin-top negativa — dentro do painel isso
    jogava o "Estratégia" para FORA da caixinha (achado do Mario, 31/07). O
    painel contem o h2; a dobra exata e re-medida pelo onda8-dobra.js. */
@@ -1437,8 +1438,18 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 /* 1. selo ao lado de Estrategia/Confianca/Resultados. O h2 e o selo num flex
    row; em caixa estreita o selo desce sozinho (sem media query com numero
    magico — quem decide e o proprio flex-wrap). */
-.onda53-slogan{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.onda53-slogan h2{margin-bottom:0}
+/* onda53 v4: o selo e EYEBROW ACIMA do slogan (era ao lado, e flutuava sem
+   ancora na altura do "Confianca"). Coluna, nao linha. */
+.onda53-slogan{display:block}
+/* ritmo do card, medido NA TINTA por analise de pixel (a caixa de linha mente:
+   o line-height de 160% do slogan enche a caixa de entrelinha). Gap de tinta
+   entre as 3 palavras: 20px. O gap ate a frase era 46px — mais que o dobro —
+   e o Mario pediu "igualmente distribuido". As margens abaixo sao o que faz os
+   tres gaps darem ~20px; o -20 no h2 desconta a entrelinha morta do line-height. */
+.onda53-selo-ia{margin-bottom:-6px}/* onda53 v4: negativo de proposito — o
+   slogan tem ~25px de entrelinha morta acima da tinta, entao puxar 20px nao
+   encosta em nada e devolve à dobra o que o eyebrow custou (34px medidos). */
+.onda53-slogan h2{margin-bottom:-20px}
 /* onda53 v2 (13/08) — a 1a versao era pilula ciano solida com canto 14px: lia
    como etiqueta de e-commerce ("o ai powered precisa melhorar", Mario). Agora
    segue o STICKER dos nossos decks (R15: caixa alta, tique vertical colado a
