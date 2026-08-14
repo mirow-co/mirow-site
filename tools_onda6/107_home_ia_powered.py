@@ -72,15 +72,15 @@ IA = {
     "pt": (u"Transversal às três práticas", u"Inteligência Artificial",
            u"Ferramental próprio de IA amplia o alcance da análise — radar de "
            u"tendências, leitura integral de bases de contratos e spend e "
-           u"benchmark de preço — com a recomendação sempre assinada por sócios."),
+           u"benchmark de preço — com a recomendação sempre assinada por sócios"),
     "en": (u"Cutting across all three practices", u"Artificial Intelligence",
            u"Our own AI tooling widens the reach of the analysis — trend radar, "
            u"full reading of contract and spend bases and price benchmarking — "
-           u"with the recommendation always signed by partners."),
+           u"with the recommendation always signed by partners"),
     "de": (u"Übergreifend über alle drei Practices", u"Künstliche Intelligenz",
            u"Eigene KI-Werkzeuge erweitern die Reichweite der Analyse — "
            u"Trendradar, vollständige Auswertung von Vertrags- und Spend-Daten "
-           u"sowie Preis-Benchmarking — die Empfehlung tragen stets die Partner."),
+           u"sowie Preis-Benchmarking — die Empfehlung tragen stets die Partner"),
 }
 
 # glifo de 3 nos ligados: os 3 cards acima, atravessados. Inline (sem asset novo).
@@ -114,12 +114,20 @@ CSS = u"""/* onda53 (#211) — a home diz que a consultoria e tradicional mas us
 /* 1. selo ao lado de Estrategia/Confianca/Resultados. O h2 e o selo num flex
    row; em caixa estreita o selo desce sozinho (sem media query com numero
    magico — quem decide e o proprio flex-wrap). */
-.onda53-slogan{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.onda53-slogan{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .onda53-slogan h2{margin-bottom:0}
-.onda53-selo-ia{display:inline-block;background:#00ADEC;color:#fff;
-  font-weight:700;font-size:15px;line-height:1;letter-spacing:.02em;
-  padding:9px 15px;border-radius:14px;white-space:nowrap;
-  box-shadow:0 2px 10px rgba(2,14,102,.18)}
+/* onda53 v2 (13/08) — a 1a versao era pilula ciano solida com canto 14px: lia
+   como etiqueta de e-commerce ("o ai powered precisa melhorar", Mario). Agora
+   segue o STICKER dos nossos decks (R15: caixa alta, tique vertical colado a
+   esquerda, sem preenchimento) — mesmo registro do eyebrow que o horizonte3.com
+   usa no hero (medido: 12px, peso 600, letter-spacing 2,2px, regua de 22x1px),
+   que foi a referencia que o Andreas citou. Selo ANOTA o slogan, nao compete. */
+.onda53-selo-ia{display:inline-flex;align-items:center;gap:11px;
+  color:#00ADEC;font-weight:700;font-size:13px;line-height:1;
+  letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;
+  background:none;padding:0;border-radius:0;box-shadow:none}
+.onda53-selo-ia::before{content:"";flex:0 0 auto;width:2px;height:1.55em;
+  background:#00ADEC}
 
 /* 2. faixa transversal de IA. Ela e filha do .praticas-3 (flex-wrap), entao o
    flex-basis 100% ja a faz atravessar as 3 colunas — a "transversalidade" e
@@ -135,7 +143,9 @@ CSS = u"""/* onda53 (#211) — a home diz que a consultoria e tradicional mas us
 .onda53-ia__desc{color:#071C25;margin:0}
 @media only screen and (max-width: 767px){
   .praticas-3__transversal{padding:18px 18px;gap:14px}
-  .onda53-selo-ia{font-size:14px;padding:8px 13px}
+  /* onda53 v2: o padding/font-size daqui era da pilula antiga — valor gemeo
+     morto. O sticker encolhe so o corpo, o tique acompanha via em. */
+  .onda53-selo-ia{font-size:12px;letter-spacing:.16em}
 }"""
 
 

@@ -3670,6 +3670,35 @@ def ao_vivo(s):
         s.check("V30", u"selo AI Powered ao lado do slogan e IA transversal, sem estourar a dobra (#211)",
                 v30)
 
+        # V31 — #221: "dessa pagina, retirar qualquer full stop nos textos".
+        # Mede o TEXTO RENDERIZADO (nao a string do HTML): percorre os nos de
+        # texto das 3 homes e exige que nenhum termine em ponto. A UNICA excecao
+        # e a marca "Mirow & Co." — ali o ponto e nome, nao pontuacao (R4).
+        # Cobre tambem o que esta escondido em modal, que so aparece no clique.
+        def v31():
+            js = """(function(){
+              var out=[], w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT), n;
+              while(n=w.nextNode()){
+                var t=(n.textContent||'').trim();
+                if(t.length<8 || t.charAt(t.length-1)!=='.') continue;
+                var p=n.parentElement; if(!p) continue;
+                if(['SCRIPT','STYLE','NOSCRIPT'].indexOf(p.tagName)>=0) continue;
+                if(/Mirow\\s*&\\s*Co\\.$/.test(t)) continue;   // a marca fica
+                out.push(t.slice(-52));
+              }
+              return out;})()"""
+            det = []
+            for rel in ("pt/index.html", "en/index.html", "de/index.html"):
+                nav.abrir("%s/%s" % (base, rel.replace("index.html", "")), 1400, 900)
+                r = nav.js(js)
+                if isinstance(r, str):
+                    det.append(u"%s: %s" % (rel, r))
+                elif r:
+                    det.append(u"%s: %d texto(s) com ponto final — \"…%s\""
+                               % (rel, len(r), r[0]))
+            return (not det, u"; ".join(det[:3]))
+        s.check("V31", u"nenhum texto da home termina em ponto final, exceto a marca (#221)", v31)
+
 
 # ------------------------------------------------------------------- main
 
