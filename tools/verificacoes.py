@@ -2752,6 +2752,57 @@ def estaticas(s):
         return (True, u"")
     s.check("M05", u"Consent Mode v2 opção C: analytics granted, ads negado, antes do config (#209)", m05)
 
+    # LF — Leadfeeder Lite, nível empresa (mirow-marketing#222). Entrou depois de o
+    # Data Reveal ser REPROVADO no probe: aquele mandava o formulário inteiro sem
+    # submit. O Leadfeeder passou no mesmo probe (14/08) — payload em base64
+    # legível, sem campo de formulário e sem fingerprint.
+    LF = "wp-content/uploads/2026/07/onda6/onda54-leadfeeder.js"
+
+    def lf01():
+        sem = [rel for rel, h in s.conteudo() if LF not in h]
+        return (not sem, u"%d página(s) de conteúdo sem o asset do Leadfeeder: %s"
+                % (len(sem), ", ".join(sem[:5])))
+    s.check("LF01", u"toda página de conteúdo carrega o asset do Leadfeeder (#222)", lf01)
+
+    def lf02():
+        # Stubs de fora: o plano Lite dá 100 empresas/mês e página de redirect não
+        # é lida por ninguém. Critério idêntico ao do injetor 94_leadfeeder.py.
+        maus = [rel for rel, h in s.todas() if LF in h and s.eh_stub(rel, h)]
+        return (not maus, u"%d stub(s) de redirect carregando o tracker à toa: %s"
+                % (len(maus), ", ".join(maus[:5])))
+    s.check("LF02", u"stub de redirect NÃO carrega o Leadfeeder (#222)", lf02)
+
+    def lf03():
+        maus = [rel for rel, h in s.conteudo() if (LF + "?v=") not in h]
+        return (not maus, u"%d página(s) referenciam o Leadfeeder sem ?v= (cache serve "
+                u"versão velha): %s" % (len(maus), ", ".join(maus[:5])))
+    s.check("LF03", u"asset do Leadfeeder carimbado com ?v= (#222)", lf03)
+
+    def lf04():
+        js = s.ler(LF)
+        url = re.search(r"var SCRIPT_URL = '([^']*)'", js)
+        if not url:
+            return (False, u"sumiu o SCRIPT_URL do asset")
+        if url.group(1) and "lfeeder.com" not in url.group(1):
+            return (False, u"SCRIPT_URL aponta para host que não é do Leadfeeder: %s"
+                    % url.group(1))
+        # A ordem é o que protege: gate e opt-out TÊM que rodar antes de o script
+        # do fornecedor ser criado. Presença sem ordem não protege ninguém (P2.1).
+        i_ativo = js.find("if (!ATIVO) return;")
+        i_opt = js.find("if (optOut()) return;")
+        i_script = js.find("document.createElement('script')")
+        if i_ativo < 0 or js.find("var ATIVO") < 0:
+            return (False, u"sumiu o interruptor ATIVO — é o kill switch de 1 linha "
+                    u"para desligar o tracker sem tocar em 112 páginas")
+        if i_opt < 0:
+            return (False, u"asset sem opt-out — a única mitigação que não depende do fornecedor")
+        if i_script >= 0 and (i_ativo > i_script or i_opt > i_script):
+            return (False, u"ATIVO/opt-out rodam DEPOIS de criar o script do fornecedor: "
+                    u"quem optou por sair seria rastreado mesmo assim")
+        return (True, u"")
+    s.check("LF04", u"Leadfeeder: host correto, kill switch e opt-out antes do tracker (#222)",
+            lf04)
+
 
 # ------------------------------------------------------- asserções ao vivo
 
