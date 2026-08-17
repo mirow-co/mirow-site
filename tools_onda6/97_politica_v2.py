@@ -168,7 +168,7 @@ Brasil, e por isso há transferência internacional.</p>
 """ + tabela(
         [u"Operador", u"Para quê", u"País"],
         [[u"GitHub, Inc. (Microsoft)", u"Hospedagem do Site", u"Estados Unidos"],
-         [u"Google LLC", u"Medição de audiência (GA4) e fontes tipográficas", u"Estados Unidos"],
+         [u"Google LLC", u"Medição de audiência (GA4)", u"Estados Unidos"],
          [u"Dealfront Group GmbH", u"Identificação da empresa do visitante", u"União Europeia"],
          [u"Amazon Web Services", u"Recebimento de candidaturas e currículos", u"Brasil"]]) + u"""
 <p>As transferências internacionais observam o art. 33 da LGPD e as cláusulas-padrão contratuais
@@ -189,7 +189,7 @@ Site, mas pode fazer com que ele esqueça o idioma escolhido.</p>
 """ + tabela(
         [u"Dado", u"Prazo"],
         [[u"Currículos e candidaturas", u"6 meses após o encerramento do processo seletivo, salvo se você autorizar a manutenção para vagas futuras"],
-         [u"Dados de navegação no Google Analytics", u"14 meses"],
+         [u"Dados de navegação no Google Analytics", u"<strong>14 meses</strong> para os dados individuais. Os relatórios agregados, que não identificam ninguém, permanecem enquanto a propriedade existir"],
          [u"Dados no Leadfeeder", u"7 dias (limite do plano contratado)"],
          [u"Mensagens que você nos envia", u"Enquanto durar o relacionamento e, depois, pelos prazos legais aplicáveis"]]) + u"""
 
@@ -292,7 +292,7 @@ time, without giving reasons, using the button in section 7.</p>
 """ + tabela(
         [u"Processor", u"Purpose", u"Country"],
         [[u"GitHub, Inc. (Microsoft)", u"Site hosting", u"United States"],
-         [u"Google LLC", u"Audience measurement (GA4) and web fonts", u"United States"],
+         [u"Google LLC", u"Audience measurement (GA4)", u"United States"],
          [u"Dealfront Group GmbH", u"Visitor company identification", u"European Union"],
          [u"Amazon Web Services", u"Receiving applications and CVs", u"Brazil"]]) + u"""
 <p>International transfers follow art. 33 of the LGPD and the standard contractual clauses of
@@ -313,7 +313,7 @@ but it may make it forget your language choice.</p>
 """ + tabela(
         [u"Data", u"Retention"],
         [[u"CVs and applications", u"6 months after the selection process ends, unless you allow us to keep them for future openings"],
-         [u"Google Analytics browsing data", u"14 months"],
+         [u"Google Analytics browsing data", u"<strong>14 months</strong> for individual-level data. Aggregated reports, which identify no one, remain for as long as the property exists"],
          [u"Leadfeeder data", u"7 days (limit of the plan in use)"],
          [u"Messages you send us", u"For as long as the relationship lasts and thereafter for applicable legal periods"]]) + u"""
 
@@ -414,7 +414,7 @@ jederzeit und ohne Begründung widersprechen — über die Schaltfläche in Ziff
 """ + tabela(
         [u"Auftragsverarbeiter", u"Zweck", u"Land"],
         [[u"GitHub, Inc. (Microsoft)", u"Hosting der Website", u"USA"],
-         [u"Google LLC", u"Reichweitenmessung (GA4) und Web-Schriften", u"USA"],
+         [u"Google LLC", u"Reichweitenmessung (GA4)", u"USA"],
          [u"Dealfront Group GmbH", u"Identifikation des Unternehmens", u"Europäische Union"],
          [u"Amazon Web Services", u"Empfang von Bewerbungen und Lebensläufen", u"Brasilien"]]) + u"""
 <p>Internationale Übermittlungen richten sich nach Art. 33 LGPD und den Standardvertragsklauseln
@@ -435,7 +435,7 @@ möglich; die Sprachwahl kann dann verloren gehen.</p>
 """ + tabela(
         [u"Daten", u"Dauer"],
         [[u"Lebensläufe und Bewerbungen", u"6 Monate nach Abschluss des Auswahlverfahrens, sofern Sie einer längeren Speicherung für künftige Stellen nicht zustimmen"],
-         [u"Nutzungsdaten in Google Analytics", u"14 Monate"],
+         [u"Nutzungsdaten in Google Analytics", u"<strong>14 Monate</strong> für Daten auf Einzelebene. Aggregierte Berichte, die niemanden identifizieren, bleiben, solange die Property besteht"],
          [u"Daten bei Leadfeeder", u"7 Tage (Grenze des genutzten Tarifs)"],
          [u"Nachrichten, die Sie uns senden", u"Für die Dauer der Beziehung und danach für die gesetzlichen Fristen"]]) + u"""
 
@@ -507,9 +507,6 @@ def main():
             problemas.append(u"%s: pagina ausente (%s)" % (lang, rel))
             continue
         html = ler(caminho)
-        if MARCA in html:
-            ja_ok += 1
-            continue
         m = ALVO.search(html)
         if not m:
             problemas.append(u"%s: nao achei o container de conteudo" % lang)
@@ -518,6 +515,9 @@ def main():
         novo_corpo = (u'<div class="pol-v2" data-bloco="%s">%s</div>\n%s'
                       % (MARCA, CORPOS[lang](), JS_OPTOUT % TXT_BOTAO[lang]))
         novo = html[:m.start(2)] + novo_corpo + html[m.end(2):]
+        if novo == html:
+            ja_ok += 1
+            continue
         if not check:
             gravar(caminho, novo)
         trocadas += 1

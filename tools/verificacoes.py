@@ -2438,13 +2438,25 @@ def estaticas(s):
         # página não carrega. Era o bug dos big numbers: o CSS pedia 800, o <head>
         # pede wght@200;300;400;600;700;900, e o navegador arredondava para 900 —
         # os números saíam no peso mais gordo da família sem ninguém ter escrito isso.
-        # A asserção lê os pesos disponíveis do PRÓPRIO <head>, não de uma lista fixa:
-        # se alguém mudar o pedido da fonte, ela acompanha.
-        h = s.ler("pt/index.html")
-        m = re.search(r'family=Titillium\+Web:wght@([0-9;]+)', h)
-        if not m:
-            return (False, u"não achei o pedido de pesos da fonte no <head> da home")
-        disponiveis = set(int(x) for x in m.group(1).split(";") if x)
+        # A asserção lê os pesos disponíveis da FONTE DA VERDADE, não de uma lista
+        # fixa. Essa fonte mudou de lugar na #227: antes era o `wght@…` do <link>
+        # do Google no <head>; agora a Titillium é autohospedada e quem manda são
+        # os @font-face do nosso CSS. A asserção quebrou o deploy no ato — motivo
+        # certo, alvo errado, como a S125 na onda 36 — e passou a ler o disco, que
+        # é ainda melhor: mede o peso que de fato existe em arquivo, não o pedido.
+        FONTES = "wp-content/uploads/2026/07/fontes/fontes-mirow.css"
+        try:
+            disponiveis = set(int(x) for x in
+                              re.findall(r"font-weight:\s*(\d+)", s.ler(FONTES)))
+        except IOError:
+            disponiveis = set()
+        if not disponiveis:
+            # Fallback ao modelo antigo, caso um dia a fonte volte a ser remota.
+            m = re.search(r'family=Titillium\+Web:wght@([0-9;]+)', s.ler("pt/index.html"))
+            if not m:
+                return (False, u"não achei os pesos nem em %s nem no <head> da home"
+                        % FONTES)
+            disponiveis = set(int(x) for x in m.group(1).split(";") if x)
         css = s.ler("wp-content/uploads/2026/07/onda6/onda6.css")
         orfaos = {}
         for w in re.findall(r'font-weight:\s*(\d+)', css):
@@ -2745,6 +2757,34 @@ def estaticas(s):
                 det.append(u"%s: sem o botão de oposição ao rastreamento" % lang)
         return (not det, u"; ".join(det[:4]))
     s.check("S137", u"política v2 nas 3 línguas: operadores reais e opt-out (#225)", s137)
+
+    def s138():
+        # #227: Google Fonts fora. Mede o efeito em TODO arquivo servido (html E
+        # css) — o furo do AddToAny foi justamente uma referência num formato que
+        # o padrão não previa, então aqui não se filtra por atributo nem por aspa.
+        # Os 3 @import mortos moravam no CSS do TEMA, não no HTML.
+        sujos = []
+        for dp, _d, fs in os.walk(pub):
+            for nome in fs:
+                if not nome.lower().endswith((".html", ".css")):
+                    continue
+                fp = os.path.join(dp, nome)
+                with io.open(fp, encoding="utf-8", errors="ignore") as f:
+                    if re.search(r"fonts\.(googleapis|gstatic)\.com", f.read()):
+                        sujos.append(os.path.relpath(fp, pub).replace(os.sep, "/"))
+        if sujos:
+            return (False, u"%d arquivo(s) ainda chamam o Google Fonts: %s"
+                    % (len(sujos), ", ".join(sujos[:4])))
+        # E o substituto tem de existir de verdade (S123 cobre o caminho; aqui,
+        # que os arquivos de fonte estejam no disco — CSS sem woff2 é fonte morta).
+        d = os.path.join(pub, "wp-content", "uploads", "2026", "07", "fontes")
+        if not os.path.isdir(d):
+            return (False, u"pasta de fontes locais não existe")
+        woff = [f for f in os.listdir(d) if f.endswith(".woff2")]
+        if len(woff) < 12:
+            return (False, u"só %d woff2 no disco; o CSS declara 12" % len(woff))
+        return (True, u"")
+    s.check("S138", u"Google Fonts fora; Titillium Web servida do nosso disco (#227)", s138)
 
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
@@ -3920,6 +3960,34 @@ def ao_vivo(s):
             nav.js("try{localStorage.removeItem('mirow:leadfeeder:optout')}catch(e){}")
             return (not det, u"; ".join(det[:3]))
         s.check("V33", u"o opt-out da política realmente desliga o Leadfeeder (#225)", v33)
+
+        # V34 — #227: autohospedar só vale se a fonte continuar sendo aplicada.
+        # A S138 garante que a referência ao Google sumiu; sozinha, ela passaria
+        # com o site inteiro em fonte de sistema. Aqui medimos o RENDER.
+        def v34():
+            det = []
+            for pag in ("pt/", "en/homepage/", "de/", "pt/insights/"):
+                nav.abrir("%s/%s" % (base, pag), largura=1400, altura=900)
+                time.sleep(1)
+                n = nav.js("""(function(){var c=0;var e=document.querySelectorAll('body *');
+                  for(var i=0;i<e.length;i++){if(!e[i].offsetParent)continue;
+                  var t=(e[i].textContent||'').trim();if(!t||e[i].children.length)continue;
+                  if(getComputedStyle(e[i]).fontFamily.indexOf('Titillium')>=0)c++;}
+                  return c;})()""")
+                if not n or n < 10:
+                    det.append(u"%s: só %s elemento(s) em Titillium Web — a fonte local "
+                               u"não está sendo aplicada" % (pag, n))
+                fora = nav.js("performance.getEntriesByType('resource')"
+                              ".filter(function(e){return /fonts\\.(googleapis|gstatic)/"
+                              ".test(e.name)}).length")
+                if fora:
+                    det.append(u"%s: %s requisição(ões) ao Google Fonts em runtime" % (pag, fora))
+                locais = nav.js("performance.getEntriesByType('resource')"
+                                ".filter(function(e){return /\\.woff2/.test(e.name)}).length")
+                if not locais:
+                    det.append(u"%s: nenhum woff2 carregado" % pag)
+            return (not det, u"; ".join(det[:3]))
+        s.check("V34", u"Titillium Web aplicada e servida localmente, 4 páginas (#227)", v34)
 
 
 # ------------------------------------------------------------------- main
