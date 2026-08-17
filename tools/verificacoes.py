@@ -3974,6 +3974,42 @@ def ao_vivo(s):
             return (not det, u"; ".join(det[:3]))
         s.check("V34", u"Titillium Web aplicada e servida localmente, 4 páginas (#227)", v34)
 
+        # V35 — #229: nenhum elemento RENDERIZADO pode pedir peso que a fonte não
+        # tem. A S127 já cobra isso, mas lendo o NOSSO css — e as 19 declarações
+        # órfãs desta onda moravam no css do TEMA, que ela não olha. Por isso esta
+        # aqui mede o computado no navegador: pega a classe inteira, não importa
+        # em que arquivo a declaração esteja, nem se ela for inline.
+        #
+        # Por que importa, se o efeito é invisível: quando o CSS pede 500 e a
+        # família não tem, o navegador serve o vizinho — e o texto sai num peso
+        # que ninguém escolheu. Foi assim que os big numbers do hero saíram em
+        # 900/Black na onda 35 sem ninguém ter escrito 900.
+        def v35():
+            FONTES = "wp-content/uploads/2026/07/fontes/fontes-mirow.css"
+            disponiveis = set(int(x) for x in
+                              re.findall(r"font-weight:\s*(\d+)", s.ler(FONTES)))
+            if not disponiveis:
+                return (False, u"não achei os pesos em %s" % FONTES)
+            js = ("(function(){var o={},e=document.querySelectorAll('body *');"
+                  "for(var i=0;i<e.length;i++){var x=e[i];if(!x.offsetParent)continue;"
+                  "var t=(x.textContent||'').trim();if(!t||x.children.length)continue;"
+                  "var c=getComputedStyle(x);"
+                  "if(c.fontFamily.indexOf('Titillium')<0)continue;"
+                  "var w=c.fontWeight;o[w]=(o[w]||0)+1;}return JSON.stringify(o);})()")
+            det = []
+            for pag in ("pt/", "pt/insights/", "pt/carreiras/", "de/", "en/homepage/"):
+                nav.abrir("%s/%s" % (base, pag), largura=1400, altura=900)
+                usados = json.loads(nav.js(js) or "{}")
+                orfaos = {w: n for w, n in usados.items() if int(w) not in disponiveis}
+                if orfaos:
+                    det.append(u"%s: %s" % (pag, ", ".join(
+                        u"peso %s em %d elemento(s)" % (w, n)
+                        for w, n in sorted(orfaos.items()))))
+            return (not det, u"%s — a fonte carrega %s"
+                    % ("; ".join(det[:3]), sorted(disponiveis)))
+        s.check("V35", u"nenhum elemento renderizado pede peso que a fonte não tem (#229)",
+                v35)
+
 
 # ------------------------------------------------------------------- main
 

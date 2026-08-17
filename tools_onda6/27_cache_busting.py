@@ -24,7 +24,11 @@ paginas passam a pedir o arquivo novo.
 
 Cobre os quatro assets proprios: onda6/onda6.css, onda6/onda8-dobra.js,
 onda6/onda9-rede.js (mapa da pagina "Nossa rede") e clientes/clientes-logos.css.
-O tema nao e tocado (os assets dele tem a versao que o WordPress ja carimbou).
+O CSS do TEMA entrou na lista na onda 58 (#229). A regra antiga dizia "o tema nao e
+tocado (os assets dele tem a versao que o WordPress ja carimbou)" -- e valia enquanto
+nunca mexiamos nele. Mexemos duas vezes: tirar os @import de fontes (#227) e trocar os
+pesos orfaos (#229). Arquivo que a gente edita TEM de ser versionado por nos, senao o
+navegador serve `?ver=1` do cache e a correcao nao existe no ar (erro no 9 do CLAUDE.md).
 
 Idempotente: se a versao ja e a atual, nao mexe.
 """
@@ -36,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
 # >>> proximas ondas: incrementar aqui e rodar o script <<<
-VERSAO = 62
+VERSAO = 63
 
 ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda6.css",
@@ -48,16 +52,27 @@ ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda54-leadfeeder.js",
     "wp-content/uploads/2026/07/fontes/fontes-mirow.css",
     "wp-content/uploads/2026/07/clientes/clientes-logos.css",
+    # CSS do tema: entrou porque passamos a edita-lo (ver acima).
+    "wp-content/themes/mirow/public/bundle-css.css",
 ]
 
 
 def carimbar(html):
-    """Poe/atualiza ?v=VERSAO em toda referencia aos nossos assets."""
+    """Poe/atualiza ?v=VERSAO em toda referencia aos nossos assets.
+
+    Aceita aspa SIMPLES ou DUPLA. O padrao antigo exigia aspa dupla, e o <link>
+    do tema que o WordPress gera usa simples:
+        <link rel='stylesheet' href='/wp-content/themes/.../bundle-css.css?ver=1'>
+    Resultado: ao registrar o CSS do tema na lista (onda 58), o carimbo nao pegava
+    e a correcao teria ficado presa no cache dos visitantes. Mesma classe do furo
+    do dns-prefetch do AddToAny (onda 55b), que tambem assumia aspa dupla.
+    """
+    ASPA = '["\']'
     for asset in ASSETS:
-        # casa o caminho com ou sem query, em href="" ou src=""
-        rex = re.compile(r'((?:href|src)=")([^"]*?' + re.escape(asset) + r')(\?[^"]*)?(")')
-        html = rex.sub(lambda m: u'%s%s?v=%d%s' % (m.group(1), m.group(2), VERSAO, m.group(4)),
-                       html)
+        rex = re.compile(r'((?:href|src)=)(' + ASPA + r')([^"\']*?'
+                         + re.escape(asset) + r')(\?[^"\']*)?\2')
+        html = rex.sub(lambda m: u'%s%s%s?v=%d%s'
+                       % (m.group(1), m.group(2), m.group(3), VERSAO, m.group(2)), html)
     return html
 
 
