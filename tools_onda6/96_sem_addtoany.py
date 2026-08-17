@@ -76,6 +76,19 @@ SCRIPT = re.compile(
     r'[ \t]*<script[^>]*(?:static\.addtoany\.com|addtoany)[^>]*>\s*</script>\s*'
     r'|[ \t]*<script[^>]*>\s*(?:window\.)?a2a_config.*?</script>\s*', re.S | re.I)
 
+# <link rel="dns-prefetch"> / preconnect para o fornecedor.
+#
+# Achado ao conferir o site AO VIVO depois de publicar: sobrara
+# `<link rel='dns-prefetch' href='//static.addtoany.com' />` — ASPAS SIMPLES e URL
+# SEM PROTOCOLO. Nem o SCRIPT acima nem a assercao S136 (que exigia
+# `href="https?://`) o pegaram. Continua fazendo o navegador resolver o dominio
+# do fornecedor em toda pagina, o que e justamente o que a #224 queria eliminar.
+# Por isso os padroes daqui aceitam aspa simples ou dupla e URL protocol-relative.
+PREFETCH = re.compile(
+    r"[ \t]*<link[^>]*rel=['\"](?:dns-prefetch|preconnect)['\"][^>]*addtoany[^>]*>\s*"
+    r"|[ \t]*<link[^>]*addtoany[^>]*rel=['\"](?:dns-prefetch|preconnect)['\"][^>]*>\s*",
+    re.I)
+
 
 def destino(rede, url, titulo):
     u, t = quote(url, safe=""), quote(titulo, safe="")
@@ -125,6 +138,8 @@ def main():
 
             novo, nk = KIT.subn(converte_kit, html)
             novo, ns = SCRIPT.subn("", novo)
+            novo, np_ = PREFETCH.subn("", novo)
+            ns += np_
             if novo != html:
                 if not check:
                     gravar(caminho, novo)

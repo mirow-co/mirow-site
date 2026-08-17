@@ -2684,10 +2684,16 @@ def estaticas(s):
         # quem clicava em compartilhar) — e a substituição de fato funcionando:
         # cada botão aponta para o destino real e tem ícone próprio.
         det = []
-        externo = re.compile(r'(?:src|href)="https?://[^"]*addtoany')
+        # O padrão nasceu exigindo `href="https?://` e DEIXOU PASSAR
+        # `<link rel='dns-prefetch' href='//static.addtoany.com' />` — aspa simples
+        # e URL sem protocolo. Publicamos com ele, e só a conferência AO VIVO pegou.
+        # Agora a asserção cobre o que o título promete: QUALQUER referência ao
+        # domínio do fornecedor, em qualquer atributo, com qualquer aspa, com ou
+        # sem protocolo (P2.1 — o escopo do teste tem de cobrir o escopo do título).
+        externo = re.compile(r'addtoany\.com', re.I)
         for rel, h in s.conteudo():
             if externo.search(h):
-                det.append(u"%s: ainda chama addtoany.com" % rel)
+                det.append(u"%s: ainda referencia addtoany.com" % rel)
                 continue
             for kit in re.finditer(r'<div class="a2a_kit[^"]*"[^>]*>(.*?)</div>', h, re.S):
                 corpo = kit.group(1)
