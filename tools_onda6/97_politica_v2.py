@@ -58,6 +58,11 @@ vertical-align:top}
 .pol-v2 th{background:#AAD5E8;color:#071C25;font-weight:600}
 .pol-v2 td{color:#D2D2D2}
 .pol-v2 .pol-v2__data{color:#AAD5E8;font-size:.9rem;margin-bottom:1.5rem}
+/* Os nomes de cookie usam <code> por semantica, mas o tema estiliza code com
+ * pilha monospace — e o site inteiro roda em UMA fonte desde a onda 26. A V12
+ * pegou os 4 elementos. Mantem-se a tag e herda-se a familia. */
+.pol-v2 code{font-family:inherit;font-size:.95em;background:rgba(170,213,232,.18);
+padding:.08em .35em;border-radius:3px}
 .pol-v2 .pol-v2__optout{background:#020E66;color:#fff;border:0;border-radius:4px;
 padding:.7rem 1.2rem;font:inherit;cursor:pointer}
 .pol-v2 .pol-v2__optout:hover{background:#00ADEC}

@@ -107,12 +107,18 @@ MARCADORES = [
     # ONDA 33 (S-118): as 12 paginas de perfil de quem saiu viraram stub, entao as
     # de conteudo cairam de 125 para 113 e os pisos abaixo desceram junto (120->110,
     # carreiras 80->74). Nao e regressao: e a mesma cobertura sobre menos paginas.
-    ("onda7:menu-sobre", 110), ("onda7:menu-praticas", 110),
+    # Onda 57 (#228): as 3 paginas de contato viraram stub de redirect, entao as
+    # de conteudo cairam de 112 para 109 e os pisos de 110 desceram para 109.
+    # Nao e regressao: e a mesma cobertura sobre menos paginas.
+    ("onda7:menu-sobre", 109), ("onda7:menu-praticas", 109),
     # o marcador de carreiras nunca existiu nas paginas DE (medido: 44 pt + 41 en,
     # 0 de) — o item esta lá, o comentario e que nao. Piso = pt+en.
     ("onda7:menu-carreiras", 74),
-    ("onda8:menu-contatos", 110), ("onda8:hero-contatos", 3), ("onda8:dobra", 3),
-    ("onda10:hero-numeros", 3), ("onda11:s08-hero-contatos", 3),
+    ("onda8:menu-contatos", 109), ("onda8:hero-contatos", 3), ("onda8:dobra", 3),
+    ("onda10:hero-numeros", 3),
+    # onda11:s08-hero-contatos saiu na onda 57 (#228): o marcador so existia
+    # nas 3 paginas de contato, que viraram stub. Os 4 canais seguem cobrados
+    # nas pilulas do hero (V23) e nos icones da barra (V14).
     # onda13:hero-malha saiu em 03/08 (S-49/#107): o bloco do video virou os
     # canvases do Horizonte 2050.
     ("onda17:hero-horizonte", 3),
@@ -122,7 +128,7 @@ MARCADORES = [
     ("onda15:hero-texto", 3),
     # onda15:rodape-barra saiu na onda 42 (#191) — barra do rodape aposentada.
     # onda 18: botao de voltar ao topo em todas; planeta so nas homes
-    ("onda18:voltar-topo", 110), ("onda18:planeta-setores", 3),
+    ("onda18:voltar-topo", 109), ("onda18:planeta-setores", 3),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -176,8 +182,13 @@ TITULO_BARRA = {
 # Páginas de contato (todas as variantes do espelho) — S-07 e S-08.
 # Só as URLs CANÔNICAS: depois da S-107 (#165) as variantes de raiz
 # (`contato/`, `carreiras/`, `imprensa/`…) são stubs de redirect.
-CONTATOS = ["pt/contato/index.html", "en/contact-us/index.html",
-            "de/kontakt/index.html"]
+# Onda 57 (#228): as páginas de contato viraram stub de redirect por decisão do
+# Mario ("nao esta agregando a nada. ja tem mil outras formas de contato"), e as
+# asserções S07 e S08 saíram com elas. Não foram mantidas com a lista vazia de
+# propósito: asserção que itera sobre nada PASSA sempre, e passar por vacuidade
+# é pior que não existir — dá confiança sem medir coisa alguma.
+# Os canais de contato seguem cobrados onde agora vivem: V23 (pílulas do hero) e
+# V14 (ícones da barra).
 
 # Páginas de carreiras — S-13.
 CARREIRAS = ["pt/carreiras/index.html",
@@ -593,27 +604,7 @@ def estaticas(s):
         return (not ruins, u"; ".join(ruins))
     s.check("S06", u"números do hero sem ponto final", s06)
 
-    def s07():
-        # S-07 (onda 9): a <section class="offices"> — escritórios, endereços,
-        # mapa — saiu de todas as variantes da página de contato.
-        ruins = [rel for rel in CONTATOS
-                 if 'section class="offices"' in s.ler(rel)]
-        return (not ruins, u"bloco de escritórios ainda em: %s" % ", ".join(ruins))
-    s.check("S07", u"0 blocos de escritórios nas páginas de contato", s07)
 
-    def s08():
-        ruins = []
-        for rel in CONTATOS:
-            h = s.ler(rel)
-            i = h.find("<!-- onda11:s08-hero-contatos -->")
-            trecho = h[i:i + 8000] if i >= 0 else ""
-            faltam = [nome for nome, agulha in CANAIS if agulha not in trecho]
-            if i < 0:
-                ruins.append("%s sem o bloco" % rel)
-            elif faltam:
-                ruins.append("%s sem %s" % (rel, "/".join(faltam)))
-        return (not ruins, u"; ".join(ruins))
-    s.check("S08", u"4 canais de contato no hero das páginas de contato", s08)
 
     def s09():
         # S-09/S-20: a mandala de 8 práticas sumiu; no lugar, a navegação
@@ -1239,27 +1230,7 @@ def estaticas(s):
         return (not det, u"; ".join(det[:5]))
     s.check("S57", u"imprensa em lista branca com veículo/data/link (#115)", s57)
 
-    def s58():
-        # título com "quer ser nosso cliente", nas páginas de contato de verdade
-        alvos = {"pt/contato/index.html": u"quer ser nosso cliente",
-                 "en/contact-us/index.html": u"become our client",
-                 "de/kontakt/index.html": u"unser Kunde werden"}
-        det = [rel for rel, txt in alvos.items() if txt not in s.ler(rel)]
-        return (not det, u"página(s) com o título antigo: %s" % ", ".join(det))
-    s.check("S58", u'contato: "Você quer ser nosso cliente?" (#116)', s58)
 
-    def s59():
-        det = []
-        for rel, h in s.todas():
-            if 'id="form_contact-form"' not in h:
-                continue
-            m = re.search(r'<label for="field_e6lis6"[^>]*>([^<]*)', h)
-            rotulo = (m.group(1) if m else "").strip()
-            if rotulo not in (u"Empresa", u"Company", u"Unternehmen"):
-                det.append(u"%s -> %r" % (rel, rotulo))
-        return (not det, u"%d página(s) com o rótulo antigo: %s"
-                % (len(det), ", ".join(det[:3])))
-    s.check("S59", u'contato: campo "Empresa" no lugar de área de atuação (#117)', s59)
 
     def s60():
         det = []
@@ -1601,7 +1572,7 @@ def estaticas(s):
                     "anerkennungen", "unser-netzwerk"], [u">Unsere Führungskräfte<"]),
         }
         det = []
-        for rel in HOMES + ["pt/contato/index.html", "de/kontakt/index.html"]:
+        for rel in HOMES:   # onda 57: as de contato viraram stub (#228)
             hh = s.ler(rel)
             idioma = "de" if "/de/" in ("/" + rel) else ("en" if "/en/" in ("/" + rel)
                                                         else "pt")
@@ -1927,14 +1898,13 @@ def estaticas(s):
     s.check("S103", u"práticas sem Elmar, com Andreas e Felipe (#161)", s103)
 
     # ------------------------------------------------------------------ onda 27
+    # Onda 57 (#228): o item de Contato saiu do menu junto com a página. Eram 6
+    # itens desde a S-106; agora são 5. O contato passou a viver só nas pílulas do
+    # hero e nos ícones do header, que a V23 e a V14 já medem.
     ORDEM_MENU = {
-        "pt": [u"Sobre nós", u"Práticas", u"Insights", u"Imprensa", u"Carreiras",
-               u"Contato"],
-        # EN e DE ganharam o item de imprensa na S-106 (#164) — 6 itens nas três
-        "en": [u"About us", u"Practices", u"Insights", u"Press", u"Careers",
-               u"Contact Us"],
-        "de": [u"Über uns", u"Branchen", u"Insights", u"Presse", u"Karrieren",
-               u"Kontakt"],
+        "pt": [u"Sobre nós", u"Práticas", u"Insights", u"Imprensa", u"Carreiras"],
+        "en": [u"About us", u"Practices", u"Insights", u"Press", u"Careers"],
+        "de": [u"Über uns", u"Branchen", u"Insights", u"Presse", u"Karrieren"],
     }
 
     def s104():
@@ -2792,10 +2762,12 @@ def estaticas(s):
     MEDICAO = "wp-content/uploads/2026/07/onda6/onda31-medicao.js"
 
     def m01():
-        sem = [rel for rel, h in s.todas() if MEDICAO not in h]
-        # public/index.html é stub de meta refresh: o navegador sai antes de a
-        # medição valer, o pageview é contado na página de destino.
-        sem = [r for r in sem if r != "index.html"]
+        # Cobra as páginas de CONTEÚDO. A razão já estava escrita aqui para o
+        # public/index.html — "o navegador sai antes de a medição valer, o
+        # pageview é contado na página de destino" — e vale para qualquer stub de
+        # redirect; a exceção é que estava estreita demais. Ficou explícito na
+        # onda 57 (#228), quando as 3 páginas de contato viraram stub.
+        sem = [rel for rel, h in s.conteudo() if MEDICAO not in h]
         return (not sem, u"%d página(s) sem o asset de medição: %s"
                 % (len(sem), ", ".join(sem[:5])))
     s.check("M01", u"toda página carrega o asset de medição", m01)
@@ -2961,7 +2933,18 @@ class Navegador(object):
     def __enter__(self):
         from shot import WS  # noqa: E402  (tools_onda6/qa já está no sys.path)
         self.perfil = tempfile.mkdtemp(prefix="verif")
-        self.porta = 9344
+        # Porta LIVRE, não a fixa 9344 que estava aqui. Com porta fixa, um Chrome
+        # de execução anterior que não morreu ainda continua ouvindo nela — e o
+        # próximo Navegador se conecta ao browser VELHO, que está numa página
+        # velha, de um ServidorLocal de outra porta. O efeito é cruel: as medições
+        # SAEM, plausíveis, e são de outra página. Custou um diagnóstico inteiro em
+        # 17/08, quase reportado como bug do site (as URLs de redirect pareciam
+        # apontar para lugares aleatórios; o HTML estava certo o tempo todo).
+        # Mesma família do P2.1: o instrumento respondia sem estar medindo o alvo.
+        _s = socket.socket()
+        _s.bind(("127.0.0.1", 0))
+        self.porta = _s.getsockname()[1]
+        _s.close()
         self.proc = subprocess.Popen(
             [CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars",
              "--remote-debugging-port=%d" % self.porta, "--user-data-dir=" + self.perfil,
@@ -3182,8 +3165,10 @@ def ao_vivo(s):
             return f
         for i, rel in enumerate(["pt/index.html", "pt/pratica/estrategia/index.html",
                                  "pt/imprensa/index.html", "pt/sobre-nos/lideres/index.html",
-                                 # canônicas: `contato/` virou stub na S-107
-                                 "pt/contato/index.html", "de/index.html"], 8):
+                                 # onda 57 (#228): contato saiu; entra a política,
+                                 # que é o outro template de texto corrido
+                                 "pt/politica-de-privacidade/index.html",
+                                 "de/index.html"], 8):
             s.check("V%02d" % i, u"uma fonte só renderizada em %s" % rel,
                     faz_fonte_unica(rel))
 
