@@ -2678,6 +2678,68 @@ def estaticas(s):
     s.check("S135", u"botões genéricos de e-mail com Andreas E Felipe; líderes intactos (#201)",
             s135)
 
+    def s136():
+        # #224: o AddToAny saiu. Mede o EFEITO — nenhuma URL do fornecedor no HTML
+        # (era ele quem recebia o IP de todo leitor de artigo, e por onde passava
+        # quem clicava em compartilhar) — e a substituição de fato funcionando:
+        # cada botão aponta para o destino real e tem ícone próprio.
+        det = []
+        externo = re.compile(r'(?:src|href)="https?://[^"]*addtoany')
+        for rel, h in s.conteudo():
+            if externo.search(h):
+                det.append(u"%s: ainda chama addtoany.com" % rel)
+                continue
+            for kit in re.finditer(r'<div class="a2a_kit[^"]*"[^>]*>(.*?)</div>', h, re.S):
+                corpo = kit.group(1)
+                ancoras = re.findall(r'<a class="a2a_button_(\w+)" href="([^"]*)"', corpo)
+                if not ancoras:
+                    det.append(u"%s: kit de compartilhar sem botões" % rel)
+                    break
+                for rede, href in ancoras:
+                    ok = (("mailto:" in href) if rede == "email"
+                          else ("wa.me" in href) if rede == "whatsapp"
+                          else ("linkedin.com/sharing" in href))
+                    if not ok:
+                        det.append(u"%s: botão %s aponta para %s" % (rel, rede, href[:40]))
+                if corpo.count("<svg") != len(ancoras):
+                    det.append(u"%s: %d botão(ões) sem ícone (o script do fornecedor "
+                               u"desenhava; agora o SVG tem de estar no HTML)"
+                               % (rel, len(ancoras) - corpo.count("<svg")))
+                break
+        return (not det, u"; ".join(sorted(set(det))[:4]))
+    s.check("S136", u"compartilhar sem AddToAny: links diretos e ícone no HTML (#224)", s136)
+
+    def s137():
+        # #225: a política v2. A asserção existe porque a v1 afirmava que os dados
+        # ficavam "exclusivamente ... no Brasil" enquanto o site era servido pelo
+        # GitHub (EUA) — declaração que divergiu da realidade e ninguém mediu.
+        # Aqui cobramos o inverso: que a página NOMEIE cada operador que o site
+        # realmente carrega, e não volte a afirmar o que é falso.
+        PAGS = {"pt": "pt/politica-de-privacidade/index.html",
+                "en": "en/privacy-policy/index.html",
+                "de": "de/datenschutzrichtlinie/index.html"}
+        OPERADORES = ("GitHub", "Google", "Dealfront", "Amazon Web Services")
+        det = []
+        for lang, rel in PAGS.items():
+            try:
+                h = s.ler(rel)
+            except IOError:
+                det.append(u"%s: página ausente" % lang)
+                continue
+            if "onda57:politica-v2" not in h:
+                det.append(u"%s: ainda na versão antiga" % lang)
+                continue
+            for op in OPERADORES:
+                if op not in h:
+                    det.append(u"%s: não declara o operador %s" % (lang, op))
+            # A frase que era falsa. Se voltar, é regressão de conteúdo.
+            if re.search(r"exclusivamente[^<]{0,80}Brasil", h):
+                det.append(u"%s: voltou a afirmar armazenamento exclusivo no Brasil" % lang)
+            if "pol-optout" not in h:
+                det.append(u"%s: sem o botão de oposição ao rastreamento" % lang)
+        return (not det, u"; ".join(det[:4]))
+    s.check("S137", u"política v2 nas 3 línguas: operadores reais e opt-out (#225)", s137)
+
     # M — medição (mirow-marketing#3). O snippet de GA4 tinha sido escrito só na
     # camada Astro, que está fora do deploy, e por isso nunca chegou ao ar. As
     # asserções abaixo existem para essa regressão não voltar em silêncio.
@@ -3787,6 +3849,71 @@ def ao_vivo(s):
                                % (rel, len(r), r[0]))
             return (not det, u"; ".join(det[:3]))
         s.check("V31", u"nenhum texto da home termina em ponto final, exceto a marca (#221)", v31)
+
+        # V32 — #223: o Mario viu, no celular, "a barra branca mostrando só o &".
+        # Não era regressão: a V14 media a barra com o CSS já carregado, e ali ela
+        # sempre esteve navy. O que ninguém media era o intervalo ANTES de o CSS
+        # externo chegar — no desktop dura milissegundos, num celular em rede móvel
+        # dura o bastante para ser visto. O logo tem 8 paths brancos (as letras) e
+        # 1 ciano (o "&"): sem fundo navy, sobra o "&".
+        #
+        # Mede as DUAS situações. A segunda é a que pega o bug: bloqueia o CSS
+        # externo no navegador e exige que a barra continue navy pelo <style>
+        # inline. Testar só com CSS é o erro de escopo do P2.1.
+        def v32():
+            det = []
+            NAVY = "rgb(2, 14, 102)"
+            leitura = ("(function(){var b=document.querySelector('.menu');"
+                       "return b?getComputedStyle(b).backgroundColor:'sem barra';})()")
+            for pag in ("pt/", "en/homepage/", "de/", "pt/contato/"):
+                for larg in (390, 1400):
+                    nav.abrir("%s/%s" % (base, pag), largura=larg, altura=844)
+                    cor = nav.js(leitura)
+                    if cor != NAVY:
+                        det.append(u"%s @%d com CSS: barra %s" % (pag, larg, cor))
+            # Agora sem o CSS do tema e das ondas.
+            nav.ws.call(nav._id(), "Network.enable", {})
+            nav.ws.call(nav._id(), "Network.setBlockedURLs",
+                        {"urls": ["*onda6.css*", "*style.css*", "*themes*"]})
+            try:
+                for pag in ("pt/", "de/"):
+                    nav.abrir("%s/%s" % (base, pag), largura=390, altura=844)
+                    cor = nav.js(leitura)
+                    if cor != NAVY:
+                        det.append(u"%s @390 SEM css: barra %s — o logo branco some "
+                                   u"no flash e sobra só o \"&\"" % (pag, cor))
+            finally:
+                nav.ws.call(nav._id(), "Network.setBlockedURLs", {"urls": []})
+            return (not det, u"; ".join(det[:4]))
+        s.check("V32", u"barra navy mesmo ANTES do CSS externo carregar, em 4 páginas (#223)",
+                v32)
+
+        # V33 — #225: a política PROMETE que o botão desliga o rastreamento. Uma
+        # promessa dessas não pode ser verificada lendo o HTML: tem que clicar e
+        # medir que o tracker some. Se um dia o opt-out quebrar, a página passa a
+        # mentir para o titular — é o pior tipo de regressão possível aqui.
+        def v33():
+            det = []
+            nav.abrir("%s/pt/politica-de-privacidade/" % base, largura=1400, altura=900)
+            if not nav.js("!!document.getElementById('pol-optout')"):
+                return (False, u"a política não tem o botão de oposição")
+            nav.js("document.getElementById('pol-optout').click()")
+            time.sleep(1)
+            if nav.js("window.localStorage.getItem('mirow:leadfeeder:optout')") != "1":
+                det.append(u"o clique não gravou a escolha")
+            # Efeito onde importa: outra página, tracker fora do ar.
+            nav.abrir("%s/pt/" % base, largura=1400, altura=900)
+            time.sleep(2)
+            if nav.js("window.mirowLeadfeederAtivo") is not False:
+                det.append(u"o tracker continuou ativo depois do opt-out")
+            n = nav.js("performance.getEntriesByType('resource')"
+                       ".filter(function(e){return e.name.indexOf('lfeeder')>=0}).length")
+            if n:
+                det.append(u"%s requisição(ões) ao Leadfeeder mesmo com opt-out" % n)
+            # Desfaz, para não contaminar as asserções seguintes.
+            nav.js("try{localStorage.removeItem('mirow:leadfeeder:optout')}catch(e){}")
+            return (not det, u"; ".join(det[:3]))
+        s.check("V33", u"o opt-out da política realmente desliga o Leadfeeder (#225)", v33)
 
 
 # ------------------------------------------------------------------- main

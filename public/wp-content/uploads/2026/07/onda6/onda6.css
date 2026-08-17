@@ -1491,3 +1491,29 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   .onda53-selo-ia{font-size:12px;letter-spacing:.10em}
 }
 /* onda53:home-ia:fim */
+
+/* onda56:share-direto:ini */
+.a2a_kit a{color:#020E66;display:inline-flex;align-items:center;
+justify-content:center;width:32px;height:32px;transition:color .15s}
+.a2a_kit a:hover,.a2a_kit a:focus{color:#00ADEC}
+/* onda56:share-direto:fim */
+
+/* onda57:politica-v2:ini */
+.pol-v2 h2{font-size:1.25rem;color:#fff;margin:2rem 0 .6rem}
+.pol-v2 h3{font-size:1.05rem;color:#00ADEC;margin:1.4rem 0 .4rem}
+.pol-v2 p,.pol-v2 li{line-height:1.6}
+.pol-v2 strong{color:#fff}
+.pol-v2 table{width:100%;border-collapse:collapse;margin:.8rem 0 1.4rem;font-size:.95rem}
+.pol-v2 th,.pol-v2 td{border:1px solid #7F7F7F;padding:.5rem .7rem;text-align:left;
+vertical-align:top}
+.pol-v2 th{background:#AAD5E8;color:#071C25;font-weight:600}
+.pol-v2 td{color:#D2D2D2}
+.pol-v2 .pol-v2__data{color:#AAD5E8;font-size:.9rem;margin-bottom:1.5rem}
+.pol-v2 .pol-v2__optout{background:#020E66;color:#fff;border:0;border-radius:4px;
+padding:.7rem 1.2rem;font:inherit;cursor:pointer}
+.pol-v2 .pol-v2__optout:hover{background:#00ADEC}
+.pol-v2 .pol-v2__status{margin-left:.8rem;color:#020E66;font-weight:600}
+@media (max-width:600px){.pol-v2 table,.pol-v2 tbody,.pol-v2 tr,.pol-v2 td,.pol-v2 th{
+display:block}.pol-v2 thead{display:none}.pol-v2 td{border-top:0}
+.pol-v2 tr{border-top:1px solid #D2D2D2;margin-bottom:.8rem}}
+/* onda57:politica-v2:fim */
