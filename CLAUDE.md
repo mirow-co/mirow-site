@@ -278,6 +278,37 @@ Backlog técnico (o que não dá para fazer no Pages, o que espera decisão): `d
     foi a **S50**, no gate. Se precisar rodar, rodar depois dele, na ordem,
     `68_home_lideres_e_espacos.py` e `105_email_andreas_e_felipe.py`.
 
+12. **Declarar um asset "transparente"/"vazio" sem DECODIFICAR o pixel.** Em 18/08 eu colei um
+    base64 de memória como "PNG 1×1 transparente" para matar um 404. Era um pixel **vermelho com
+    alfa 127**, e como os 22 seletores do tema usam `background-size:cover`, esse 1×1 se esticou e
+    pintou a home, os insights, as páginas de líder e o menu de **vermelho, em produção**. Eu
+    "conferi" o arquivo checando que era PNG válido e 1×1 — medi a existência, não o efeito, e a
+    `S157` fazia o mesmo. Agora o PNG é **gerado byte a byte** e a **S159** decodifica o pixel de
+    todo placeholder. **E: depois de todo deploy, olhar um screenshot da home.** Este bug morreria
+    em 5 segundos com um olho na página; nenhuma das 195 asserções o pegou.
+
+## Ritmo do gate (onda 60c) — rodar só o que a mudança pede
+
+A fase estática são **1,2 s** para 162 asserções. O tempo do gate morava nos **111 page loads**,
+que dormiam **6 s cegos** cada. Duas mudanças, com o mesmo veredito (196 OK):
+
+- **Espera por estabilidade, não por relógio.** O `Navegador.abrir` espera uma impressão digital
+  do layout (geometria + opacidade dos elementos animados) parar de mudar em duas amostras
+  seguidas. Gate: **~12 min → ~4 min**. Só `readyState`+fontes **não basta** — a `V30` acusava o
+  selo fora de lugar porque ele ainda animava. `--espera-fixa` volta ao antigo, para comparar.
+- **Etapas.** Cada asserção declara área: `texto`, `css`, `asset`, `estrutura`, `schema`,
+  `medicao`. No laço de trabalho:
+
+```bash
+python tools/verificacoes.py . --desde=HEAD --tempos
+```
+
+  `--desde=<ref>` descobre as etapas a partir do que mudou no git (e **ignora** arquivo que só
+  levou carimbo de cache — sem esse filtro, acusaria 291 arquivos a cada onda; com ele, 12).
+  `--para=texto,css` força as etapas. `--tempos` lista as asserções mais lentas.
+  **Regra de segurança: asserção NÃO mapeada roda SEMPRE** — o mapa só pode acelerar, nunca
+  esconder. O `deploy.ps1` continua rodando **tudo**.
+
 ## Governança a cada marco
 
 Comentar a issue `mirow-co/mirow-marketing#42`, atualizar `00_Admin/gestao-projeto.html` no repo
