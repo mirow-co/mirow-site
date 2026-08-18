@@ -46,8 +46,12 @@ def main(raiz):
         if re.search(r'<meta name="description"(?![^>]*onda59-meta)', h):
             raise SystemExit("ja existe meta description alheia em %s — nao duplicar" % rel)
         tag = '<meta name="description" content="%s" data-onda="onda59-meta">\n' % texto
-        novo = RE_TAG.sub("", h)
-        novo = novo.replace("</head>", tag + "</head>", 1)
+        # Mesmo cuidado do 111: substituir no lugar, senao os dois disputam a posicao
+        # imediatamente anterior a </head> e nenhum fica idempotente.
+        if RE_TAG.search(h):
+            novo = RE_TAG.sub(lambda _m: tag, h, count=1)
+        else:
+            novo = h.replace("</head>", tag + "</head>", 1)
         if novo != h:
             with io.open(p, "w", encoding="utf-8", newline="") as f:
                 f.write(novo)

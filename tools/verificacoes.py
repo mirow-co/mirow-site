@@ -3,9 +3,16 @@
 
 Uso:
     python tools/verificacoes.py <raiz-que-contem-public> [--rapido] [--so=PREFIXO] [-v]
+                                 [--para=etapa1,etapa2] [--desde=<ref-git>]
+                                 [--tempos] [--espera-fixa]
 
     --rapido        só as asserções estáticas (sem Chrome/servidor local)
     --so=H          roda só as asserções cujo id começa com H (ex.: --so=H03)
+    --para=texto    roda só as etapas pedidas (texto, css, asset, estrutura,
+                    schema, medicao). Asserção sem etapa declarada roda SEMPRE.
+    --desde=HEAD    descobre as etapas a partir do que mudou no git desde <ref>
+    --tempos        lista as asserções mais lentas e o custo dos page loads
+    --espera-fixa   volta à espera cega de 6 s por page load (para comparar)
     -v              mostra detalhe de cada asserção, inclusive as que passaram
 
 Saída: uma linha por asserção — OK / FALHA / PENDENTE — e um resumo.
@@ -36,6 +43,7 @@ import json
 import os
 import re
 import socket
+import struct
 import subprocess
 import sys
 import tempfile
@@ -203,11 +211,127 @@ REDE = ["pt/sobre-nos/nossa-rede/index.html", "en/about-us/our-network/index.htm
 
 # ------------------------------------------------------------------ mecânica
 
+
+# ============================================================================
+# ETAPAS — rodar so o que a mudanca pede (onda 60c, pedido do Mario)
+# ============================================================================
+# PROBLEMA MEDIDO: a fase estatica leva 1,2 s para 162 assercoes; a fase ao vivo
+# leva ~20 min para 23, porque cada page load custava 6 s de espera cega. Trocar
+# uma frase disparava o rol inteiro.
+#
+# COMO FUNCIONA: cada assercao pertence a uma ou mais ETAPAS. O seletor
+# `--para=<etapa>` roda as etapas pedidas; `--desde=<ref-git>` descobre as etapas
+# a partir dos arquivos que mudaram.
+#
+# REGRA DE SEGURANCA (importante): assercao NAO mapeada aqui roda SEMPRE. O mapa
+# so pode ACELERAR, nunca esconder — esquecer de classificar uma assercao nova a
+# deixa no caminho, e nao fora dele. E o gate do deploy continua rodando TUDO por
+# padrao; a selecao e para o laco de desenvolvimento.
+ETAPAS_VALIDAS = ("texto", "css", "asset", "estrutura", "schema", "medicao")
+
+# prefixo de id -> etapas. Prefixo mais longo vence.
+ETAPAS = {
+    # --- ao vivo: tudo que depende de render (CSS, layout, fonte, hover) ---
+    "V": ("css",),
+    # --- estrutura de URL, sitemap, redirect, hreflang, canonical ---
+    "S107": ("estrutura",), "S118": ("estrutura",), "S119": ("estrutura",),
+    "S120": ("estrutura",), "S121": ("estrutura",), "S122": ("estrutura",),
+    "S124": ("estrutura",), "S151": ("estrutura",),
+    # --- schema/GEO/meta ---
+    "S149": ("schema",), "S150": ("schema",), "S152": ("schema",),
+    # --- assets referenciados (existencia, peso, dimensao, placeholder) ---
+    "S123": ("asset",), "S153": ("asset", "texto"), "S157": ("asset", "css"),
+    "S159": ("asset",), "E": ("asset",),
+    # --- CSS proprio: blocos marcados, pesos, cache busting ---
+    "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
+    # --- medicao/analytics ---
+    "M": ("medicao",), "LF": ("medicao",), "L": ("medicao",),
+}
+
+
+def etapas_de(cid):
+    """Etapas de uma assercao. Sem mapeamento -> roda sempre."""
+    melhor = None
+    for pref, ets in ETAPAS.items():
+        if cid.startswith(pref) and (melhor is None or len(pref) > len(melhor)):
+            melhor = pref
+    return ETAPAS[melhor] if melhor else None  # None = sempre
+
+
+# padrao de caminho que mudou -> etapas a rodar
+def etapas_do_diff(arquivos):
+    ets = set()
+    for f in arquivos:
+        f = f.replace("\\", "/")
+        if f.endswith(".css"):
+            ets.update(("css", "asset"))
+        elif f.endswith((".js",)):
+            ets.update(("css", "asset", "medicao"))
+        elif f.endswith((".png", ".jpg", ".jpeg", ".svg", ".gif", ".webp",
+                         ".woff", ".woff2")):
+            ets.add("asset")
+        elif f.endswith(("sitemap.xml", "robots.txt")):
+            ets.add("estrutura")
+        elif f.endswith(".html"):
+            ets.add("texto")
+            # stub de redirect e pagina nova mexem em estrutura
+            ets.add("estrutura")
+        elif "/tools" in f or f.startswith("tools"):
+            ets.update(ETAPAS_VALIDAS)  # mudou ferramenta: nao arrisca
+    return ets or set(ETAPAS_VALIDAS)
+
+
+def _so_carimbo(ref):
+    """Arquivos cuja unica diferenca e o carimbo de cache (`?v=NN`).
+
+    Sem isto o `--desde` seria inutil: o 27_cache_busting.py toca as 282 paginas a
+    cada onda, entao QUALQUER diff pareceria "mudou tudo". Um arquivo em que todas
+    as linhas alteradas contem `?v=` nao mudou conteudo — mudou o carimbo.
+    """
+    cosmeticos = set()
+    try:
+        r = subprocess.run(["git", "diff", "-U0", ref], capture_output=True,
+                           text=True, timeout=120)
+    except Exception:
+        return cosmeticos
+    atual, linhas = None, []
+    def fecha():
+        if atual and linhas and all("?v=" in l for l in linhas):
+            cosmeticos.add(atual)
+    for l in r.stdout.splitlines():
+        if l.startswith("+++ b/"):
+            fecha()
+            atual, linhas = l[6:].strip(), []
+        elif l[:1] in "+-" and not l.startswith(("+++", "---")):
+            linhas.append(l)
+    fecha()
+    return cosmeticos
+
+
+def arquivos_mudados(ref):
+    """Arquivos alterados desde `ref` (inclui nao-commitados), sem os que so
+    levaram carimbo de cache."""
+    saida = []
+    for cmd in (["git", "diff", "--name-only", ref],
+                ["git", "diff", "--name-only"],
+                ["git", "ls-files", "--others", "--exclude-standard"]):
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            saida += [l.strip() for l in r.stdout.splitlines() if l.strip()]
+        except Exception:
+            pass
+    cosmeticos = _so_carimbo(ref)
+    return sorted(set(saida) - cosmeticos)
+
+
 class Suite(object):
-    def __init__(self, pub, verboso=False, filtro=None):
+    def __init__(self, pub, verboso=False, filtro=None, etapas=None):
         self.pub = pub
         self.verboso = verboso
         self.filtro = filtro
+        self.etapas = etapas          # None = roda tudo
+        self.tempos = []              # (segundos, id, titulo)
+        self.puladas = 0
         self.res = []          # (id, titulo, estado, detalhe)
         self._cache = {}
         self._htmls = None
@@ -261,11 +385,21 @@ class Suite(object):
     def check(self, cid, titulo, fn):
         if self.filtro and not cid.startswith(self.filtro):
             return
+        # Selecao por etapa. Assercao sem etapa declarada (etapas_de -> None) roda
+        # SEMPRE: o mapa pode acelerar, nunca esconder.
+        if self.etapas is not None:
+            minhas = etapas_de(cid)
+            if minhas is not None and not (set(minhas) & self.etapas):
+                self.puladas += 1
+                return
+        t0 = time.time()
         try:
             ok, detalhe = fn()
             estado = "OK" if ok else "FALHA"
         except Exception as e:  # asserção que explode conta como falha
             estado, detalhe = "FALHA", "erro na asserção: %r" % (e,)
+        gasto = time.time() - t0
+        self.tempos.append((gasto, cid, titulo))
         self.res.append((cid, titulo, estado, detalhe))
         self._imprime(cid, titulo, estado, detalhe)
 
@@ -960,8 +1094,33 @@ def estaticas(s):
             if len(pessoas) != 6 or len(orgs) != 1:
                 det.append(u"%s: %d Person / %d Organization (esperado 6/1)"
                            % (lang, len(pessoas), len(orgs)))
-            if "foundingDate" in m.group(1) or "__PREENCHER" in m.group(1):
-                det.append(u"%s: campo não-publicado no ar" % lang)
+            # Onda 60b. Tres fatos do Mario, e a distincao entre eles e o ponto:
+            #   SEDE  = assento juridico, CNPJ 15.353.236/0001-89 ativo, RIO -> `address`
+            #   ESCRITORIO = onde o time trabalha, SAO PAULO -> `location` (Place)
+            #   fundacao 12/04/2012, `foundingLocation` no Rio (nasceu la em 2012)
+            # A primeira versao desta asserção cobrava Sao Paulo no `address` porque eu
+            # li "endereco novo" como mudanca de sede. Nao era.
+            if "__PREENCHER" in m.group(1):
+                det.append(u"%s: placeholder não-preenchido no ar" % lang)
+            org = g[0] if g else {}
+            sede = org.get("address") or {}
+            if sede.get("addressLocality") != u"Rio de Janeiro" or sede.get("addressRegion") != "RJ":
+                det.append(u"%s: sede é %r/%r (esperado Rio de Janeiro/RJ — o CNPJ de lá "
+                           u"segue ativo)" % (lang, sede.get("addressLocality"),
+                                              sede.get("addressRegion")))
+            if sede.get("postalCode") != "22290-160":
+                det.append(u"%s: CEP da sede = %r" % (lang, sede.get("postalCode")))
+            escr = (org.get("location") or {}).get("address") or {}
+            if escr.get("addressLocality") != u"São Paulo" or escr.get("addressRegion") != "SP":
+                det.append(u"%s: escritório é %r/%r (esperado São Paulo/SP)"
+                           % (lang, escr.get("addressLocality"), escr.get("addressRegion")))
+            if escr.get("postalCode") != "04029-100":
+                det.append(u"%s: CEP do escritório = %r" % (lang, escr.get("postalCode")))
+            if org.get("foundingDate") != "2012-04-12":
+                det.append(u"%s: foundingDate = %r (esperado 2012-04-12)"
+                           % (lang, org.get("foundingDate")))
+            if u"Rio" not in ((org.get("foundingLocation") or {}).get("name") or ""):
+                det.append(u"%s: foundingLocation deixou de ser o Rio" % lang)
             nomes = u" ".join(p.get("name", "") for p in pessoas)
             for fora in (u"Elmar", u"Daniel Ramos"):
                 if fora in nomes:
@@ -1247,6 +1406,66 @@ def estaticas(s):
                     det.append(u"%s: card aponta para %s inexistente" % (rel, mid))
         return (not det, u"; ".join(det[:4]) or u"12 cards de líder abrem modal nas 3 homes")
     s.check("S158", u"cards de líder da home continuam abrindo modal de bio", s158)
+
+    def s159():
+        # Onda 60b. Esta asserção existe por causa de um bug MEU que foi para producao:
+        # o placeholder de texture-7.png era um pixel VERMELHO com alfa 127, e como os
+        # 22 seletores do tema usam `background-size:cover`, esse 1x1 se esticou e pintou
+        # a home, os insights, as paginas de lider e o menu de VERMELHO. A S157 nao pegou
+        # porque cobrava que o arquivo EXISTISSE — mediu a existencia, nao o efeito.
+        # Aqui o pixel de todo placeholder de 1x1 e DECODIFICADO e tem de ser
+        # completamente transparente. Se um dia entrar o asset real (maior que 1x1), a
+        # asserção sai do caminho.
+        import zlib as _zlib
+        det = []
+        conferidos = 0
+        for rel in ("wp-content/themes/mirow/resources/images/texture-7.png",
+                    "wp-content/themes/mirow/resources/images/form-success.gif",
+                    "wp-content/themes/mirow/resources/images/form-select-arrow.svg",
+                    "wp-content/plugins/formidable/images/ajax_loader.gif"):
+            fp = os.path.join(pub, rel.replace("/", os.sep))
+            if not os.path.exists(fp):
+                det.append(u"%s ausente" % rel)
+                continue
+            with io.open(fp, "rb") as f:
+                d = f.read()
+            conferidos += 1
+            if rel.endswith(".png"):
+                if d[:8] != bytes([137, 80, 78, 71, 13, 10, 26, 10]):
+                    det.append(u"%s nao e PNG" % rel)
+                    continue
+                w, h = struct.unpack(">II", d[16:24])
+                ct = d[25]
+                if (w, h) != (1, 1):
+                    continue  # asset real; nada a cobrar
+                if ct != 6:
+                    det.append(u"%s e 1x1 mas sem canal alfa (colortype=%d)" % (rel, ct))
+                    continue
+                i, pix = 8, None
+                while i < len(d):
+                    ln = struct.unpack(">I", d[i:i + 4])[0]
+                    if d[i + 4:i + 8] == b"IDAT":
+                        pix = tuple(_zlib.decompress(d[i + 8:i + 8 + ln])[1:5])
+                        break
+                    i += 12 + ln
+                if pix is None:
+                    det.append(u"%s sem IDAT legivel" % rel)
+                elif pix[3] != 0:
+                    det.append(u"%s PINTA: rgba%s (alfa tem de ser 0)" % (rel, pix,))
+            elif rel.endswith(".gif"):
+                if d[:6] not in (b"GIF87a", b"GIF89a"):
+                    det.append(u"%s nao e GIF" % rel)
+                elif len(d) < 200:  # 1x1 placeholder
+                    k = d.find(bytes([0x21, 0xF9, 0x04]))
+                    if k < 0 or not (d[k + 3] & 1):
+                        det.append(u"%s e placeholder sem transparencia declarada" % rel)
+            elif rel.endswith(".svg"):
+                txt = d.decode("utf-8", "ignore")
+                if re.search(r"<(path|rect|circle|ellipse|polygon|line|image)", txt):
+                    det.append(u"%s desenha forma (deveria ser vazio)" % rel)
+        return (not det, u"%d placeholder(es); %s" % (
+            conferidos, u"; ".join(det[:3]) or u"nenhum pinta pixel"))
+    s.check("S159", u"placeholder de asset faltante nao pinta nada (pixel decodificado)", s159)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
@@ -3304,14 +3523,77 @@ class Navegador(object):
         self.mid += 1
         return self.mid
 
-    def abrir(self, url, largura=None, altura=None):
+    # ---- instrumentacao e reuso (onda 60c) -------------------------------------
+    # ANTES: todo abrir() dormia 6 s fixos. Com a fase estatica em 1,2 s, era ai
+    # que morria o tempo do gate: cada page load custava 6 s, houvesse ou nao o
+    # que esperar, e varias assercoes reabrem a MESMA url no MESMO viewport.
+    # AGORA: espera a pagina ficar pronta de verdade (readyState + fontes + um
+    # frame de animacao) e reaproveita a pagina quando nada mudou.
+    # `--espera-fixa` volta ao comportamento antigo, para comparar.
+    loads = 0
+    tempo_loads = 0.0
+    espera_fixa = False
+
+    def _pronto(self, limite=8.0):
+        """Bloqueia ate a pagina estar ESTAVEL, ou ate `limite` segundos.
+
+        Nao basta `readyState=complete` + fontes: o tema usa AOS e o
+        `onda8-dobra.js` re-mede a dobra em runtime, entao a geometria ainda muda
+        depois do load. Medido em 18/08: com so readyState+fontes, a V30 acusava
+        que o selo "AI Powered" nao estava acima do slogan — o selo AINDA estava
+        animando. Aqui a espera olha uma IMPRESSAO DIGITAL do layout e sai quando
+        ela para de mudar em duas amostras seguidas. E o mesmo principio da P2.1:
+        esperar o efeito (layout assentado), nao um numero de segundos chutado.
+        """
+        FP = ("(function(){try{"
+              "if(document.readyState!=='complete')return 'x';"
+              "if(document.fonts&&document.fonts.status!=='loaded')return 'x';"
+              "var p=[document.body.scrollHeight,window.innerHeight];"
+              "var e=document.querySelectorAll('[data-aos],.onda53-selo-ia,"
+              ".clientes-logos,.hero-texto,.hero-numeros');"
+              "for(var i=0;i<e.length && i<14;i++){var r=e[i].getBoundingClientRect();"
+              "p.push(Math.round(r.top),Math.round(r.left),Math.round(r.width),"
+              "Math.round(r.height),getComputedStyle(e[i]).opacity);}"
+              "return p.join(',');}catch(err){return 'x'}})()")
+        t0 = time.time()
+        anterior, iguais = None, 0
+        while time.time() - t0 < limite:
+            atual = self.js(FP)
+            if atual and atual != "x" and atual == anterior:
+                iguais += 1
+                if iguais >= 2:      # duas amostras seguidas identicas
+                    break
+            else:
+                iguais = 0
+            anterior = atual
+            time.sleep(0.2)
+        return time.time() - t0
+
+    def abrir(self, url, largura=None, altura=None, forcar=False):
+        larg = largura or self.largura
+        alt = altura or self.altura
+        estado = (url, larg, alt)
+        # Reuso: mesma url e mesmo viewport, e ninguem sujou a pagina desde entao
+        # (hover e clique marcam `_sujo`, porque deixam estado que a proxima
+        # assercao nao espera encontrar).
+        if (not forcar and not getattr(self, "_sujo", True)
+                and getattr(self, "_estado", None) == estado):
+            return
         # trava as métricas do device: sem isso a barra do Chrome come ~98px e
         # qualquer medição de primeira dobra sai errada (bug real da onda 8).
+        t0 = time.time()
         self.ws.call(self._id(), "Emulation.setDeviceMetricsOverride", {
-            "width": largura or self.largura, "height": altura or self.altura,
+            "width": larg, "height": alt,
             "deviceScaleFactor": 1, "mobile": False})
         self.ws.call(self._id(), "Page.navigate", {"url": url})
-        time.sleep(6)
+        if Navegador.espera_fixa:
+            time.sleep(6)
+        else:
+            self._pronto()
+        Navegador.loads += 1
+        Navegador.tempo_loads += time.time() - t0
+        self._estado = estado
+        self._sujo = False
 
     def js(self, expr):
         r = self.ws.call(self._id(), "Runtime.evaluate",
@@ -3319,6 +3601,7 @@ class Navegador(object):
         return r.get("result", {}).get("result", {}).get("value")
 
     def hover(self, x, y, espera=1.0):
+        self._sujo = True  # hover deixa estado; a proxima assercao precisa recarregar
         """Hover de verdade (Input.dispatchMouseEvent), como o mouse do Mario.
 
         Serve para medir o que só existe em hover — o painel dos submenus. NÃO
@@ -4353,13 +4636,33 @@ def main():
     rapido = "--rapido" in args
     verboso = "-v" in args
     filtro = None
+    etapas = None
+    mostrar_tempos = "--tempos" in args
+    Navegador.espera_fixa = "--espera-fixa" in args
     for a in args:
         if a.startswith("--so="):
             filtro = a[5:]
+        elif a.startswith("--para="):
+            pedidas = set(x.strip() for x in a[7:].split(",") if x.strip())
+            invalidas = pedidas - set(ETAPAS_VALIDAS)
+            if invalidas:
+                raise SystemExit(u"etapa desconhecida: %s. Válidas: %s"
+                                 % (", ".join(sorted(invalidas)), ", ".join(ETAPAS_VALIDAS)))
+            etapas = pedidas
+        elif a.startswith("--desde="):
+            ref = a[8:]
+            mudou = arquivos_mudados(ref)
+            etapas = etapas_do_diff(mudou)
+            print(u"--desde=%s: %d arquivo(s) mudado(s) → etapas %s"
+                  % (ref, len(mudou), ", ".join(sorted(etapas))))
+            for f in mudou[:6]:
+                print(u"    %s" % f)
+            if len(mudou) > 6:
+                print(u"    … e %d outro(s)" % (len(mudou) - 6))
 
     print(u"suite de verificações — %s" % pub)
     print(u"-" * 72)
-    s = Suite(pub, verboso=verboso, filtro=filtro)
+    s = Suite(pub, verboso=verboso, filtro=filtro, etapas=etapas)
     estaticas(s)
     if not rapido:
         print(u"-" * 72)
@@ -4373,6 +4676,20 @@ def main():
     n_fa = sum(1 for r in s.res if r[2] == "FALHA")
     n_pe = sum(1 for r in s.res if r[2] == "PENDENTE")
     print(u"%d OK · %d FALHA · %d PENDENTE" % (n_ok, n_fa, n_pe))
+    if s.puladas:
+        print(u"%d asserção(ões) fora das etapas pedidas — o gate do deploy roda TODAS"
+              % s.puladas)
+    if Navegador.loads:
+        print(u"%d page load(s) no Chrome, %.1f s somados (%.1f s cada)"
+              % (Navegador.loads, Navegador.tempo_loads,
+                 Navegador.tempo_loads / Navegador.loads))
+    if mostrar_tempos and s.tempos:
+        print(u"-" * 72)
+        print(u"as 12 asserções mais lentas (é aqui que o gate gasta):")
+        for gasto, cid, titulo in sorted(s.tempos, reverse=True)[:12]:
+            print(u"  %6.1f s  %-6s %s" % (gasto, cid, titulo[:62]))
+        total = sum(t[0] for t in s.tempos)
+        print(u"  %6.1f s  TOTAL de %d asserção(ões)" % (total, len(s.tempos)))
     if n_fa:
         print(u"\nDEPLOY BLOQUEADO — %d asserção(ões) falhando:" % n_fa)
         for cid, titulo, estado, detalhe in s.res:

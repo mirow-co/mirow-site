@@ -27,16 +27,50 @@ Idempotente: nao reescreve se o placeholder ja estiver la.
 """
 import base64
 import io
+import struct
+import zlib
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import resolve_public
 
-# PNG 1x1, RGBA, alfa 0 (70 bytes). Com background-size:cover, nao pinta nada.
-PNG_1X1_TRANSPARENTE = base64.b64decode(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8"
-    "z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
+# PNG 1x1 RGBA com alfa 0, GERADO e CONFERIDO aqui — nao um blob base64 colado.
+#
+# POR QUE ASSIM: na primeira versao desta onda eu colei um base64 "1x1 transparente"
+# tirado de memoria. Ele era um pixel VERMELHO com alfa 127. Como os 22 seletores do
+# tema usam `background-size:cover`, esse unico pixel se esticou sobre o elemento
+# inteiro e pintou a home (e as paginas de insights, de lider e o menu) de VERMELHO,
+# em producao. Eu havia "verificado" o arquivo checando que era PNG valido e 1x1 —
+# isto e, medi a existencia, nao o efeito. Exatamente o erro que a P2.1 descreve.
+# Agora o pixel e construido byte a byte e o proprio script RELE o que gravou.
+def _png_1x1_alfa0():
+    def chunk(tipo, dados):
+        corpo = tipo + dados
+        return (struct.pack(">I", len(dados)) + corpo
+                + struct.pack(">I", zlib.crc32(corpo) & 0xffffffff))
+    ihdr = struct.pack(">IIBBBBB", 1, 1, 8, 6, 0, 0, 0)  # 1x1, 8 bits, RGBA
+    raw = bytes([0, 0, 0, 0, 0])                          # filtro 0 + R0 G0 B0 A0
+    assinatura = bytes([137, 80, 78, 71, 13, 10, 26, 10])  # assinatura PNG
+    return (assinatura + chunk(b"IHDR", ihdr)
+            + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b""))
+
+
+def pixel_do_png(dados):
+    """(R,G,B,A) do unico pixel — usado para PROVAR que o placeholder nao pinta."""
+    i = 8
+    while i < len(dados):
+        ln = struct.unpack(">I", dados[i:i + 4])[0]
+        if dados[i + 4:i + 8] == b"IDAT":
+            bruto = zlib.decompress(dados[i + 8:i + 8 + ln])
+            return tuple(bruto[1:5])
+        i += 12 + ln
+    return None
+
+
+PNG_1X1_TRANSPARENTE = _png_1x1_alfa0()
+if pixel_do_png(PNG_1X1_TRANSPARENTE) != (0, 0, 0, 0):
+    raise SystemExit("placeholder PNG nao esta transparente — abortando")
 
 # GIF 1x1 transparente (43 bytes) — mesmo papel, para as referencias .gif
 GIF_1X1_TRANSPARENTE = base64.b64decode(

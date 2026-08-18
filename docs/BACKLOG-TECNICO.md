@@ -105,13 +105,12 @@
 
 ## Classe C — espera dado ou decisão de terceiro
 
-### C1. `foundingDate` no schema — **Felipe**
-- Ficou **fora** do JSON-LD porque não é dado publicado, e a regra do próprio handoff é "campo
-  inventado é pior que campo ausente".
-- **A ambiguidade é real e está no site:** a página Nossa História diz "Desde 2013", e a linha do
-  tempo diz que em **2012** nasceu a *Portas Consulting Brasil* e em **2013** virou *Mirow & Co.*
-  Qual é a data de fundação da firma?
-- **Não copiar de site de CNPJ** — é justamente a fonte errada que o trabalho GEO quer superar.
+### C1. ~~`foundingDate`~~ — RESOLVIDO em 18/08
+- O Mario confirmou: **12/04/2012**. Está no schema como `"foundingDate": "2012-04-12"`, e a
+  S149 passou a **exigir** o valor (antes ela proibia o campo, por não ser dado publicado).
+- `foundingLocation` **continua Rio de Janeiro** — a firma nasceu lá em 2012 como *Portas
+  Consulting Brasil*, e a Nossa História do site diz isso. É o campo que explica as menções ao
+  Rio sem afirmar sede no Rio.
 
 ### C2. Elmar Gans no schema — **Felipe**
 - Deixado fora de propósito ("há mudança de situação em curso"). Ele **continua** na listagem de
@@ -126,13 +125,20 @@
 - Saiu do hero porque **estourava a dobra exata em 31px** (medido pelos checks V01–V03 e V30).
 - É mudança de posicionamento, então segue o fluxo: staging → OK do Andreas → produção.
 
-### C5. Endereço da sede — **Felipe/Andreas**
-- O schema publica `Rua Lauro Müller, 116 — sala 1504, Rio de Janeiro, RJ, 22290-160`, que veio
-  do handoff.
-- **Dois pontos a confirmar antes de virar verdade oficial:** (a) a sala 1504 está atual? (b) o
-  snippet antigo do Google, ainda em cache, mostrava também um endereço em **São Paulo**
-  (Ibirapuera 2033, cj 133) — existe operação em SP? O schema declara só o Rio, e o Google
-  Business que o Mario está criando precisa refletir a mesma coisa.
+### C5. Endereço da sede — CORRIGIDO em 18/08, com duas pendências
+- **Fato novo do Mario:** o escritório é **Av. Ibirapuera, 2033 — conjunto 133, São Paulo/SP**.
+  **Não existe mais escritório no Rio**, mas o **CNPJ do Rio continua ativo**.
+- Corrigido no schema das 3 listagens, na descrição da Organization e na `meta description` das
+  3 homes (`tools_onda6/119_sede_sao_paulo.py`). A S149 agora **cobra** São Paulo/SP.
+- **Pendência 1 — CEP.** Saiu do schema: o Mario não passou o CEP novo e a regra é não inventar
+  (o antigo, 22290-160, era do Rio). Uma linha para reinserir quando ele passar.
+- **Pendência 2 — política de privacidade (pt/en/de).** Ali o endereço é o **legal**, amarrado ao
+  CNPJ ("inscrita no CNPJ sob o n° 15.353.236/0001-89, com endereço na Rua Lauro Müller, 116,
+  sala 1504, Rio de Janeiro/RJ"). Como o CNPJ do Rio segue ativo, **não** foi alterado — mudar
+  texto jurídico é decisão do Mario/jurídico, não conserto de conteúdo.
+- **Achado colateral:** `en/press/` e `de/presse/` carregam esse mesmo parágrafo de privacidade,
+  e o `pt/imprensa/` **não**. Provável resíduo do molde da onda 29 (a mesma origem do bug de
+  `hreflang` que a onda 33b consertou). Vale uma limpeza.
 
 ### C6. Nome dos 6 selos de reconhecimento — **Mario**
 - O `alt` deles foi escrito lendo o que está **dentro de cada imagem** (não deduzido do nome do

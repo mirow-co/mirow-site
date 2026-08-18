@@ -35,6 +35,10 @@ ORG_DESC = {
            u"Sourcing und Einkauf. Betreut Kunden auf Portugiesisch, Englisch und Deutsch."),
 }
 
+ESCRITORIO_NOME = {"pt": u"Escritório São Paulo",
+                   "en": u"São Paulo office",
+                   "de": u"Büro São Paulo"}
+
 HOME = {"pt": "https://mirow.com.br/pt/", "en": "https://mirow.com.br/en/", "de": "https://mirow.com.br/de/"}
 
 # constantes do handoff do Felipe (por pessoa, idioma-invariantes exceto traducao)
@@ -103,6 +107,27 @@ def montar(lang, cards):
             "https://www.instagram.com/mirowandco",
         ],
         "founder": {"@id": "https://mirow.com.br/pt/lider/andreas-mirow/#person"},
+        # Onda 60b — os tres fatos que o Mario deu em 18/08:
+        #  - a SEDE (assento juridico, CNPJ 15.353.236/0001-89 ativo) segue no RIO, e e
+        #    ela que fica no `address` e no que a descricao afirma;
+        #  - o ESCRITORIO onde o time trabalha e em SAO PAULO, e entra como `location`
+        #    (Place), que e como o schema.org diz "onde a organizacao esta" sem
+        #    sobrescrever o assento juridico;
+        #  - fundacao em 12/04/2012. `foundingLocation` fica no Rio porque a firma
+        #    nasceu la como Portas Consulting Brasil, o que a Nossa Historia do site diz.
+        "location": {
+            "@type": "Place",
+            "name": ESCRITORIO_NOME[lang],
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": u"Av. Ibirapuera, 2033 — conjunto 133",
+                "addressLocality": u"São Paulo",
+                "addressRegion": "SP",
+                "postalCode": "04029-100",
+                "addressCountry": "BR",
+            },
+        },
+        "foundingDate": "2012-04-12",
         "foundingLocation": {"@type": "Place", "name": "Rio de Janeiro, Brasil"},
     }]
     for nome, paginas in PAGINAS.items():
@@ -139,8 +164,13 @@ def main(raiz):
                 raise SystemExit(u"dados incompletos para %s em %s" % (nome, lang))
         bloco = json.dumps(montar(lang, cards), ensure_ascii=False, indent=1)
         tag = '<script type="application/ld+json" id="onda59-geo">%s</script>\n' % bloco
-        novo = INI_RE.sub("", h)
-        novo = novo.replace("</head>", tag + "</head>", 1)
+        # Substituir NO LUGAR quando a tag ja existe. Remover-e-anexar nao serve: o
+        # 112 tambem insere antes de </head>, e os dois passavam a brigar pela ultima
+        # posicao — cada run empurrava o outro e nenhum era idempotente.
+        if INI_RE.search(h):
+            novo = INI_RE.sub(lambda _m: tag, h, count=1)
+        else:
+            novo = h.replace("</head>", tag + "</head>", 1)
         if novo != h:
             mod.gravar(p, novo)
             mudancas += 1
