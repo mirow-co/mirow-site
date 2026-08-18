@@ -137,9 +137,17 @@ def main(raiz):
                 h = f.read()
             o = h
             for antigo_rel, (novo_rel, dim) in trocas.items():
-                if antigo_rel not in h:
+                esc_antigo = antigo_rel.replace("/", chr(92) + "/")
+                # o guarda testa AS DUAS formas. Testando so a normal, as paginas cujo
+                # unico resto era o JSON-LD escapado eram puladas antes da troca.
+                if antigo_rel not in h and esc_antigo not in h:
                     continue
+                # duas formas: o caminho normal e o ESCAPADO do JSON-LD do Yoast
+                # ("\/wp-content\/uploads\/..."), que um replace simples nao pega.
+                # Sem isto o schema seguia apontando para o PNG enquanto a pagina
+                # mostrava o WebP — e o PNG ficava preso no espelho so por causa disso.
                 h = h.replace(antigo_rel, novo_rel)
+                h = h.replace(esc_antigo, novo_rel.replace("/", chr(92) + "/"))
             if h != o:
                 with io.open(fp, "w", encoding="utf-8", newline="") as f:
                     f.write(h)
