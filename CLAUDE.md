@@ -260,6 +260,18 @@ Backlog aberto: issues `site-onda` (S-01..S-19) no `mirow-co/mirow-marketing`.
    mais importante da suíte. É o erro que mais passou desapercebido aqui.
 9. Editar CSS/JS de asset e **não incrementar a `VERSAO`** do cache busting: o navegador serve o
    arquivo velho e a correção "não funciona" no ar (a onda 35 quase publicou assim).
+10. **Regex de markup próprio com a tag literal (`<h4>`), sem tolerar atributo novo.** Na onda 60
+    isto quebrou **três coisas de uma vez**, todas porque um `aria-level="3"` entrou no `<h4>`:
+    o reconhecedor de card do `06_quadro_lideres.py` (que então achou que os cards não existiam,
+    trocou os `<button>` por `<div>` e **apagou os 4 modais de bio da home**), a `S128` e a `S101`
+    (que passou a ler o nome do líder como `?`). Escreva `<h4[^>]*>`. A exceção legítima é quando
+    a *ausência* do atributo é justamente o gatilho — o `114_a11y_atributos.py` usa `<h4>` literal
+    de propósito, para não reaplicar o que já aplicou.
+11. **Rodar script de onda inicial isoladamente numa onda nova.** O `06_quadro_lideres.py`
+    reconstrói a região dos líderes e descarta o que ondas posteriores penduraram ali como irmão
+    do card: rodado sozinho em 18/08, apagou os links de LinkedIn da onda 18 (4 → 1). Quem pegou
+    foi a **S50**, no gate. Se precisar rodar, rodar depois dele, na ordem,
+    `68_home_lideres_e_espacos.py` e `105_email_andreas_e_felipe.py`.
 
 ## Governança a cada marco
 

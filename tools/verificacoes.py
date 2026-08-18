@@ -2158,7 +2158,13 @@ def estaticas(s):
         for rel in HOMES:
             hh = s.ler(rel)
             for bloco in re.findall(r'<div class="onda18-lider.*?</div>', hh, re.S):
-                mn = re.search(r'<h4>([^<]*)</h4>', bloco)
+                # `<h4[^>]*>` e nao `<h4>`: a onda 60 escreveu <h4 aria-level="3"> nos
+                # cards, e a versao literal deixava o nome como "?" — o que fazia esta
+                # assercao acusar "nao devia ter e-mail" para um card que estava certo.
+                # Terceira vez que a mesma classe apareceu na sessao de 18/08 (as outras
+                # foram o reconhecedor do 06_quadro_lideres.py e a S128): regex de
+                # markup PROPRIO tolera atributo novo na tag.
+                mn = re.search(r'<h4[^>]*>([^<]*)</h4>', bloco)
                 nome = mn.group(1).strip() if mn else "?"
                 tem = "onda26-lider__mail" in bloco
                 if nome in esperado:
