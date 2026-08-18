@@ -38,6 +38,7 @@ REGRAS
 3. Asserção tem que falhar por um motivo legível. Mensagem diz o que se esperava
    e o que se achou.
 """
+import hashlib
 import io
 import json
 import os
@@ -241,7 +242,8 @@ ETAPAS = {
     "S149": ("schema",), "S150": ("schema",), "S152": ("schema",),
     # --- assets referenciados (existencia, peso, dimensao, placeholder) ---
     "S123": ("asset",), "S153": ("asset", "texto"), "S157": ("asset", "css"),
-    "S159": ("asset",), "E": ("asset",),
+    "S159": ("asset",), "S160": ("asset",), "S161": ("asset",),
+    "S162": ("asset",), "E": ("asset",),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -1562,6 +1564,82 @@ def estaticas(s):
         return (not det, u"%d webp referenciado(s); %s"
                 % (len(webps), u"; ".join(det[:4]) or u"todos resolvem, nenhum PNG/SVG velho"))
     s.check("S161", u"imagens convertidas: só WebP referenciado e existente (onda 61)", s161)
+
+    def s162():
+        # Onda 62 (vídeo). A S160 e a varredura de órfãs da onda 61 só olham extensão
+        # de IMAGEM — então 185 MB de MP4 nunca foram vistos: 87 MB que NENHUMA página
+        # pedia e 49 MB de cópia byte-idêntica de arquivo em uso. `public/` caiu de
+        # 262 MB para 132 MB removendo isso, sem mudar um pixel.
+        #
+        # Esta asserção cobra a CLASSE, não os 5 arquivos daquela limpeza:
+        #   (a) nenhum vídeo/áudio órfão — ninguém referencia, nem por caminho nem por nome
+        #   (b) nenhum par de vídeos byte-a-byte idênticos (md5), mesmo os dois em uso
+        #   (c) todo <source>/<video> referenciado resolve num arquivo que existe
+        #
+        # Por que md5 e não tamanho: dois arquivos de mesmo peso podem ser cortes
+        # diferentes; o que autoriza consolidar é o conteúdo ser o MESMO.
+        MIDIA = (".mp4", ".webm", ".mov", ".m4v", ".ogv", ".mp3", ".wav")
+        det = []
+
+        textos = []
+        for dp, _d, fs in os.walk(pub):
+            if os.sep + ".git" in dp:
+                continue
+            for nome in fs:
+                if nome.endswith((".html", ".css", ".js", ".xml", ".txt", ".json")):
+                    with io.open(os.path.join(dp, nome), encoding="utf-8",
+                                 errors="ignore") as f:
+                        textos.append(f.read())
+        tudo = chr(10).join(textos)
+
+        achados = []
+        for dp, _d, fs in os.walk(pub):
+            if os.sep + ".git" in dp:
+                continue
+            for nome in fs:
+                if nome.lower().endswith(MIDIA):
+                    fp = os.path.join(dp, nome)
+                    achados.append((os.path.relpath(fp, pub).replace(os.sep, "/"),
+                                    fp, os.path.getsize(fp)))
+
+        # (a) órfãos
+        for rel, fp, tam in achados:
+            nome = rel.split("/")[-1]
+            if rel not in tudo and nome not in tudo:
+                det.append(u"órfão %s (%.1f MB)" % (nome, tam / 1048576.0))
+
+        # (b) idênticos
+        porhash = {}
+        for rel, fp, tam in achados:
+            h = hashlib.md5()
+            with open(fp, "rb") as f:
+                for bloco in iter(lambda: f.read(1 << 20), b""):
+                    h.update(bloco)
+            porhash.setdefault(h.hexdigest(), []).append((rel, tam))
+        for h, grupo in porhash.items():
+            if len(grupo) > 1:
+                det.append(u"%d cópias idênticas de %s (%.1f MB desperdiçados)"
+                           % (len(grupo), grupo[0][0].split("/")[-1],
+                              grupo[0][1] * (len(grupo) - 1) / 1048576.0))
+
+        # (c) referência resolve
+        pedidos = set()
+        for rel, h in s.todas():
+            for m in re.finditer(r'<(?:source|video|audio)\b[^>]*?src="([^"]+)"', h):
+                ref = m.group(1).split("?")[0]
+                if ref.lower().endswith(MIDIA):
+                    pedidos.add(ref)
+        for ref in sorted(pedidos):
+            r = ref[len("/mirow-site/"):] if ref.startswith("/mirow-site/") else ref.lstrip("/")
+            if not os.path.exists(os.path.join(pub, r.replace("/", os.sep))):
+                det.append(u"%s referenciado e ausente no disco" % ref.split("/")[-1])
+
+        peso = sum(t for _r, _f, t in achados)
+        return (not det, u"%d arquivo(s) de mídia, %.1f MB, %d referência(s); %s"
+                % (len(achados), peso / 1048576.0, len(pedidos),
+                   u"; ".join(det[:4]) or u"nenhum órfão, nenhuma cópia idêntica"))
+    s.check("S162", u"vídeo: nenhum órfão, nenhuma cópia idêntica, referência resolve (onda 62)",
+            s162)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado

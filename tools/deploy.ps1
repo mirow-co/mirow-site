@@ -188,6 +188,28 @@ try {
         }
         Write-Host 'CONFIRME AO VIVO antes de dizer NO AR:' -ForegroundColor Green
         Write-Host '  https://mirow.com.br/pt/ (dominio custom; staging github.io redireciona)' -ForegroundColor Green
+
+        # INVARIANTE DO STAGING (regra do Mario, 18/08/2026): staging nunca fica ATRAS
+        # da producao. Aqui nao se publica staging automaticamente -- pode haver coisa
+        # pendente de OK naquele branch -- mas nao se sai daqui sem SABER que ficou atras.
+        # Medido em 18/08: staging em v=64 contra producao em v=69, cinco ondas atras.
+        try {
+            $rxV = 'onda6\.css\?v=(\d+)'
+            $prod = (Invoke-WebRequest -Uri 'https://mirow.com.br/pt/' -UseBasicParsing -TimeoutSec 25).Content
+            $stag = (Invoke-WebRequest -Uri 'https://staging.mirow.com.br/pt/' -UseBasicParsing -TimeoutSec 25).Content
+            $vp = [int]([regex]::Match($prod, $rxV).Groups[1].Value)
+            $vs = [int]([regex]::Match($stag, $rxV).Groups[1].Value)
+            Write-Host ("Versao ao vivo: producao v=" + $vp + " | staging v=" + $vs)
+            if ($vs -lt $vp) {
+                Write-Host ''
+                Write-Host ('ATENCAO: staging (v=' + $vs + ') esta ATRAS da producao (v=' + $vp + ').') -ForegroundColor Red
+                Write-Host 'Regra do repo: staging no minimo igual a producao. Republique:' -ForegroundColor Red
+                Write-Host '  powershell -NoProfile -ExecutionPolicy Bypass -File tools/deploy-staging.ps1' -ForegroundColor Red
+            }
+        }
+        catch {
+            Write-Host ('Nao consegui comparar staging x producao: ' + $_.Exception.Message) -ForegroundColor Yellow
+        }
     }
     finally {
         Remove-Item Env:\GIT_INDEX_FILE -ErrorAction SilentlyContinue
