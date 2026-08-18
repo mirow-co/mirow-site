@@ -930,6 +930,147 @@ def estaticas(s):
         return (not det, u"%d bloco(s); %s" % (len(inis), "; ".join(det[:3]) or u"todos bem formados"))
     s.check("S148", u"blocos marcados do onda6.css bem formados e sem duplicata", s148)
 
+    GEO_LISTAGENS = {"pt": "pt/sobre-nos/lideres/index.html",
+                     "en": "en/about-us/leaders/index.html",
+                     "de": "de/ueber-uns/fuehrungskraefte/index.html"}
+    GEO_LIDERES = [u"Andreas Mirow", u"Felipe Diniz", u"Stephan Friedrich",
+                   u"Renato Alvarenga", u"Michael Munch", u"Raoni Morais"]
+
+    def s149():
+        # #230 (GEO): o bloco JSON-LD dos líderes tem de PARSEAR (não basta a
+        # string existir), ter Organization + exatamente 6 Person, cada Person
+        # com sameAs de LinkedIn e url resolvendo para página que EXISTE no
+        # disco (padrão S123: resolver a referência). Elmar e João Daniel FORA
+        # por decisão do Felipe; foundingDate FORA porque não é dado publicado.
+        det = []
+        for lang, rel in GEO_LISTAGENS.items():
+            h = s.ler(rel)
+            m = re.search(r'<script type="application/ld\+json" id="onda59-geo">'
+                          r'(.*?)</script>', h, re.S)
+            if not m:
+                det.append(u"%s: bloco onda59-geo ausente" % lang)
+                continue
+            try:
+                g = json.loads(m.group(1))["@graph"]
+            except (ValueError, KeyError) as e:
+                det.append(u"%s: JSON inválido (%s)" % (lang, e))
+                continue
+            pessoas = [n for n in g if n.get("@type") == "Person"]
+            orgs = [n for n in g if n.get("@type") != "Person"]
+            if len(pessoas) != 6 or len(orgs) != 1:
+                det.append(u"%s: %d Person / %d Organization (esperado 6/1)"
+                           % (lang, len(pessoas), len(orgs)))
+            if "foundingDate" in m.group(1) or "__PREENCHER" in m.group(1):
+                det.append(u"%s: campo não-publicado no ar" % lang)
+            nomes = u" ".join(p.get("name", "") for p in pessoas)
+            for fora in (u"Elmar", u"Daniel Ramos"):
+                if fora in nomes:
+                    det.append(u"%s: %s entrou no schema sem decisão do Felipe" % (lang, fora))
+            for p in pessoas:
+                nome = p.get("name", "?")
+                same = p.get("sameAs") or []
+                if not any("linkedin.com/in/" in x for x in same):
+                    det.append(u"%s: %s sem LinkedIn no sameAs" % (lang, nome))
+                url = p.get("url", "")
+                alvo = url.replace("https://mirow.com.br/", "").strip("/")
+                fp = os.path.join(pub, alvo.replace("/", os.sep), "index.html")
+                if not alvo or not os.path.exists(fp):
+                    det.append(u"%s: url de %s não resolve no disco (%s)" % (lang, nome, url))
+                elif "http-equiv=\"refresh\"" in s.ler(alvo + "/index.html"):
+                    det.append(u"%s: url de %s aponta para stub redirect" % (lang, nome))
+        return (not det, u"; ".join(det[:4]) or u"3 línguas: 6 Person válidos, urls resolvem")
+    s.check("S149", u"JSON-LD GEO: 6 líderes parseáveis, LinkedIn e url no disco (#230)", s149)
+
+    def s150():
+        # #232 (GEO): meta description presente, não-vazia e ÚNICA nas homes e
+        # listagens de líderes; a da home pt é o texto do Felipe verbatim.
+        FELIPE = (u"Mirow & Co. — consultoria estratégica brasileira, sede no Rio de "
+                  u"Janeiro. Estratégia, inovação, pricing e compras para empresas de "
+                  u"grande porte. Atendimento em português, inglês e alemão.")
+        PAGS = ["pt/index.html", "en/index.html", "de/index.html"] + list(GEO_LISTAGENS.values())
+        det = []
+        for rel in PAGS:
+            h = s.ler(rel)
+            tags = re.findall(r'<meta name="description" content="([^"]*)"', h)
+            if len(tags) != 1:
+                det.append(u"%s: %d meta description (esperado 1)" % (rel, len(tags)))
+            elif len(tags[0].strip()) < 50:
+                det.append(u"%s: description curta/vazia" % rel)
+            elif rel == "pt/index.html" and tags[0] != FELIPE:
+                det.append(u"home pt: texto difere do sugerido pelo Felipe")
+        return (not det, u"; ".join(det[:4]) or u"6 páginas com description única")
+    s.check("S150", u"meta description nas homes e listagens de líderes (#232)", s150)
+
+    def s151():
+        # #231 (GEO): o slug numérico do Michael. Efeito medido: a página nova
+        # existe e é canônica de si mesma; a 591 é stub noindex; e NENHUM outro
+        # arquivo servido referencia a 591 (padrão S107: zero clique de 2 saltos,
+        # sitemap limpo).
+        det = []
+        novo = s.ler("pt/lider/michael-munch/index.html")
+        if 'rel="canonical" href="https://mirow.com.br/pt/lider/michael-munch/"' not in novo:
+            det.append(u"michael-munch sem canonical próprio")
+        if "http-equiv=\"refresh\"" in novo:
+            det.append(u"michael-munch é redirect, não conteúdo")
+        velho = s.ler("pt/lider/591/index.html")
+        if "noindex" not in velho or "url=/pt/lider/michael-munch/" not in velho:
+            det.append(u"591 não é stub noindex para o slug novo")
+        sujos = []
+        for dp, _d, fs in os.walk(pub):
+            for nome in fs:
+                if not nome.lower().endswith((".html", ".xml")):
+                    continue
+                fp = os.path.join(dp, nome)
+                rel = os.path.relpath(fp, pub).replace(os.sep, "/")
+                if rel == "pt/lider/591/index.html":
+                    continue
+                with io.open(fp, encoding="utf-8", errors="ignore") as f:
+                    if "pt/lider/591/" in f.read():
+                        sujos.append(rel)
+        if sujos:
+            det.append(u"%d arquivo(s) ainda referenciam 591: %s"
+                       % (len(sujos), ", ".join(sujos[:3])))
+        return (not det, u"; ".join(det[:3]) or u"slug novo canônico, 591 stub, 0 referência")
+    s.check("S151", u"slug do Michael: michael-munch canônico, 591 stub sem links (#231)", s151)
+
+    def s152():
+        # #233 (GEO): as páginas individuais dos 6 líderes têm cargo + bio +
+        # LinkedIn — e a bio BATE com o card da listagem do idioma (recalcular
+        # e comparar, padrão S116/S120: a listagem é a fonte única).
+        det = []
+        for lang, rel in GEO_LISTAGENS.items():
+            h = s.ler(rel)
+            cards = re.findall(r'<button class="page-leaders__list-item".*?</button>', h, re.S)
+            bios = {}
+            for card in cards:
+                mt = re.search(r'page-leaders__list-title">(.*?)<small', card, re.S)
+                mb = re.search(r'content-summary">(.*?)</ul>', card, re.S)
+                if mt and mb:
+                    nome = re.sub(r"<[^>]+>", "", mt.group(1)).replace("Private:", "").strip()
+                    li = re.findall(r"<li>(.*?)</li>", mb.group(1), re.S)
+                    bios[nome] = re.sub(r"<[^>]+>", "", li[0]).strip() if li else ""
+            m = re.search(r'id="onda59-geo">(.*?)</script>', h, re.S)
+            pessoas = json.loads(m.group(1))["@graph"][1:] if m else []
+            for p in pessoas:
+                url = p.get("url", "").replace("https://mirow.com.br/", "").strip("/")
+                try:
+                    ind = s.ler(url + "/index.html")
+                except IOError:
+                    det.append(u"%s: página de %s ausente" % (lang, p.get("name")))
+                    continue
+                m2 = re.search(r"onda59:geo-bio:ini(.*?)onda59:geo-bio:fim", ind, re.S)
+                if not m2:
+                    det.append(u"%s: %s sem bloco de bio" % (lang, p.get("name")))
+                    continue
+                bloco = m2.group(1)
+                if "onda59-cargo" not in bloco or "linkedin.com/in/" not in bloco:
+                    det.append(u"%s: %s sem cargo ou LinkedIn" % (lang, p.get("name")))
+                nome_card = [n for n in bios if n.split()[0] in p.get("name", "")]
+                if nome_card and bios[nome_card[0]] and bios[nome_card[0]] not in bloco:
+                    det.append(u"%s: bio de %s diverge da listagem" % (lang, p.get("name")))
+        return (not det, u"; ".join(det[:4]) or u"18 páginas com cargo+bio+LinkedIn da listagem")
+    s.check("S152", u"páginas individuais de líder com cargo, bio e LinkedIn (#233)", s152)
+
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
         # privado) e não pode aparecer em página nenhuma; o Elmar é Senior
