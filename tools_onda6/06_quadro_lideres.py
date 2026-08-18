@@ -21,6 +21,16 @@ Composicao decidida pelo Mario (30/07), em todas as linguas:
   mesmo markup do tema (sem modal, porque nao existe modal para ele naquela pagina).
 - Idempotente: reconstroi sempre a mesma sequencia.
 - Modais orfaos de quem saiu ficam no HTML (invisiveis) — nada de imagem apagada.
+
+!!! PERIGO DE ORDEM — NAO RODAR ESTE SCRIPT ISOLADO EM ONDA NOVA !!!
+Este e script de onda INICIAL: ele RECONSTROI a regiao dos lideres a partir dos cards
+que encontra, e nesse processo descarta o que ondas POSTERIORES penduraram ali como
+IRMAO do card (fora do <button>). Rodado sozinho em 18/08/2026 (onda 60), apagou os
+links `<a class="onda18-lider__in">` de LinkedIn que o 68_home_lideres_e_espacos.py
+havia adicionado na onda 18: a home ficou com 4 cards e 1 link. Quem pegou foi a
+assercao S50, no gate do deploy — funcionou exatamente como devia.
+Se precisar rodar de novo, rodar DEPOIS dele, na ordem, os scripts que tocam a mesma
+regiao: 68_home_lideres_e_espacos.py e 105_email_andreas_e_felipe.py. E conferir a S50.
 """
 import io
 import os
@@ -90,7 +100,12 @@ def idioma_do_caminho(rel):
 
 
 def nome_do_card(bloco):
-    m = re.search(r'<h4>(.*?)</h4>', bloco, re.S)
+    # `<h4[^>]*>` e nao `<h4>`: a onda 60 passou a escrever <h4 aria-level="3"> nos
+    # cards (ordem de cabecalhos do PageSpeed). Com o padrao antigo, este reconhecedor
+    # devolvia None, o gerador achava que o card NAO existia, criava um <div> novo no
+    # lugar do <button> e os 4 modais de bio da home desapareciam em silencio.
+    # Regra: reconhecedor de markup proprio tolera atributo novo na tag.
+    m = re.search(r'<h4[^>]*>(.*?)</h4>', bloco, re.S)
     if not m:
         m = re.search(r'page-leaders__list-title">(.*?)<small', bloco, re.S)
     if not m:
@@ -101,8 +116,12 @@ def nome_do_card(bloco):
 
 
 def card_home_novo(nome, cargo, foto, prefix):
-    return ('<div class="home-leaders__card"><img src="%s%s"><span><h4>%s</h4>'
-            '<p>%s</p></span></div>' % (prefix, foto, nome, cargo))
+    # alt e aria-level: onda 60. O card nascia sem alt (falha de acessibilidade E de
+    # SEO no PageSpeed de 18/08) e com <h4> depois de um <h2>, quebrando a ordem de
+    # cabecalhos. A tag continua h4 porque o CSS do tema estiliza h4 por TAG.
+    return ('<div class="home-leaders__card"><img src="%s%s" alt="%s">'
+            '<span><h4 aria-level="3">%s</h4>'
+            '<p>%s</p></span></div>' % (prefix, foto, nome, nome, cargo))
 
 
 def card_pagina_novo(nome, cargo, foto, prefix):

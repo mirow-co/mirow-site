@@ -1071,6 +1071,183 @@ def estaticas(s):
         return (not det, u"; ".join(det[:4]) or u"18 páginas com cargo+bio+LinkedIn da listagem")
     s.check("S152", u"páginas individuais de líder com cargo, bio e LinkedIn (#233)", s152)
 
+    def s153():
+        # Onda 60 (PageSpeed 18/08). O relatório citou 4 <img> sem alt; esta asserção
+        # cobra a CLASSE, não os 4 casos: nenhuma imagem de conteúdo sem alt, em
+        # nenhuma das páginas. alt="" é permitido (decorativa declarada) — o que não
+        # se aceita é o atributo AUSENTE, que é o que o Lighthouse acusa.
+        det = []
+        total = 0
+        for rel, h in s.todas():
+            for m in re.finditer(r"<img\b[^>]*>", h):
+                tag = m.group(0)
+                total += 1
+                if not re.search(r'\balt\s*=', tag):
+                    src = re.search(r'src="([^"]*)"', tag)
+                    det.append(u"%s: %s" % (rel, (src.group(1) if src else tag)[:60]))
+        return (not det, u"%d imagens; %s" % (
+            total, u"; ".join(det[:4]) or u"todas com alt"))
+    s.check("S153", u"toda imagem tem atributo alt (PageSpeed, a11y + SEO)", s153)
+
+    def s154():
+        # Onda 60. A logo do <h1> carregava alt="Stratigital" — nome do tema anterior —
+        # em 109 páginas, então o cabeçalho de nível 1 de TODO o site anunciava a marca
+        # errada para robô e leitor de tela. A asserção proíbe a classe: nenhuma marca
+        # alheia em atributo visível. Mesma família do endereço velho no snippet do
+        # Google: dado de terceiro publicado como nosso.
+        ALHEIAS = ("Stratigital", "stratigital")
+        det = [rel for rel, h in s.todas() if any(a in h for a in ALHEIAS)]
+        return (not det, u"%d página(s) com marca alheia%s" % (
+            len(det), (u": " + u", ".join(det[:3])) if det else u" — nenhuma"))
+    s.check("S154", u"nenhuma marca alheia (Stratigital) no HTML", s154)
+
+    def s155():
+        # Onda 60. Botão sem nome acessível é lido como "botão" — era a única falha da
+        # categoria Agentic Browsing (que mede se um agente de IA entende a página), e
+        # falhava no mobile e no desktop. Cobra texto, aria-label ou title em todo
+        # <button> das páginas de conteúdo.
+        det = []
+        for rel, h in s.todas():
+            for m in re.finditer(r"<button\b([^>]*)>(.*?)</button>", h, re.S):
+                attrs, dentro = m.group(1), m.group(2)
+                if "aria-label" in attrs or "title=" in attrs:
+                    continue
+                texto = re.sub(r"<[^>]+>", "", dentro).strip()
+                if texto:
+                    continue
+                # <img alt> ou <svg><title> dentro também dão nome ao botão
+                if re.search(r'<img[^>]*\balt="[^"]+"', dentro) or "<title" in dentro:
+                    continue
+                det.append(u"%s: %s" % (rel, (attrs.strip() or u"<button>")[:50]))
+        return (not det, u"; ".join(det[:4]) or u"todo botão tem nome acessível")
+    s.check("S155", u"todo botão tem nome acessível (PageSpeed / Agentic Browsing)", s155)
+
+    def s156():
+        # Onda 60. Duas folhas de plugin do WordPress eram carregadas nas 109 páginas
+        # sem serem usadas (dashicons 36 KiB e formidableforms 23 KiB), bloqueando o
+        # desenho por ~3 s somados. A asserção mede o EFEITO na página, não a lista de
+        # arquivos: se a folha está declarada, alguma marca de uso dela tem de existir
+        # ali. Impede que outro CSS de plugin volte sorrateiro.
+        FOLHAS = {
+            "dashicons-css": ("dashicons-",),
+            "formidable-css": ("frm_forms", "frm_form_field", "frm-show-form"),
+        }
+        det = []
+        for rel, h in s.todas():
+            for css_id, provas in FOLHAS.items():
+                m = re.search(r"<link[^>]*id='%s'[^>]*>" % re.escape(css_id), h)
+                if not m:
+                    continue
+                sem_tag = h[:m.start()] + h[m.end():]
+                if not any(p in sem_tag for p in provas):
+                    det.append(u"%s carrega %s sem usar" % (rel, css_id))
+        return (not det, u"; ".join(det[:4]) or u"nenhuma folha de plugin carregada sem uso")
+    s.check("S156", u"nenhum CSS de plugin carregado sem uso na página (PageSpeed)", s156)
+
+    def s157():
+        # Onda 60. Generaliza a S123 para DENTRO do CSS: o único erro de console do
+        # relatório era um 404 de texture-7.png, pedido em 22 seletores do tema. A S123
+        # não pegava porque olha o HTML, e a referência morava num url() de CSS.
+        #
+        # Mede o que o NAVEGADOR buscaria, não o que existe num arquivo em disco —
+        # senão acusa referência que ninguém pede. Dois filtros, ambos medidos:
+        #   1. só CSS que alguma página realmente carrega (o dashicons.min.css ficou
+        #      órfão nesta onda: continua no disco, e nenhuma página o pede);
+        #   2. só regra cujo seletor tem chance de casar — se nenhuma das classes do
+        #      seletor aparece em página nenhuma, aquela regra nunca é aplicada e o
+        #      url() dela nunca é buscado (caso do chosen-sprite e dos mundi-*.jpg,
+        #      restos de componentes que o espelho não tem).
+        # LIMITE DECLARADO: classe criada em tempo de execução por JS (ex.: frm_message,
+        # que o plugin de formulário insere depois do envio) não aparece no HTML
+        # estático, então cai no filtro 2 e não é coberta aqui.
+        linkados = set()
+        classes_html = set()
+        for _rel, h in s.todas():
+            for m in re.finditer(r'<link[^>]+href=[\'"]([^\'"]+\.css)[^\'"]*[\'"]', h):
+                linkados.add(m.group(1).split("?")[0].lstrip("/"))
+            for m in re.finditer(r'class=[\'"]([^\'"]+)[\'"]', h):
+                classes_html.update(m.group(1).split())
+        det = []
+        checados = 0
+        for ref_css in sorted(linkados):
+            fp = os.path.join(pub, ref_css.replace("/", os.sep))
+            if not os.path.exists(fp):
+                det.append(u"CSS linkado não existe: %s" % ref_css)
+                continue
+            with io.open(fp, encoding="utf-8", errors="ignore") as f:
+                css = f.read()
+            # tira comentários: `texture-7` aparecia num comentário do onda6.css e um
+            # grep ingênuo o tomou por declaração viva
+            css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+            base = os.path.dirname(fp)
+            for m in re.finditer(r"""url\(\s*['"]?([^'")]+)['"]?\s*\)""", css):
+                ref = m.group(1).strip().split("?")[0].split("#")[0]
+                if (not ref or ref.startswith("data:") or ref.startswith("http")
+                        or ref.startswith("//")):
+                    continue
+                # O seletor da regra é o texto ENTRE a fronteira anterior e a chave que
+                # abre o bloco onde o url() está. Retroceder só até o `}` anterior erra
+                # dentro de @media: pega a linha do media query em vez do seletor.
+                abre = css.rfind("{", 0, m.start())
+                if abre < 0:
+                    seletor = ""
+                else:
+                    ini = max(css.rfind("}", 0, abre), css.rfind("{", 0, abre)) + 1
+                    seletor = css[ini:abre]
+                # Um seletor pode ser uma LISTA (a, b, c). Cada grupo casa só se TODAS
+                # as classes dele existirem no HTML; a regra é alcançável se ALGUM grupo
+                # casar. Testar a união das classes seria permissivo demais: em
+                # `.menu__nav-submenu>div.tab_nossarede` a primeira classe existe e a
+                # segunda não, e o navegador nunca aplica essa regra.
+                grupos = [g for g in seletor.split(",") if g.strip()]
+                if grupos:
+                    alcancavel = False
+                    for g in grupos:
+                        cls = set(re.findall(r"\.([A-Za-z0-9_-]+)", g))
+                        if not cls or cls <= classes_html:
+                            alcancavel = True
+                            break
+                    if not alcancavel:
+                        continue  # nenhuma variante do seletor casa: nada a buscar
+                checados += 1
+                if ref.startswith("/"):
+                    alvo = os.path.join(pub, ref.lstrip("/").replace("/", os.sep))
+                else:
+                    alvo = os.path.normpath(os.path.join(base, ref.replace("/", os.sep)))
+                if not os.path.exists(alvo):
+                    det.append(u"%s pede %s (não existe)" % (ref_css, ref[:44]))
+        vistos, unicos = set(), []
+        for d in det:
+            if d not in vistos:
+                vistos.add(d)
+                unicos.append(d)
+        return (not unicos, u"%d url() alcançáveis em %d CSS; %s" % (
+            checados, len(linkados), u"; ".join(unicos[:3]) or u"todas resolvem no disco"))
+    s.check("S157", u"todo url() alcançável de CSS resolve no disco (404 no console)", s157)
+
+    def s158():
+        # Onda 60, e esta nasceu de um bug MEU. Ao escrever <h4 aria-level="3"> nos
+        # cards, o reconhecedor do 06_quadro_lideres.py (`<h4>(.*?)</h4>`) deixou de
+        # casar, o gerador concluiu que os cards não existiam, trocou os <button> por
+        # <div> e os 4 modais de bio da home sumiram sem ninguém ver. A asserção mede o
+        # EFEITO no HTML: os cards de líder da home continuam sendo botões que abrem um
+        # modal que existe na própria página.
+        det = []
+        for rel in ("pt/index.html", "en/index.html", "de/index.html"):
+            h = s.ler(rel)
+            botoes = re.findall(r'<button class="home-leaders__card"[^>]*'
+                                r'data-bs-target="#(modal_[^"]+)"', h)
+            divs = len(re.findall(r'<div class="home-leaders__card"', h))
+            if len(botoes) != 4:
+                det.append(u"%s: %d card(s) com modal (esperado 4)" % (rel, len(botoes)))
+            if divs:
+                det.append(u"%s: %d card(s) viraram <div> sem modal" % (rel, divs))
+            for mid in botoes:
+                if ('id="%s"' % mid) not in h:
+                    det.append(u"%s: card aponta para %s inexistente" % (rel, mid))
+        return (not det, u"; ".join(det[:4]) or u"12 cards de líder abrem modal nas 3 homes")
+    s.check("S158", u"cards de líder da home continuam abrindo modal de bio", s158)
+
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
         # privado) e não pode aparecer em página nenhuma; o Elmar é Senior
@@ -2589,7 +2766,12 @@ def estaticas(s):
                 "de/index.html": u"Strategie &amp; Innovation"}
         det = []
         for rel, txt in alvo.items():
-            if ('icon-strategy.svg"><span>%s</span>' % txt) not in s.ler(rel):
+            # `[^>]*` entre o src e o `>`: a onda 60 pôs alt="" no ícone (imagem
+            # decorativa), e a versão literal desta asserção quebrou o deploy por
+            # motivo certo e alvo errado — o texto da caixinha nunca mudou. O que
+            # importa é o ícone de estratégia estar colado no rótulo certo.
+            if not re.search(r'icon-strategy\.svg"[^>]*><span>%s</span>' % re.escape(txt),
+                             s.ler(rel)):
                 det.append(u"%s sem '%s'" % (rel, txt))
         return (not det, u"; ".join(det))
     s.check("S128", u'caixinha de expertise é "Estratégia e Inovação" nas 3 homes (#187)',
