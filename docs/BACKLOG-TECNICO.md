@@ -158,33 +158,57 @@
 
 ---
 
-## Classe D — dá para fazer, ficou para a onda 61
+## Classe D — onda 61, FEITA em 18/08
 
-### D1. Dois SVG de logo de cliente absurdamente pesados
-- **Medido no disco:** `clientes/edp.svg` tem **414 KB** e contém uma imagem `base64` embutida —
-  é bitmap disfarçado de vetor. `clientes/mercedes-benz.svg` tem **301 KB** de vetor real, com
-  traçado não otimizado. Para comparação, o da Suzano e o da Klabin têm 2 KB.
-- **Precisa de asset:** refazer, não recomprimir. Mesmo tipo de caça da onda 41 — pede agentes em
-  paralelo (Wikimedia, sites oficiais, archive.org).
+### D1–D3. ~~Imagens~~ — RESOLVIDO
+- **`clientes/edp.svg` 414 KB → `edp.webp` 35 KB.** Não era vetor: eram **quatro bitmaps
+  embutidos** em base64 sobre clipPath/gradiente, para um logo exibido a **81×30 px**.
+- **`clientes/mercedes-benz.svg` 298 KB → `mercedes-benz.webp` 17 KB.** Vetor de verdade, mas
+  **489 paths e 160 KB só de coordenadas** para exibir 119×30.
+- **4 fotos de líder e 6 selos → WebP**, e `taesa.png` → WebP: 658 KB → 110 KB.
+- **181 imagens órfãs removidas (25,9 MB)** — nenhuma página, CSS ou JS as referenciava. Peso
+  morto herdado do WordPress.
+- **Total: ~27,5 MB a menos no espelho**, sendo ~1,1 MB no que a home baixa.
 
-### D2. WebP nas fotos e nos selos
-- 330 KiB de economia declarada. As 4 fotos de líder da home somam 275 KB em PNG (238 KB de
-  economia); os 6 selos somam o resto.
+**A lição que custou mais tempo — dimensão de raster e reflow sub-pixel.** Ao trocar SVG por
+WebP eu usei "3× o tamanho exibido" (edp: 243×90). A largura renderizada caiu de **81,38 para
+81,00 px**, porque depois do load quem define a caixa é o **aspecto real do arquivo** — os
+atributos `width`/`height` do HTML são só dica de pré-load. Como a fileira de logos é
+**centrada**, os 0,38px se redistribuíram e **7 logos que eu nunca toquei** mudaram de
+antialiasing (2,25% dos pixels da barra). Conserto: gerar o raster na **razão exata** do
+original, dividindo pelo máximo divisor comum (edp 3426×1263 → **1142×421**; mercedes 1400×354 →
+**700×177**; taesa tem gcd 1, então ficou no tamanho original, só trocou de formato). Depois
+disso o diff caiu para **0,27%**, confinado aos dois logos realmente trocados.
 
-### D3. `taesa.png` servido maior que o exibido
-- Único caso do relatório: servido em **400×147** para ser exibido em **114×42**.
+**O preço dessa escolha:** `edp.webp` tem 1142×421 para exibir 81×30 — 14× maior em pixels do que
+o necessário, porque é a menor dimensão com a razão exata. Em bytes são 35 KB (contra 414 KB), o
+que é o que importa na transferência. Se algum dia valer os 29 KB, dá para usar 244×90 aceitando
+um reflow de 0,04px.
 
-### D4. Asserção que falta escrever
-- "Nenhuma imagem servida maior que o exibido" — exige medir no navegador
-  (`naturalWidth` vs `getBoundingClientRect`). Faz sentido junto da onda 61, quando as imagens
-  forem tratadas.
+### D4. ~~Asserção de imagem maior que o exibido~~ — substituída por algo melhor
+A **S160** cobra dois invariantes que valem mais: **nenhuma imagem que a home pede passa de
+120 KB**, e **nenhuma imagem órfã acima de 120 KB** (impede os 25,9 MB de voltarem).
 
-### D5. Duas tarefas longas nossas
-- `onda8-dobra.js` (99 ms) e `onda17-horizonte.js` (81 ms no mobile, 57 no desktop) aparecem na
-  lista de *long tasks* dos dois relatórios. Não são o gargalo, mas são **nossos** — diferente do
-  bundle, dá para mexer sem tocar no tema.
+### D5. Duas tarefas longas nossas — em aberto
+`onda8-dobra.js` (99 ms) e `onda17-horizonte.js` (81 ms mobile / 57 ms desktop) aparecem na lista
+de *long tasks* dos dois relatórios. Não são o gargalo, mas são **nossos** — dá para mexer sem
+tocar no tema.
 
----
+### D6. Imagens grandes de ARTIGO — onda 62 (o maior naco que sobrou)
+Depois da limpeza, ainda há **~167 imagens referenciadas acima de 120 KB, somando ~50 MB**. Não
+estão na home, então não afetam o PageSpeed dela, mas pesam nas páginas de insight, líder e
+carreiras:
+
+| Arquivo | Peso | Onde |
+|---|---|---|
+| `2026/01/GRANDE-02-scaled.png` | **3.583 KB** | artigo |
+| `2024/12/imagem_gerada-e1734389796400.png` | 1.374 KB | artigo |
+| `2024/03/Imagem1-scaled.jpg` | 927 KB | artigo |
+| `2024/04/banner-bg-carreiras-1.png` e `-2.png` | 915 KB cada | banner de carreiras |
+| `2024/04/banner-bg-leaders.png` e `-1.png` | 822 KB cada | banner de líderes |
+
+Os banners repetidos (`-1`, `-2`) são o caso mais fácil: são o mesmo fundo duplicado. A
+**S160 não cobre estes de propósito** — para não virar alarme crônico que se aprende a ignorar.
 
 ## Classe E — dívida estrutural do espelho
 

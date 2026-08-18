@@ -580,7 +580,10 @@ def estaticas(s):
         ruins = []
         for rel in HOMES:
             h = s.ler(rel)
-            achados = re.findall(r"/clientes/([a-z0-9\-]+)\.(?:svg|png|jpg)", h)
+            # `webp` entrou na lista na onda 61: o edp, o mercedes-benz e o taesa
+            # passaram a ser servidos em WebP. Esta asserção cobra que o CLIENTE esteja
+            # na barra — o formato do arquivo não é o que ela mede.
+            achados = re.findall(r"/clientes/([a-z0-9\-]+)\.(?:svg|png|jpg|jpeg|webp)", h)
             if sorted(achados) != sorted(LOGOS_ESPERADOS):
                 falta = set(LOGOS_ESPERADOS) - set(achados)
                 sobra = set(achados) - set(LOGOS_ESPERADOS)
@@ -1466,6 +1469,99 @@ def estaticas(s):
         return (not det, u"%d placeholder(es); %s" % (
             conferidos, u"; ".join(det[:3]) or u"nenhum pinta pixel"))
     s.check("S159", u"placeholder de asset faltante nao pinta nada (pixel decodificado)", s159)
+
+    def s160():
+        # Onda 61. DOIS invariantes, e a distincao entre eles e o ponto:
+        #
+        # (a) nenhuma imagem que a HOME pede passa de 120 KB. E a pagina que o
+        #     PageSpeed audita e a que todo visitante abre. O caso que originou:
+        #     `clientes/edp.svg` tinha 414 KB (QUATRO bitmaps embutidos num wrapper
+        #     SVG) para um logo exibido a 81x30 px; `mercedes-benz.svg`, 298 KB em 489
+        #     paths. Viraram WebP com a razao EXATA do original.
+        #
+        # (b) nenhuma imagem ORFA acima de 120 KB. Em 18/08 o espelho carregava 181
+        #     imagens que NENHUMA pagina referenciava — 25,9 MB de peso morto vindo do
+        #     WordPress. Foram removidas; esta metade impede que voltem.
+        #
+        # O QUE ESTA ASSERÇÃO **NAO** COBRE, de proposito: as imagens grandes de
+        # ARTIGO que estao referenciadas (banners de 822-915 KB, um PNG de 3,5 MB).
+        # Sao reais e continuam no `docs/BACKLOG-TECNICO.md` como onda 62 — nao entram
+        # aqui para a asserção nao virar um alarme cronico que se aprende a ignorar.
+        TETO = 120 * 1024
+        EXT = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg")
+        det = []
+
+        # (a) o que a home pede
+        da_home = set()
+        for rel in HOMES:
+            h = s.ler(rel)
+            for m in re.finditer(r'(?:src|href)="(/[^"]+\.(?:png|jpg|jpeg|webp|gif|svg))', h):
+                da_home.add(m.group(1).split("?")[0].lstrip("/"))
+        for ref in sorted(da_home):
+            fp = os.path.join(pub, ref.replace("/", os.sep))
+            if os.path.exists(fp) and os.path.getsize(fp) > TETO:
+                det.append(u"a home pede %s (%.0f KB)"
+                           % (ref.split("/")[-1], os.path.getsize(fp) / 1024.0))
+
+        # (b) orfas grandes
+        texto = []
+        for dp, _d, fs in os.walk(pub):
+            if os.sep + ".git" in dp:
+                continue
+            for nome in fs:
+                if nome.endswith((".html", ".css", ".xml", ".js", ".txt")):
+                    with io.open(os.path.join(dp, nome), encoding="utf-8",
+                                 errors="ignore") as f:
+                        texto.append(f.read())
+        tudo = chr(10).join(texto)
+        orfas = []
+        for dp, _d, fs in os.walk(pub):
+            if os.sep + ".git" in dp:
+                continue
+            for nome in fs:
+                if not nome.lower().endswith(EXT):
+                    continue
+                fp = os.path.join(dp, nome)
+                if os.path.getsize(fp) <= TETO:
+                    continue
+                rel = os.path.relpath(fp, pub).replace(os.sep, "/")
+                if rel not in tudo and nome not in tudo:
+                    orfas.append((os.path.getsize(fp), rel))
+        orfas.sort(reverse=True)
+        for t, r in orfas[:3]:
+            det.append(u"órfã %s (%.0f KB)" % (r.split("/")[-1], t / 1024.0))
+        if len(orfas) > 3:
+            det.append(u"… e %d outra(s) órfã(s) grandes" % (len(orfas) - 3))
+        return (not det, u"%d imagem(ns) na home, %d órfã(s) grande(s); %s"
+                % (len(da_home), len(orfas), u"; ".join(det[:4]) or u"tudo sob 120 KB"))
+    s.check("S160", u"home sem imagem acima de 120 KB, e nenhuma órfã grande (onda 61)", s160)
+
+    def s161():
+        # Onda 61. As referencias trocadas para WebP tem de resolver, e o PNG/SVG antigo
+        # nao pode voltar a ser referenciado por descuido num script futuro.
+        CONVERTIDOS = ("clientes/edp", "clientes/mercedes-benz", "clientes/taesa",
+                       "02/Andreas-Mirow", "02/Felipe-Diniz-1", "02/prof",
+                       "02/Elmar-Gans-1", "certificate-cdp", "certificate-basedtargets",
+                       "certificate-seventowatch", "certificate-growingfirms",
+                       "certificate-globalimpact", "image-52")
+        det = []
+        webps = set()
+        for rel, h in s.todas():
+            for m in re.finditer(r'(?:src|href)="([^"]*?/(?:uploads)/[^"]*?)"', h):
+                ref = m.group(1).split("?")[0]
+                if not any(c in ref for c in CONVERTIDOS):
+                    continue
+                if ref.endswith((".png", ".svg")):
+                    det.append(u"%s ainda pede %s" % (rel, ref.split("/")[-1]))
+                elif ref.endswith(".webp"):
+                    webps.add(ref)
+        for ref in sorted(webps):
+            fp = os.path.join(pub, ref.lstrip("/").replace("/", os.sep))
+            if not os.path.exists(fp):
+                det.append(u"%s referenciado e ausente no disco" % ref.split("/")[-1])
+        return (not det, u"%d webp referenciado(s); %s"
+                % (len(webps), u"; ".join(det[:4]) or u"todos resolvem, nenhum PNG/SVG velho"))
+    s.check("S161", u"imagens convertidas: só WebP referenciado e existente (onda 61)", s161)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
