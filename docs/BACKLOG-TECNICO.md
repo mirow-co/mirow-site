@@ -194,29 +194,10 @@ A **S160** cobra dois invariantes que valem mais: **nenhuma imagem que a home pe
 de *long tasks* dos dois relatórios. Não são o gargalo, mas são **nossos** — dá para mexer sem
 tocar no tema.
 
-### D6. Imagens grandes de ARTIGO — onda 62, escopo agora MEDIDO
-**164 imagens referenciadas acima de 120 KB, 48,9 MB.** Não estão na home (que já está resolvida:
-o PageSpeed de 18/08 à noite pede só **68 KiB** de imagem, contra 330 KiB de manhã), então o ganho
-cai nas páginas de insight, artigo, líder e carreiras — que o PageSpeed nunca mediu.
-
-Convertendo de verdade as 12 mais pesadas para WebP e **pesando o resultado** (não aplicando taxa
-de manual): **48,9 MB → ~6,3 MB**, e a mediana de imagem por página vai de **587 KB → 148 KB**.
-
-**A taxa não é uniforme, e é isso que define o escopo:**
-
-| Origem | Exemplo | Corte |
-|---|---|---|
-| PNG (screenshot, gráfico, banner) | `GRANDE-02-scaled.png` 3.583 → 157 KB | **93–97%** |
-| JPEG já comprimido | `Imagem1-scaled.jpg` 927 → 770 KB | **17%** |
-| JPEG grande | `Automotive-industry-scaled.jpg` 686 → 397 KB | 42% |
-
-Ou seja: o ganho está quase todo no PNG. Uma onda que ataque **só os PNG** pega ~90% do benefício
-com metade dos arquivos. Os banners de página (`banner-bg-*`, 26 arquivos / 18,0 MB) são o subgrupo
-mais seguro: são `background-size:cover`, então **a armadilha de reflow sub-pixel da onda 61 não se
-aplica** — o aspecto do arquivo não define a caixa. Há também **7,7 MB em cópias byte-idênticas**
-entre eles (`banner-bg-leaders.png` existe 3×, `banner-bg-insights` 4×).
-
-A **S160 não cobre estes de propósito** — para não virar alarme crônico que se aprende a ignorar.
+### D6. ~~Imagens grandes de ARTIGO~~ — RESOLVIDO na onda 62c (18/08)
+**155 PNG viraram WebP na MESMA dimensao: 45,5 MB -> 12,8 MB.** Os 10 JPEG ficaram fora de
+proposito (corte de so 17-42%). Qualidade medida compondo sobre fundo: diferenca media de
+**0,94 de 255 (0,37%)**; dimensao mudou em **0 de 158**. A **S163** impede a volta.
 
 ### D7. Recomprimir os 2 vídeos que ficaram — precisa de ffmpeg (o maior item que sobrou)
 A onda 62a tirou 130 MB de vídeo órfão e duplicado. **Sobraram 2 arquivos, ambos em uso, e um
