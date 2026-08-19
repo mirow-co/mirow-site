@@ -3020,17 +3020,25 @@ def estaticas(s):
             "novo/wp-content/uploads/2023/05/7-transformacao-metodologia-agil-gestao-da-mudanca-governanca-quick-wins-1024x521.png",
             "novo/wp-content/uploads/2023/05/8-adaptacao-climatica-sustentabilidade-net-zero-ESG-descarbonizacao-carbono-1024x552.png",
         ]
+        # Onda 62c: as 6 viraram WebP na mesma dimensão. A asserção cobra que a
+        # IMAGEM exista e não seja placeholder — o formato é incidental, como na
+        # H04, que passou a aceitar webp porque cobra o cliente, não a extensão.
+        # Sem isto, a S119 quebraria o deploy por motivo certo e alvo errado
+        # (o caso da S125 na onda 33b).
         for rel in esperadas:
-            p = os.path.join(pub, rel.replace("/", os.sep))
-            if not os.path.exists(p):
+            candidatos = [rel, rel[:-4] + ".webp"] if rel.endswith(".png") else [rel]
+            p = next((os.path.join(pub, c.replace("/", os.sep)) for c in candidatos
+                      if os.path.exists(os.path.join(pub, c.replace("/", os.sep)))), None)
+            if p is None:
                 det.append(u"ausente: %s" % rel.split("/")[-1])
                 continue
-            if os.path.getsize(p) < 10 * 1024:
+            if os.path.getsize(p) < 4 * 1024:
                 det.append(u"%s tem só %d bytes — não é a imagem"
-                           % (rel.split("/")[-1], os.path.getsize(p)))
+                           % (os.path.basename(p), os.path.getsize(p)))
             with io.open(p, "rb") as f:
-                if f.read(4) != b"\x89PNG":
-                    det.append(u"%s não é PNG" % rel.split("/")[-1])
+                cab = f.read(12)
+            if not (cab[:4] == b"\x89PNG" or (cab[:4] == b"RIFF" and cab[8:12] == b"WEBP")):
+                det.append(u"%s não é PNG nem WebP" % os.path.basename(p))
         for rel in esperadas:
             if rel in FALTAS_CONHECIDAS:
                 det.append(u"%s voltou para FALTAS_CONHECIDAS" % rel.split("/")[-1])
