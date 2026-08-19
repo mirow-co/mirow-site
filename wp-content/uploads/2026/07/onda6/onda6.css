@@ -1583,3 +1583,46 @@ display:block}.pol-v2 thead{display:none}.pol-v2 td{border-top:0}
   .onda67-busca__trecho{font-size:14px}
 }
 /* onda67:busca:fim */
+
+/* onda68:ia-praticas:ini */
+/* ---- onda68 (#212/#213/#214): "Como usamos IA" na pagina de pratica ---------
+   PALETA MEDIDA, NAO SUPOSTA. A primeira versao deste bloco usou titulo navy
+   #020E66 e subtitulo cinza #7F7F7F, porque eu assumi fundo branco -- a lista de
+   imprensa, de onde vinha a gramatica visual, e branca. Medido no render: o fundo
+   da pagina de pratica e uma IMAGEM azul (nao ha background-color para o
+   getComputedStyle achar), e o texto do proprio tema ali e BRANCO:
+       .experience-single__content h3   -> rgb(255,255,255) peso 700
+       .experience-single__content p    -> rgb(255,255,255) peso 400
+       .experience-single__cases-list-item p -> rgb(255,255,255) peso 300
+   Navy sobre aquele azul e ilegivel, e cinza #7F7F7F e pior.
+   (O h4 "Cases" do tema E navy -- mas ele tem 350px e funciona como marca d'agua
+   decorativa, nao como titulo de leitura. Nao serve de referencia.)
+   Este bloco segue a convencao do CONTEUDO da pagina: branco, com o acento ciano
+   -- que le sobre azul -- como unico sinal proprio. A V39 mede o contraste. */
+.onda68-ia{margin:0 0 46px}
+.onda68-ia__titulo{color:#fff;font-weight:700;
+  font-size:clamp(20px,16.6px + 0.53vw,26px);margin:0 0 4px}
+/* .88 e nao .78: a V39 mediu o contraste no PIXEL e o .78 dava 4,35:1 contra
+   o fundo real rgb(46,91,204) -- abaixo do piso de 4,5 do texto normal. Com
+   .88 fica 5,0:1. Calculado, nao chutado. */
+.onda68-ia__subtitulo{color:rgba(255,255,255,.88);font-weight:400;
+  font-size:clamp(15px,13.6px + 0.19vw,17px);margin:0 0 20px}
+.onda68-ia__lista{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:16px}
+.onda68-ia__item{border-left:3px solid #00ADEC;padding:2px 0 2px 16px}
+.onda68-ia__item-titulo{display:block;color:#fff;font-weight:700;
+  font-size:clamp(16px,14.6px + 0.19vw,19px);line-height:1.3;margin:0 0 4px}
+.onda68-ia__item-texto{display:block;color:rgba(255,255,255,.92);
+  font-size:clamp(15px,13.9px + 0.15vw,17px);line-height:1.55}
+/* o fecho e um painel claro DE PROPOSITO: ele carrega a ressalva (o julgamento
+   continua sendo do consultor) e o contraste invertido a destaca do resto */
+.onda68-ia__fecho{color:#071C25;font-size:clamp(15px,13.9px + 0.15vw,17px);
+  line-height:1.55;margin:0;padding:16px 18px;background:#F2F2F2;
+  border-left:3px solid #020E66}
+@media only screen and (max-width: 991px){
+  .onda68-ia__item{padding-left:13px}
+}
+/* onda68:ia-praticas:fim */
+
+/* onda59:sede:ini */
+.onda59-sede{max-width:760px;margin:8px auto 0;text-align:center;color:#5b6770;font-size:17px;line-height:1.5}
+/* onda59:sede:fim */
