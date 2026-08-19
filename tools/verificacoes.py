@@ -250,6 +250,7 @@ ETAPAS = {
     "S165": ("texto",), "S166": ("texto", "asset"),
     # onda 67: a busca depende do indice (asset) e do markup das 3 paginas
     "S167": ("texto", "asset"), "S168": ("texto", "asset"),
+    "S169": ("texto", "css"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -2020,6 +2021,95 @@ def estaticas(s):
                 det.append(u"llms.txt diz AI Powered e a home pt nao")
         return (not det, u"; ".join(det[:4]) or u"IA declarada, todo link resolve")
     s.check("S168", u"llms.txt declara IA e não manda o robô para stub (#215)", s168)
+
+    # ------------------------------------------------------------------ onda 68
+    def s169():
+        # #212/#213/#214: "Na pagina de estrategia precisamos falar como usamos IA
+        # nesses tipos de projetos" / "na pagina de compras a mesma coisa" / "na
+        # outra pagina a mesma coisa" (Andreas/Mario/Luciana, 12/08).
+        #
+        # O criterio das issues pede exemplos CONCRETOS e tom de fato, nao de
+        # autopromocao. Dois desses criterios dao para medir, e sao os que mais
+        # doem se quebrarem:
+        #
+        #   (a) NENHUM NOME DE CLIENTE dentro do bloco. A lista de clientes vem do
+        #       proprio mestre publicado (tools/clients-publicados.json), entao a
+        #       assercao acompanha a curadoria em vez de ter lista hardcoded que
+        #       envelhece. Citar cliente em texto de metodo, sem autorizacao por
+        #       contrato, e problema de confidencialidade -- nao de estilo.
+        #   (b) NENHUM PERCENTUAL nem numero de resultado atribuido a IA. Nao ha
+        #       medicao isolada do efeito da IA sobre o resultado dos projetos;
+        #       "reduz 30%" seria invencao. Os numeros das paginas continuam sendo
+        #       dos CASOS, no bloco de Cases, que e outro lugar.
+        #
+        # Mais o basico: as 9 paginas tem o bloco, 3 itens cada, titulo no idioma
+        # da pagina, e o bloco vem ANTES do bloco de Cases (o leitor conhece o
+        # metodo, depois como a IA entra nele, depois os exemplos).
+        ALVOS = {
+            "pt": ["pt/pratica/estrategia/index.html",
+                   "pt/pratica/operacoes/index.html",
+                   "pt/pratica/marketing-vendas-e-pricing/index.html"],
+            "en": ["en/practice/strategy/index.html",
+                   "en/practice/operations/index.html",
+                   "en/practice/marketing-sales-and-pricing/index.html"],
+            "de": ["de/branchen/strategie/index.html",
+                   "de/branchen/betrieb/index.html",
+                   "de/branchen/marketing-vertrieb-und-preisgestaltung/index.html"],
+        }
+        TITULO = {"pt": u"Como usamos IA", "en": u"How we use AI",
+                  "de": u"Wie wir KI einsetzen"}
+        det = []
+
+        # os clientes, do mestre publicado (nao lista hardcoded)
+        clientes = []
+        pc = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "clients-publicados.json")
+        if os.path.exists(pc):
+            try:
+                clientes = [c["wordmark"] for c in json.load(io.open(pc, encoding="utf-8"))]
+            except (ValueError, KeyError):
+                det.append(u"clients-publicados.json ilegivel")
+
+        for lang, rels in sorted(ALVOS.items()):
+            for rel in rels:
+                h = s.ler(rel)
+                m = re.search(r'<div class="onda68-ia">(.*?)</div>\s*<div class='
+                              r'"experience-single__cases">', h, re.S)
+                if not m:
+                    # ou o bloco falta, ou nao esta antes dos Cases
+                    if 'class="onda68-ia"' not in h:
+                        det.append(u"%s sem o bloco de IA" % rel)
+                    else:
+                        det.append(u"%s: o bloco de IA nao esta antes dos Cases" % rel)
+                    continue
+                bloco = m.group(1)
+                if TITULO[lang] not in bloco:
+                    det.append(u"%s: titulo fora do idioma (esperado %r)"
+                               % (rel, TITULO[lang]))
+                n = bloco.count('class="onda68-ia__item"')
+                if n != 3:
+                    det.append(u"%s: %d item(ns) no bloco (esperado 3)" % (rel, n))
+                # (a) nenhum nome de cliente
+                texto = re.sub(r"<[^>]+>", u" ", bloco)
+                for c in clientes:
+                    if c and re.search(r"(?i)\b" + re.escape(c) + r"\b", texto):
+                        det.append(u"%s: o bloco de IA cita o cliente %r" % (rel, c))
+                # (b) nenhum percentual nem R$ atribuido a IA
+                for mm in re.finditer(r"\d+\s*%|R\$\s*\d", texto):
+                    det.append(u"%s: o bloco de IA traz numero de resultado (%r)"
+                               % (rel, mm.group(0)))
+                    break
+        # o css_o18 nao esta em escopo aqui (e definido mais adiante na funcao);
+        # ler o arquivo direto e o que mede a mesma coisa sem depender da ordem
+        _pcss = os.path.join(pub, "wp-content", "uploads", "2026", "07", "onda6",
+                             "onda6.css")
+        _css = io.open(_pcss, encoding="utf-8").read() if os.path.exists(_pcss) else u""
+        if ".onda68-ia__item{border-left:3px solid #00ADEC" not in _css:
+            det.append(u"o bloco de IA perdeu o acento ciano no CSS")
+        return (not det, u"; ".join(det[:4])
+                or u"9 paginas, 3 itens cada, 0 cliente citado, 0 numero atribuido a IA")
+    s.check("S169", u'"Como usamos IA" nas 3 práticas core × 3 idiomas, sem citar cliente (#212/#213/#214)',
+            s169)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado

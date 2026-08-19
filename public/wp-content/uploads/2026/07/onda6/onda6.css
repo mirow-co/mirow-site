@@ -1583,3 +1583,26 @@ display:block}.pol-v2 thead{display:none}.pol-v2 td{border-top:0}
   .onda67-busca__trecho{font-size:14px}
 }
 /* onda67:busca:fim */
+
+/* onda68:ia-praticas:ini */
+/* ---- onda68 (#212/#213/#214): "Como usamos IA" na pagina de pratica ---------
+   Reusa a gramatica do bloco de Cases (h4 titulo + h5 subtitulo + lista), para
+   nao inventar componente. O acento ciano na lateral e o unico sinal proprio:
+   marca que a secao fala de IA, no mesmo vocabulario do selo do hero. */
+.onda68-ia{margin:0 0 46px}
+.onda68-ia__titulo{color:#020E66;font-weight:700;
+  font-size:clamp(20px,16.6px + 0.53vw,24px);margin:0 0 4px}
+.onda68-ia__subtitulo{color:#7F7F7F;font-weight:400;
+  font-size:clamp(15px,13.6px + 0.19vw,17px);margin:0 0 20px}
+.onda68-ia__lista{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:16px}
+.onda68-ia__item{border-left:3px solid #00ADEC;padding:2px 0 2px 16px}
+.onda68-ia__item-titulo{display:block;color:#020E66;font-weight:700;
+  font-size:clamp(16px,14.6px + 0.19vw,18px);line-height:1.3;margin:0 0 4px}
+.onda68-ia__item-texto{display:block;color:#071C25;
+  font-size:clamp(15px,13.9px + 0.15vw,17px);line-height:1.55}
+.onda68-ia__fecho{color:#071C25;font-size:clamp(15px,13.9px + 0.15vw,17px);
+  line-height:1.55;margin:0;padding:16px 18px;background:#F2F2F2}
+@media only screen and (max-width: 991px){
+  .onda68-ia__item{padding-left:13px}
+}
+/* onda68:ia-praticas:fim */
