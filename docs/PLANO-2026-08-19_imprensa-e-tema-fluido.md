@@ -10,6 +10,51 @@
 
 ---
 
+## Estado deste plano (atualizado 19/08/2026, depois da Fase A)
+
+**FASE A: NO AR** — v=75, `gh-pages` `b8592f91`, verificado ao vivo (43 itens nas três
+páginas, os 8 logos novos servindo 200, staging republicado no mesmo v=75). Suíte
+**205 OK**. Issues #237–#243 no `mirow-co/mirow-marketing`.
+
+**FASE B: não começou.** É o assunto da próxima sessão.
+
+### Decisões do Mario, 19/08
+
+| # | Decisão | O que ele escolheu |
+|---|---|---|
+| **D1** | gerador P3 ou 7º script à mão | **gerador** (implementado) |
+| **D2** | Certificação B entra na imprensa | **entra** (no ar) |
+| **D3** | rótulo da Broadcast | **“Broadcast (Estadão)”** com `estadao.svg`, exceção declarada na S165 |
+| **D4** | os 2 links faltantes | **issue** (#241), não bloqueiam |
+| **D5** | escopo da Fase B | **só a nossa camada + overrides**, sem tocar no bundle do tema |
+| **D6** | família `F` antes de migrar | **NÃO** — ir direto, `F` só onde quebrar |
+| **D7** | data do item do Valor | **10/05/2024** (o `datePublished` da fonte), com nota no mestre |
+| **novo** | o que julgar no staging | **home (pt/en/de) + imprensa** |
+
+### A consequência de D6, dita na cara
+
+Sem a família `F` escrita antes, as 25 asserções `V` que prendem o pixel do modelo antigo
+vão falhar **de propósito** durante a migração, e não haverá número que separe *“mudei
+porque quis”* de *“quebrei sem ver”*. O julgamento passa a ser **a olho**.
+
+O que eu faço para compensar, sem contrariar a decisão (nada disto é asserção `F` — é o
+P4 que o repo já exige):
+
+1. **Baseline visual antes de tocar em CSS** — home (pt/en/de) e imprensa fotografadas em
+   9 larguras no `main`, guardadas em `_baseline/` (gitignored). É o antes/depois que o
+   Mario vai olhar, e é o que transforma “ficou igual” em imagem comparável.
+2. **Baseline de texto renderizado** — o `innerText` de cada página-alvo antes e depois.
+   Se o texto é idêntico, tudo que mudou é apresentação. Custa segundos e é a única coisa
+   que eu não abro mão, porque conteúdo perdido numa migração de CSS é irreversível sem
+   ninguém notar.
+3. **Triagem explícita das `V`** — cada `V` que mudar de estado vai numa tabela dizendo se
+   prendia pixel do modelo antigo ou se é regressão. Nunca “rebaselinei”.
+
+Se em algum ponto a migração ficar difícil de julgar sem número, a recomendação volta à
+mesa — mas por dado, não por insistência.
+
+---
+
 ## O que eu já MEDI antes de planejar (não é levantamento do Felipe repetido)
 
 | O que | Resultado |
