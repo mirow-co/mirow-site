@@ -243,7 +243,7 @@ ETAPAS = {
     # --- assets referenciados (existencia, peso, dimensao, placeholder) ---
     "S123": ("asset",), "S153": ("asset", "texto"), "S157": ("asset", "css"),
     "S159": ("asset",), "S160": ("asset",), "S161": ("asset",),
-    "S162": ("asset",), "E": ("asset",),
+    "S162": ("asset",), "S163": ("asset",), "E": ("asset",),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -1651,6 +1651,62 @@ def estaticas(s):
                    u"; ".join(det[:4]) or u"nenhum órfão, nenhuma cópia idêntica"))
     s.check("S162", u"vídeo: nenhum órfão, nenhuma cópia idêntica, referência resolve (onda 62)",
             s162)
+
+    def s163():
+        # Onda 62c. A S161 lista os arquivos convertidos na onda 61 pelo nome — não
+        # escala para 155. Esta cobra a CLASSE, e por isso se mantém sozinha:
+        #   (a) NENHUM PNG referenciado passa de 120 KB. É o invariante que a onda
+        #       estabeleceu: PNG pesado no espelho é peso morto, porque WebP na
+        #       MESMA dimensão corta 72-97% sem mexer em layout.
+        #   (b) todo .webp referenciado existe no disco.
+        # O piso de 120 KB é o mesmo da S160, de propósito: um número só.
+        TETO = 120 * 1024
+        det = []
+        citados = set()
+        fim = re.compile(r'\.(png|webp)(?![a-z0-9])', re.I)
+        # sem ':' de propósito — com ele, "https://host/x.webp" era partido no
+        # "https:" e virava "//host/x.webp", um caminho que nunca existe no disco,
+        # e a asserção acusava ausente um arquivo que estava lá
+        PARA = set(' "\'(),\\\n\t{}[];=|<>')
+        for _rel, h in s.todas():
+            t = h.replace("\\/", "/")
+            for m in fim.finditer(t):
+                i, j = m.start(), m.end()
+                while i > 0 and t[i - 1] not in PARA:
+                    i -= 1
+                ref = t[i:j].split("?")[0]
+                if not ref or ref.startswith("."):
+                    continue
+                if ref.startswith("/mirow-site/"):
+                    ref = ref[len("/mirow-site/"):]
+                elif ref.startswith("http"):
+                    mm = re.match(r'https?://[^/]+/(.*)$', ref)
+                    if not mm:
+                        continue
+                    ref = mm.group(1)
+                    if ref.startswith("mirow-site/"):
+                        ref = ref[len("mirow-site/"):]
+                citados.add(ref.lstrip("/"))
+
+        gordos, webps = [], 0
+        for ref in sorted(citados):
+            fp = os.path.join(pub, ref.replace("/", os.sep))
+            if ref.lower().endswith(".webp"):
+                webps += 1
+                if not os.path.exists(fp):
+                    det.append(u"%s referenciado e ausente" % ref.split("/")[-1])
+            elif os.path.exists(fp) and os.path.getsize(fp) > TETO:
+                gordos.append((os.path.getsize(fp), ref))
+        gordos.sort(reverse=True)
+        for t, r in gordos[:3]:
+            det.append(u"PNG %s tem %.0f KB" % (r.split("/")[-1], t / 1024.0))
+        if len(gordos) > 3:
+            det.append(u"… e mais %d PNG acima de 120 KB" % (len(gordos) - 3))
+        return (not det, u"%d referência(s), %d webp; %s"
+                % (len(citados), webps,
+                   u"; ".join(det[:4]) or u"nenhum PNG acima de 120 KB, todo webp resolve"))
+    s.check("S163", u"PNG pesado não volta: nenhum acima de 120 KB, webp resolve (onda 62c)",
+            s163)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
