@@ -301,6 +301,33 @@ Backlog técnico (o que não dá para fazer no Pages, o que espera decisão): `d
     todo placeholder. **E: depois de todo deploy, olhar um screenshot da home.** Este bug morreria
     em 5 segundos com um olho na página; nenhuma das 195 asserções o pegou.
 
+13. **Escrever regex (ou qualquer backslash) por heredoc do bash NESTE ambiente.** O `\b` chega
+    ao arquivo como **backspace literal (0x08)** e o `\\` é comido. Regex com backspace **nunca
+    casa** — e não quebra com estardalhaço: a asserção fica **verde medindo o vazio**. Em 19/08
+    isso já estava no repo em **dois** lugares, vindos da onda 60b: a **S72** inteira passava
+    vazia (o `finditer` nunca casava, então o laço nunca rodava) e o braço da **S159** que confere
+    placeholder SVG estava morto — justamente a asserção criada contra o pixel vermelho. Eu criei
+    um terceiro no mesmo dia. **Para código com backslash, use as ferramentas Write/Edit, nunca
+    heredoc**; e prefira classe explícita (`[ ]`, `[ />]`) a `\b`. Para caçar: procurar
+    `chr(8)` no arquivo. Na mesma família: `python -c "..."` com aspas aninhadas e
+    `git commit -m "...(\"texto\")..."` — as aspas internas fecharam o argumento e o commit
+    inteiro se perdeu dentro do commit seguinte. **Mensagem de commit longa vai por `-F -`.**
+
+14. **Ler número de um relatório sem conferir O QUE ele mediu.** Em 19/08 li 64/95 de um
+    PageSpeed salvo e afirmei que as três ondas não tinham movido a nota. O `fetchTime` era de
+    **antes das ondas** e os assets medidos eram **`v=64`** contra `v=72` em produção — o Google
+    devolveu análise em cache. **Todo relatório salvo: conferir `fetchTime` e a versão dos assets
+    citados antes de tirar conclusão.** Vale para PageSpeed, export de analytics, planilha de
+    cliente. É o erro 12 aplicado a artefato de terceiro, e a variante interna dele é entregar um
+    artefato que você não mediu: provei a animação no quadro que referenciava os SVG como arquivo
+    e mandei ao Mario a versão com base64, que ele abriu e viu **três painéis vazios** (as aspas
+    duplas do `url("data:...")` fechavam o atributo `style="..."`).
+
+15. **Comparar imagem RGBA sem compor sobre um fundo.** O RGB debaixo de pixel transparente não
+    significa nada: a primeira medição de qualidade da onda 62c acusou **40 níveis de diferença
+    em 6 imagens intactas**. Compostas sobre fundo, 0,16. Sempre `Image.new(fundo)` + `paste(im,
+    mask=im)` antes de qualquer diff.
+
 ## Ritmo do gate (onda 60c) — rodar só o que a mudança pede
 
 A fase estática são **1,2 s** para 162 asserções. O tempo do gate morava nos **111 page loads**,
