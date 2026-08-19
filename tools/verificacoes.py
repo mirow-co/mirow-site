@@ -1634,6 +1634,17 @@ def estaticas(s):
             if not os.path.exists(os.path.join(pub, r.replace("/", os.sep))):
                 det.append(u"%s referenciado e ausente no disco" % ref.split("/")[-1])
 
+        # (d) teto de peso. Onda 62b: o vídeo de carreiras estava a 13.115 kb/s —
+        # 40 MB para um loop de fundo MUDO de 25 s. Recomprimido a 1.408 kb/s
+        # (4,3 MB) sem tocar no que a página mostra. O teto impede a volta: nenhum
+        # arquivo de mídia acima de 8 MB (o maior legítimo hoje é o
+        # video-porque-mirow.mp4, com 6,8 MB).
+        TETO_MIDIA = 8 * 1024 * 1024
+        for rel, _fp, tam in achados:
+            if tam > TETO_MIDIA:
+                det.append(u"%s tem %.1f MB (teto 8 MB)"
+                           % (rel.split("/")[-1], tam / 1048576.0))
+
         peso = sum(t for _r, _f, t in achados)
         return (not det, u"%d arquivo(s) de mídia, %.1f MB, %d referência(s); %s"
                 % (len(achados), peso / 1048576.0, len(pedidos),
