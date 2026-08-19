@@ -30,6 +30,11 @@ from _onda7_css import resolve_public
 FOLHAS = {
     "dashicons-css": ("dashicons-",),
     "formidable-css": ("frm_forms", "frm_form_field", "frm-show-form"),
+    # Onda 62d: o PageSpeed de 18/08 nomeia addtoany.min.css como o PIOR bloqueador
+    # isolado do render — 36 KB, 283 ms. Medido: 109 paginas carregam, so 55 usam o
+    # botao de compartilhar, e as 3 homes estao entre as que NAO usam. Mesmo criterio
+    # das outras duas: quem usa continua carregando.
+    "addtoany-css": ("a2a_kit", "addtoany_shortcode", "a2a_button"),
 }
 
 RE_LINK = re.compile(r"<link[^>]*id='([a-z0-9-]+)'[^>]*/?>\s*")

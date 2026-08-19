@@ -243,7 +243,7 @@ ETAPAS = {
     # --- assets referenciados (existencia, peso, dimensao, placeholder) ---
     "S123": ("asset",), "S153": ("asset", "texto"), "S157": ("asset", "css"),
     "S159": ("asset",), "S160": ("asset",), "S161": ("asset",),
-    "S162": ("asset",), "S163": ("asset",), "E": ("asset",),
+    "S162": ("asset",), "S163": ("asset",), "S164": ("asset", "medicao"), "E": ("asset",),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -1295,6 +1295,9 @@ def estaticas(s):
         FOLHAS = {
             "dashicons-css": ("dashicons-",),
             "formidable-css": ("frm_forms", "frm_form_field", "frm-show-form"),
+            # onda 62d: o pior bloqueador isolado do render na home (36 KB, 283 ms).
+            # 109 páginas carregavam, 55 usam o botão de compartilhar.
+            "addtoany-css": ("a2a_kit", "addtoany_shortcode", "a2a_button"),
         }
         det = []
         for rel, h in s.todas():
@@ -1307,6 +1310,25 @@ def estaticas(s):
                     det.append(u"%s carrega %s sem usar" % (rel, css_id))
         return (not det, u"; ".join(det[:4]) or u"nenhuma folha de plugin carregada sem uso")
     s.check("S156", u"nenhum CSS de plugin carregado sem uso na página (PageSpeed)", s156)
+
+    def s164():
+        # Onda 62d. `onda31-medicao.js` entrava sem defer/async e o PageSpeed o
+        # cobrava em 236 ms de bloqueio do render. Como o LCP da home é TEXTO
+        # (o relatório nomeia `div.hero-texto > p`), não há imagem no caminho
+        # crítico: o que atrasa aquele parágrafo é o que bloqueia o desenho.
+        #
+        # Mede a DECLARAÇÃO no HTML das 282 páginas — a V-nova mede o computado.
+        det = []
+        n = 0
+        for rel, h in s.todas():
+            for m in re.finditer(r'<script([^>]*\bsrc="[^"]*onda31-medicao\.js[^"]*")([^>]*)>', h):
+                n += 1
+                tag = m.group(0)
+                if "defer" not in tag and "async" not in tag:
+                    det.append(u"%s carrega a medição bloqueando o render" % rel)
+        return (not det, u"%d tag(s) de medição; %s"
+                % (n, u"; ".join(det[:4]) or u"todas com defer"))
+    s.check("S164", u"medição não bloqueia o desenho (onda 62d)", s164)
 
     def s157():
         # Onda 60. Generaliza a S123 para DENTRO do CSS: o único erro de console do
