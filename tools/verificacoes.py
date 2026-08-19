@@ -4956,6 +4956,68 @@ def ao_vivo(s):
                        or u"nenhum texto do card do hero encosta no vizinho"))
         s.check("V36", u"card do hero sem texto sobre texto, em 4 larguras (onda 63)", v36)
 
+        def v37():
+            # Onda 64 (Mario, 19/08): "no mobile, quando clico nas 3 linhas ... depois
+            # fecho, a barra volta a ser branca e o mirow fica ilegível".
+            #
+            # Reproduzido e MEDIDO: a classe `menu--mobile-opened` sai certo ao fechar.
+            # Quem pintava era `.header .menu:hover{background:#fff}` — em tela de toque
+            # o :hover GRUDA depois do tap e só sai no próximo toque em outro lugar.
+            # Logo branco sobre barra branca.
+            #
+            # Mede os DOIS ramos, porque o conserto não pode custar o hover do desktop:
+            #   ponteiro fino  -> hover DEVE embranquecer (comportamento aprovado)
+            #   toque          -> hover NÃO pode embranquecer
+            #
+            # Navegador PRÓPRIO de propósito: `Emulation.setTouchEmulationEnabled` vira
+            # a media query e **não volta atrás** na mesma sessão — usar o `nav`
+            # compartilhado envenenaria toda asserção V que rodasse depois.
+            js = ("(function(){var m=document.querySelector('.header .menu');"
+                  "if(!m) return '';var cs=getComputedStyle(m);"
+                  "return JSON.stringify({fundo:cs.backgroundColor,"
+                  "fino:matchMedia('(hover:hover) and (pointer:fine)').matches,"
+                  "aberto:m.classList.contains('menu--mobile-opened')});})()")
+            NAVY, BRANCO = "rgb(2, 14, 102)", "rgb(255, 255, 255)"
+            det = []
+            with Navegador() as n2:
+                # 1) ponteiro fino: o hover branco do desktop tem de continuar
+                n2.abrir("%s/pt/index.html" % base, largura=1400, altura=900)
+                d = json.loads(n2.js(js) or "{}")
+                if not d.get("fino"):
+                    det.append(u"o navegador de teste não reporta ponteiro fino; "
+                               u"ramo do desktop não medido")
+                else:
+                    n2.hover(700, 40)
+                    d = json.loads(n2.js(js) or "{}")
+                    if d.get("fundo") != BRANCO:
+                        det.append(u"desktop: hover deixou de embranquecer (%s)"
+                                   % d.get("fundo"))
+                # 2) toque: nem no hover, nem depois de abrir e fechar o menu
+                # SÓ setTouchEmulationEnabled: ele vira `(hover:hover)`/`(pointer:fine)`
+                # para false, que é o que a regra consulta. NÃO ligar
+                # `setEmitTouchEventsForMouse` — com ele o hover vira toque, nenhum
+                # estado de hover é produzido, e a asserção passa a medir o vazio
+                # (testado: com o bug de volta ela ficava VERDE).
+                n2.ws.call(n2._id(), "Emulation.setTouchEmulationEnabled",
+                           {"enabled": True, "maxTouchPoints": 5})
+                for rel in HOMES:
+                    n2.abrir("%s/%s" % (base, rel), largura=390, altura=800, forcar=True)
+                    d = json.loads(n2.js(js) or "{}")
+                    if d.get("fino"):
+                        det.append(u"%s: emulação de toque não pegou" % rel)
+                        continue
+                    n2.js("var b=document.querySelector('.menu__hamburguer');"
+                          "if(b){b.click();b.click();}")
+                    n2.hover(60, 30)
+                    d = json.loads(n2.js(js) or "{}")
+                    if d.get("fundo") != NAVY:
+                        det.append(u"%s: barra ficou %s após abrir/fechar o menu"
+                                   % (rel, d.get("fundo")))
+            return (not det, u"; ".join(det[:3])
+                    or u"hover branco só com ponteiro fino; no toque a barra fica navy")
+        s.check("V37", u"barra do topo não embranquece no toque após fechar o menu (onda 64)",
+                v37)
+
 
 # ------------------------------------------------------------------- main
 

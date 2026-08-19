@@ -1096,11 +1096,22 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
    de seletor mais especifico para vencer a regra de repouso. */
 .header .menu{background:#020E66 !important;
   transition:background 300ms ease-in-out}
-.header .menu:hover,
+/* onda64 (19/08): o hover branco so onde existe ponteiro de verdade. Em tela
+   de toque o :hover GRUDA depois do tap -- o Mario abriu o menu pelo hamburguer,
+   fechou, e a barra ficou branca com o logo branco por cima. Reproduzido no
+   navegador: a classe menu--mobile-opened sai certo ao fechar; quem pintava era
+   o :hover. `(hover:hover) and (pointer:fine)` e a condicao que a regra sempre
+   pressupos, agora escrita. O menu ABERTO segue branco em qualquer aparelho,
+   porque ali o painel e branco mesmo. */
 .header .menu.menu--mobile-opened{background:#fff !important}
+@media (hover:hover) and (pointer:fine){
+  .header .menu:hover{background:#fff !important}
+}
 /* o clone do rodape mora sobre o navy do footer: mesma cor, sem costura */
 .rodape-barra .menu{background:#020E66 !important}
-.rodape-barra .menu:hover{background:#fff !important}
+@media (hover:hover) and (pointer:fine){
+  .rodape-barra .menu:hover{background:#fff !important}
+}
 /* onda27:barra-igual:fim */
 
 /* onda28:painel-mesma-altura:ini */
