@@ -250,6 +250,7 @@ ETAPAS = {
     "S165": ("texto",), "S166": ("texto", "asset"),
     # onda 67: a busca depende do indice (asset) e do markup das 3 paginas
     "S167": ("texto", "asset"), "S168": ("texto", "asset"),
+    "S169": ("texto", "css"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -2020,6 +2021,95 @@ def estaticas(s):
                 det.append(u"llms.txt diz AI Powered e a home pt nao")
         return (not det, u"; ".join(det[:4]) or u"IA declarada, todo link resolve")
     s.check("S168", u"llms.txt declara IA e não manda o robô para stub (#215)", s168)
+
+    # ------------------------------------------------------------------ onda 68
+    def s169():
+        # #212/#213/#214: "Na pagina de estrategia precisamos falar como usamos IA
+        # nesses tipos de projetos" / "na pagina de compras a mesma coisa" / "na
+        # outra pagina a mesma coisa" (Andreas/Mario/Luciana, 12/08).
+        #
+        # O criterio das issues pede exemplos CONCRETOS e tom de fato, nao de
+        # autopromocao. Dois desses criterios dao para medir, e sao os que mais
+        # doem se quebrarem:
+        #
+        #   (a) NENHUM NOME DE CLIENTE dentro do bloco. A lista de clientes vem do
+        #       proprio mestre publicado (tools/clients-publicados.json), entao a
+        #       assercao acompanha a curadoria em vez de ter lista hardcoded que
+        #       envelhece. Citar cliente em texto de metodo, sem autorizacao por
+        #       contrato, e problema de confidencialidade -- nao de estilo.
+        #   (b) NENHUM PERCENTUAL nem numero de resultado atribuido a IA. Nao ha
+        #       medicao isolada do efeito da IA sobre o resultado dos projetos;
+        #       "reduz 30%" seria invencao. Os numeros das paginas continuam sendo
+        #       dos CASOS, no bloco de Cases, que e outro lugar.
+        #
+        # Mais o basico: as 9 paginas tem o bloco, 3 itens cada, titulo no idioma
+        # da pagina, e o bloco vem ANTES do bloco de Cases (o leitor conhece o
+        # metodo, depois como a IA entra nele, depois os exemplos).
+        ALVOS = {
+            "pt": ["pt/pratica/estrategia/index.html",
+                   "pt/pratica/operacoes/index.html",
+                   "pt/pratica/marketing-vendas-e-pricing/index.html"],
+            "en": ["en/practice/strategy/index.html",
+                   "en/practice/operations/index.html",
+                   "en/practice/marketing-sales-and-pricing/index.html"],
+            "de": ["de/branchen/strategie/index.html",
+                   "de/branchen/betrieb/index.html",
+                   "de/branchen/marketing-vertrieb-und-preisgestaltung/index.html"],
+        }
+        TITULO = {"pt": u"Como usamos IA", "en": u"How we use AI",
+                  "de": u"Wie wir KI einsetzen"}
+        det = []
+
+        # os clientes, do mestre publicado (nao lista hardcoded)
+        clientes = []
+        pc = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "clients-publicados.json")
+        if os.path.exists(pc):
+            try:
+                clientes = [c["wordmark"] for c in json.load(io.open(pc, encoding="utf-8"))]
+            except (ValueError, KeyError):
+                det.append(u"clients-publicados.json ilegivel")
+
+        for lang, rels in sorted(ALVOS.items()):
+            for rel in rels:
+                h = s.ler(rel)
+                m = re.search(r'<div class="onda68-ia">(.*?)</div>\s*<div class='
+                              r'"experience-single__cases">', h, re.S)
+                if not m:
+                    # ou o bloco falta, ou nao esta antes dos Cases
+                    if 'class="onda68-ia"' not in h:
+                        det.append(u"%s sem o bloco de IA" % rel)
+                    else:
+                        det.append(u"%s: o bloco de IA nao esta antes dos Cases" % rel)
+                    continue
+                bloco = m.group(1)
+                if TITULO[lang] not in bloco:
+                    det.append(u"%s: titulo fora do idioma (esperado %r)"
+                               % (rel, TITULO[lang]))
+                n = bloco.count('class="onda68-ia__item"')
+                if n != 3:
+                    det.append(u"%s: %d item(ns) no bloco (esperado 3)" % (rel, n))
+                # (a) nenhum nome de cliente
+                texto = re.sub(r"<[^>]+>", u" ", bloco)
+                for c in clientes:
+                    if c and re.search(r"(?i)\b" + re.escape(c) + r"\b", texto):
+                        det.append(u"%s: o bloco de IA cita o cliente %r" % (rel, c))
+                # (b) nenhum percentual nem R$ atribuido a IA
+                for mm in re.finditer(r"\d+\s*%|R\$\s*\d", texto):
+                    det.append(u"%s: o bloco de IA traz numero de resultado (%r)"
+                               % (rel, mm.group(0)))
+                    break
+        # o css_o18 nao esta em escopo aqui (e definido mais adiante na funcao);
+        # ler o arquivo direto e o que mede a mesma coisa sem depender da ordem
+        _pcss = os.path.join(pub, "wp-content", "uploads", "2026", "07", "onda6",
+                             "onda6.css")
+        _css = io.open(_pcss, encoding="utf-8").read() if os.path.exists(_pcss) else u""
+        if ".onda68-ia__item{border-left:3px solid #00ADEC" not in _css:
+            det.append(u"o bloco de IA perdeu o acento ciano no CSS")
+        return (not det, u"; ".join(det[:4])
+                or u"9 paginas, 3 itens cada, 0 cliente citado, 0 numero atribuido a IA")
+    s.check("S169", u'"Como usamos IA" nas 3 práticas core × 3 idiomas, sem citar cliente (#212/#213/#214)',
+            s169)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
@@ -4178,6 +4268,21 @@ class Navegador(object):
                          {"expression": expr, "returnByValue": True})
         return r.get("result", {}).get("result", {}).get("value")
 
+    def recorte(self, x, y, largura, altura):
+        """PNG em base64 de uma regiao da pagina. None se o CDP recusar.
+
+        Existe para assercao que precisa do PIXEL PINTADO, nao do
+        getComputedStyle: `background-image` nao devolve cor, e cor declarada nao
+        diz se o texto le. Usado pela V39 (contraste do bloco de IA), na mesma
+        familia do pixel vermelho da onda 60b.
+        """
+        r = self.ws.call(self._id(), "Page.captureScreenshot", {
+            "format": "png", "captureBeyondViewport": True,
+            "clip": {"x": max(0, int(x)), "y": max(0, int(y)),
+                     "width": max(1, int(largura)), "height": max(1, int(altura)),
+                     "scale": 1}})
+        return (r.get("result") or {}).get("data")
+
     def hover(self, x, y, espera=1.0):
         self._sujo = True  # hover deixa estado; a proxima assercao precisa recarregar
         """Hover de verdade (Input.dispatchMouseEvent), como o mouse do Mario.
@@ -5400,6 +5505,151 @@ def ao_vivo(s):
                 det.append(u"termo inexistente nao mostra mensagem de nada encontrado")
             return (not det, u"; ".join(det[:4]) or u"busca responde nas 3 linguas")
         s.check("V38", u"buscar \"pricing\" devolve resultado real nas 3 línguas (#104)", v38)
+        def v39():
+            # Onda 68. A primeira versao do bloco de IA saiu com titulo navy
+            # #020E66 e subtitulo cinza #7F7F7F, porque eu ASSUMI fundo branco --
+            # a gramatica visual vinha da lista de imprensa, que e branca. O fundo
+            # da pagina de pratica e uma IMAGEM azul, e o texto do proprio tema ali
+            # e branco. Navy sobre aquele azul e ilegivel; cinza e pior.
+            #
+            # Nenhuma assercao de nome de cor pegaria isso: "color:#020E66" e uma
+            # declaracao perfeitamente valida. E o getComputedStyle do fundo tambem
+            # nao, porque background-image nao devolve cor. So o PIXEL PINTADO
+            # revela. Entao esta assercao:
+            #   1. fotografa a regiao do bloco,
+            #   2. toma a cor de FUNDO como a mais frequente da regiao (o texto
+            #      ocupa poucos pixels; o fundo ocupa a maioria),
+            #   3. calcula o contraste WCAG entre cada cor de texto e esse fundo,
+            #   4. exige >= 4.5:1 -- o piso de texto normal.
+            # Mesma familia do pixel vermelho da onda 60b: medir o efeito, nao a
+            # declaracao.
+            import base64 as _b64
+            import struct as _st
+            import zlib as _zl
+
+            def _png_rgb(dados):
+                # decodificador minimo de PNG truecolor, sem PIL no processo da suite
+                if dados[:8] != b"\x89PNG\r\n\x1a\n":
+                    return None
+                i, larg, alt, prof, tipo, idat = 8, 0, 0, 0, 0, b""
+                while i < len(dados):
+                    ln = _st.unpack(">I", dados[i:i + 4])[0]
+                    ct = dados[i + 4:i + 8]
+                    corpo = dados[i + 8:i + 8 + ln]
+                    if ct == b"IHDR":
+                        larg, alt, prof, tipo = _st.unpack(">IIBB", corpo[:10])
+                    elif ct == b"IDAT":
+                        idat += corpo
+                    elif ct == b"IEND":
+                        break
+                    i += 12 + ln
+                if prof != 8 or tipo not in (2, 6):
+                    return None
+                canais = 3 if tipo == 2 else 4
+                bruto = _zl.decompress(idat)
+                passo = larg * canais
+                saida, ant = [], bytearray(passo)
+                pos = 0
+                for _y in range(alt):
+                    f = bruto[pos]
+                    pos += 1
+                    linha = bytearray(bruto[pos:pos + passo])
+                    pos += passo
+                    for x in range(passo):
+                        a = linha[x - canais] if x >= canais else 0
+                        b = ant[x]
+                        c = ant[x - canais] if x >= canais else 0
+                        if f == 1:
+                            linha[x] = (linha[x] + a) & 255
+                        elif f == 2:
+                            linha[x] = (linha[x] + b) & 255
+                        elif f == 3:
+                            linha[x] = (linha[x] + (a + b) // 2) & 255
+                        elif f == 4:
+                            p = a + b - c
+                            pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                            pr = a if (pa <= pb and pa <= pc) else (b if pb <= pc else c)
+                            linha[x] = (linha[x] + pr) & 255
+                    saida.append(bytes(linha))
+                    ant = linha
+                return larg, alt, canais, saida
+
+            def _lum(rgb):
+                def canal(v):
+                    v = v / 255.0
+                    return v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+                return (0.2126 * canal(rgb[0]) + 0.7152 * canal(rgb[1])
+                        + 0.0722 * canal(rgb[2]))
+
+            def _contraste(a, b):
+                la, lb = _lum(a), _lum(b)
+                if la < lb:
+                    la, lb = lb, la
+                return (la + 0.05) / (lb + 0.05)
+
+            det = []
+            for rel in ("pt/pratica/estrategia/", "en/practice/strategy/",
+                        "de/branchen/strategie/"):
+                nav.abrir("%s/%s" % (base, rel), 1400, 900)
+                info = nav.js(
+                    "(function(){var b=document.querySelector('.onda68-ia');"
+                    "if(!b)return 'sem bloco';"
+                    "b.scrollIntoView({block:'start'});"
+                    "var r=b.getBoundingClientRect();"
+                    "function cor(sel){var e=b.querySelector(sel);"
+                    "return e?getComputedStyle(e).color:null;}"
+                    "return JSON.stringify({x:Math.round(r.left),y:Math.round(r.top),"
+                    "w:Math.round(r.width),h:Math.round(r.height),"
+                    "titulo:cor('.onda68-ia__titulo'),sub:cor('.onda68-ia__subtitulo'),"
+                    "it:cor('.onda68-ia__item-titulo'),tx:cor('.onda68-ia__item-texto')});})()")
+                if isinstance(info, str) and info.startswith("sem"):
+                    det.append(u"%s: %s" % (rel, info))
+                    continue
+                try:
+                    d = json.loads(info)
+                except (ValueError, TypeError):
+                    det.append(u"%s: nao consegui medir a caixa do bloco" % rel)
+                    continue
+                # o fecho tem fundo proprio (painel claro): fica fora da amostra
+                png = nav.recorte(d["x"], max(0, d["y"]), d["w"],
+                                  max(40, int(d["h"] * 0.62)))
+                dec = _png_rgb(_b64.b64decode(png)) if png else None
+                if not dec:
+                    det.append(u"%s: nao consegui decodificar o recorte" % rel)
+                    continue
+                larg, alt, canais, linhas = dec
+                freq = {}
+                for y in range(0, alt, 2):
+                    lin = linhas[y]
+                    for x in range(0, larg, 3):
+                        o = x * canais
+                        k = (lin[o], lin[o + 1], lin[o + 2])
+                        freq[k] = freq.get(k, 0) + 1
+                fundo = max(freq.items(), key=lambda kv: kv[1])[0]
+                for nome, css in (("titulo", d["titulo"]), ("subtitulo", d["sub"]),
+                                  ("titulo do item", d["it"]), ("texto", d["tx"])):
+                    if not css:
+                        det.append(u"%s: sem cor para %s" % (rel, nome))
+                        continue
+                    m = re.findall(r"[\d.]+", css)
+                    if len(m) < 3:
+                        continue
+                    rgb = tuple(int(float(v)) for v in m[:3])
+                    alfa = float(m[3]) if len(m) > 3 else 1.0
+                    # cor com alfa: compor sobre o fundo antes de medir (licao da
+                    # onda 62c -- RGB debaixo de pixel translucido nao significa nada)
+                    if alfa < 1.0:
+                        rgb = tuple(int(round(rgb[i] * alfa + fundo[i] * (1 - alfa)))
+                                    for i in range(3))
+                    c = _contraste(rgb, fundo)
+                    if c < 4.5:
+                        det.append(u"%s: %s tem contraste %.2f:1 contra o fundo "
+                                   u"%s (piso 4.5)" % (rel, nome, c, fundo))
+            return (not det, u"; ".join(det[:4])
+                    or u"contraste >= 4.5:1 em titulo, subtitulo e texto, 3 idiomas")
+        s.check("V39", u"bloco \"Como usamos IA\" legível sobre o fundo real da página (#212)",
+                v39)
+
 
         s.check("V37", u"barra do topo não embranquece no toque após fechar o menu (onda 64)",
                 v37)

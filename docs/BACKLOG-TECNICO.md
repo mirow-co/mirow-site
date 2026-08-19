@@ -123,7 +123,9 @@
 - **Está pronta e no staging**, no branch `onda59-sede`: abre a seção "Nossas áreas de expertise"
   nas 3 homes e a Nossa História nos 3 idiomas.
 - Saiu do hero porque **estourava a dobra exata em 31px** (medido pelos checks V01–V03 e V30).
-- É mudança de posicionamento, então segue o fluxo: staging → OK do Andreas → produção.
+- É mudança de posicionamento, então vai primeiro ao staging para o **Mario** ver, e ele
+  aprova. (Esta linha dizia "OK do Andreas" — corrigida em 19/08: **quem decide neste
+  projeto é o Mario, só ele**. Ver a cláusula pétrea no topo do `CLAUDE.md`.)
 
 ### C5. Endereço da sede — CORRIGIDO em 18/08, com duas pendências
 - **Fato novo do Mario:** o escritório é **Av. Ibirapuera, 2033 — conjunto 133, São Paulo/SP**.
