@@ -251,6 +251,7 @@ ETAPAS = {
     # onda 67: a busca depende do indice (asset) e do markup das 3 paginas
     "S167": ("texto", "asset"), "S168": ("texto", "asset"),
     "S169": ("texto", "css"),
+    "S170": ("texto",),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -2110,6 +2111,50 @@ def estaticas(s):
                 or u"9 paginas, 3 itens cada, 0 cliente citado, 0 numero atribuido a IA")
     s.check("S169", u'"Como usamos IA" nas 3 práticas core × 3 idiomas, sem citar cliente (#212/#213/#214)',
             s169)
+
+    def s170():
+        # #68 (S-19). O criterio de aceite pedia validacao do FATO e assercao. O
+        # Mario validou os marcos 2024-2026 em 19/08 ("#68 ok"), e daqui em diante
+        # eles nao mudam em silencio: a pagina de historia e conteudo editorial que
+        # 137 scripts de onda podem tocar de raspao.
+        #
+        # Trava o NUCLEO de cada marco, nao o paragrafo inteiro -- exigir o texto
+        # literal completo transformaria qualquer ajuste de virgula em falha de
+        # gate, e assercao que grita por virgula e assercao que se aprende a
+        # ignorar. O que fica travado e o fato: qual e o ano e o que aconteceu.
+        MARCOS = {
+            "2024": [u"prática de Energia se consolida",
+                     u"setor elétrico brasileiro"],
+            "2025": [u"fora da América Latina", u"África Austral"],
+            "2026": [u"programa de inteligência artificial aplicada",
+                     u"julgamento estratégico"],
+        }
+        rel = "pt/sobre-nos/nossa-historia/index.html"
+        # A pagina de historia escreve acento como ENTIDADE HTML
+        # (`pr&aacute;tica`, `el&eacute;trico`) -- comparar o texto acentuado direto
+        # nao casa. Decodificar e o que mede a mesma coisa sem depender de como o
+        # WordPress serializou o caractere.
+        import html as _html
+        h = _html.unescape(s.ler(rel))
+        det = []
+        for ano, pedacos in sorted(MARCOS.items()):
+            if (">%s<" % ano) not in h:
+                det.append(u"o marco de %s desapareceu da linha do tempo" % ano)
+                continue
+            for p in pedacos:
+                if p not in h:
+                    det.append(u"marco de %s sem %r" % (ano, p))
+        # A linha do tempo pula 2023, e o texto de 2024 cita "2023 e 2024". Isso foi
+        # levantado com o Mario em 19/08 e ele validou os marcos como estao -- entao
+        # nao e defeito, e escolha editorial. Fica REGISTRADO aqui para o proximo
+        # agente nao "consertar" por conta propria; se um dia 2023 ganhar marco
+        # proprio, esta linha sai junto.
+        if u"projetos consecutivos em 2023 e 2024" not in h:
+            det.append(u"o marco de 2024 deixou de citar 2023 — se 2023 ganhou "
+                       u"marco proprio, atualize a S170")
+        return (not det, u"; ".join(det[:3])
+                or u"marcos 2024/2025/2026 como o Mario validou em 19/08")
+    s.check("S170", u"marcos 2024-2026 da história como validados (#68)", s170)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
