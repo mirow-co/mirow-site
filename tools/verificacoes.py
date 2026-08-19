@@ -943,7 +943,9 @@ def estaticas(s):
             det.append(u"sem <img class=\"logo\"> na 404")
         elif not os.path.exists(os.path.join(pub, m.group(1).lstrip("/").replace("/", os.sep))):
             det.append(u"logo aponta p/ arquivo inexistente: %s" % m.group(1))
-        m = re.search(r'<script src="([^"?]*onda31-medicao\.js)[^"]*"', html)
+        # erro 10 do CLAUDE.md: tag literal nao tolera atributo novo. A onda 62d pos
+        # `defer` na tag e `<script src=` deixou de casar, embora o script estivesse la.
+        m = re.search(r'<script[^>]*[ ]src="([^"?]*onda31-medicao\.js)[^"]*"', html)
         if not m:
             det.append(u"404 sem onda31-medicao.js (page_view de 404 não conta)")
         elif not os.path.exists(os.path.join(pub, m.group(1).lstrip("/").replace("/", os.sep))):
@@ -1488,7 +1490,7 @@ def estaticas(s):
                         det.append(u"%s e placeholder sem transparencia declarada" % rel)
             elif rel.endswith(".svg"):
                 txt = d.decode("utf-8", "ignore")
-                if re.search(r"<(path|rect|circle|ellipse|polygon|line|image)", txt):
+                if re.search(r"<(path|rect|circle|ellipse|polygon|line|image)[ />]", txt):
                     det.append(u"%s desenha forma (deveria ser vazio)" % rel)
         return (not det, u"%d placeholder(es); %s" % (
             conferidos, u"; ".join(det[:3]) or u"nenhum pinta pixel"))
@@ -2222,7 +2224,7 @@ def estaticas(s):
     def s72():
         det = []
         for rel, hh in s.conteudo():
-            for m in re.finditer(r'<a[^>]*href="mailto:[^"]*"[^>]*>', hh):
+            for m in re.finditer(r'<a[ ][^>]*href="mailto:[^"]*"[^>]*>', hh):
                 tag = m.group(0)
                 if not ("menu__contatos-link--mail" in tag
                         or "hero-contatos__link--mail" in tag):
@@ -4892,6 +4894,67 @@ def ao_vivo(s):
                     % ("; ".join(det[:3]), sorted(disponiveis)))
         s.check("V35", u"nenhum elemento renderizado pede peso que a fonte não tem (#229)",
                 v35)
+
+        def v36():
+            # Onda 63 (foto do iPhone do Mario, 19/08): "texto sobre texto, difícil
+            # legibilidade". O `.onda53-slogan h2{margin-bottom:-20px}` valia em TODA
+            # largura, mas foi calibrado na tinta do desktop (62px/160% ⇒ ~18,6px de
+            # entrelinha morta). Abaixo de 992px a fonte cai para 38px/116% ⇒ ~3px de
+            # entrelinha morta, e os -20px comiam 27px do parágrafo.
+            #
+            # Mede a TINTA, não a caixa: `Range.getClientRects()` dá o retângulo real
+            # de cada linha de texto — a caixa de linha mente quando o line-height é
+            # grande, que é exatamente a armadilha que criou o bug.
+            #
+            # Cobre 4 larguras e as 3 homes: o escopo do teste tem de cobrir o escopo
+            # do título (lição da V07, que prometia "no máximo 2 linhas" medindo só
+            # pt/ em 1920 enquanto o alemão quebrava em 3 no ar).
+            js = ("(function(){"
+                  "var card=document.querySelector('.hero-texto');"
+                  "if(!card) return JSON.stringify({erro:'sem .hero-texto'});"
+                  "function tinta(el){var mx=null;"
+                  "var it=document.createNodeIterator(el,NodeFilter.SHOW_TEXT);var n;"
+                  "while((n=it.nextNode())){if(!n.nodeValue.trim())continue;"
+                  "var r=document.createRange();r.selectNodeContents(n);"
+                  "var rc=r.getClientRects();"
+                  "for(var i=0;i<rc.length;i++){if(rc[i].width<1||rc[i].height<1)continue;"
+                  "var b={t:rc[i].top,b:rc[i].bottom};"
+                  "if(!mx||b.t<mx.t)mx=mx?{t:b.t,b:Math.max(mx.b,b.b)}:b;"
+                  "else if(b.b>mx.b)mx.b=b.b;}}"
+                  "return mx;}"
+                  "var alvos=[['eyebrow','.onda53-selo-ia'],['slogan','h2'],"
+                  "['frase','p'],['pilulas','ul']];"
+                  "var cx=[];"
+                  "for(var i=0;i<alvos.length;i++){"
+                  "var e=card.querySelector(alvos[i][1]);if(!e)continue;"
+                  "var t=tinta(e);if(!t)continue;"
+                  "cx.push({nome:alvos[i][0],t:Math.round(t.t),b:Math.round(t.b)});}"
+                  "cx.sort(function(a,b){return a.t-b.t;});"
+                  "var col=[];"
+                  "for(var j=1;j<cx.length;j++){var folga=cx[j].t-cx[j-1].b;"
+                  "if(folga<2) col.push(cx[j-1].nome+'/'+cx[j].nome+' folga '"
+                  "+Math.round(folga)+'px');}"
+                  "return JSON.stringify({col:col,n:cx.length});})()")
+            det = []
+            medidos = 0
+            for rel in HOMES:
+                for larg in (390, 768, 1024, 1400):
+                    nav.abrir("%s/%s" % (base, rel), largura=larg, altura=900)
+                    bruto = nav.js(js)
+                    if not bruto:
+                        det.append(u"%s@%d sem retorno" % (rel, larg))
+                        continue
+                    d = json.loads(bruto)
+                    if d.get("erro"):
+                        det.append(u"%s@%d %s" % (rel, larg, d["erro"]))
+                        continue
+                    medidos += 1
+                    for c in d.get("col", []):
+                        det.append(u"%s@%dpx: %s" % (rel, larg, c))
+            return (not det, u"%d combinação(ões) medida(s); %s"
+                    % (medidos, u"; ".join(det[:4])
+                       or u"nenhum texto do card do hero encosta no vizinho"))
+        s.check("V36", u"card do hero sem texto sobre texto, em 4 larguras (onda 63)", v36)
 
 
 # ------------------------------------------------------------------- main
