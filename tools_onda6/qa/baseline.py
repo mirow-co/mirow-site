@@ -88,7 +88,7 @@ JS_SONDAR = """(function(sondas){
   out['_overflow'] = document.documentElement.scrollWidth
                    - document.documentElement.clientWidth;
   return JSON.stringify(out);
-})(%s)"""
+})(SONDAS_JSON)"""
 
 JS_TEXTO = """(function(){
   var m = document.querySelector('main') || document.body;
@@ -125,7 +125,7 @@ def capturar(rotulo):
                 w = FAIXA[0]
                 while w <= FAIXA[1]:
                     nav.abrir(url, largura=w, altura=900)
-                    d = nav.js(JS_SONDAR % sondas_json)
+                    d = nav.js(JS_SONDAR.replace("SONDAS_JSON", sondas_json))
                     try:
                         serie.append(json.loads(d) if isinstance(d, str) else d)
                     except Exception:
