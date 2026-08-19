@@ -1,6 +1,7 @@
 # Mirow & Co.
 
-> Consultoria estratégica brasileira (Rio de Janeiro) especializada em
+> Consultoria estratégica brasileira — sede no Rio de Janeiro, escritório
+> em São Paulo — especializada em
 > estratégia, inovação, go-to-market/pricing e sourcing/compras. Mais de 10
 > anos de mercado; projetos em mais de 50 clientes, a maioria com faturamento
 > anual acima de R$ 1 bi; 90% dos clientes voltam a contratar. Atende em
@@ -20,6 +21,17 @@ e agronegócio, serviços financeiros e tecnologia.
 - [Sourcing, Compras e Estoques](/pt/pratica/operacoes/): sourcing
   estratégico da avaliação de spend à captura
 
+## Inteligência artificial
+
+Posicionamento declarado no site (selo **AI Powered** na página inicial):
+consultoria estratégica tradicional que **utiliza IA nos projetos** de
+estratégia e inovação, sourcing/compras e go-to-market/pricing — com
+resultados acordados, trabalhando lado a lado com a equipe do cliente.
+
+A IA entra como ferramental dentro do método, não como produto separado: não
+há oferta de "projeto de IA" avulsa. O detalhamento por prática está em
+elaboração e será publicado nas páginas das próprias práticas.
+
 ## Páginas principais
 
 - [Home (PT)](/pt/): visão geral, setores e líderes
@@ -29,10 +41,16 @@ e agronegócio, serviços financeiros e tecnologia.
 - [Imprensa](/pt/imprensa/): cobertura em veículos como Valor
   Econômico, Reuters, The Economist, Estadão e Folha de S.Paulo
 - [Nossos líderes](/pt/sobre-nos/lideres/): sócios e senior experts
-- [Contato](/pt/contato/): WhatsApp, e-mail e formulário
+- [Carreiras](/pt/carreiras/): vagas abertas e envio de currículo
 
 ## Contato
 
-- Rua Lauro Müller, 116 — sala 1504, Rio de Janeiro — RJ, Brasil, CEP 22290-160
+Não há formulário de contato no site: os canais diretos ficam na página
+inicial (WhatsApp, e-mail, LinkedIn e Instagram).
+
+- Sede (assento jurídico): Rua Lauro Müller, 116 — sala 1504,
+  Rio de Janeiro — RJ, Brasil, CEP 22290-160
+- Escritório: Av. Ibirapuera, 2033 — conjunto 133, São Paulo — SP, Brasil,
+  CEP 04029-100
 - LinkedIn: https://www.linkedin.com/company/mirow-co-/
 - Instagram: https://www.instagram.com/mirowandco
