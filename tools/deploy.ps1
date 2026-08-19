@@ -44,7 +44,10 @@ param(
     # antigo: push e fim). O acompanhamento existe porque na onda 41 o build
     # veio "errored" por causa transitoria e ficou 30+ min sem ninguem ver --
     # 1 rebuild via API resolveu (issue mirow-marketing#195).
-    [switch] $SemEspera
+    [switch] $SemEspera,
+    # Publica um branch que nao seja o main em PRODUCAO. Existe para a excecao
+    # consciente; sem ele o deploy aborta fora do main (onda 66).
+    [switch] $Forcar
 )
 
 $ErrorActionPreference = 'Stop'
@@ -63,6 +66,21 @@ try {
     Write-Host "branch: $branch"
     if ($branch -eq 'gh-pages') {
         throw 'nao rode o deploy com o gh-pages checkado -- ele e artefato de build, gerado do main'
+    }
+    # ONDA 66. Este script publica o public/ DO DISCO, nao do main. Ate aqui ele so
+    # recusava o gh-pages, entao rodar o deploy com um branch de trabalho checkado
+    # punha aquele branch EM PRODUCAO. Isso passou a ser risco concreto quando a
+    # reconstrucao fluida do tema comecou a viver num branch destinado APENAS ao
+    # staging: um deploy no branch errado publicaria um tema que ninguem aprovou.
+    # Com este guard, "o teste morre no staging" deixa de depender de ninguem errar
+    # um comando e passa a depender do script.
+    if ($branch -ne 'main' -and -not $Forcar) {
+        throw ("branch atual e '" + $branch + "', nao 'main'. Producao sai do main. " +
+               "Se a intencao e realmente publicar este branch, repita com -Forcar.")
+    }
+    if ($Forcar -and $branch -ne 'main') {
+        Write-Host ("ATENCAO: -Forcar ligado; publicando o branch '" + $branch +
+                    "' em PRODUCAO.") -ForegroundColor Red
     }
     $sujo = git status --porcelain -- public tools tools_onda6
     if ($sujo) {

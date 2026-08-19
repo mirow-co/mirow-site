@@ -13,3 +13,4 @@ _scrape-legado/
 
 # Segredos locais — NUNCA versionar (R11)
 access.txt
+_baseline/

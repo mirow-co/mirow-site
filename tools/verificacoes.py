@@ -2654,10 +2654,26 @@ def estaticas(s):
         if not m:
             det.append(u"a classe única dos títulos (.onda30-titulo-secao) não existe")
         else:
-            for prop in ("font-size:48px !important", "font-weight:700 !important",
+            for prop in ("font-weight:700 !important",
                          "text-transform:none !important", "text-align:left !important"):
                 if prop not in m.group(1):
                     det.append(u"a classe dos títulos sem %s" % prop)
+            # ONDA 66: aqui se cobrava a string literal `font-size:48px !important`.
+            # A migração fluida trocou o 48px fixo por
+            # `clamp(28px, 17.6px + 2.17vw, 48px)` — mesma tipografia nas larguras
+            # aprovadas, sem o salto de 41% em 992px — e a asserção quebrou o gate
+            # por MOTIVO CERTO, ALVO ERRADO: ela media a declaração, não o efeito.
+            # Quarta vez nesta classe em dois dias (S125 na onda 33b, S119 na 62c,
+            # S146 na 65). O invariante que interessa é "os 4 títulos são parelhos",
+            # e quem o mede de verdade é a V17, no render. Aqui fica o que é estático:
+            # a classe declara UM tamanho, seja ele qual for — se alguém voltar a
+            # espalhar tamanho por seletor, isto acusa.
+            tam = re.findall(r"font-size:\s*([^;}]+)", m.group(1))
+            if len(tam) != 1:
+                det.append(u"a classe dos títulos declara %d font-size (esperado 1): %s"
+                           % (len(tam), tam))
+            elif "!important" not in tam[0]:
+                det.append(u"o font-size da classe dos títulos perdeu o !important")
         # v2 do marcador (S-86): grade 2x2, navy fixo, a esquerda do titulo
         if ".onda22-marca{float:left;display:grid" not in css_o18:
             det.append(u"marca não é grade 2x2 flutuando à esquerda do título")

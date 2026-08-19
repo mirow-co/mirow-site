@@ -14,6 +14,11 @@ if (-not (Test-Path (Join-Path $pub ".nojekyll"))) { throw "public/.nojekyll nao
 
 $tmp = Join-Path $env:TEMP ("staging-" + [guid]::NewGuid().ToString("N").Substring(0,8))
 New-Item -ItemType Directory -Path $tmp | Out-Null
+# Onda 66: dizer O QUE esta sendo publicado. O staging recebe branch de trabalho
+# (a reconstrucao fluida), e antes disso nada no log dizia de onde a arvore vinha.
+$br = (git -C $raiz rev-parse --abbrev-ref HEAD).Trim()
+$vs = (Select-String -Path (Join-Path $raiz "tools_onda6_cache_busting.py") -Pattern "^VERSAO = (\d+)").Matches[0].Groups[1].Value
+Write-Host ("[0/4] branch: " + $br + " | VERSAO de cache: v=" + $vs) -ForegroundColor Cyan
 Write-Host "[1/4] Copiando public/ para $tmp ..."
 robocopy $pub $tmp /E /NFL /NDL /NJH /NJS | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "robocopy falhou ($LASTEXITCODE)" }
