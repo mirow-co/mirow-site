@@ -1446,10 +1446,23 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
    entre as 3 palavras: 20px. O gap ate a frase era 46px — mais que o dobro —
    e o Mario pediu "igualmente distribuido". As margens abaixo sao o que faz os
    tres gaps darem ~20px; o -20 no h2 desconta a entrelinha morta do line-height. */
-.onda53-selo-ia{margin-bottom:-6px}/* onda53 v4: negativo de proposito — o
+/* onda53 v4: negativo de proposito — o
    slogan tem ~25px de entrelinha morta acima da tinta, entao puxar 20px nao
    encosta em nada e devolve à dobra o que o eyebrow custou (34px medidos). */
-.onda53-slogan h2{margin-bottom:-20px}
+/* onda63 (19/08): os dois negativos abaixo valiam em TODA largura, mas foram
+   medidos na tinta do DESKTOP, onde a entrelinha morta e ~18,6px (62px/160%).
+   Abaixo de 992px a fonte cai para 38px/116% e a entrelinha morta vira ~3px --
+   os -20px passavam a comer 27px do paragrafo, e o -6px encostava o eyebrow no
+   "Estrategia". Medido no navegador em 390/768/1024/1400. Escopados aqui, com
+   ritmo proprio para o mobile; editado NO LUGAR (valores gemeos). */
+@media only screen and (min-width:992px){
+  .onda53-selo-ia{margin-bottom:-6px}
+  .onda53-slogan h2{margin-bottom:-20px}
+}
+@media only screen and (max-width:991px){
+  .onda53-selo-ia{margin-bottom:18px}
+  .onda53-slogan h2{margin-bottom:20px}
+}
 /* onda53 v2 (13/08) — a 1a versao era pilula ciano solida com canto 14px: lia
    como etiqueta de e-commerce ("o ai powered precisa melhorar", Mario). Agora
    segue o STICKER dos nossos decks (R15: caixa alta, tique vertical colado a
