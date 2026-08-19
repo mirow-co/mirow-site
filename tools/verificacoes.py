@@ -50,6 +50,7 @@ import sys
 import tempfile
 import threading
 import time
+import unicodedata
 import urllib.request
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -244,6 +245,9 @@ ETAPAS = {
     "S123": ("asset",), "S153": ("asset", "texto"), "S157": ("asset", "css"),
     "S159": ("asset",), "S160": ("asset",), "S161": ("asset",),
     "S162": ("asset",), "S163": ("asset",), "S164": ("asset", "medicao"), "E": ("asset",),
+    # onda 65: a lista de imprensa e gerada do mestre; mexer no dado e mexer no
+    # texto das 3 paginas, e o logo de cada veiculo e asset
+    "S165": ("texto",), "S166": ("texto", "asset"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -963,10 +967,19 @@ def estaticas(s):
     def s146():
         # #220: a coluna Vaivém (Folha, 10/02/2026) com o alerta do Andreas sobre
         # celulose entra na lista de imprensa das 3 páginas. Mede o EFEITO (P2.1):
-        # não basta a URL aparecer — o item tem de ser o PRIMEIRO da lista (é o
-        # mais recente do acervo), a data em <time datetime> tem de bater com a
-        # que a Folha publica, e o logo tem de resolver para arquivo no disco.
-        # A ordem é o que o leitor vê primeiro; foi por isso que o pedido existiu.
+        # não basta a URL aparecer — a data em <time datetime> tem de bater com
+        # a que a Folha publica, o logo tem de resolver para arquivo no disco, e o
+        # item tem de estar na POSIÇÃO QUE A DATA DELE MANDA.
+        #
+        # ONDA 65: esta asserção cobrava "tem de ser o PRIMEIRO da lista", e o
+        # próprio comentário dela declarava o motivo entre parênteses — "(é o mais
+        # recente do acervo)". Era um VALOR GÊMEO: em 13/08 topo e mais-recente
+        # eram a mesma coisa; com as 14 matérias da #237, sete delas posteriores,
+        # o item caiu para 8º — CORRETAMENTE — e a asserção bloqueou o deploy por
+        # motivo certo e alvo errado. Terceira vez nesta classe (S125 na onda 33b,
+        # S119 na 62c). Agora ela mede o invariante que "topo" representava: a
+        # posição do item é igual ao número de matérias com data posterior — o que
+        # vale com qualquer quantidade de matérias novas.
         URL_VAIVEM = ("https://www1.folha.uol.com.br/colunas/vaivem/2026/02/"
                       "exportacao-de-celulose-cresce-mas-setor-pode-ter-desequilibrio.shtml")
         alvos = ["pt/imprensa/index.html", "en/press/index.html", "de/presse/index.html"]
@@ -980,22 +993,31 @@ def estaticas(s):
             if URL_VAIVEM not in html:
                 det.append(u"%s sem a coluna Vaivém" % rel)
                 continue
-            if URL_VAIVEM not in itens[0]:
-                pos = next((i for i, it in enumerate(itens) if URL_VAIVEM in it), -1)
-                det.append(u"%s: Vaivém em %dº, não no topo" % (rel, pos + 1))
-            if 'datetime="2026-02-10"' not in itens[0]:
-                det.append(u"%s: data do topo não é 2026-02-10 (a que a Folha publica)" % rel)
+            pos = next((i for i, it in enumerate(itens) if URL_VAIVEM in it), -1)
+            item = itens[pos]
+            if 'datetime="2026-02-10"' not in item:
+                det.append(u"%s: a coluna Vaivém não está datada 2026-02-10 "
+                           u"(a data que a Folha publica)" % rel)
+            if '>Folha de S.Paulo<' not in item:
+                det.append(u"%s: a coluna Vaivém não está rotulada Folha de S.Paulo" % rel)
+            # a posição é a que a data manda (o que "no topo" representava)
+            posteriores = sum(1 for d in re.findall(r'datetime="([^"]+)"', html)
+                              if d > "2026-02-10")
+            if pos != posteriores:
+                det.append(u"%s: Vaivém em %dº, mas há %d matéria(s) mais nova(s) "
+                           u"— devia estar em %dº" % (rel, pos + 1, posteriores,
+                                                      posteriores + 1))
             # a lista inteira tem de seguir em ordem decrescente de data
             datas = re.findall(r'datetime="([^"]+)"', html)
             if datas != sorted(datas, reverse=True):
                 det.append(u"%s: lista fora de ordem cronológica" % rel)
-            m = re.search(r'<img[^>]*class="onda41-imprensa__logo"[^>]*src="([^"?]+)', itens[0])
+            m = re.search(r'<img[^>]*class="onda41-imprensa__logo"[^>]*src="([^"?]+)', item)
             if not m:
-                det.append(u"%s: item do topo sem logo" % rel)
+                det.append(u"%s: a coluna Vaivém está sem logo" % rel)
             elif not os.path.exists(os.path.join(pub, m.group(1).lstrip("/").replace("/", os.sep))):
                 det.append(u"%s: logo aponta p/ inexistente %s" % (rel, m.group(1)))
         return (not det, u"; ".join(det[:4]))
-    s.check("S146", u"coluna Vaivém/Folha (10/02/2026, Andreas) no topo da imprensa pt/en/de (#220)", s146)
+    s.check("S146", u"coluna Vaivém/Folha (10/02/2026, Andreas) na imprensa pt/en/de, na posição da data (#220)", s146)
 
     def s147():
         # #211 (onda 53): a home diz que a consultoria é tradicional mas usa IA.
@@ -1731,6 +1753,172 @@ def estaticas(s):
                    u"; ".join(det[:4]) or u"nenhum PNG acima de 120 KB, todo webp resolve"))
     s.check("S163", u"PNG pesado não volta: nenhum acima de 120 KB, webp resolve (onda 62c)",
             s163)
+
+    # ------------------------------------------------------------------ onda 65
+    def s165():
+        # Onda 65 / issue #238. DOIS itens ficaram no ar por mais de doze meses com
+        # o veículo errado:
+        #
+        #   28/05/2024 "Armazenamento de energia trava aportes consistentes"
+        #       rótulo Estadão + logo do Estadão + data 28/05 — e o link é do VALOR
+        #       (Revista Energia), cujo datePublished é 2024-05-10.
+        #   02/03/2024 "Descarbonização: onde investir…"
+        #       rótulo Folha de S.Paulo + logo da Folha — e o link é do jornal
+        #       EMPRESAS & NEGÓCIOS.
+        #
+        # E havia asserção contra isso. A S57b cobra literalmente "o logo segue o
+        # veículo, não o link" — e passava VERDE nos dois, porque o logo batia com o
+        # rótulo, e o rótulo é que estava errado. Ela compara dois campos NOSSOS
+        # entre si e nunca comparou nenhum deles com o host do link, que é o único
+        # dado da linha que não escrevemos. P2.1: medir o efeito, não a declaração.
+        #
+        # Dois braços, e o primeiro é o que pega a CLASSE:
+        #
+        #   (a) UM HOST, UM VEÍCULO. Invariante derivado do próprio dado, sem mapa
+        #       hardcoded: se o mesmo host aparece rotulado com dois veículos
+        #       diferentes, um dos dois está errado por construção. Era exatamente o
+        #       caso — valor.globo.com aparecia como "Valor Econômico" E "Estadão";
+        #       jornalempresasenegocios.com.br como "Empresas & Negócios" E "Folha
+        #       de S.Paulo".
+        #   (b) O NOME TEM DE APARECER NO HOST. Algum token de 3+ letras do veículo
+        #       (sem acento, só letras) está presente no host — ou o par é exceção
+        #       DECLARADA aqui, com o motivo. Isto pega o caso em que o erro é
+        #       consistente (um host novo rotulado errado desde o primeiro item, que
+        #       o braço (a) não vê).
+        EXCECOES = {
+            # veículo -> host, e por que host e marca não se parecem
+            u"iG": ("ig.com.br", u"a marca tem 2 letras; token de 3+ não existe"),
+            u"CZ Insights": ("czapp.com", u"o veículo publica em czapp.com, "
+                                          u"domínio da Czarnikow"),
+        }
+        det = []
+        por_host = {}
+        for rel in IMPRENSA:
+            h = s.ler(rel)
+            itens = re.findall(r'<li class="onda18-imprensa__item">(.*?)</li>', h, re.S)
+            for it in itens:
+                mu = re.search(r'href="(https?://[^"]+)"', it)
+                mv = re.search(r'class="onda18-imprensa__veiculo">([^<]*)<', it)
+                if not (mu and mv):
+                    det.append(u"%s: item sem url ou sem veículo" % rel)
+                    continue
+                host = mu.group(1).split("/")[2].lower()
+                if host.startswith("www."):
+                    host = host[4:]
+                veic = mv.group(1).replace("&amp;", "&")
+                por_host.setdefault(host, set()).add(veic)
+
+        # (a) um host, um veículo
+        for host, veics in sorted(por_host.items()):
+            if len(veics) > 1:
+                det.append(u"host %s rotulado com %d veículos: %s"
+                           % (host, len(veics), u" / ".join(sorted(veics))))
+
+        # (b) o nome do veículo aparece no host
+        def tokens(nome):
+            limpo = unicodedata.normalize("NFKD", nome)
+            limpo = u"".join(c for c in limpo if not unicodedata.combining(c))
+            return [t for t in re.split(r"[^A-Za-z]+", limpo.lower()) if len(t) >= 3]
+
+        for host, veics in sorted(por_host.items()):
+            for veic in sorted(veics):
+                if any(t in host for t in tokens(veic)):
+                    continue
+                esperado = EXCECOES.get(veic)
+                if esperado and host.endswith(esperado[0]):
+                    continue
+                det.append(u"%s: nenhum token do nome aparece no host %s "
+                           u"(e não é exceção declarada)" % (veic, host))
+        return (not det, u"%d host(s) distinto(s); %s"
+                % (len(por_host),
+                   u"; ".join(det[:4]) or u"cada host com um veículo só, "
+                                          u"e o nome bate com o host"))
+    s.check("S165", u"imprensa: o veículo bate com o host do link (#238)", s165)
+
+    def s166():
+        # Onda 65 / issue #239. A lista deixou de ser HTML à mão em três arquivos e
+        # passou a ser GERADA do mestre P3 (tools/gen_imprensa.py). Esta asserção
+        # RECALCULA a lista a partir de tools/imprensa-publicada.json — a lista que
+        # o gerador emite — e compara com o HTML das três páginas.
+        #
+        # É o padrão da S116 (reprojeta os pins da Nossa Rede e compara) e da S120
+        # (regera o sitemap inteiro): a forma mais forte de P2.1, porque não confere
+        # se o HTML "parece certo" — refaz a conta e exige igualdade. Com isso, a
+        # lista não pode divergir do dado curado nem por edição à mão nem por script
+        # futuro que mexa nas páginas.
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "imprensa-publicada.json")
+        if not os.path.exists(p):
+            return (False, u"falta tools/imprensa-publicada.json — rode "
+                           u"tools/gen_imprensa.py")
+        with io.open(p, encoding="utf-8") as f:
+            esperado = json.load(f)
+        det = []
+
+        if len(esperado) < 40:
+            det.append(u"a lista publicada tem só %d matérias" % len(esperado))
+
+        # ordem: data decrescente
+        datas = [m["data"] for m in esperado]
+        if datas != sorted(datas, reverse=True):
+            det.append(u"a lista publicada não está em data decrescente")
+
+        # url única
+        urls = [m["url"] for m in esperado]
+        if len(set(urls)) != len(urls):
+            dup = sorted(set(u for u in urls if urls.count(u) > 1))
+            det.append(u"URL duplicada: %s" % u", ".join(dup[:3]))
+
+        # logo declarado existe no disco
+        for m in esperado:
+            if m["logo"]:
+                fp = os.path.join(pub, "wp-content", "uploads", "2026", "08",
+                                  "imprensa-logos", m["logo"])
+                if not os.path.exists(fp):
+                    det.append(u"logo ausente do disco: %s" % m["logo"])
+
+        # o HTML de cada página é o que o mestre manda — e as três são iguais
+        assinaturas = {}
+        for rel in IMPRENSA:
+            h = s.ler(rel)
+            itens = re.findall(r'<li class="onda18-imprensa__item">(.*?)</li>', h, re.S)
+            if len(itens) != len(esperado):
+                det.append(u"%s tem %d itens, o mestre manda %d"
+                           % (rel, len(itens), len(esperado)))
+                continue
+            achado = []
+            for it in itens:
+                mu = re.search(r'href="([^"]+)"', it)
+                mv = re.search(r'class="onda18-imprensa__veiculo">([^<]*)<', it)
+                md = re.search(r'datetime="([^"]+)"', it)
+                mt = re.search(r'class="onda18-imprensa__titulo">([^<]*)<', it)
+                ml = re.search(r'class="onda41-imprensa__logo"[^>]*src="[^"?]*/'
+                               r'([^"/?]+)', it)
+                achado.append((md.group(1) if md else u"",
+                               (mv.group(1) if mv else u"").replace("&amp;", "&"),
+                               (mt.group(1) if mt else u"").replace("&amp;", "&"),
+                               mu.group(1).replace("&amp;", "&") if mu else u"",
+                               ml.group(1) if ml else None))
+            assinaturas[rel] = achado
+            for i, (esp, got) in enumerate(zip(esperado, achado)):
+                alvo = (esp["data"], esp["veiculo"], esp["titulo"], esp["url"],
+                        esp["logo"])
+                if got != alvo:
+                    campos = [n for n, a, b in zip(
+                        ("data", "veículo", "título", "url", "logo"), alvo, got)
+                        if a != b]
+                    det.append(u"%s item %d divergente em %s"
+                               % (rel, i + 1, u"/".join(campos)))
+                    break
+        vistas = list(assinaturas.values())
+        if len(vistas) == 3 and not (vistas[0] == vistas[1] == vistas[2]):
+            det.append(u"as três páginas não listam a mesma coisa")
+        com_logo = sum(1 for m in esperado if m["logo"])
+        return (not det, u"%d matéria(s) recalculada(s) do mestre (%d com logo, "
+                         u"%d com wordmark de texto); %s"
+                % (len(esperado), com_logo, len(esperado) - com_logo,
+                   u"; ".join(det[:4]) or u"as 3 páginas idênticas ao mestre"))
+    s.check("S166", u"imprensa recalculada do mestre P3, 3 páginas idênticas (#239)", s166)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
@@ -4580,6 +4768,21 @@ def ao_vivo(s):
         # com naturalWidth>0, o primeiro logo com >=90px renderizados, e a linha
         # inteira clicável (o grid mora no <a>, S-102).
         def v26():
+            # Onda 65: a contagem deixa de ser o "10" hardcoded e passa a vir do
+            # mestre (tools/imprensa-publicada.json). Valor gêmeo: com o 10 fixo, a
+            # asserção continuaria verde se o gerador emitisse 12 dos 43 itens.
+            # Também passa a exigir que os wordmarks de TEXTO (veículo sem asset —
+            # hoje epbr, CZ Insights, Money Times e Revista Amazônia) rendereizem
+            # com tinta: um <span> vazio ou de altura 0 é logo invisível, e era
+            # invisível também para a versão anterior desta asserção.
+            esperado_img = esperado_txt = None
+            _p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "imprensa-publicada.json")
+            if os.path.exists(_p):
+                with io.open(_p, encoding="utf-8") as _f:
+                    _lista = json.load(_f)
+                esperado_img = sum(1 for m in _lista if m["logo"])
+                esperado_txt = len(_lista) - esperado_img
             det = []
             for rel in ["pt/imprensa/", "en/press/", "de/presse/"]:
                 nav.abrir("%s/%s" % (base, rel), 1400, 900)
@@ -4593,15 +4796,31 @@ def ao_vivo(s):
                     "var maior=0;imgs.forEach(function(i){maior=Math.max(maior,i.getBoundingClientRect().width);});"
                     "var link=document.querySelector('a.onda26-imprensa__link');"
                     "var lw=link?Math.round(link.getBoundingClientRect().width):0;"
+                    "var txts=document.querySelectorAll('span.onda41-imprensa__logo--texto');"
+                    "var txtRuins=[];txts.forEach(function(t){var r=t.getBoundingClientRect();"
+                    "if(r.width<40||r.height<10||!t.textContent.trim())"
+                    "txtRuins.push(t.textContent.trim()||'(vazio)');});"
                     "return {ruins:ruins,imgs:imgs.length,pequenos:pequenos,maior:Math.round(maior),lw:lw,"
+                    "txts:txts.length,txtRuins:txtRuins,"
                     "ov:document.documentElement.scrollWidth-document.documentElement.clientWidth};})()")
                 if isinstance(d, str):
                     det.append(u"%s: %s" % (rel, d))
                     continue
                 if d["ruins"]:
                     det.append(u"%s: logo(s) quebrado(s): %s" % (rel, d["ruins"][:3]))
-                if d["imgs"] < 10:
-                    det.append(u"%s: só %d imagens de logo" % (rel, d["imgs"]))
+                # onda 65: a contagem vem do mestre, nao de um 10 hardcoded
+                if esperado_img is None:
+                    det.append(u"falta tools/imprensa-publicada.json")
+                else:
+                    if d["imgs"] != esperado_img:
+                        det.append(u"%s: %d imagens de logo, o mestre manda %d"
+                                   % (rel, d["imgs"], esperado_img))
+                    if d["txts"] != esperado_txt:
+                        det.append(u"%s: %d wordmark(s) de texto, o mestre manda %d"
+                                   % (rel, d["txts"], esperado_txt))
+                if d["txtRuins"]:
+                    det.append(u"%s: wordmark de texto sem tinta: %s"
+                               % (rel, d["txtRuins"][:3]))
                 # "grande": todo logo tem >=90px de largura OU >=36px de altura
                 # (os quadrados como iG e E&N são altos; os wordmarks, largos —
                 # o favicon antigo era 28x28 e falha nos dois critérios), e o
