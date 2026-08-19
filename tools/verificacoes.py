@@ -248,6 +248,8 @@ ETAPAS = {
     # onda 65: a lista de imprensa e gerada do mestre; mexer no dado e mexer no
     # texto das 3 paginas, e o logo de cada veiculo e asset
     "S165": ("texto",), "S166": ("texto", "asset"),
+    # onda 67: a busca depende do indice (asset) e do markup das 3 paginas
+    "S167": ("texto", "asset"), "S168": ("texto", "asset"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -1919,6 +1921,105 @@ def estaticas(s):
                 % (len(esperado), com_logo, len(esperado) - com_logo,
                    u"; ".join(det[:4]) or u"as 3 páginas idênticas ao mestre"))
     s.check("S166", u"imprensa recalculada do mestre P3, 3 páginas idênticas (#239)", s166)
+
+    # ------------------------------------------------------------------ onda 67
+    def s167():
+        # #104 / S-47. O campo de busca do tema postava `?s=` para `action="/"`.
+        # Num WordPress o servidor responde; no espelho estatico do Pages nao ha
+        # quem responda -- medido em 19/08, `/?s=pricing` devolvia o STUB da raiz e
+        # jogava o visitante em /pt/. Era o unico dos tres caminhos de conversao
+        # mortos que o visitante ACIONA de proposito.
+        #
+        # Esta assercao cobra a parte estatica; quem mede o EFEITO (buscar e
+        # receber resultado) e a V38, no render.
+        BUSCA = {"pt": ("pt/insights/index.html", u"Buscar no site"),
+                 "en": ("en/insights/index.html", u"Search the site"),
+                 "de": ("de/insights/index.html", u"Website durchsuchen")}
+        det = []
+        for lang, (rel, rotulo) in sorted(BUSCA.items()):
+            h = s.ler(rel)
+            m = re.search(r'<form class="search-form"[^>]*action="([^"]*)"', h)
+            if not m:
+                det.append(u"%s: sem <form class=\"search-form\">" % rel)
+                continue
+            alvo = "/" + rel[:-len("index.html")]
+            if m.group(1) != alvo:
+                det.append(u"%s: form posta para %r (esperado %r)"
+                           % (rel, m.group(1), alvo))
+            if "post_type" in h:
+                det.append(u"%s: campo oculto post_type do WordPress ainda la" % rel)
+            if rotulo not in h:
+                det.append(u"%s: rotulo da busca nao esta no idioma da pagina" % rel)
+            if 'id="onda67-busca-resultados"' not in h:
+                det.append(u"%s: sem contentor de resultados" % rel)
+            if not re.search(r'onda67/busca\.js\?v=\d+', h):
+                det.append(u"%s: busca.js ausente ou sem ?v=" % rel)
+        # o indice: existe, parseia, e toda URL dele resolve e NAO e stub
+        pj = os.path.join(pub, "busca-indice.json")
+        if not os.path.exists(pj):
+            det.append(u"falta public/busca-indice.json")
+        else:
+            try:
+                idx = json.load(io.open(pj, encoding="utf-8"))["itens"]
+            except (ValueError, KeyError) as e:
+                idx = []
+                det.append(u"busca-indice.json invalido (%s)" % e)
+            if len(idx) < 100:
+                det.append(u"indice com so %d pagina(s)" % len(idx))
+            sem_t = [d["u"] for d in idx if not d.get("t")]
+            if sem_t:
+                det.append(u"%d item(ns) sem titulo: %s" % (len(sem_t), sem_t[:3]))
+            langs = set(d.get("l") for d in idx)
+            if not {"pt", "en", "de"} <= langs:
+                det.append(u"indice sem os 3 idiomas: %s" % sorted(langs))
+            for d in idx[:400]:
+                rel2 = d["u"].strip("/").replace("/", os.sep)
+                fp = os.path.join(pub, rel2, "index.html") if rel2 \
+                    else os.path.join(pub, "index.html")
+                if not os.path.exists(fp):
+                    det.append(u"indice aponta para %s, que nao existe" % d["u"])
+                    break
+                hh = io.open(fp, encoding="utf-8", errors="ignore").read()
+                if 'http-equiv="refresh"' in hh or "window.location.replace" in hh:
+                    det.append(u"indice aponta para %s, que e STUB" % d["u"])
+                    break
+        return (not det, u"; ".join(det[:4]) or u"3 formularios ligados, indice resolve")
+    s.check("S167", u"busca estática: o campo posta na própria página e o índice resolve (#104)",
+            s167)
+
+    def s168():
+        # #215. A camada que os LLMs leem (llms.txt) nao dizia uma palavra sobre IA,
+        # enquanto a home abre com o selo AI Powered desde a onda 58. E, medido ao
+        # escrever isto, ela mandava o robo para /pt/contato/ anunciando
+        # "formulario" -- aquela pagina e STUB e nao tem formulario nenhum.
+        p = os.path.join(pub, "llms.txt")
+        if not os.path.exists(p):
+            return (False, u"nao existe public/llms.txt")
+        t = io.open(p, encoding="utf-8").read()
+        det = []
+        if not re.search(r"(?i)intelig[eê]ncia artificial|AI Powered|\bIA\b", t):
+            det.append(u"nao menciona IA")
+        if u"São Paulo" not in t:
+            det.append(u"nao cita o escritorio de Sao Paulo")
+        if u"formulário" in t and u"Não há formulário" not in t:
+            det.append(u"promete formulario de contato, que nao existe")
+        # nenhum link interno pode faltar nem ser stub (o caso do /pt/contato/)
+        for m in re.finditer(r"\]\((/[^)]+)\)", t):
+            rel = m.group(1).strip("/").replace("/", os.sep)
+            fp = os.path.join(pub, rel, "index.html")
+            if not os.path.exists(fp):
+                det.append(u"link %s nao existe" % m.group(1))
+                continue
+            hh = io.open(fp, encoding="utf-8", errors="ignore").read()
+            if 'http-equiv="refresh"' in hh or "window.location.replace" in hh:
+                det.append(u"link %s e stub de redirect" % m.group(1))
+        # o invisivel nao pode prometer o que o visivel nao diz: se o llms.txt
+        # afirma IA, a home tem de afirmar tambem
+        if re.search(r"(?i)AI Powered", t):
+            if "AI Powered" not in s.ler("pt/index.html"):
+                det.append(u"llms.txt diz AI Powered e a home pt nao")
+        return (not det, u"; ".join(det[:4]) or u"IA declarada, todo link resolve")
+    s.check("S168", u"llms.txt declara IA e não manda o robô para stub (#215)", s168)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
@@ -5250,6 +5351,56 @@ def ao_vivo(s):
                                    % (rel, d.get("fundo")))
             return (not det, u"; ".join(det[:3])
                     or u"hover branco só com ponteiro fino; no toque a barra fica navy")
+        def v38():
+            # #104. A S167 confere o markup; esta mede o EFEITO, que e o criterio
+            # de aceite da issue: "buscar 'pricing' retorna resultados reais".
+            # Sem isto, a suite ficaria verde com o indice no lugar e a busca sem
+            # renderizar nada -- exatamente o P2.1.
+            det = []
+            for rel, lang, termo in (("pt/insights/", "pt", "pricing"),
+                                     ("en/insights/", "en", "pricing"),
+                                     ("de/insights/", "de", "pricing")):
+                nav.abrir("%s/%s?s=%s" % (base, rel, termo), 1400, 900)
+                time.sleep(0.8)
+                d = nav.js(
+                    "(function(){var c=document.getElementById('onda67-busca-resultados');"
+                    "if(!c)return 'sem contentor';"
+                    "var its=c.querySelectorAll('.onda67-busca__item');"
+                    "var langs=[];its.forEach(function(li){"
+                    "langs.push((li.querySelector('a').getAttribute('href')||'/x/').split('/')[1]);});"
+                    "var campo=document.querySelector('input[name=s]');"
+                    "return JSON.stringify({n:its.length,marcas:c.querySelectorAll('mark').length,"
+                    "campo:campo?campo.value:null,idiomas:Array.from(new Set(langs))});})()")
+                if isinstance(d, str) and d.startswith("sem"):
+                    det.append(u"%s: %s" % (rel, d))
+                    continue
+                try:
+                    d = json.loads(d)
+                except (ValueError, TypeError):
+                    det.append(u"%s: nao consegui medir" % rel)
+                    continue
+                if d["n"] < 1:
+                    det.append(u"%s: 0 resultado para %r" % (rel, termo))
+                if d["marcas"] < 1:
+                    det.append(u"%s: resultado sem o termo destacado" % rel)
+                if d["campo"] != termo:
+                    det.append(u"%s: o campo nao repete o termo buscado (%r)"
+                               % (rel, d["campo"]))
+                fora = [x for x in d["idiomas"] if x != lang]
+                if fora:
+                    det.append(u"%s: resultado de outro idioma: %s" % (rel, fora))
+            # termo inexistente tem de dizer que nao achou, nao ficar em branco
+            nav.abrir("%s/pt/insights/?s=zzzznaoexistexyz" % base, 1400, 900)
+            time.sleep(0.8)
+            vazio = nav.js(
+                "(function(){var c=document.getElementById('onda67-busca-resultados');"
+                "var v=c?c.querySelector('.onda67-busca__vazio'):null;"
+                "return v?v.textContent.length:0;})()")
+            if not vazio:
+                det.append(u"termo inexistente nao mostra mensagem de nada encontrado")
+            return (not det, u"; ".join(det[:4]) or u"busca responde nas 3 linguas")
+        s.check("V38", u"buscar \"pricing\" devolve resultado real nas 3 línguas (#104)", v38)
+
         s.check("V37", u"barra do topo não embranquece no toque após fechar o menu (onda 64)",
                 v37)
 

@@ -1560,3 +1560,26 @@ display:block}.pol-v2 thead{display:none}.pol-v2 td{border-top:0}
 .banner__content .onda53-slogan h2{
   font-size:clamp(38px, 8.8px + 3.8vw, 62px) !important}
 /* onda66:slogan-fluido:fim */
+
+/* onda67:busca:ini */
+/* ---- onda67 (#104): resultados da busca estatica -------------------------
+   Herda a tipografia do corpo; a lista usa a mesma gramatica visual da lista de
+   imprensa (linha inteira clicavel, fundo branco, separador fino), para nao
+   inventar um componente novo. */
+.onda67-busca{margin:0 0 44px}
+.onda67-busca__contagem{font-size:15px;color:#7F7F7F;margin:0 0 14px}
+.onda67-busca__vazio{font-size:17px;color:#071C25;margin:0;padding:18px 20px;
+  background:#fff;border-left:3px solid #00ADEC}
+.onda67-busca__lista{list-style:none;margin:0;padding:0;background:#fff}
+.onda67-busca__item+.onda67-busca__item{border-top:1px solid #E5E5E5}
+.onda67-busca__link{display:grid;gap:4px;padding:18px 22px;text-decoration:none}
+.onda67-busca__link:hover .onda67-busca__titulo{color:#00ADEC}
+.onda67-busca__titulo{font-size:clamp(16px,14.6px + 0.19vw,18px);font-weight:700;
+  color:#020E66;line-height:1.3}
+.onda67-busca__trecho{font-size:15px;color:#071C25;line-height:1.5}
+.onda67-busca__trecho mark{background:#AAD5E8;color:#071C25;padding:0 2px}
+@media only screen and (max-width: 991px){
+  .onda67-busca__link{padding:16px 16px}
+  .onda67-busca__trecho{font-size:14px}
+}
+/* onda67:busca:fim */

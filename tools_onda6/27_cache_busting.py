@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
 # >>> proximas ondas: incrementar aqui e rodar o script <<<
-VERSAO = 76
+VERSAO = 77
 
 ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda6.css",
@@ -50,6 +50,7 @@ ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda17-horizonte.js",
     "wp-content/uploads/2026/07/onda6/onda31-medicao.js",
     "wp-content/uploads/2026/07/onda6/onda54-leadfeeder.js",
+    "wp-content/uploads/2026/08/onda67/busca.js",
     "wp-content/uploads/2026/07/fontes/fontes-mirow.css",
     "wp-content/uploads/2026/07/clientes/clientes-logos.css",
     # CSS do tema: entrou porque passamos a edita-lo (ver acima).
@@ -73,6 +74,13 @@ def carimbar(html):
                          + re.escape(asset) + r')(\?[^"\']*)?\2')
         html = rex.sub(lambda m: u'%s%s%s?v=%d%s'
                        % (m.group(1), m.group(2), m.group(3), VERSAO, m.group(2)), html)
+    # Onda 67: o busca.js usa window.ONDA67_V no ?v= do busca-indice.json. Aquele
+    # numero e escrito pelo 134_busca_estatica.py no momento em que ele roda, e
+    # sem esta linha ele nao acompanharia a VERSAO -- o navegador serviria o
+    # INDICE VELHO depois de uma onda que muda conteudo, e a busca devolveria
+    # pagina que nao existe mais. Valor gemeo, resolvido no carimbo.
+    html = re.sub(r'window\.ONDA67_V\s*=\s*"\d+"',
+                  'window.ONDA67_V="%d"' % VERSAO, html)
     return html
 
 
