@@ -19,7 +19,7 @@
   max-height:30px;max-width:132px;
   filter:grayscale(1) opacity(.65);transition:filter 300ms ease-in-out}
 .clientes-logos__item--alto svg{max-height:44px;max-width:96px}
-.clientes-logos__item:hover svg{filter:grayscale(1) opacity(1)}
+@media (hover:hover) and (pointer:fine){.clientes-logos__item:hover svg{filter:grayscale(1) opacity(1)}}
 @media only screen and (max-width: 991px){
   .clientes-logos__item svg{max-height:24px;max-width:104px}
   .clientes-logos__item--alto svg{max-height:36px;max-width:78px}
@@ -44,12 +44,12 @@
 /* onda7 — "Nossos Lideres" da home vira caminho para a pagina de lideres */
 .home-leaders__subtitle .onda7-titulo-link{color:inherit;text-decoration:none;
   transition:color 300ms ease-in-out}
-.home-leaders__subtitle .onda7-titulo-link:hover{color:#00ADEC}
+@media (hover:hover) and (pointer:fine){.home-leaders__subtitle .onda7-titulo-link:hover{color:#00ADEC}}
 .onda7-vertodos{display:inline-flex;align-items:center;gap:10px;
   color:var(--whiteColor,#fff);font-family:var(--fontFamily);font-size:16px;
   font-weight:700;text-decoration:none;margin-top:6px;
   transition:color 300ms ease-in-out}
-.onda7-vertodos:hover{color:#00ADEC}
+@media (hover:hover) and (pointer:fine){.onda7-vertodos:hover{color:#00ADEC}}
 .onda7-vertodos svg{flex:none}
 /* onda7:lideres-link:fim */
 
@@ -247,7 +247,7 @@
 .rede-lista__item{flex:1 1 300px;background:rgba(255,255,255,.06);
   border:1px solid rgba(170,213,232,.3);padding:24px;display:flex;
   flex-direction:column;gap:8px;transition:border-color .15s ease,background .15s ease}
-.rede-lista__item:hover{background:rgba(255,255,255,.1);border-color:#00ADEC}
+@media (hover:hover) and (pointer:fine){.rede-lista__item:hover{background:rgba(255,255,255,.1);border-color:#00ADEC}}
 .rede-lista__num{display:inline-flex;align-items:center;justify-content:center;
   width:30px;height:30px;border-radius:50%;background:#00ADEC;color:#020E66;
   font-family:var(--fontFamily),Arial,sans-serif;font-weight:900;font-size:14px}
@@ -257,7 +257,7 @@
   font-size:15px;margin:0}
 .rede-lista__link{color:#00ADEC;font-family:var(--fontFamily),Arial,sans-serif;
   font-size:15px;font-weight:700;text-decoration:none;margin-top:auto}
-.rede-lista__link:hover{color:#fff}
+@media (hover:hover) and (pointer:fine){.rede-lista__link:hover{color:#fff}}
 @media only screen and (max-width: 991px){
   .rede-mapa__box{padding:10px}
   /* no celular o mapa fica com ~340px de largura: os pins da Europa encostam
@@ -318,12 +318,12 @@
     position:absolute;left:-16px;top:-44px;
     color:#00adec;font-size:34px;line-height:1;font-weight:700;
     pointer-events:none}
-  .our-numbers__list strong{font-size:72px;font-size:4.5rem;padding-bottom:12px}
-  .our-numbers__list span{font-size:26px;font-size:1.625rem}
+  .our-numbers__list strong{font-size:clamp(52px,27.7px + 3.16vw,72px);padding-bottom:12px}
+  .our-numbers__list span{font-size:clamp(19px,10.5px + 1.11vw,26px)}
 }
 @media only screen and (max-width: 991px){
-  .our-numbers__list strong{font-size:52px;font-size:3.25rem}
-  .our-numbers__list span{font-size:19px;font-size:1.1875rem}
+  /* onda66: o 52px de <=991 virou o PISO do clamp em .our-numbers__list strong */
+  /* onda66: o 19px de <=991 virou o PISO do clamp em .our-numbers__list span */
 }
 /* onda10:numeros:fim */
 
@@ -373,9 +373,9 @@
   mix-blend-mode:screen;
   opacity:.88;
   transition:opacity 300ms ease-in-out}
-.clientes-logos__item:hover img{
+@media (hover:hover) and (pointer:fine){.clientes-logos__item:hover img{
   filter:grayscale(1) invert(1) contrast(1.05);
-  opacity:1}
+  opacity:1}}
 /* onda10:clientes-barra:fim */
 
 /* onda12:praticas-nav:ini */
@@ -384,7 +384,7 @@
 .praticas-nav__item{margin:0}
 .praticas-nav__link{color:#fff;font-weight:600;text-decoration:underline;
   text-underline-offset:3px}
-.praticas-nav__link:hover{color:#fff;text-decoration:none}
+@media (hover:hover) and (pointer:fine){.praticas-nav__link:hover{color:#fff;text-decoration:none}}
 .experience-single__others .col-12 > h5{color:#fff}
 @media only screen and (max-width: 991px){
   .praticas-nav{gap:8px 20px}
@@ -441,7 +441,7 @@
 .rodape-menu li{margin:0}
 .rodape-menu a{color:#fff;font-size:14px;text-decoration:none;
   transition:color 200ms ease}
-.rodape-menu a:hover{color:#00ADEC}
+@media (hover:hover) and (pointer:fine){.rodape-menu a:hover{color:#00ADEC}}
 /* onda14:menu-executivo:fim */
 
 /* onda14:fundo-sem-sobras:ini */
@@ -490,7 +490,7 @@
 .rodape-contatos .menu__contatos{display:flex;gap:26px;align-items:center;
   margin-left:0 !important;padding-right:0 !important}
 .rodape-contatos .menu__contatos-link{color:#fff;opacity:.9}
-.rodape-contatos .menu__contatos-link:hover{color:#00ADEC;opacity:1}
+@media (hover:hover) and (pointer:fine){.rodape-contatos .menu__contatos-link:hover{color:#00ADEC;opacity:1}}
 .rodape-contatos .menu__contatos-link svg{width:22px !important;
   height:22px !important}
 /* onda15:barras-gemeas:fim */
@@ -510,7 +510,7 @@
    (S-36 v2); sobra so o link pequeno da politica, discreto e centrado. */
 .rodape-legal{text-align:center;padding:2px 0 0}
 .rodape-legal .footer__contacts-link{font-size:12px;opacity:.65}
-.rodape-legal .footer__contacts-link:hover{opacity:1}
+@media (hover:hover) and (pointer:fine){.rodape-legal .footer__contacts-link:hover{opacity:1}}
 /* onda15:rodape-legal:fim */
 
 /* onda16:hero-layout-s41:ini */
@@ -550,7 +550,7 @@
   color:#E1306C}
 .menu__contatos-link--mail:hover,.menu__contatos-link--mail:focus-visible{
   color:#00ADEC}
-/* onda16:hover-marcas-s42:fim */
+@media (hover:hover) and (pointer:fine){/* onda16:hover-marcas-s42:fim */
 
 /* onda17:hero-horizonte-s49:ini */
 /* S-49 (#107): hero Horizonte 2050 — cena no tamanho do fundo do banner
@@ -559,7 +559,7 @@
    do tema: conteudo z-5 (onda14); o convite fica z-4 para nunca roubar
    clique das pills. */
 .banner__background .hero-horizonte__cena{
-  position:absolute;top:0;left:0;width:100%;height:100%;display:block}
+  position:absolute;top:0;left:0;width:100%;height:100%;display:block}}
 .hero-horizonte__convite{
   position:absolute;left:50%;bottom:18px;transform:translateX(-50%);
   width:48px;height:72px;z-index:4;pointer-events:none}
@@ -576,9 +576,9 @@
   background:#00ADEC !important;border:2px solid #00ADEC !important;
   color:#020E66 !important;font-weight:700 !important;letter-spacing:.02em;
   transition:background 200ms ease,color 200ms ease}
-.contact .contact__form .frm_pro_form .frm_button_submit:hover,
+@media (hover:hover) and (pointer:fine){.contact .contact__form .frm_pro_form .frm_button_submit:hover,
 .contact .contact__form .frm_pro_form .frm_final_submit:hover{
-  background:#fff !important;border-color:#fff !important;color:#020E66 !important}
+  background:#fff !important;border-color:#fff !important;color:#020E66 !important}}
 /* S-60: o asterisco sai do proprio label (o container muda de numero por idioma) */
 /* onda18:contato-botao:fim */
 
@@ -686,8 +686,8 @@ html{scroll-behavior:smooth}
    a COR PLENA (1.0), o scrim fica so na base (atras do titulo), e o card
    ganha acento cyan no hover. */
 .page-insights__list-image{filter:grayscale(0%) brightness(1) !important}
-.page-insights__list-item:hover .page-insights__list-image{
-  filter:grayscale(0%) brightness(0.88) !important}
+@media (hover:hover) and (pointer:fine){.page-insights__list-item:hover .page-insights__list-image{
+  filter:grayscale(0%) brightness(0.88) !important}}
 /* scrim: denso em CIMA — e no topo do card que o tema poe o titulo
    (medido: .page-insights__list-title rende dentro do terco superior) */
 .page-insights__list-image{position:relative}
@@ -701,8 +701,8 @@ html{scroll-behavior:smooth}
 .page-insights__list-item::before{content:"";position:absolute;left:0;right:0;
   bottom:0;height:4px;background:#00ADEC;transform:scaleX(0);
   transform-origin:left;transition:transform 260ms ease;z-index:3}
-.page-insights__list-item:hover::before{transform:scaleX(1)}
-.page-insights__list-item:hover .page-insights__list-title{color:#7FDBFF}
+@media (hover:hover) and (pointer:fine){.page-insights__list-item:hover::before{transform:scaleX(1)}}
+@media (hover:hover) and (pointer:fine){.page-insights__list-item:hover .page-insights__list-title{color:#7FDBFF}}
 /* onda18:insights-colorido:fim */
 
 /* onda18:home-lideres:ini */
@@ -738,7 +738,7 @@ html{scroll-behavior:smooth}
   align-items:center;gap:0 18px;padding:16px 22px;
   border-bottom:1px solid rgba(2,14,102,.12)}
 .onda18-imprensa__item:last-child{border-bottom:0}
-.onda18-imprensa__item:hover{background:#F4F8FC}
+@media (hover:hover) and (pointer:fine){.onda18-imprensa__item:hover{background:#F4F8FC}}
 .onda18-imprensa__logo{width:28px;height:28px;object-fit:contain;display:block;
   background:#F0F4F8;border-radius:4px;padding:2px;box-sizing:border-box}
 .onda18-imprensa__logo--vazio{display:flex;align-items:center;justify-content:center;
@@ -771,15 +771,15 @@ html{scroll-behavior:smooth}
 .onda18-orbe{position:relative;z-index:6;margin:56px 0 0}
 /* titulo no mesmo tratamento do "Nossos Lideres" da propria home:
    branco-azulado #e9f0ff, display grande, alinhado a esquerda */
-.onda18-orbe__titulo{color:#e9f0ff;font-size:64px;font-weight:700;line-height:1.05;
+.onda18-orbe__titulo{color:#e9f0ff;font-size:clamp(32px,19.7px + 3.16vw,64px);font-weight:700;line-height:1.05;
   margin:0 0 30px;text-align:left}
 .onda18-orbe__cards{display:grid;grid-template-columns:repeat(3,1fr);/* onda42 (#194): 6 cards em 2 fileiras de 3; era repeat(5) p/ 5 cards */gap:16px;
   list-style:none;margin:0;padding:0}
 .onda18-const{background:#020E66;border-top:3px solid #00ADEC;
   padding:20px 18px 22px;display:flex;flex-direction:column;
   transition:transform 220ms ease,box-shadow 220ms ease}
-.onda18-const:hover{transform:translateY(-4px);
-  box-shadow:0 14px 30px rgba(2,14,102,.28)}
+@media (hover:hover) and (pointer:fine){.onda18-const:hover{transform:translateY(-4px);
+  box-shadow:0 14px 30px rgba(2,14,102,.28)}}
 /* S-134 (#198, 10/08): 17px/14px -> 18px, o tamanho do subtitulo do hero
    ("Focamos em estrategia..."); o bullet desce de 7 p/ 9px pro novo centro */
 .onda18-const__nome{display:block;color:#fff;font-size:18px;font-weight:700;
@@ -795,10 +795,10 @@ html{scroll-behavior:smooth}
   .onda18-orbe__cards{grid-template-columns:repeat(3,1fr)}
 }
 @media only screen and (max-width: 991px){
-  .onda18-orbe__titulo{font-size:44px}
+  /* onda66: o 44px de <=991 saiu — o clamp de .onda18-orbe__titulo da 44,0 em 768px */
 }
 @media only screen and (max-width: 767px){
-  .onda18-orbe__titulo{font-size:32px;margin-bottom:20px}
+  .onda18-orbe__titulo{margin-bottom:20px}
   .onda18-orbe__cards{grid-template-columns:1fr;gap:12px}
 }
 /* onda18:planeta-setores:fim */
@@ -921,8 +921,8 @@ html{scroll-behavior:smooth}
 .menu__languages-list::after{border-bottom-color:#020E66 !important}
 .rodape-barra .menu__languages-list::after{border-top-color:#020E66 !important}
 .menu__languages-list li a{color:#fff !important}
-.menu__languages-list li:not(.menu__languages-list-current) a:hover{
-  color:#00ADEC !important}
+@media (hover:hover) and (pointer:fine){.menu__languages-list li:not(.menu__languages-list-current) a:hover{
+  color:#00ADEC !important}}
 .menu__languages-list li.menu__languages-list-current a{color:#00ADEC !important}
 
 /* ---- S-79: a barra do rodape sangra 100vw, como a de cima ---------------- */
@@ -1059,8 +1059,8 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
   align-items:center;gap:0 18px;padding:16px 22px;
   text-decoration:none;color:inherit}
 .onda26-imprensa__link:focus-visible{outline:2px solid #00ADEC;outline-offset:-2px}
-.onda18-imprensa__item:hover .onda18-imprensa__titulo{color:#00ADEC;
-  border-bottom-color:#00ADEC}
+@media (hover:hover) and (pointer:fine){.onda18-imprensa__item:hover .onda18-imprensa__titulo{color:#00ADEC;
+  border-bottom-color:#00ADEC}}
 @media only screen and (max-width: 991px){
   .onda26-imprensa__link{grid-template-columns:28px 1fr;gap:6px 14px;
     padding:14px 16px}
@@ -1096,14 +1096,14 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
    de seletor mais especifico para vencer a regra de repouso. */
 .header .menu{background:#020E66 !important;
   transition:background 300ms ease-in-out}
-/* onda64 (19/08): o hover branco so onde existe ponteiro de verdade. Em tela
+@media (hover:hover) and (pointer:fine){/* onda64 (19/08): o hover branco so onde existe ponteiro de verdade. Em tela
    de toque o :hover GRUDA depois do tap -- o Mario abriu o menu pelo hamburguer,
    fechou, e a barra ficou branca com o logo branco por cima. Reproduzido no
    navegador: a classe menu--mobile-opened sai certo ao fechar; quem pintava era
    o :hover. `(hover:hover) and (pointer:fine)` e a condicao que a regra sempre
    pressupos, agora escrita. O menu ABERTO segue branco em qualquer aparelho,
    porque ali o painel e branco mesmo. */
-.header .menu.menu--mobile-opened{background:#fff !important}
+.header .menu.menu--mobile-opened{background:#fff !important}}
 @media (hover:hover) and (pointer:fine){
   .header .menu:hover{background:#fff !important}
 }
@@ -1142,16 +1142,16 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
    para o ritmo ser o mesmo sem inventar imagem. */
 .onda29-abertura{background:#020E66;padding:150px 0 70px;position:relative}
 .onda29-abertura__titulo{color:#fff;font-family:var(--fontFamily);
-  font-size:62px;font-weight:700;line-height:1.1;margin:0}
+  font-size:clamp(40px,12.2px + 3.55vw,62px);font-weight:700;line-height:1.1;margin:0}
 .onda29-abertura__apoio{color:#fff;font-family:var(--secondaryFontFamily);
-  font-size:22px;font-weight:400;line-height:1.4;margin:14px 0 0;max-width:60ch}
+  font-size:clamp(18px,14.6px + 0.53vw,22px);font-weight:400;line-height:1.4;margin:14px 0 0;max-width:60ch}
 /* o conteudo que segue nao precisa mais do respiro que compensava a falta da faixa */
 .onda29-abertura + .page-default,
 .onda29-abertura + div .page-default{padding-top:60px}
 @media only screen and (max-width: 991px){
   .onda29-abertura{padding:110px 0 50px}
-  .onda29-abertura__titulo{font-size:40px}
-  .onda29-abertura__apoio{font-size:18px}
+  /* onda66: o 40px de <=991 virou o PISO do clamp em .onda29-abertura__titulo */
+  /* onda66: o 18px de <=991 virou o PISO do clamp em .onda29-abertura__apoio */
 }
 /* onda29:abertura-padrao:fim */
 
@@ -1165,7 +1165,7 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
    aqui e tipografia. */
 .onda30-titulo-secao{
   font-family:var(--fontFamily),Arial,sans-serif !important;
-  font-size:48px !important;font-weight:700 !important;line-height:1.1 !important;
+  font-size:clamp(28px,17.6px + 2.17vw,48px) !important;font-weight:700 !important;line-height:1.1 !important;
   letter-spacing:normal !important;text-transform:none !important;
   text-align:left !important;margin:0 0 28px !important;
   color:#020E66 !important}
@@ -1173,10 +1173,10 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 .onda30-titulo-secao .onda7-titulo-link{color:inherit;font-size:inherit;
   font-family:inherit;font-weight:inherit}
 @media only screen and (max-width: 991px){
-  .onda30-titulo-secao{font-size:34px !important;margin-bottom:22px !important}
+  .onda30-titulo-secao{margin-bottom:22px !important}
 }
 @media only screen and (max-width: 767px){
-  .onda30-titulo-secao{font-size:28px !important}
+  /* onda66: o 28px de <=767 virou o PISO do clamp em .onda30-titulo-secao */
 }
 /* onda30:titulo-secao:fim */
 
@@ -1232,9 +1232,9 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 .onda31-pin__nome{color:#020E66;font-size:16px;font-weight:700;margin:0 0 2px}
 .onda31-pin__local{color:#4A4A4A;font-size:14px;margin:0 0 8px}
 .onda31-pin__link{color:#00ADEC;font-size:14px;font-weight:700;text-decoration:none}
-.onda31-pin__link:hover{text-decoration:underline}
-/* o pin com hover sobe na pilha, senao o card fica atras do chip vizinho */
-.onda31-pin:hover{z-index:7}
+@media (hover:hover) and (pointer:fine){.onda31-pin__link:hover{text-decoration:underline}}
+@media (hover:hover) and (pointer:fine){/* o pin com hover sobe na pilha, senao o card fica atras do chip vizinho */
+.onda31-pin:hover{z-index:7}}
 
 .onda31-nota{color:#fff;opacity:.82;font-size:15px;margin:6px 0 0}
 
@@ -1341,7 +1341,7 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 .onda41-imprensa__logo{grid-area:logo;justify-self:start;align-self:center;
   display:block;width:auto;height:auto;max-width:176px;max-height:52px;
   object-fit:contain;background:none;border-radius:0;padding:0}
-.onda41-imprensa__logo--texto{font-weight:900;font-size:24px;line-height:1.1;
+.onda41-imprensa__logo--texto{font-weight:900;font-size:clamp(19px,12.9px + 0.79vw,24px);line-height:1.1;
   color:#020E66;letter-spacing:.01em}
 .onda18-imprensa__veiculo{grid-area:veiculo;font-size:13px;font-weight:700;
   letter-spacing:.08em;text-transform:uppercase;color:#7F7F7F}
@@ -1352,7 +1352,7 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
     grid-template-areas:"logo veiculo" "logo data" "titulo titulo";
     gap:2px 16px;padding:16px 16px}
   .onda41-imprensa__logo{max-width:116px;max-height:40px}
-  .onda41-imprensa__logo--texto{font-size:19px}
+  /* onda66: o 19px de <=991 virou o PISO do clamp em .onda41-imprensa__logo--texto */
   .onda18-imprensa__data{grid-column:auto}
   .onda18-imprensa__titulo{grid-column:1 / -1;margin-top:8px}
 }
@@ -1393,7 +1393,7 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 .mc-field.mc-req>span::after{content:" *";color:#d23f31}
 .mc-field input,.mc-field select{font-family:Arial,Helvetica,sans-serif;font-size:15px;padding:11px 12px;border:1.5px solid #b8c6d0;border-radius:7px;background:#fff;color:#071C25;width:100%}
 .mc-field input::placeholder{color:#8aa0ac}
-.mc-field input:hover,.mc-field select:hover{border-color:#7fa8bd}
+@media (hover:hover) and (pointer:fine){.mc-field input:hover,.mc-field select:hover{border-color:#7fa8bd}}
 .mc-field input:focus,.mc-field select:focus{outline:none;border-color:#00ADEC;box-shadow:0 0 0 3px rgba(0,173,236,.25)}
 .mc-field input[type=file]{padding:9px 10px;background:#f2f8fb;font-size:14px}
 /* estado invalido: borda vermelha + label vermelho + dica */
@@ -1408,7 +1408,7 @@ body,html,button,input,optgroup,select,textarea{font-family:"Titillium Web",sans
 .mc-errors.mc-show{display:block}
 .mc-errors b{color:#8f271b}
 .mc-submit{background:#00ADEC;color:#fff;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;letter-spacing:.01em;border:0;border-radius:9px;padding:15px 40px;cursor:pointer;transition:background .15s,transform .05s;align-self:flex-start}
-.mc-submit:hover{background:#020E66}
+@media (hover:hover) and (pointer:fine){.mc-submit:hover{background:#020E66}}
 .mc-submit:active{transform:translateY(1px)}
 .mc-submit:disabled{background:#9fb4c0;cursor:default}
 @media(max-width:640px){.mc-submit{width:100%;text-align:center}}
@@ -1540,9 +1540,23 @@ vertical-align:top}
 padding:.08em .35em;border-radius:3px}
 .pol-v2 .pol-v2__optout{background:#020E66;color:#fff;border:0;border-radius:4px;
 padding:.7rem 1.2rem;font:inherit;cursor:pointer}
-.pol-v2 .pol-v2__optout:hover{background:#00ADEC}
+@media (hover:hover) and (pointer:fine){.pol-v2 .pol-v2__optout:hover{background:#00ADEC}}
 .pol-v2 .pol-v2__status{margin-left:.8rem;color:#020E66;font-weight:600}
 @media (max-width:600px){.pol-v2 table,.pol-v2 tbody,.pol-v2 tr,.pol-v2 td,.pol-v2 th{
 display:block}.pol-v2 thead{display:none}.pol-v2 td{border-top:0}
 .pol-v2 tr{border-top:1px solid #D2D2D2;margin-bottom:.8rem}}
 /* onda57:politica-v2:fim */
+
+/* onda66:slogan-fluido:ini */
+/* ---- onda66: o slogan do hero deixa de saltar 63% em 992px -----------------
+   Medido pelo baseline (320->2560 de 64 em 64): 38,0 -> 62,0px entre 960 e 1024px.
+   O par 38/62 e do TEMA (.banner__title), nao da nossa camada, entao aqui e
+   override e nao edicao no lugar.
+   A reta passa pelos dois valores aprovados: 768px -> 38,0 e 1400px -> 62,0.
+   line-height e margens NAO mudam nesta passada — ver o cabecalho do
+   131_tipografia_fluida.py para o porque (o gap tinta a tinta de 13,1/10,2px e a
+   entrelinha morta de 3,0/18,6px sao consistentes entre si). */
+.hero-texto .onda53-slogan h2,
+.banner__content .onda53-slogan h2{
+  font-size:clamp(38px, 8.8px + 3.8vw, 62px) !important}
+/* onda66:slogan-fluido:fim */
