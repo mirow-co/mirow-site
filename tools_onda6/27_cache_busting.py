@@ -79,9 +79,15 @@ def carimbar(html):
     e a correcao teria ficado presa no cache dos visitantes. Mesma classe do furo
     do dns-prefetch do AddToAny (onda 55b), que tambem assumia aspa dupla.
     """
+    # `content=` entrou na onda 68: o <meta name="msapplication-TileImage"> declara
+    # o icone do bloco do Windows em content=, nao em href=, e por isso o 270x270
+    # era o UNICO dos 5 favicons que saia sem carimbo -- conferido no navegador, os
+    # outros 4 vinham com ?v=82 e ele nao. Erro 6 do CLAUDE.md, na variante que o
+    # atributo esconde. Nenhum og:image entra por aqui porque a ASSETS lista so
+    # arquivo nosso, e nenhum deles e imagem de preview.
     ASPA = '["\']'
     for asset in ASSETS:
-        rex = re.compile(r'((?:href|src)=)(' + ASPA + r')([^"\']*?'
+        rex = re.compile(r'((?:href|src|content)=)(' + ASPA + r')([^"\']*?'
                          + re.escape(asset) + r')(\?[^"\']*)?\2')
         html = rex.sub(lambda m: u'%s%s%s?v=%d%s'
                        % (m.group(1), m.group(2), m.group(3), VERSAO, m.group(2)), html)
