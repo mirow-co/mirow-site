@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
 # >>> proximas ondas: incrementar aqui e rodar o script <<<
-VERSAO = 81
+VERSAO = 82
 
 ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda6.css",
@@ -55,6 +55,17 @@ ASSETS = [
     "wp-content/uploads/2026/07/clientes/clientes-logos.css",
     # CSS do tema: entrou porque passamos a edita-lo (ver acima).
     "wp-content/themes/mirow/public/bundle-css.css",
+    # Onda 68: os favicons. Trocamos o CONTEUDO dos arquivos mantendo o nome (as
+    # 109 paginas ja os referenciam), entao SEM carimbo o navegador serviria o
+    # icone velho do cache e a troca "nao funcionaria" no ar. Favicon e o caso
+    # mais agressivo de cache que existe -- erro 6 e 9 do CLAUDE.md.
+    # `favicon.ico` da RAIZ nao entra: nenhuma tag o referencia (o navegador bate
+    # em /favicon.ico por convencao), logo nao ha href para carimbar.
+    "wp-content/uploads/2023/04/cropped-favicon-mirow-32x32.png",
+    "wp-content/uploads/2023/04/cropped-favicon-mirow-180x180.png",
+    "wp-content/uploads/2023/04/cropped-favicon-mirow-192x192.png",
+    "wp-content/uploads/2023/04/cropped-favicon-mirow-270x270.png",
+    "wp-content/themes/mirow/favicon.ico",
 ]
 
 

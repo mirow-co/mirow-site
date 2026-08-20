@@ -52,6 +52,7 @@ import threading
 import time
 import unicodedata
 import urllib.request
+import zlib
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "tools_onda6"))
@@ -145,6 +146,59 @@ MARCADORES = [
 # que divergia): vem de tools/clients-publicados.json, que o tools/gen_clients.py
 # gera a partir do arquivo mestre de curadoria no repo PRIVADO mirow-co/mirow-marketing
 # (08_Site/2026-07-30_clients-curadoria-interna.json). É o P3 em ação.
+# Decodificador minimo de PNG truecolor, sem PIL no processo da suite.
+# Nasceu local dentro de uma assercao V (contraste medido no pixel) e virou
+# helper de modulo na onda 68, quando a S171 passou a precisar do mesmo
+# decodificador para medir a TINTA do favicon. Duas copias de 40 linhas seria
+# valor gemeo -- a classe de bug da onda 31.
+def _png_rgb(dados):
+    # decodificador minimo de PNG truecolor, sem PIL no processo da suite
+    if dados[:8] != b"\x89PNG\r\n\x1a\n":
+        return None
+    i, larg, alt, prof, tipo, idat = 8, 0, 0, 0, 0, b""
+    while i < len(dados):
+        ln = struct.unpack(">I", dados[i:i + 4])[0]
+        ct = dados[i + 4:i + 8]
+        corpo = dados[i + 8:i + 8 + ln]
+        if ct == b"IHDR":
+            larg, alt, prof, tipo = struct.unpack(">IIBB", corpo[:10])
+        elif ct == b"IDAT":
+            idat += corpo
+        elif ct == b"IEND":
+            break
+        i += 12 + ln
+    if prof != 8 or tipo not in (2, 6):
+        return None
+    canais = 3 if tipo == 2 else 4
+    bruto = zlib.decompress(idat)
+    passo = larg * canais
+    saida, ant = [], bytearray(passo)
+    pos = 0
+    for _y in range(alt):
+        f = bruto[pos]
+        pos += 1
+        linha = bytearray(bruto[pos:pos + passo])
+        pos += passo
+        for x in range(passo):
+            a = linha[x - canais] if x >= canais else 0
+            b = ant[x]
+            c = ant[x - canais] if x >= canais else 0
+            if f == 1:
+                linha[x] = (linha[x] + a) & 255
+            elif f == 2:
+                linha[x] = (linha[x] + b) & 255
+            elif f == 3:
+                linha[x] = (linha[x] + (a + b) // 2) & 255
+            elif f == 4:
+                p = a + b - c
+                pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                pr = a if (pa <= pb and pa <= pc) else (b if pb <= pc else c)
+                linha[x] = (linha[x] + pr) & 255
+        saida.append(bytes(linha))
+        ant = linha
+    return larg, alt, canais, saida
+
+
 def _logos_esperados():
     p = os.path.join(AQUI, "clients-publicados.json")
     with io.open(p, encoding="utf-8") as f:
@@ -252,6 +306,7 @@ ETAPAS = {
     "S167": ("texto", "asset"), "S168": ("texto", "asset"),
     "S169": ("texto", "css"),
     "S170": ("texto",),
+    "S171": ("asset", "texto"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -2155,6 +2210,136 @@ def estaticas(s):
         return (not det, u"; ".join(det[:3])
                 or u"marcos 2024/2025/2026 como o Mario validou em 19/08")
     s.check("S170", u"marcos 2024-2026 da história como validados (#68)", s170)
+
+    def s171():
+        # Onda 68 (#246). O favicon era a WORDMARK inteira -- "MIROW & CO." com 11
+        # caracteres -- espremida no quadro do icone. Medido antes da troca:
+        #
+        #     cropped-favicon-mirow-192x192.png   tinta branca 0,29%  (caixa 125x11 px)
+        #     cropped-favicon-mirow-32x32.png     tinta branca 0,00%
+        #     themes/mirow/favicon.ico            16x16, abaixo do minimo do Google
+        #
+        # ZERO por cento. A 32px cada caractere recebe ~3px e o antialias apaga
+        # tudo: o icone servido era um quadrado navy VAZIO, que o Google ainda
+        # recorta em circulo. Quem abriu o caso foi o proprio Mario, perguntando
+        # "que simbolo e esse que aparece do lado do nosso site no google?" -- o
+        # dono da marca nao reconhecia o icone do proprio site. A marca ("m" do
+        # LogoNeg.png) da 10,67% de tinta, 37x mais.
+        #
+        # POR QUE ESTA ASSERÇÃO MEDE TINTA, E NAO O NOME DO ARQUIVO. Cobrar o
+        # nome (ou o md5) passaria verde no dia em que alguem regenerasse os
+        # icones a partir da wordmark outra vez -- e e justamente esse o erro que
+        # se repete, porque "poe o logo no favicon" soa correto. O invariante da
+        # CLASSE e: todo icone que declaramos tem de ter tinta suficiente para
+        # ser VISTO no tamanho em que e servido. E a lista de icones e lida do
+        # PROPRIO HTML (padrao da S127, que le os pesos do <head>), entao a
+        # asserção acompanha se as tags mudarem em vez de envelhecer calada.
+        TINTA_MIN = 4.0
+        det = []
+
+        def medir(dados, area):
+            """(% de pixel claro) de um PNG, ou None se nao der para decodificar."""
+            dec = _png_rgb(dados)
+            if dec is None:
+                return None
+            larg, alt, canais, linhas = dec
+            claros = 0
+            for ln in linhas:
+                for x in range(0, len(ln), canais):
+                    if canais == 4 and ln[x + 3] < 128:
+                        continue
+                    if ln[x] > 200 and ln[x + 1] > 200 and ln[x + 2] > 200:
+                        claros += 1
+            return 100.0 * claros / float(larg * alt) if area is None else \
+                100.0 * claros / float(area)
+
+        def frames_ico(dados):
+            """[(w, h, offset, tamanho)] do diretorio do .ico."""
+            if len(dados) < 6:
+                return []
+            _res, tipo, n = struct.unpack("<HHH", dados[:6])
+            if tipo != 1:
+                return []
+            saida = []
+            for i in range(n):
+                e = dados[6 + i * 16:6 + (i + 1) * 16]
+                if len(e) < 16:
+                    break
+                w, h, _c, _r, _pl, _bpp, tam, off = struct.unpack("<BBBBHHII", e)
+                saida.append((w or 256, h or 256, off, tam))
+            return saida
+
+        # --- a lista de icones sai do HTML, nao de constante ---
+        refs = set()
+        for rel in HOMES:
+            h = s.ler(rel)
+            for m in re.finditer(r'<link[^>]*rel="[^"]*icon[^"]*"[^>]*>', h):
+                mh = re.search(r'href="([^"]+)"', m.group(0))
+                if mh:
+                    refs.add(mh.group(1).split("?")[0])
+            for m in re.finditer(r'name="msapplication-TileImage"[^>]*'
+                                 r'content="([^"]+)"', h):
+                refs.add(m.group(1).split("?")[0])
+        if len(refs) < 4:
+            det.append(u"as homes declaram só %d ícone(s); esperado >= 4" % len(refs))
+
+        # `/favicon.ico` da raiz nao e declarado por tag nenhuma: navegador e
+        # crawler batem nele por convencao. Antes da onda 68 ele nao existia no
+        # espelho, ou seja respondia 404 em producao.
+        refs.add("/favicon.ico")
+
+        for ref in sorted(refs):
+            fp = os.path.join(pub, ref.lstrip("/").replace("/", os.sep))
+            if not os.path.exists(fp):
+                det.append(u"%s declarado e AUSENTE no disco" % ref)
+                continue
+            with io.open(fp, "rb") as f:
+                dados = f.read()
+            nome = ref.split("/")[-1]
+
+            if nome.endswith(".ico"):
+                fr = frames_ico(dados)
+                if not fr:
+                    det.append(u"%s não é um .ico legível" % nome)
+                    continue
+                lados = sorted(set(w for w, _h, _o, _t in fr))
+                if 48 not in lados:
+                    det.append(u"%s sem o frame de 48px (tem %s) — 48 é o mínimo "
+                               u"que o Google documenta para o ícone do resultado"
+                               % (nome, lados))
+                maior = max(fr, key=lambda t: t[0])
+                corpo = dados[maior[2]:maior[2] + maior[3]]
+                pct = medir(corpo, None)
+                if pct is None:
+                    det.append(u"%s: frame de %dpx não decodificou" % (nome, maior[0]))
+                elif pct < TINTA_MIN:
+                    det.append(u"%s tem só %.2f%% de tinta no frame de %dpx "
+                               u"(mínimo %.1f%%) — é wordmark, não marca"
+                               % (nome, pct, maior[0], TINTA_MIN))
+                continue
+
+            if not nome.endswith(".png"):
+                continue  # svg/outro formato: nada a medir por pixel aqui
+            pct = medir(dados, None)
+            if pct is None:
+                det.append(u"%s não decodificou como PNG truecolor" % nome)
+            elif pct < TINTA_MIN:
+                det.append(u"%s tem só %.2f%% de tinta (mínimo %.1f%%) — "
+                           u"ícone assim sai como quadrado vazio no tamanho servido"
+                           % (nome, pct, TINTA_MIN))
+
+        # O `det` volta JUNTO numa string, nao como lista: o `_imprime` da suite
+        # concatena o detalhe direto no texto. Escrevi `return (not det), det` na
+        # primeira versao e a asserção ficou VERDE no caso bom (com det vazio o
+        # caminho do detalhe nunca roda) e QUEBROU o gate inteiro com TypeError no
+        # primeiro caso ruim. Quem pegou foi o teste negativo, nao o positivo --
+        # e o motivo pelo qual asserção nova sem cenario negativo exercitado nao
+        # vale nada (licao da V37, onda 64).
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S171", u"ícones expostos têm tinta para serem vistos, e o /favicon.ico "
+                    u"da raiz existe (#246)", s171)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
@@ -5569,55 +5754,6 @@ def ao_vivo(s):
             # Mesma familia do pixel vermelho da onda 60b: medir o efeito, nao a
             # declaracao.
             import base64 as _b64
-            import struct as _st
-            import zlib as _zl
-
-            def _png_rgb(dados):
-                # decodificador minimo de PNG truecolor, sem PIL no processo da suite
-                if dados[:8] != b"\x89PNG\r\n\x1a\n":
-                    return None
-                i, larg, alt, prof, tipo, idat = 8, 0, 0, 0, 0, b""
-                while i < len(dados):
-                    ln = _st.unpack(">I", dados[i:i + 4])[0]
-                    ct = dados[i + 4:i + 8]
-                    corpo = dados[i + 8:i + 8 + ln]
-                    if ct == b"IHDR":
-                        larg, alt, prof, tipo = _st.unpack(">IIBB", corpo[:10])
-                    elif ct == b"IDAT":
-                        idat += corpo
-                    elif ct == b"IEND":
-                        break
-                    i += 12 + ln
-                if prof != 8 or tipo not in (2, 6):
-                    return None
-                canais = 3 if tipo == 2 else 4
-                bruto = _zl.decompress(idat)
-                passo = larg * canais
-                saida, ant = [], bytearray(passo)
-                pos = 0
-                for _y in range(alt):
-                    f = bruto[pos]
-                    pos += 1
-                    linha = bytearray(bruto[pos:pos + passo])
-                    pos += passo
-                    for x in range(passo):
-                        a = linha[x - canais] if x >= canais else 0
-                        b = ant[x]
-                        c = ant[x - canais] if x >= canais else 0
-                        if f == 1:
-                            linha[x] = (linha[x] + a) & 255
-                        elif f == 2:
-                            linha[x] = (linha[x] + b) & 255
-                        elif f == 3:
-                            linha[x] = (linha[x] + (a + b) // 2) & 255
-                        elif f == 4:
-                            p = a + b - c
-                            pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
-                            pr = a if (pa <= pb and pa <= pc) else (b if pb <= pc else c)
-                            linha[x] = (linha[x] + pr) & 255
-                    saida.append(bytes(linha))
-                    ant = linha
-                return larg, alt, canais, saida
 
             def _lum(rgb):
                 def canal(v):
