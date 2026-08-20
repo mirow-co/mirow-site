@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Onda 59 (GEO, mirow-marketing#230): bloco JSON-LD com Organization +
-6 Persons nas 3 listagens de lideres (pt/en/de).
+5 Persons nas 3 listagens de lideres E nas 3 homes (pt/en/de).
+
+- Eram 6 Persons ate 20/08/2026, quando o Michael Munch saiu da firma e o Mario
+  pediu para tira-lo "de tudo" -- ele sai por  no 110.
 
 - Segue o handoff do Felipe (11/08/2026). foundingDate REMOVIDO (nao publicado;
   campo inventado e pior que campo ausente). Elmar Gans e Joao Daniel Ramos
@@ -22,6 +25,15 @@ mod = __import__("110_geo_bios_lideres")
 
 LISTAGENS = mod.LISTAGENS
 PAGINAS = mod.PAGINAS
+
+# Onda 68: o bloco passa a ser escrito TAMBEM nas 3 homes. Ele so vivia nas 3
+# listagens de lider, e a home e a pagina que o Google e os assistentes de IA leem
+# primeiro -- era o no rico do site inteiro escondido a dois cliques da entrada.
+HOMES = {"pt": "pt/index.html", "en": "en/index.html", "de": "de/index.html"}
+
+# O raster quadrado do "m" gerado pelo 142. Mesma marca do favicon e do manifest.
+ICONE_LOGO = ("https://mirow.com.br/wp-content/uploads/2026/08/onda68/"
+              "icone-mirow-512.png")
 
 ORG_DESC = {
     "pt": (u"Consultoria estratégica brasileira, com sede no Rio de Janeiro, "
@@ -62,11 +74,6 @@ KNOWS = {
         "pt": [u"Energia", u"Novos negócios", u"Estratégia"],
         "en": [u"Energy", u"New businesses", u"Strategy"],
         "de": [u"Energie", u"Neue Geschäftsfelder", u"Strategie"],
-    },
-    u"Michael Munch": {
-        "pt": [u"Pricing", u"Advanced analytics", u"Finanças corporativas", u"Digitalização"],
-        "en": [u"Pricing", u"Advanced analytics", u"Corporate finance", u"Digitalization"],
-        "de": [u"Pricing", u"Advanced Analytics", u"Unternehmensfinanzen", u"Digitalisierung"],
     },
     u"Raoni Morais": {
         "pt": [u"Energia", u"Energias renováveis", u"Planejamento energético", u"Infraestrutura"],
@@ -129,6 +136,29 @@ def montar(lang, cards):
         },
         "foundingDate": "2012-04-12",
         "foundingLocation": {"@type": "Place", "name": "Rio de Janeiro, Brasil"},
+        # Onda 68 (#247) -- `logo` e `image`, que faltavam. O levantamento de icones
+        # achou o site com QUATRO Organization no grafo: as tres do Yoast, com @id
+        # RELATIVO por idioma (`/pt/#organization`, `/en/...`, `/de/...`), que tinham
+        # logo e nenhum endereco; e esta, com @id absoluto, que tinha endereco,
+        # descricao, fundacao e socios -- e nenhum logo. Nenhuma das quatro dizia ao
+        # mesmo tempo quem somos E qual e a nossa marca. O 143 aponta os @id do Yoast
+        # para este, e este passa a declarar a marca.
+        #
+        # O logo NAO e o `logo_mirow_azul_e_branco1svg.svg` que o Yoast usava: aquele
+        # SVG tem `viewBox="0 0 210 297"` e `width="210mm" height="297mm"` -- e uma
+        # prancha A4, nao um logo, e era por isso que a dimensao declarada parecia
+        # torta. Aqui entra o raster quadrado do "m", o mesmo glifo que a onda 68 pos
+        # no favicon e no manifest: uma marca, coerente em todas as superficies.
+        "logo": {
+            "@type": "ImageObject",
+            "@id": "https://mirow.com.br/#logo",
+            "url": ICONE_LOGO,
+            "contentUrl": ICONE_LOGO,
+            "width": 512,
+            "height": 512,
+            "caption": "Mirow & Co.",
+        },
+        "image": {"@id": "https://mirow.com.br/#logo"},
     }]
     for nome, paginas in PAGINAS.items():
         d = cards[nome]
@@ -167,14 +197,23 @@ def main(raiz):
         # Substituir NO LUGAR quando a tag ja existe. Remover-e-anexar nao serve: o
         # 112 tambem insere antes de </head>, e os dois passavam a brigar pela ultima
         # posicao — cada run empurrava o outro e nenhum era idempotente.
-        if INI_RE.search(h):
-            novo = INI_RE.sub(lambda _m: tag, h, count=1)
-        else:
-            novo = h.replace("</head>", tag + "</head>", 1)
-        if novo != h:
-            mod.gravar(p, novo)
-            mudancas += 1
-            print("json-ld: %s" % rel)
+        #
+        # Onda 68: o MESMO bloco vai para a listagem E para a home daquele idioma. O
+        # @id e o mesmo nas duas, e no schema.org isso e uma entidade so -- as
+        # propriedades se somam em vez de competir. A home entrou porque e a pagina
+        # que o Google e os assistentes de IA leem primeiro, e o no rico do site
+        # estava a dois cliques da entrada.
+        for destino in (rel, HOMES[lang]):
+            pd = os.path.join(pub, destino.replace("/", os.sep))
+            hd = mod.ler(pd)
+            if INI_RE.search(hd):
+                novo = INI_RE.sub(lambda _m: tag, hd, count=1)
+            else:
+                novo = hd.replace("</head>", tag + "</head>", 1)
+            if novo != hd:
+                mod.gravar(pd, novo)
+                mudancas += 1
+                print("json-ld: %s" % destino)
     print("total de mudancas: %d" % mudancas)
 
 

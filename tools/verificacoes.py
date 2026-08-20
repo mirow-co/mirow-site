@@ -109,6 +109,15 @@ BLOCOS_CSS = [
 # onda7:menu-carreiras só foi injetado em pt/en (204 páginas): as 71 páginas
 # alemãs já traziam "Karriere" nativo do tema. O invariante de verdade — todas as
 # páginas terem link de carreiras no menu — é a asserção H08, não o marcador.
+# Sentinelas de piso para a tabela MARCADORES abaixo. Existem porque o piso das
+# entregas de rodape/menu NAO e um numero: e "todas as paginas de conteudo", e esse
+# total muda a cada onda que transforma pagina em stub (ja mudou em 29, 33, 57 e 68).
+# Com o numero escrito a mao, cada uma dessas ondas produzia asserções vermelhas sem
+# nenhum defeito de conteudo, e a correcao era editar a tabela -- ou seja, o teste
+# cobrava a consequencia em vez da causa.
+TODAS = "__todas_as_de_conteudo__"          # piso = numero de paginas de conteudo
+PT_EN = ("pt", "en")                        # piso = as de conteudo em pt e en
+
 MARCADORES = [
     # Onda 41 (S-135/#65): en/homepage virou stub — marcadores de home valem 3.
     ("onda5:clientes-logos", 3), ("onda6:praticas", 3), ("onda7:lideres-link", 3),
@@ -121,11 +130,11 @@ MARCADORES = [
     # Onda 57 (#228): as 3 paginas de contato viraram stub de redirect, entao as
     # de conteudo cairam de 112 para 109 e os pisos de 110 desceram para 109.
     # Nao e regressao: e a mesma cobertura sobre menos paginas.
-    ("onda7:menu-sobre", 109), ("onda7:menu-praticas", 109),
+    ("onda7:menu-sobre", TODAS), ("onda7:menu-praticas", TODAS),
     # o marcador de carreiras nunca existiu nas paginas DE (medido: 44 pt + 41 en,
     # 0 de) — o item esta lá, o comentario e que nao. Piso = pt+en.
-    ("onda7:menu-carreiras", 74),
-    ("onda8:menu-contatos", 109), ("onda8:hero-contatos", 3), ("onda8:dobra", 3),
+    ("onda7:menu-carreiras", PT_EN),
+    ("onda8:menu-contatos", TODAS), ("onda8:hero-contatos", 3), ("onda8:dobra", 3),
     ("onda10:hero-numeros", 3),
     # onda11:s08-hero-contatos saiu na onda 57 (#228): o marcador so existia
     # nas 3 paginas de contato, que viraram stub. Os 4 canais seguem cobrados
@@ -139,7 +148,7 @@ MARCADORES = [
     ("onda15:hero-texto", 3),
     # onda15:rodape-barra saiu na onda 42 (#191) — barra do rodape aposentada.
     # onda 18: botao de voltar ao topo em todas; planeta so nas homes
-    ("onda18:voltar-topo", 109), ("onda18:planeta-setores", 3),
+    ("onda18:voltar-topo", TODAS), ("onda18:planeta-setores", 3),
 ]
 
 # Logos que a barra de clientes precisa mostrar. NÃO é lista hardcoded (era assim
@@ -151,6 +160,75 @@ MARCADORES = [
 # helper de modulo na onda 68, quando a S171 passou a precisar do mesmo
 # decodificador para medir a TINTA do favicon. Duas copias de 40 linhas seria
 # valor gemeo -- a classe de bug da onda 31.
+# Dimensao e formato de imagem lendo o CABECALHO do arquivo, sem PIL -- a suite
+# evita a dependencia de proposito (ver `_png_rgb`). Existe porque a onda 68 precisa
+# comparar o `og:image:width/height/type` declarado com o arquivo real: o defeito que
+# a S172 persegue nao e tag ausente, e tag presente e ERRADA (58 paginas diziam
+# `image/png` para arquivo WebP, residuo das ondas 61/62c).
+def _dim_imagem(caminho):
+    """(largura, altura, formato) ou None se nao reconhecer."""
+    try:
+        with io.open(caminho, "rb") as f:
+            d = f.read(64 * 1024)
+    except Exception:
+        return None
+    if d[:8] == b"\x89PNG\r\n\x1a\n" and d[12:16] == b"IHDR":
+        w, h = struct.unpack(">II", d[16:24])
+        return (w, h, "PNG")
+    if d[:6] in (b"GIF87a", b"GIF89a"):
+        w, h = struct.unpack("<HH", d[6:10])
+        return (w, h, "GIF")
+    if d[:4] == b"RIFF" and d[8:12] == b"WEBP":
+        sub = d[12:16]
+        if sub == b"VP8 ":
+            w = struct.unpack("<H", d[26:28])[0] & 0x3FFF
+            h = struct.unpack("<H", d[28:30])[0] & 0x3FFF
+            return (w, h, "WEBP")
+        if sub == b"VP8L":
+            b0, b1, b2, b3 = d[21], d[22], d[23], d[24]
+            n = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24)
+            return ((n & 0x3FFF) + 1, ((n >> 14) & 0x3FFF) + 1, "WEBP")
+        if sub == b"VP8X":
+            w = 1 + (d[24] | (d[25] << 8) | (d[26] << 16))
+            h = 1 + (d[27] | (d[28] << 8) | (d[29] << 16))
+            return (w, h, "WEBP")
+        return None
+    if d[:2] == b"\xff\xd8":
+        i = 2
+        while i + 9 < len(d):
+            if d[i] != 0xFF:
+                i += 1
+                continue
+            marca = d[i + 1]
+            if marca in (0xD8, 0xD9) or 0xD0 <= marca <= 0xD7 or marca == 0x01:
+                i += 2
+                continue
+            tam = struct.unpack(">H", d[i + 2:i + 4])[0]
+            # SOF0..SOF15, menos os marcadores que nao sao SOF (C4, C8, CC)
+            if 0xC0 <= marca <= 0xCF and marca not in (0xC4, 0xC8, 0xCC):
+                h, w = struct.unpack(">HH", d[i + 5:i + 9])
+                return (w, h, "JPEG")
+            i += 2 + tam
+        return None
+    return None
+
+
+_MOD110 = []
+
+
+def _mod110():
+    """O modulo 110_geo_bios_lideres, carregado uma vez.
+
+    E o cadastro de lideres do projeto (`PAGINAS`), a mesma fonte de onde o bloco
+    JSON-LD da onda 59, os cartoes de preview da onda 68 e a meta description das
+    listagens sao montados. Asserção que precisa saber QUANTOS lideres existem
+    pergunta a ele, em vez de trazer o numero escrito.
+    """
+    if not _MOD110:
+        _MOD110.append(__import__("110_geo_bios_lideres"))
+    return _MOD110[0]
+
+
 def _png_rgb(dados):
     # decodificador minimo de PNG truecolor, sem PIL no processo da suite
     if dados[:8] != b"\x89PNG\r\n\x1a\n":
@@ -307,6 +385,8 @@ ETAPAS = {
     "S169": ("texto", "css"),
     "S170": ("texto",),
     "S171": ("asset", "texto"),
+    "S172": ("asset", "texto"), "S173": ("asset", "texto"),
+    "S174": ("schema", "asset", "texto"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -596,13 +676,20 @@ def estaticas(s):
     # M — marcadores das entregas ainda presentes (proteção contra regressão)
     def faz_marcador(marca, n):
         def f():
-            achou = [rel for rel, h in s.conteudo() if ("<!-- %s" % marca) in h]
-            if n == 275:
-                ok = len(achou) >= 270
+            conteudo = s.conteudo()
+            achou = [rel for rel, h in conteudo if ("<!-- %s" % marca) in h]
+            if n == TODAS:
+                esperado = len(conteudo)
+            elif isinstance(n, tuple):
+                esperado = len([1 for rel, _h in conteudo
+                                if rel.split("/")[0] in n])
+            elif n == 275:
+                esperado = 270
             else:
-                ok = len(achou) >= n
-            return (ok, u"marcador <!-- %s --> em %d página(s), esperado >= %d"
-                    % (marca, len(achou), 270 if n == 275 else n))
+                esperado = n
+            return (len(achou) >= esperado,
+                    u"marcador <!-- %s --> em %d página(s), esperado >= %d"
+                    % (marca, len(achou), esperado))
         return f
     for i, (marca, n) in enumerate(MARCADORES, 1):
         s.check("M%02d" % i, u"entrega presente: %s" % marca, faz_marcador(marca, n))
@@ -1179,9 +1266,15 @@ def estaticas(s):
                 continue
             pessoas = [n for n in g if n.get("@type") == "Person"]
             orgs = [n for n in g if n.get("@type") != "Person"]
-            if len(pessoas) != 6 or len(orgs) != 1:
-                det.append(u"%s: %d Person / %d Organization (esperado 6/1)"
-                           % (lang, len(pessoas), len(orgs)))
+            # Quantos lideres, DERIVADO do `PAGINAS` do 110 -- que e a mesma fonte
+            # de onde o proprio bloco JSON-LD e montado. Estava escrito `!= 6`, e
+            # em 20/08 o Michael Munch saiu da firma: o bloco passou a ter 5 Person,
+            # corretamente, e a asserção acusou as 3 linguas. Numero de pessoas numa
+            # asserção e valor gemeo do cadastro; quem manda e o cadastro.
+            esperado = len(_mod110().PAGINAS)
+            if len(pessoas) != esperado or len(orgs) != 1:
+                det.append(u"%s: %d Person / %d Organization (esperado %d/1)"
+                           % (lang, len(pessoas), len(orgs), esperado))
             # Onda 60b. Tres fatos do Mario, e a distincao entre eles e o ponto:
             #   SEDE  = assento juridico, CNPJ 15.353.236/0001-89 ativo, RIO -> `address`
             #   ESCRITORIO = onde o time trabalha, SAO PAULO -> `location` (Place)
@@ -1226,7 +1319,7 @@ def estaticas(s):
                 elif "http-equiv=\"refresh\"" in s.ler(alvo + "/index.html"):
                     det.append(u"%s: url de %s aponta para stub redirect" % (lang, nome))
         return (not det, u"; ".join(det[:4]) or u"3 línguas: 6 Person válidos, urls resolvem")
-    s.check("S149", u"JSON-LD GEO: 6 líderes parseáveis, LinkedIn e url no disco (#230)", s149)
+    s.check("S149", u"JSON-LD GEO: os líderes do cadastro, parseáveis, com LinkedIn e url no disco (#230)", s149)
 
     def s150():
         # #232 (GEO): meta description presente, não-vazia e ÚNICA nas homes e
@@ -1249,36 +1342,74 @@ def estaticas(s):
     s.check("S150", u"meta description nas homes e listagens de líderes (#232)", s150)
 
     def s151():
-        # #231 (GEO): o slug numérico do Michael. Efeito medido: a página nova
-        # existe e é canônica de si mesma; a 591 é stub noindex; e NENHUM outro
-        # arquivo servido referencia a 591 (padrão S107: zero clique de 2 saltos,
-        # sitemap limpo).
+        # NASCEU na onda 59 (#231) cobrando que o slug numerico do Michael Munch
+        # tivesse virado nominal: `michael-munch` era conteudo canonico e `591` era
+        # stub apontando para ele. Em 20/08/2026 o Mario pediu para tirar a pessoa
+        # "de tudo" -- ele deixou a firma no dia 19 --, e a premissa daquela versao
+        # virou falsa por decisao, nao por defeito.
+        #
+        # A asserção NAO foi apagada: trocou de sujeito preservando o invariante que
+        # ela sempre protegeu -- ninguem chega a uma pagina de perfil encerrada, e
+        # ninguem da dois saltos para descobrir isso. Agora os 8 caminhos (4 do slug
+        # nominal e 4 do numerico) tem de ser stub noindex apontando DIRETO para a
+        # listagem de lideres, e nenhum arquivo servido pode referenciar nenhum deles.
+        #
+        # E ela deixa um registro que vale mais que o teste: na onda 68 a versao
+        # anterior desta asserção acusou 8 referencias ao `591` dentro do JSON-LD do
+        # Yoast da pagina do Michael. Elas estavam la desde a onda 59, ESCAPADAS
+        # (`https:\/\/...\/591\/`), e esta asserção procurava a forma limpa --
+        # entao passou verde por um mes. Quem as revelou foi o `143`, ao reserializar
+        # o JSON com json.dumps do Python, que nao escapa barra. Ver erro 17.
+        CAMINHOS = [
+            "pt/lider/michael-munch/index.html",
+            "en/leader/michael-munch/index.html",
+            "de/lider/michael-munch/index.html",
+            "de/leader/michael-munch/index.html",
+            "pt/lider/591/index.html", "pt/leader/591/index.html",
+            "lider/591/index.html", "leader/591/index.html",
+        ]
+        LIDERES = ("/sobre-nos/lideres/", "/about-us/leaders/",
+                   "/ueber-uns/fuehrungskraefte/")
         det = []
-        novo = s.ler("pt/lider/michael-munch/index.html")
-        if 'rel="canonical" href="https://mirow.com.br/pt/lider/michael-munch/"' not in novo:
-            det.append(u"michael-munch sem canonical próprio")
-        if "http-equiv=\"refresh\"" in novo:
-            det.append(u"michael-munch é redirect, não conteúdo")
-        velho = s.ler("pt/lider/591/index.html")
-        if "noindex" not in velho or "url=/pt/lider/michael-munch/" not in velho:
-            det.append(u"591 não é stub noindex para o slug novo")
+        for rel in CAMINHOS:
+            fp = os.path.join(pub, rel.replace("/", os.sep))
+            if not os.path.exists(fp):
+                det.append(u"%s desapareceu — deveria ser stub" % rel)
+                continue
+            h = s.ler(rel)
+            if "noindex" not in h:
+                det.append(u"%s não é noindex" % rel)
+            m = re.search(r'content="0;url=([^"]+)"', h)
+            if not m:
+                det.append(u"%s sem destino de redirect" % rel)
+            elif not any(a in m.group(1) for a in LIDERES):
+                det.append(u"%s redireciona para %s, e não para a listagem "
+                           u"(dois saltos)" % (rel, m.group(1)))
+
+        # nenhum arquivo servido referencia o slug, o id numerico ou o nome. Cobre
+        # .html, .xml E .json — o `busca-indice.json` da onda 67 e servido tambem, e
+        # e onde um nome removido reaparece com mais facilidade.
         sujos = []
         for dp, _d, fs in os.walk(pub):
             for nome in fs:
-                if not nome.lower().endswith((".html", ".xml")):
+                if not nome.lower().endswith((".html", ".xml", ".json", ".txt")):
                     continue
                 fp = os.path.join(dp, nome)
                 rel = os.path.relpath(fp, pub).replace(os.sep, "/")
-                if rel == "pt/lider/591/index.html":
+                if rel in CAMINHOS:
                     continue
                 with io.open(fp, encoding="utf-8", errors="ignore") as f:
-                    if "pt/lider/591/" in f.read():
-                        sujos.append(rel)
-        if sujos:
-            det.append(u"%d arquivo(s) ainda referenciam 591: %s"
-                       % (len(sujos), ", ".join(sujos[:3])))
-        return (not det, u"; ".join(det[:3]) or u"slug novo canônico, 591 stub, 0 referência")
-    s.check("S151", u"slug do Michael: michael-munch canônico, 591 stub sem links (#231)", s151)
+                    conteudo = f.read()
+                for agulha in ("michael-munch", "lider/591", "leader/591",
+                               "Michael Munch", "Michael-Munch", "modal_591"):
+                    if agulha in conteudo:
+                        sujos.append(u"%s cita %s" % (rel, agulha))
+                        break
+        det.extend(sujos[:6])
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S151", u"perfil encerrado: os 8 caminhos são stub para a listagem, e nada os cita (#231)", s151)
 
     def s152():
         # #233 (GEO): as páginas individuais dos 6 líderes têm cargo + bio +
@@ -1611,6 +1742,14 @@ def estaticas(s):
                            % (ref.split("/")[-1], os.path.getsize(fp) / 1024.0))
 
         # (b) orfas grandes
+        #
+        # Onda 68: a varredura abaixo junta o TEXTO das paginas e procura o basename,
+        # entao referencia em `content=` conta igual -- e bom que conte, porque as 20
+        # derivadas de `og:image` da onda 68 sao citadas SO em
+        # `<meta property="og:image" content="...">`. Se um dia esta metade passar a
+        # extrair referencias por regex de `src|href` (como a metade (a) faz), as
+        # derivadas viram orfas falsas na hora. Fica registrado aqui porque o proximo
+        # a mexer nao tem como adivinhar.
         texto = []
         for dp, _d, fs in os.walk(pub):
             if os.sep + ".git" in dp:
@@ -2340,6 +2479,225 @@ def estaticas(s):
 
     s.check("S171", u"ícones expostos têm tinta para serem vistos, e o /favicon.ico "
                     u"da raiz existe (#246)", s171)
+
+    def s172():
+        # Onda 68 (#247). O cartao de preview de link -- WhatsApp, LinkedIn, Slack,
+        # Telegram, iMessage. Tres defeitos medidos, e o do meio e o instrutivo:
+        #
+        #   6 paginas sem `og:image` NENHUMA (as 3 de imprensa e as 3 de politica)
+        #  58 paginas com metadado MENTINDO sobre o proprio arquivo
+        #   0 de 109 com `og:image:alt` ou `twitter:image`
+        #
+        # As 58: quase todas declaravam `og:image:type = image/png` para arquivo que
+        # hoje e WebP -- residuo das ondas 61/62c, que converteram a imagem e nao
+        # mexeram na tag. E as 3 homes diziam `width 663 / height 394` para o
+        # `og-mirow.png`, que e 1200x630, com `type image/jpeg` para um PNG. Valor
+        # gemeo classico: a dimensao vivia em dois lugares e divergiu calada.
+        #
+        # POR QUE ESTA ASSERÇÃO RECALCULA em vez de conferir presenca: o defeito nao
+        # era tag AUSENTE, era tag PRESENTE E ERRADA. Cobrar existencia passaria
+        # verde nas 58. Aqui cada width/height/type e comparado com o arquivo ABERTO,
+        # no padrao da S116/S120/S166.
+        det = []
+        MIME = {"PNG": "image/png", "JPEG": "image/jpeg", "WEBP": "image/webp",
+                "GIF": "image/gif"}
+        conferidas = 0
+        for rel, h in s.conteudo():
+            m = re.search(r'<meta property="og:image" content="([^"]+)"', h)
+            if not m:
+                det.append(u"%s sem og:image (o preview sai sem imagem)" % rel)
+                continue
+            ref = m.group(1).replace("https://mirow.com.br/", "").lstrip("/")
+            fp = os.path.join(pub, ref.replace("/", os.sep))
+            if not os.path.exists(fp):
+                det.append(u"%s: og:image aponta para %s, que nao existe" % (rel, ref))
+                continue
+            conferidas += 1
+            dec = _dim_imagem(fp)
+            if dec is None:
+                det.append(u"%s: nao consegui medir %s" % (rel, ref))
+                continue
+            larg, altura, fmt = dec
+            for prop, real in (("og:image:width", larg), ("og:image:height", altura)):
+                mm = re.search(r'<meta property="%s" content="(\d+)"' % prop, h)
+                if not mm:
+                    det.append(u"%s sem %s" % (rel, prop))
+                elif int(mm.group(1)) != real:
+                    det.append(u"%s: %s diz %s, o arquivo tem %d"
+                               % (rel, prop, mm.group(1), real))
+            mt = re.search(r'<meta property="og:image:type" content="([^"]+)"', h)
+            esperado = MIME.get(fmt)
+            if not mt:
+                det.append(u"%s sem og:image:type" % rel)
+            elif esperado and mt.group(1) != esperado:
+                det.append(u"%s: og:image:type diz %s, o arquivo e %s"
+                           % (rel, mt.group(1), esperado))
+            if not re.search(r'<meta property="og:image:alt" content="[^"]', h):
+                det.append(u"%s sem og:image:alt" % rel)
+            # summary_large_image sem imagem e promessa vazia
+            if re.search(r'twitter:card" content="summary_large_image"', h) \
+                    and not re.search(r'<meta name="twitter:image" content="[^"]', h):
+                det.append(u"%s promete summary_large_image e nao tem twitter:image" % rel)
+            if larg < 600 or altura < 315:
+                det.append(u"%s: %s tem %dx%d, abaixo do minimo de cartao"
+                           % (rel, ref.split("/")[-1], larg, altura))
+        if conferidas < 100:
+            det.append(u"so %d pagina(s) conferida(s); esperado ~109" % conferidas)
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S172", u"cartão de link coerente: og:image existe e width/height/type "
+                    u"batem com o arquivo (#247)", s172)
+
+    def s173():
+        # Onda 68 (#247). As 4 superficies de identidade que o site nao tinha em
+        # NENHUMA das 109 paginas: theme-color (barra do Chrome no Android),
+        # msapplication-TileColor (fundo do bloco do Windows), mask-icon (aba fixada
+        # do Safari) e manifest (nome e icone ao instalar no Android).
+        #
+        # A asserção cobra as tags E resolve o que elas prometem: o manifest tem de
+        # parsear e cada icone dele existir no disco -- manifest que aponta para
+        # arquivo ausente e pior que manifest nenhum, porque o Android mostra um
+        # quadrado vazio no lugar da marca.
+        NAVY = "#020E66"
+        det = []
+        for rel, h in s.conteudo():
+            for nome, rex in (
+                ("theme-color",
+                 r'<meta name="theme-color" content="%s"' % NAVY),
+                ("msapplication-TileColor",
+                 r'<meta name="msapplication-TileColor" content="%s"' % NAVY),
+                ("mask-icon", r'<link rel="mask-icon"[^>]*color="%s"' % NAVY),
+                ("manifest", r'<link rel="manifest" href="[^"]+"'),
+            ):
+                if not re.search(rex, h):
+                    det.append(u"%s sem %s (ou fora do navy)" % (rel, nome))
+        man = os.path.join(pub, "site.webmanifest")
+        if not os.path.exists(man):
+            det.append(u"site.webmanifest ausente")
+        else:
+            try:
+                with io.open(man, encoding="utf-8") as f:
+                    j = json.load(f)
+                if j.get("theme_color") != NAVY:
+                    det.append(u"manifest com theme_color %s" % j.get("theme_color"))
+                if not j.get("icons"):
+                    det.append(u"manifest sem icones")
+                for ic in j.get("icons", []):
+                    fp = os.path.join(pub, ic["src"].lstrip("/").replace("/", os.sep))
+                    if not os.path.exists(fp):
+                        det.append(u"manifest aponta para %s, que nao existe" % ic["src"])
+                    else:
+                        dec = _dim_imagem(fp)
+                        if dec and "%dx%d" % (dec[0], dec[1]) != ic.get("sizes"):
+                            det.append(u"manifest diz %s para %s, que e %dx%d"
+                                       % (ic.get("sizes"), ic["src"], dec[0], dec[1]))
+            except Exception as e:
+                det.append(u"site.webmanifest nao parseia: %s" % e)
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S173", u"identidade do navegador: theme-color, TileColor, mask-icon e "
+                    u"manifest que resolve (#247)", s173)
+
+    def s174():
+        # Onda 68 (#247). O site declarava QUATRO Organization ao Google: as 3 do
+        # Yoast, com @id relativo/por-idioma, com logo e sem endereco, e a da onda 59,
+        # com endereco/descricao/fundacao e SEM logo. Quatro @id sao quatro entidades,
+        # nao uma vista de quatro angulos -- nenhuma dizia ao mesmo tempo quem somos e
+        # qual e a nossa marca, que e o que o painel de conhecimento precisa.
+        #
+        # DUAS NOTAS DE METODO, porque as duas me pegaram na mesma onda:
+        #
+        # 1. A primeira versao do 143 corrigiu 3 de 109 e a verificacao DELE passou
+        #    verde, porque procurava a string relativa `/pt/#organization` enquanto as
+        #    outras 106 usavam a absoluta por idioma. No HTML os ids vem com barra
+        #    escapada (`https:\/\/`), o que ajudou a esconder. Por isso aqui o JSON e
+        #    RE-PARSEADO e se olha o valor, nunca a string no arquivo.
+        #
+        # 2. A primeira versao DESTA assercao procurava o ImageObject do logo apenas
+        #    nos nos de TOPO de `@graph`. O Yoast escreve esse no ANINHADO dentro de
+        #    `Organization.logo`, entao a checagem de existencia do arquivo nunca
+        #    rodava: apaguei o PNG do logo e a assercao continuou verde. Foi o teste
+        #    negativo que mostrou. Agora a varredura e recursiva, pela arvore inteira.
+        ORG_CANON = "https://mirow.com.br/#organization"
+        det = []
+
+        def _achar(no, tipo=None, saida=None):
+            """Todos os dicts da arvore, opcionalmente filtrando por @type."""
+            if saida is None:
+                saida = []
+            if isinstance(no, dict):
+                t = no.get("@type")
+                t = t if isinstance(t, list) else [t]
+                if tipo is None or tipo in t:
+                    saida.append(no)
+                for v in no.values():
+                    _achar(v, tipo, saida)
+            elif isinstance(no, list):
+                for v in no:
+                    _achar(v, tipo, saida)
+            return saida
+
+        for rel, h in s.conteudo():
+            ids, urls_logo = set(), set()
+            vistos_logo = 0
+            for m in re.finditer(
+                    r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', h, re.S):
+                try:
+                    d = json.loads(m.group(1))
+                except Exception:
+                    det.append(u"%s tem json-ld ilegível" % rel)
+                    continue
+                for org in _achar(d, "Organization"):
+                    ids.add(org.get("@id"))
+                for img in _achar(d, "ImageObject"):
+                    if not str(img.get("@id", "")).endswith("#logo"):
+                        continue
+                    vistos_logo += 1
+                    url = img.get("url")
+                    urls_logo.add(url)
+                    ref = str(url or "").replace("https://mirow.com.br/", "")
+                    fp = os.path.join(pub, ref.lstrip("/").replace("/", os.sep))
+                    if not ref or not os.path.exists(fp):
+                        det.append(u"%s: logo aponta para %s, que não existe"
+                                   % (rel, url))
+                        continue
+                    dec = _dim_imagem(fp)
+                    if dec and (img.get("width") != dec[0]
+                                or img.get("height") != dec[1]):
+                        det.append(u"%s: logo declara %sx%s, o arquivo é %dx%d"
+                                   % (rel, img.get("width"), img.get("height"),
+                                      dec[0], dec[1]))
+            # Cobrar "um @id por pagina" NAO basta, e o cenario negativo mostrou:
+            # troquei as 2 ocorrencias de uma pagina para o @id por idioma e ela
+            # seguiu com UM id -- outro -- e a assercao passou verde. O invariante
+            # de verdade e que todas as 109 usem O MESMO id, o canonico; e isso que
+            # faz o site descrever uma entidade so em vez de 109 consistentes entre
+            # si e discordantes entre paginas.
+            if not ids:
+                det.append(u"%s sem nenhum nó Organization" % rel)
+            elif ids != {ORG_CANON}:
+                det.append(u"%s usa @id de Organization fora do canônico: %s"
+                           % (rel, sorted(str(i) for i in ids)))
+            if not vistos_logo:
+                det.append(u"%s sem nó de logo" % rel)
+            if len(urls_logo) > 1:
+                det.append(u"%s declara %d URLs de logo diferentes"
+                           % (rel, len(urls_logo)))
+
+        # o nó rico tem de estar nas 3 homes E nas 3 listagens de líder
+        for rel in list(HOMES) + ["pt/sobre-nos/lideres/index.html",
+                                  "en/about-us/leaders/index.html",
+                                  "de/ueber-uns/fuehrungskraefte/index.html"]:
+            h = s.ler(rel)
+            if '"addressLocality"' not in h or '"foundingDate"' not in h:
+                det.append(u"%s sem o nó rico (endereço/fundação)" % rel)
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S174", u"uma Organization só no grafo, com logo que resolve, e o nó rico "
+                    u"nas homes (#247)", s174)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
@@ -3610,7 +3968,12 @@ def estaticas(s):
 
     # Quem saiu da firma e tinha página de perfil no espelho.
     SAIRAM_SLUGS = ["giulia-turcato", "lucas-duarte",
-                    "mariana-nakagawa", "matheus-strapasson"]
+                    "mariana-nakagawa", "matheus-strapasson",
+                    # Onda 68: Michael Munch deixou a firma em 19/08/2026 e o
+                    # Mario pediu para tira-lo "de tudo". Sao 4 URLs com o slug
+                    # (pt/lider, en/leader, de/lider e o duplicado de/leader),
+                    # e mais 4 stubs de `591` que a S151 cobra.
+                    "michael-munch"]
     # Nomes que não podem aparecer como AUTORIA nem como perfil. Fernando Fabbris
     # não entra: ele é coautor real do artigo da transição climática (evento de
     # out/2024), e apagar o crédito de quem escreveu seria falsear o registro — o
@@ -3626,8 +3989,9 @@ def estaticas(s):
         det = []
         alvos = [(rel, h) for rel, h in s.todas()
                  if any(sl in rel.lower() for sl in SAIRAM_SLUGS)]
-        if len(alvos) != 28:
-            det.append(u"esperava 28 URLs de ex-líder, achei %d" % len(alvos))
+        # 28 na onda 33 + 4 do Michael na onda 68.
+        if len(alvos) != 32:
+            det.append(u"esperava 32 URLs de ex-líder, achei %d" % len(alvos))
         lideres = ("/sobre-nos/lideres/", "/about-us/leaders/",
                    "/ueber-uns/fuehrungskraefte/")
         for rel, h in alvos:

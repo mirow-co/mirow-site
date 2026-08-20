@@ -19,19 +19,52 @@ TEXTOS = {
     "de/index.html": (u"Mirow & Co. — brasilianische Strategieberatung mit Sitz in Rio de "
                       u"Janeiro. Strategie, Innovation, Pricing und Einkauf für "
                       u"Großunternehmen. Betreuung auf Portugiesisch, Englisch und Deutsch."),
-    "pt/sobre-nos/lideres/index.html": (
-        u"Os líderes da Mirow & Co.: Andreas Mirow, Felipe Diniz, Stephan Friedrich, "
-        u"Renato Alvarenga, Michael Munch e Raoni Morais — trajetórias em McKinsey, "
-        u"Monitor Deloitte e grandes indústrias."),
-    "en/about-us/leaders/index.html": (
-        u"The leaders of Mirow & Co.: Andreas Mirow, Felipe Diniz, Stephan Friedrich, "
-        u"Renato Alvarenga, Michael Munch and Raoni Morais — backgrounds at McKinsey, "
-        u"Monitor Deloitte and major industries."),
-    "de/ueber-uns/fuehrungskraefte/index.html": (
-        u"Die Führungskräfte von Mirow & Co.: Andreas Mirow, Felipe Diniz, Stephan "
-        u"Friedrich, Renato Alvarenga, Michael Munch und Raoni Morais — Stationen bei "
-        u"McKinsey, Monitor Deloitte und in der Industrie."),
+    # As 3 listagens NAO entram neste dicionario: a frase delas cita a lista de
+    # lideres, e lista de lider e dado que mora no `PAGINAS` do 110 (a mesma fonte do
+    # JSON-LD e dos cartoes de preview). Hardcodear aqui foi valor gemeo, e ele
+    # divergiu na primeira oportunidade: quando o Michael Munch saiu em 20/08/2026, o
+    # card saiu do HTML e o `Person` saiu do JSON-LD, mas estas 3 frases seguiram
+    # anunciando o nome dele. Agora sao MONTADAS em `desc_listagem()`.
 }
+
+# `mod` e o 110: mesma fonte de verdade do JSON-LD e dos cartoes de lider.
+mod = __import__("110_geo_bios_lideres")
+
+LISTAGEM_REL = {
+    "pt": "pt/sobre-nos/lideres/index.html",
+    "en": "en/about-us/leaders/index.html",
+    "de": "de/ueber-uns/fuehrungskraefte/index.html",
+}
+
+# `Prof. Dr Stephan Friedrich` aparece na frase como "Stephan Friedrich": a meta
+# description e prosa corrida, nao registro. O mapa cobre so quem precisa encurtar.
+CURTO = {u"Prof. Dr Stephan Friedrich": u"Stephan Friedrich"}
+
+MOLDE = {
+    "pt": (u"Os líderes da Mirow & Co.: %s — trajetórias em McKinsey, "
+           u"Monitor Deloitte e grandes indústrias."),
+    "en": (u"The leaders of Mirow & Co.: %s — backgrounds at McKinsey, "
+           u"Monitor Deloitte and major industries."),
+    "de": (u"Die Führungskräfte von Mirow & Co.: %s — Stationen bei "
+           u"McKinsey, Monitor Deloitte und in der Industrie."),
+}
+
+E = {"pt": u" e ", "en": u" and ", "de": u" und "}
+
+
+def desc_listagem(lang):
+    """A frase da listagem, montada da MESMA lista que o resto da onda 59 usa."""
+    nomes = [CURTO.get(n, n) for n in mod.PAGINAS]
+    if len(nomes) > 1:
+        lista = u", ".join(nomes[:-1]) + E[lang] + nomes[-1]
+    else:
+        lista = nomes[0] if nomes else u""
+    return MOLDE[lang] % lista
+
+
+for _lang, _rel in LISTAGEM_REL.items():
+    TEXTOS[_rel] = desc_listagem(_lang)
+
 
 RE_TAG = re.compile(r'<meta name="description" content="[^"]*" data-onda="onda59-meta">\n?')
 

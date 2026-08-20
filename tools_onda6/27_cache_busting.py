@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
 # >>> proximas ondas: incrementar aqui e rodar o script <<<
-VERSAO = 82
+VERSAO = 83
 
 ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda6.css",
@@ -66,6 +66,14 @@ ASSETS = [
     "wp-content/uploads/2023/04/cropped-favicon-mirow-192x192.png",
     "wp-content/uploads/2023/04/cropped-favicon-mirow-270x270.png",
     "wp-content/themes/mirow/favicon.ico",
+    # Onda 68, segunda metade: o mask-icon do Safari e o manifest. Os dois entram
+    # por `href=`. O `icone-mirow-512.png` NAO entra: ele e citado dentro do JSON do
+    # manifest e dentro do JSON-LD, e carimbar URL de dado estruturado atrapalha o
+    # crawler em vez de ajudar -- ali a URL e identidade, nao cache de navegador.
+    # As derivadas de `og:image` tambem ficam fora, pelo mesmo motivo: o scraper
+    # indexa pela URL, e trocar a URL a cada onda invalidaria preview que ja funciona.
+    "wp-content/uploads/2026/08/onda68/marca-m-mask.svg",
+    "site.webmanifest",
 ]
 
 

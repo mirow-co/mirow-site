@@ -1,158 +1,182 @@
 # Ícones e imagens que o site expõe para fora
 
-> Levantamento medido em 20/08/2026 sobre as **109 páginas de conteúdo** do `sitemap.xml`
-> (os 177 stubs de redirect ficam fora por construção). Nasceu de uma pergunta do Mario —
-> *"que símbolo é esse que aparece do lado do nosso site no google??"* — e virou inventário
-> porque ele pediu: *"não apenas o favicon, mas toda identidade visual do site nos ícones
-> que ele oferece (link que aparece para whatsapp, etc.)"*.
+> Levantamento e correção de 20/08/2026, sobre as **109 páginas de conteúdo** do
+> `sitemap.xml` (os 177 stubs de redirect ficam fora por construção). Nasceu de uma pergunta
+> do Mario — *"que símbolo é esse que aparece do lado do nosso site no google??"* — e o pedido
+> seguinte foi: *"não apenas o favicon, mas toda identidade visual do site nos ícones que ele
+> oferece (link que aparece para whatsapp, etc.)"*, e depois *"corrija tudo já, de uma vez"*.
 >
-> Regra de leitura: **superfície** é onde o público vê; **tag** é o que a declara; a coluna
-> de medição é pixel contado, não declaração lida (P2.1).
+> Regra de leitura: **superfície** é onde o público vê; **tag** é o que a declara; toda coluna
+> de medição é pixel contado ou arquivo aberto, nunca declaração lida (P2.1).
 
 ---
 
-## O quadro geral
+## As 14 superfícies, e o estado de cada uma
 
-| # | Superfície (onde o público vê) | Tag / mecanismo | Arquivo | Estado |
-|---|---|---|---|---|
-| 1 | Aba do navegador · resultado do Google | `<link rel="icon" sizes="32x32">` | `cropped-favicon-mirow-32x32.png` | ✅ onda 68 |
-| 2 | Aba em tela retina · atalho Android | `<link rel="icon" sizes="192x192">` | `cropped-favicon-mirow-192x192.png` | ✅ onda 68 |
-| 3 | Favorito legado · `/favicon.ico` pedido por tag | `<link rel="shortcut icon">` | `themes/mirow/favicon.ico` | ✅ onda 68 |
-| 4 | `/favicon.ico` pedido **por convenção** | nenhuma tag — o navegador e o crawler batem no caminho | `favicon.ico` (raiz) | ✅ onda 68 (**não existia**) |
-| 5 | Tela de início do iPhone/iPad | `<link rel="apple-touch-icon">` | `cropped-favicon-mirow-180x180.png` | ✅ onda 68 |
-| 6 | Bloco do menu Iniciar do Windows | `<meta name="msapplication-TileImage">` | `cropped-favicon-mirow-270x270.png` | ✅ onda 68 |
-| 7 | **Preview de link: WhatsApp, LinkedIn, Slack, Telegram, iMessage** | `<meta property="og:image">` | 30 imagens distintas | ⚠️ ver §2 |
-| 8 | Cartão do X/Twitter | `twitter:card` = `summary_large_image` | `twitter:image` **ausente** | ⚠️ ver §3 |
-| 9 | Painel de conhecimento do Google | JSON-LD `Organization.logo` | `logo_mirow_azul_e_branco1svg.svg` | ⚠️ ver §4 |
-| 10 | Barra de endereço do Chrome no Android | `<meta name="theme-color">` | — | ❌ ausente nas 109 |
-| 11 | Cor do bloco do Windows | `<meta name="msapplication-TileColor">` | — | ❌ ausente nas 109 |
-| 12 | Aba fixada do Safari | `<link rel="mask-icon">` | — | ❌ ausente nas 109 |
-| 13 | Nome e ícone ao instalar no Android | `<link rel="manifest">` | — | ❌ ausente nas 109 |
-| 14 | Marca visível no cabeçalho | `<h1><img>` | `marca-mirow-co.svg` | ✅ (alt corrigido na onda 60) |
+| # | Superfície (onde o público vê) | Tag / mecanismo | Estado |
+|---|---|---|---|
+| 1 | Aba do navegador · resultado do Google | `<link rel="icon" sizes="32x32">` | ✅ onda 68 |
+| 2 | Aba retina · atalho Android | `<link rel="icon" sizes="192x192">` | ✅ onda 68 |
+| 3 | Favorito legado | `<link rel="shortcut icon">` (`.ico`) | ✅ onda 68 |
+| 4 | `/favicon.ico` pedido **por convenção** | nenhuma tag | ✅ onda 68 (**era 404**) |
+| 5 | Tela de início do iPhone/iPad | `<link rel="apple-touch-icon">` | ✅ onda 68 |
+| 6 | Bloco do menu Iniciar do Windows | `<meta name="msapplication-TileImage">` | ✅ onda 68 |
+| 7 | **WhatsApp · LinkedIn · Slack · Telegram · iMessage** | `<meta property="og:image">` | ✅ onda 68 |
+| 8 | Cartão do X/Twitter | `twitter:card` + `twitter:image` | ✅ onda 68 |
+| 9 | Painel de conhecimento do Google | JSON-LD `Organization.logo` | ✅ onda 68 |
+| 10 | Barra de endereço do Chrome no Android | `<meta name="theme-color">` | ✅ onda 68 (**era ausente**) |
+| 11 | Cor do bloco do Windows | `<meta name="msapplication-TileColor">` | ✅ onda 68 (**era ausente**) |
+| 12 | Aba fixada do Safari | `<link rel="mask-icon">` | ✅ onda 68 (**era ausente**) |
+| 13 | Instalar no Android (nome + ícone) | `<link rel="manifest">` | ✅ onda 68 (**era ausente**) |
+| 14 | Marca visível no cabeçalho | `<h1><img>` `marca-mirow-co.svg` | ✅ (alt corrigido na onda 60) |
+
+Sentinelas: **S171** (tinta dos ícones), **S172** (cartão de link), **S173** (identidade do
+navegador), **S174** (uma `Organization` só).
 
 ---
 
-## §1 — O que a onda 68 consertou, e a lição de classe
+## §1 — Favicon: a wordmark tinha 0,00% de tinta
 
-O favicon era a **wordmark inteira** — `MIROW & CO.`, 11 caracteres — espremida no quadro
-do ícone. Medido, em tinta branca sobre o quadro:
+Era a wordmark inteira — `MIROW & CO.`, 11 caracteres — espremida no quadro do ícone.
 
 | Arquivo | Antes | Depois |
 |---|---|---|
-| `…-32x32.png` | **0,00%** | 7,62% |
+| `…-32x32.png` | **0,00%** de tinta branca | 7,62% |
 | `…-180x180.png` | — | 10,10% |
 | `…-192x192.png` | **0,29%** (caixa de 125×**11** px) | 10,51% |
 | `…-270x270.png` | — | 10,41% |
 | `themes/mirow/favicon.ico` | 16×16 só | 16+32+48, 8,59% |
-| `favicon.ico` (raiz) | **404** | 16+32+48, 8,59% |
+| `favicon.ico` (raiz) | **404** | 16+32+48 |
 
-**Zero por cento.** O 32×32 não tinha um único pixel acima de 200 de brilho: a 32px cada
-caractere recebe ~3px e o antialias apaga tudo. O ícone servido era um quadrado navy vazio,
-que o Google ainda recorta em círculo — por isso o próprio dono da marca não o reconheceu.
+A 32px cada caractere recebe ~3px e o antialias apaga tudo: o ícone servido era um quadrado
+navy **vazio**, que o Google ainda recorta em círculo. Fonte nova: `LogoNeg.png` (navy
+`#020E66` medido, alfa 255 em todo pixel), em `tools_onda6/dados/marca-mirow-m-neg.png`.
 
-A fonte nova é `LogoNeg.png` (1150×1150, navy `#020E66` medido, alfa 255 em todo pixel),
-copiada para `tools_onda6/dados/marca-mirow-m-neg.png`. O gerador é
-`tools_onda6/138_favicon_marca.py`, idempotente, e confere dimensão e tinta **do que gravou**.
-
-> **A lição transferível: favicon não aceita wordmark.** O que cabe em 16px é UM glifo. Não
-> é preferência estética, é aritmética de pixel por caractere. E o contra-exemplo está no
-> mesmo repo: o `og-mirow.png` (§2) é a wordmark, e ali está **certo**, porque o cartão de
-> preview renderiza a ~400px. O mesmo desenho, duas superfícies, dois vereditos — o que
-> decide é o tamanho de render, nunca "é o nosso logo".
-
-Asserção: **S171**, que mede a **tinta** de todo ícone declarado (lendo a lista do próprio
-HTML, não de constante) e exige o frame de 48px no `.ico`. Cobrar o nome do arquivo passaria
-verde no dia em que alguém regenerasse os ícones da wordmark outra vez.
+> **A lição, e ela é geral: favicon não aceita wordmark.** O que cabe em 16px é UM glifo — é
+> aritmética de pixel por caractere, não gosto. O contra-exemplo mora no mesmo repo: o
+> `og-mirow.png` de 1200×630 **é** a wordmark e ali está **certo**, porque o cartão renderiza a
+> ~400px. Mesmo desenho, duas superfícies, dois vereditos; o que decide é o tamanho de render.
 
 ---
 
-## §2 — `og:image`: o preview de WhatsApp (o buraco maior)
+## §2 — `og:image`: o preview de WhatsApp
 
-São **30 imagens distintas** em 109 páginas. Três problemas, em ordem de gravidade:
+Três defeitos, e o do meio é o instrutivo.
 
-**(a) 6 páginas não têm `og:image` nenhuma.** Compartilhadas no WhatsApp, saem sem imagem:
+**(a) 6 páginas não tinham `og:image` nenhuma** — `/pt/imprensa/`, `/en/press/`, `/de/presse/`
+e as 3 políticas de privacidade. Compartilhadas no WhatsApp saíam sem imagem, e imprensa é a
+página que se manda para jornalista. Passam a usar o `og-mirow.png`.
 
-```
-/pt/imprensa/            /en/press/               /de/presse/
-/pt/politica-de-privacidade/   /en/privacy-policy/   /de/datenschutzrichtlinie/
-```
+**(b) 58 páginas declaravam metadado que mentia sobre o próprio arquivo.** Quase todas diziam
+`og:image:type = image/png` para arquivo que hoje é **WebP** — resíduo das ondas 61/62c, que
+converteram a imagem e não mexeram na tag. E as 3 homes diziam `width 663 / height 394` para o
+`og-mirow.png`, que é **1200×630**, com `type image/jpeg` para um **PNG**. Valor gêmeo
+clássico: a dimensão vivia em dois lugares e divergiu calada. Como o scraper do Facebook usa
+o width/height declarado para decidir se desenha o cartão grande, a home pedia cartão grande e
+se descrevia como pequena.
 
-As três de imprensa são as que mais doem: a onda 65 acabou de levar a vitrine de 29 para 43
-matérias, e é justamente a página que se manda para jornalista.
+Agora width/height/type são **recalculados do arquivo aberto** a cada execução do
+`141_cartao_de_link.py`. Não existe número digitado — a classe de divergência não pode voltar.
 
-**(b) 6 páginas de líder usam a foto do líder a 232×246.** Abaixo do que o cartão grande
-pede; o preview cai para miniatura ou não aparece.
+**(c) 20 `og:image` fora do padrão de cartão** ganharam derivada 1200×630 controlada por nós,
+em vez de deixar o scraper recortar às cegas. A regra é explícita: mais de 200 KB, ou mais
+largo que 1600px, ou razão fora de 1,905 por mais de 15%, ou formato que não seja JPEG/PNG.
 
-| Página | `og:image` | Dimensão |
+| Original | Era | Virou |
 |---|---|---|
-| líderes (6 páginas) | `Andreas-Mirow.webp`, `Felipe-Diniz-1.webp`, `Michael-Munch.png`, `prof.webp`, `Raoni-Moraes.png`, `Renato-Alvarenga-1.png` | **232×246** |
+| `Imagem1-scaled.jpg` | 2560×1475, **927 KB** | 1200×630, 113 KB |
+| `Automotive-industry-scaled.jpg` | 2560×1920 (4:3), 686 KB | 1200×630, 117 KB |
+| `energia-1.jpg` | 2560×1707, 679 KB | 1200×630, 115 KB |
+| `imagem_gerada-….webp` | 1792×493 (**razão 3,63**) | 1200×630, 116 KB |
 
-**(c) imagens de artigo enormes e com recorte descontrolado** como `og:image`:
+O arquivo original **não** é substituído — segue servindo a página. Só o `og:image` muda.
 
-| Arquivo | Dimensão | Peso |
-|---|---|---|
-| `Imagem1-scaled.jpg` | 2560×1475 | **927 KB** |
-| `Automotive-industry-scaled.jpg` | 2560×1920 | 686 KB |
-| `energia-1.jpg` | 2560×1707 | 679 KB |
-| `embedded-finance.jpg` | 2560×1362 | 268 KB |
+**(d) `og:image:alt` e `twitter:image`** entraram nas 109 (eram 0). O alt é derivado do que a
+página já diz: nome e cargo nas de líder, `Mirow & Co.` no cartão institucional, o `og:title`
+sem o sufixo do site nas demais.
 
-São os mesmos arquivos da dívida de imagem de artigo já registrada no
-`BACKLOG-TECNICO.md`. A 2560×1920 (4:3) o cartão recorta o centro e o resultado é
-imprevisível — o padrão é **1200×630**, que é o que as 3 homes já usam corretamente
-(`og-mirow.png`).
+### As 18 páginas de líder ganharam cartão próprio
 
-**(d) `og:image:alt` em 0 de 109 páginas.**
+Usavam o **retrato a 232×246** — abaixo do mínimo do cartão grande, nas mesmas páginas que
+declaram `summary_large_image`. Agora há 6 cartões 1200×630 (o cargo está em inglês nas três
+línguas, então pt/en/de compartilham), em Titillium Web extraída dos `.woff2` do próprio repo,
+com nome, cargo, foto e a marca. JPEG q90, ~50 KB.
 
----
-
-## §3 — `twitter:card` promete o que não entrega
-
-As 109 páginas declaram `twitter:card = summary_large_image`, e **nenhuma** tem
-`twitter:image`. O X cai no `og:image`, então funciona onde há — e nas 6 páginas da §2(a)
-não mostra nada.
+A foto entra a **1,4×** (324×344), não esticada para 630px de altura: não existe original maior
+no espelho, e 2,7× de upscale num rosto que representa um sócio fica borrado.
 
 ---
 
-## §4 — Duas `Organization` disputando o painel de conhecimento
+## §3 — De quatro `Organization` para uma
 
-Achado novo, e liga direto no trabalho de GEO da onda 59 e no perfil do Google Business:
+O site declarava **quatro** entidades de organização ao Google:
 
-| Nó | `@id` | Tem `logo`? | Tem endereço/descrição? |
+| Nó | `@id` | `logo`? | endereço/descrição? |
 |---|---|---|---|
-| do Yoast | `/pt/#organization` (URL **relativa**) | ✅ `logo_mirow_azul_e_branco1svg.svg` | ❌ |
-| nosso, onda 59 | `https://mirow.com.br/#organization` | ❌ **ausente** | ✅ |
+| Yoast, pt | `/pt/#organization` | ✅ | ❌ |
+| Yoast, en | `/en/#organization` | ✅ | ❌ |
+| Yoast, de | `/de/#organization` | ✅ | ❌ |
+| onda 59 | `https://mirow.com.br/#organization` | ❌ | ✅ |
 
-São **duas entidades** no grafo, não uma. O nó rico — o que a onda 59 escreveu com sede,
-descrição, fundação, sócios — é exatamente o que **não** declara logo; e o nó que declara
-logo aponta para um SVG com `width: 210, height: 297`, proporção de folha A4, o que não é
-forma de logo.
+Quatro `@id` são quatro entidades, não uma vista de quatro ângulos. Nenhuma dizia ao mesmo
+tempo quem somos **e** qual é nossa marca. Agora todas apontam para o `@id` canônico, e o nó
+rico (endereço, descrição, fundação, sócios) passou a ser escrito também nas **3 homes** — ele
+só vivia nas 3 listagens de líder, a dois cliques da entrada.
 
-Consequência prática: quando o Google monta o painel, não há um único nó que diga ao mesmo
-tempo quem somos e qual é a nossa marca.
-
----
-
-## Ordem sugerida para as próximas ondas
-
-1. **`og:image` nas 6 páginas sem nenhuma** — usa o `og-mirow.png` que já existe. É a
-   correção de menor custo e maior alcance das listadas aqui.
-2. **Unificar as duas `Organization`** — `logo` e `image` no nó da onda 59, num raster
-   1200×630 ou quadrado, com URL absoluta.
-3. **`theme-color` + `msapplication-TileColor`** em navy `#020E66` — duas linhas de `<meta>`,
-   e é a identidade na barra do Chrome no celular.
-4. **`og:image` dedicado para as páginas de líder** — 1200×630 com a foto e o nome, em vez
-   do retrato de 232×246.
-5. **`manifest` + `mask-icon`** — o rabo da lista, cosmético para nós hoje.
-6. **`og:image` dos artigos** — cai junto com a dívida de imagem de artigo do
-   `BACKLOG-TECNICO.md`, não vale onda própria.
+O `logo` também mudou de arquivo. O anterior era `logo_mirow_azul_e_branco1svg.svg`, e aquele
+arquivo tem `viewBox="0 0 210 297"` com `width="210mm" height="297mm"` — é uma prancha **A4**,
+não um logo. Era por isso que a dimensão declarada parecia torta: descrevia a folha, não a
+marca. Agora é o raster quadrado do "m", 512×512, o mesmo glifo do favicon e do manifest.
 
 ---
 
-## Como refazer esta medição
+## §4 — Michael Munch saiu do site
+
+Pedido do Mario no meio da onda: *"inclusive pode retirar o michael munch totalmente da
+pagina, de tudo. ele nao trabalha mais aqui desde ontem"* (deixou a firma em 19/08/2026).
+Mesma regra da onda 33 — "quem saiu sai do site" —, com uma diferença que mudou o trabalho:
+os 4 daquela onda já estavam fora da listagem e do JSON-LD; ele estava **dentro**.
+
+Pegada medida antes de mexer, **16 arquivos**: 3 páginas de perfil, 3 listagens (card + nó
+`Person`), 3 homes (nó `Person`, que entrou nesta mesma onda), 5 stubs, `sitemap.xml`,
+`busca-indice.json` e 2 assets. Depois: **zero referência** em `public/`, e balanço de `<div>`
+preservado em todas as 6 páginas tocadas (medido antes/depois contra o `git`).
+
+Três coisas que o pedido revelou e que valem mais que a remoção em si:
+
+1. **O modal de bio sobrevive à remoção do card** — são elementos separados, e foi o achado
+   da onda 33 se repetindo. Pior: o **id do modal difere entre as línguas** (`modal_591` em
+   pt, `modal_michael-munch` em en/de), porque a troca de slug da onda 59 só tocou o PT. Uma
+   primeira versão do script fixava o id e limpou **1 de 6 páginas**. Agora o modal é
+   localizado pelo **conteúdo**, com varredura balanceada de `<div>`.
+2. **A meta description das 3 listagens tinha a lista de líderes hardcoded** — valor gêmeo
+   com o `PAGINAS` do `110`, a fonte que o JSON-LD e os cartões usam. O card saiu do HTML, o
+   `Person` saiu do JSON-LD, e as 3 frases seguiram anunciando o nome dele. Agora são
+   **montadas** a partir de `PAGINAS`.
+3. **A `S151` estava cega há um mês.** Ela cobrava que nada referenciasse o slug antigo
+   `591`, e a página do Michael o referenciava em **8 lugares** do JSON-LD do Yoast — desde a
+   onda 59, **escapados** como `https:\/\/…\/591\/`. A asserção procurava a forma limpa.
+   Quem os revelou foi o `143`, ao reserializar o JSON com `json.dumps` do Python, que não
+   escapa barra. A `S151` trocou de sujeito e agora cobra os 8 caminhos como stub de um salto.
+
+## §4 — O que ficou de fora, e por quê
+
+- **`og:image` com `?v=`**: as derivadas e os cartões **não** entram no cache busting. O
+  scraper indexa pela URL; trocar a URL a cada onda invalidaria preview que já funciona.
+- **O `logo_mirow_azul_e_branco1svg.svg`** não foi apagado — só deixou de ser citado no schema.
+- **`/pt/#primaryimage`** e outros `ImageObject` de artigo seguem com URL relativa. É
+  pré-existente, não é superfície de ícone, e não estava no pedido.
+
+---
+
+## Como refazer a medição
 
 ```bash
-python tools/verificacoes.py . --so=S171
+python tools/verificacoes.py . --so=S17
 ```
 
-E o inventário completo (as 14 superfícies, página a página) sai do script de varredura
-descrito no handoff da onda 68.
+E a sequência que produz o estado atual, na ordem (o 141 depende dos dois primeiros):
+
+```bash
+python tools_onda6/138_favicon_marca.py . && python tools_onda6/139_og_cards_lideres.py . && python tools_onda6/140_og_image_derivada.py . && python tools_onda6/111_geo_jsonld_lideres.py . && python tools_onda6/141_cartao_de_link.py . && python tools_onda6/142_identidade_navegador.py . && python tools_onda6/143_schema_organizacao_unica.py . && python tools_onda6/27_cache_busting.py .
+```

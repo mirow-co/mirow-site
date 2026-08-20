@@ -20,12 +20,14 @@ LISTAGENS = {
 }
 
 # slug da pagina individual por idioma (so os 6 lideres com pagina propria)
+# Michael Munch saiu de PAGINAS em 20/08/2026: deixou a firma em 19/08 e o Mario
+# pediu para retirar "totalmente da pagina, de tudo". Tirar daqui e o que apaga o no
+# `Person` dele do JSON-LD das 3 listagens E das 3 homes, na proxima execucao do 111.
 PAGINAS = {
     u"Andreas Mirow": {"pt": "pt/lider/andreas-mirow", "en": "en/leader/andreas-mirow", "de": "de/lider/andreas-mirow"},
     u"Felipe Diniz": {"pt": "pt/lider/felipe-diniz", "en": "en/leader/felipe-diniz", "de": "de/lider/felipe-diniz"},
     u"Prof. Dr Stephan Friedrich": {"pt": "pt/lider/prof-dr-stephan-friedrich", "en": "en/leader/prof-dr-stephan-friedrich", "de": "de/lider/prof-dr-stephan-friedrich"},
     u"Renato Alvarenga": {"pt": "pt/lider/renato-alvarenga", "en": "en/leader/renato-alvarenga", "de": "de/lider/renato-alvarenga"},
-    u"Michael Munch": {"pt": "pt/lider/michael-munch", "en": "en/leader/michael-munch", "de": "de/lider/michael-munch"},
     u"Raoni Morais": {"pt": "pt/lider/raoni-morais", "en": "en/leader/raoni-morais", "de": "de/lider/raoni-morais"},
 }
 
