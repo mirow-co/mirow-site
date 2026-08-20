@@ -1,5 +1,7 @@
 # Ícones e imagens que o site expõe para fora
 
+> **NO AR desde 20/08/2026** (produção e staging em `v=83`, suíte 215 OK no gate do deploy).
+>
 > Levantamento e correção de 20/08/2026, sobre as **109 páginas de conteúdo** do
 > `sitemap.xml` (os 177 stubs de redirect ficam fora por construção). Nasceu de uma pergunta
 > do Mario — *"que símbolo é esse que aparece do lado do nosso site no google??"* — e o pedido
