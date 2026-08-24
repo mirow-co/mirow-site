@@ -82,11 +82,39 @@ def extrai_cards(html):
     return dados
 
 
-def bloco_bio(d):
+# Onda 72 (#250, e-mail do Felipe de 24/08/2026): a pagina individual dele ganha a
+# "bio media" em paragrafos, verbatim do anexo (traducoes en/de minhas). Os demais
+# seguem com os bullets do card. O JSON-LD (111) continua usando a descricao curta
+# do card — a bio media e texto para humano, da pagina individual.
+BIO_MEDIA = {
+    u"Felipe Diniz": {
+        "pt": [
+            u"Felipe Diniz é sócio da Mirow & Co. desde 2018, onde lidera a prática de Energia e Inovação. São 18 anos de consultoria estratégica ininterruptos, iniciados na McKinsey & Company e seguidos por Schlumberger Business Consulting, e Monitor Deloitte.",
+            u"Atende clientes de setores intensivos em capital — energia elétrica, gás natural, óleo e gás, automotivo — além de extensa experiência em segmentos como seguros, tecnologia, educação e setor público. Tem grande atuação em projetos de planejamento estratégico, inovação e novos modelos de negócio, estratégia comercial e pricing, eficiência e redução de custos, finanças corporativas e desenho organizacional e de governança.",
+            u"É PhD em Economia pela University of Chicago. Foi docente do Departamento de Economia e orientador acadêmico do Executive MBA da Booth School of Business, na mesma universidade.",
+        ],
+        "en": [
+            u"Felipe Diniz has been a partner at Mirow & Co. since 2018, where he leads the Energy and Innovation practice. He brings 18 uninterrupted years of strategy consulting, starting at McKinsey & Company and followed by Schlumberger Business Consulting and Monitor Deloitte.",
+            u"He serves clients in capital-intensive sectors — electricity, natural gas, oil and gas, automotive — with extensive experience in segments such as insurance, technology, education and the public sector. He works broadly on strategic planning, innovation and new business models, commercial strategy and pricing, efficiency and cost reduction, corporate finance, and organizational and governance design.",
+            u"He holds a PhD in Economics from the University of Chicago, where he also taught in the Department of Economics and served as academic advisor to the Executive MBA at the Booth School of Business.",
+        ],
+        "de": [
+            u"Felipe Diniz ist seit 2018 Partner bei Mirow & Co., wo er die Practice Energie und Innovation leitet. Er bringt 18 ununterbrochene Jahre Strategieberatung mit, begonnen bei McKinsey & Company, gefolgt von Schlumberger Business Consulting und Monitor Deloitte.",
+            u"Er betreut Kunden in kapitalintensiven Branchen — Elektrizität, Erdgas, Öl und Gas, Automobil — mit umfangreicher Erfahrung in Segmenten wie Versicherungen, Technologie, Bildung und öffentlichem Sektor. Er arbeitet in Projekten zu strategischer Planung, Innovation und neuen Geschäftsmodellen, Vertriebsstrategie und Pricing, Effizienz und Kostensenkung, Corporate Finance sowie Organisations- und Governance-Design.",
+            u"Er ist PhD in Wirtschaftswissenschaften der University of Chicago, wo er auch am Department of Economics lehrte und akademischer Berater des Executive MBA der Booth School of Business war.",
+        ],
+    },
+}
+
+
+def bloco_bio(d, nome=None, lang=None):
     partes = [INI]
     if d["cargo"]:
         partes.append('<p class="onda59-cargo"><strong>%s</strong></p>' % d["cargo"])
-    if d["bio"]:
+    paragrafos = BIO_MEDIA.get(nome, {}).get(lang)
+    if paragrafos:
+        partes.extend("<p>%s</p>" % p for p in paragrafos)
+    elif d["bio"]:
         partes.append("<ul>%s</ul>" % "".join("<li>%s</li>" % b for b in d["bio"]))
     if d["linkedin"]:
         partes.append('<p><a href="%s" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>' % d["linkedin"])
@@ -112,7 +140,7 @@ def main(raiz):
             if not os.path.exists(alvo):
                 raise SystemExit("pagina individual ausente: %s" % paginas[lang])
             h = ler(alvo)
-            novo_bloco = bloco_bio(d)
+            novo_bloco = bloco_bio(d, nome, lang)
             m = RE_TEXTO.search(h)
             if not m:
                 raise SystemExit("blog-single__text ausente em %s" % paginas[lang])

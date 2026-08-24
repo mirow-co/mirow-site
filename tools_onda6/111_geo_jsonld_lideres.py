@@ -60,10 +60,24 @@ KNOWS = {
         "en": [u"Corporate strategy", u"Pricing", u"Marketing and sales"],
         "de": [u"Unternehmensstrategie", u"Pricing", u"Marketing und Vertrieb"],
     },
+    # Onda 72 (#250, e-mail do Felipe de 24/08/2026): de 4 para os 10 termos que
+    # ele mandou no anexo. Traducoes en/de minhas, a partir do verbatim pt.
     u"Felipe Diniz": {
-        "pt": [u"Estratégia", u"Energia", u"Inovação", u"Governança corporativa"],
-        "en": [u"Strategy", u"Energy", u"Innovation", u"Corporate governance"],
-        "de": [u"Strategie", u"Energie", u"Innovation", u"Corporate Governance"],
+        "pt": [u"Planejamento estratégico", u"Inovação e novos modelos de negócio",
+               u"Finanças corporativas", u"Avaliação de projetos de capital e business cases",
+               u"Redução de custos e eficiência operacional", u"Estratégia comercial e pricing",
+               u"Gás natural", u"Energia elétrica e óleo e gás",
+               u"Organização e governança corporativa", u"Economia aplicada e modelagem econométrica"],
+        "en": [u"Strategic planning", u"Innovation and new business models",
+               u"Corporate finance", u"Capital project evaluation and business cases",
+               u"Cost reduction and operational efficiency", u"Commercial strategy and pricing",
+               u"Natural gas", u"Electricity and oil & gas",
+               u"Organization and corporate governance", u"Applied economics and econometric modeling"],
+        "de": [u"Strategische Planung", u"Innovation und neue Geschäftsmodelle",
+               u"Corporate Finance", u"Bewertung von Investitionsprojekten und Business Cases",
+               u"Kostensenkung und operative Effizienz", u"Vertriebsstrategie und Pricing",
+               u"Erdgas", u"Elektrizität sowie Öl und Gas",
+               u"Organisation und Corporate Governance", u"Angewandte Ökonomie und ökonometrische Modellierung"],
     },
     u"Prof. Dr Stephan Friedrich": {
         "pt": [u"Gestão da inovação", u"Estratégia corporativa", u"Modelos de negócio"],
@@ -84,6 +98,11 @@ KNOWS = {
 
 ALUMNI = {
     u"Andreas Mirow": [u"Universidade Técnica de Berlim"],
+    # Onda 72 (#249, e-mail do Felipe de 24/08/2026): so o diploma alemao chegava a
+    # maquina — pista que fazia os assistentes deduzirem "consultoria alema". O PhD
+    # de Chicago ja estava no modal, mas so em texto para humano. Stephan e Renato
+    # entram quando autorizarem (o Mario confirma com eles).
+    u"Felipe Diniz": [u"University of Chicago", u"Fundação Getulio Vargas — EPGE"],
     u"Raoni Morais": [u"Instituto Militar de Engenharia (IME)", u"Universitat de Barcelona",
                       u"Universidade Federal do Rio de Janeiro (UFRJ)"],
 }
@@ -164,11 +183,19 @@ def montar(lang, cards):
         d = cards[nome]
         url = "https://mirow.com.br/%s/" % paginas[lang]
         pid = "https://mirow.com.br/%s/#person" % paginas["pt"]
+        # Onda 72 (#250): o Felipe pediu jobTitle de ficha mais especifico que o
+        # "Partner" visivel do card ("Sócio — Prática de Energia e Inovação, Mirow
+        # & Co."). O ", Mirow & Co." fica de fora porque worksFor ja o declara.
+        cargo_ficha = {
+            u"Felipe Diniz": {"pt": u"Sócio — Prática de Energia e Inovação",
+                              "en": u"Partner — Energy and Innovation Practice",
+                              "de": u"Partner — Practice Energie und Innovation"},
+        }.get(nome, {}).get(lang, d["cargo"])
         pessoa = {
             "@type": "Person",
             "@id": pid,
             "name": nome.replace(u"Prof. Dr Stephan Friedrich", u"Prof. Dr. Stephan Friedrich"),
-            "jobTitle": d["cargo"],
+            "jobTitle": cargo_ficha,
             "worksFor": {"@id": org_id},
             "url": url,
             "description": ". ".join(d["bio"]) + ".",

@@ -387,6 +387,7 @@ ETAPAS = {
     "S171": ("asset", "texto"),
     "S172": ("asset", "texto"), "S173": ("asset", "texto"),
     "S174": ("schema", "asset", "texto"),
+    "S175": ("schema", "texto"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -1444,7 +1445,18 @@ def estaticas(s):
                 if "onda59-cargo" not in bloco or "linkedin.com/in/" not in bloco:
                     det.append(u"%s: %s sem cargo ou LinkedIn" % (lang, p.get("name")))
                 nome_card = [n for n in bios if n.split()[0] in p.get("name", "")]
-                if nome_card and bios[nome_card[0]] and bios[nome_card[0]] not in bloco:
+                # Onda 72 (#250): quem tem BIO_MEDIA no 110 leva parágrafos na página
+                # individual, não os bullets do card. A comparação segue sendo contra a
+                # fonte que gera o bloco — só que a fonte, para esses, é a constante.
+                esperado_bm = None
+                for chave, textos in _mod110().BIO_MEDIA.items():
+                    if nome_card and chave.split()[0] in p.get("name", ""):
+                        esperado_bm = textos.get(lang, [None])[0]
+                if esperado_bm is not None:
+                    if esperado_bm not in bloco:
+                        det.append(u"%s: bio média de %s diverge da constante do 110"
+                                   % (lang, p.get("name")))
+                elif nome_card and bios[nome_card[0]] and bios[nome_card[0]] not in bloco:
                     det.append(u"%s: bio de %s diverge da listagem" % (lang, p.get("name")))
         return (not det, u"; ".join(det[:4]) or u"18 páginas com cargo+bio+LinkedIn da listagem")
     s.check("S152", u"páginas individuais de líder com cargo, bio e LinkedIn (#233)", s152)
@@ -2698,6 +2710,80 @@ def estaticas(s):
 
     s.check("S174", u"uma Organization só no grafo, com logo que resolve, e o nó rico "
                     u"nas homes (#247)", s174)
+
+    def s175():
+        # Onda 72 (#249, #250, #251 — e-mail do Felipe de 24/08/2026). Quatro
+        # invariantes, medidos no efeito (JSON re-parseado, nunca a string):
+        #  a) a ficha do Felipe declara alumniOf com Chicago (o contrapeso ao único
+        #     diploma alemão que fazia a máquina deduzir "consultoria alemã") e
+        #     knowsAbout com os 10 termos do anexo;
+        #  b) "15 anos/years/Jahre de experiência" sumiu do site inteiro — são 18;
+        #  c) toda página individual de líder do cadastro (PAGINAS do 110, piso
+        #     vivo, nunca número literal) tem <meta name="description"> não-vazia
+        #     com o nome do líder;
+        #  d) a bio média e os 8 exemplos rebalanceados estão nas 3 línguas
+        #     (medido por strings distintivas: Booth School / estaleiro; e o item
+        #     velho "man power planing" não pode voltar).
+        det = []
+        VELHO_15 = {"pt": u"15 anos de experiência", "en": u"15 years of experience",
+                    "de": u"15 Jahre Erfahrung"}
+        for rel, h in s.todas():
+            for t in VELHO_15.values():
+                if t in h:
+                    det.append(u"%s ainda diz '%s'" % (rel, t))
+        for lang, home in (("pt", "pt/index.html"), ("en", "en/index.html"),
+                           ("de", "de/index.html")):
+            h = s.ler(home)
+            m = re.search(r'<script type="application/ld\+json" id="onda59-geo">'
+                          r'(.*?)</script>', h, re.S)
+            if not m:
+                det.append(u"%s sem bloco onda59-geo" % home)
+                continue
+            try:
+                g = json.loads(m.group(1))["@graph"]
+            except (ValueError, KeyError) as e:
+                det.append(u"%s: JSON inválido (%s)" % (home, e))
+                continue
+            fel = [p for p in g if p.get("name") == u"Felipe Diniz"]
+            if not fel:
+                det.append(u"%s sem o Person do Felipe" % home)
+                continue
+            p = fel[0]
+            alumni = [a.get("name", "") for a in p.get("alumniOf", [])]
+            if u"University of Chicago" not in alumni or not any(u"EPGE" in a for a in alumni):
+                det.append(u"%s: alumniOf do Felipe = %r (falta Chicago/EPGE)" % (lang, alumni))
+            if len(p.get("knowsAbout", [])) < 10:
+                det.append(u"%s: knowsAbout do Felipe com %d termos (< 10)"
+                           % (lang, len(p.get("knowsAbout", []))))
+            if "18" not in p.get("description", ""):
+                det.append(u"%s: descrição do Felipe sem os 18 anos" % lang)
+        DISTINTIVAS = {"pt": (u"estaleiro de reparação naval", u"Booth School of Business"),
+                       "en": (u"ship repair yard", u"Booth School of Business"),
+                       "de": (u"Schiffsreparaturwerft", u"Booth School of Business")}
+        VELHOS = (u"man power planing", u"manpower planning model",
+                  u"Modells für das Personalmanagement")
+        for nome, paginas in _mod110().PAGINAS.items():
+            for lang, rel in paginas.items():
+                h = s.ler(rel + "/index.html")
+                m = re.search(r'<meta name="description"[^>]*content="([^"]+)"', h)
+                primeiro = nome.split()[-2] if nome.startswith(u"Prof") else nome.split()[0]
+                if not m or primeiro not in m.group(1):
+                    det.append(u"%s sem meta description com o nome" % rel)
+                if nome == u"Felipe Diniz" and DISTINTIVAS[lang][1] not in h:
+                    det.append(u"%s sem a bio média (Booth ausente)" % rel)
+        for lang, home in (("pt", "pt/index.html"), ("en", "en/index.html"),
+                           ("de", "de/index.html")):
+            h = s.ler(home)
+            if DISTINTIVAS[lang][0] not in h:
+                det.append(u"%s sem os 8 exemplos novos (estaleiro ausente)" % home)
+            for v in VELHOS:
+                if v in h:
+                    det.append(u"%s ainda tem exemplo velho: %s" % (home, v))
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S175", u"bio nova do Felipe: alumniOf+knowsAbout na ficha, 18 anos em vez "
+                    u"de 15, meta description nos líderes, bio média e 8 exemplos (#249-#251)", s175)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
