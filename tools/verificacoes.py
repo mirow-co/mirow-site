@@ -2744,6 +2744,12 @@ def estaticas(s):
             except (ValueError, KeyError) as e:
                 det.append(u"%s: JSON inválido (%s)" % (home, e))
                 continue
+            # Onda 72b (#249, confirmação do Mario em 24/08): TODO líder do grafo tem
+            # alumniOf não-vazio — era exatamente a assimetria (só diploma alemão
+            # legível) que fazia a máquina deduzir "consultoria alemã".
+            for p in g:
+                if p.get("@type") == "Person" and not p.get("alumniOf"):
+                    det.append(u"%s: %s sem alumniOf" % (lang, p.get("name")))
             fel = [p for p in g if p.get("name") == u"Felipe Diniz"]
             if not fel:
                 det.append(u"%s sem o Person do Felipe" % home)

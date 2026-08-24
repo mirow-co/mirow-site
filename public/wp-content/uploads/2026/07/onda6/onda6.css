@@ -1626,3 +1626,11 @@ display:block}.pol-v2 thead{display:none}.pol-v2 td{border-top:0}
 /* onda59:sede:ini */
 .onda59-sede{max-width:760px;margin:8px auto 0;text-align:center;color:#5b6770;font-size:17px;line-height:1.5}
 /* onda59:sede:fim */
+
+/* onda72:modal-centralizado:ini */
+div.modal[id^="modal_"] .modal-dialog {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - 3.5rem);
+}
+/* onda72:modal-centralizado:fim */

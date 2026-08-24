@@ -105,6 +105,12 @@ ALUMNI = {
     u"Felipe Diniz": [u"University of Chicago", u"Fundação Getulio Vargas — EPGE"],
     u"Raoni Morais": [u"Instituto Militar de Engenharia (IME)", u"Universitat de Barcelona",
                       u"Universidade Federal do Rio de Janeiro (UFRJ)"],
+    # Onda 72b (#249): Mario confirmou Stephan e Renato em 24/08. Fonte: o proprio
+    # modal de lideres do site (Educacao). O vinculo do Stephan com Bremen e
+    # DOCENCIA, nao formacao — nao entra no alumniOf.
+    u"Prof. Dr Stephan Friedrich": [u"Universität Karlsruhe", u"Universität Mannheim"],
+    u"Renato Alvarenga": [u"Carnegie Mellon University — Tepper School of Business",
+                          u"Universidade de Brasília (UnB)"],
 }
 
 INI_RE = re.compile(r'<script type="application/ld\+json" id="onda59-geo">.*?</script>\n?', re.S)
