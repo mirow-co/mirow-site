@@ -6287,6 +6287,52 @@ def ao_vivo(s):
         s.check("V39", u"bloco \"Como usamos IA\" legível sobre o fundo real da página (#212)",
                 v39)
 
+        def v40():
+            # Onda 72b (#253). O modal de líder vive DENTRO de <main>, que tem
+            # position:relative + z-index:1 — o stacking context inteiro ficava
+            # atrás do header fixo (z=90): o topo do modal sumia por baixo da
+            # barra, sem nem scroll que o alcançasse, e o backdrop ia a z=-1
+            # (nada escurecia). O Mario viu no staging ("conectado à barra").
+            # Medição do EFEITO, com o modal ABERTO de verdade:
+            #   1. elementFromPoint no alto da tela pertence ao modal (não ao menu);
+            #   2. o diálogo cabe inteiro na viewport (top >= 0 e bottom <= vh);
+            #   3. o backdrop está acima do header (z > 90).
+            det = []
+            nav.abrir("%s/pt/sobre-nos/lideres/" % base, 1600, 900)
+            r = nav.js(
+                "(function(){"
+                "var b=document.querySelector('[data-bs-target=\"#modal_raoni-morais\"]');"
+                "if(!b) return 'sem-botao'; b.click(); return 'ok';})()")
+            if r != "ok":
+                return (False, u"card do Raoni sem botão de modal")
+            time.sleep(1.2)
+            r = nav.js(
+                "(function(){"
+                "var d=document.querySelector('#modal_raoni-morais .modal-dialog');"
+                "if(!d) return JSON.stringify({erro:'sem dialogo'});"
+                "var rd=d.getBoundingClientRect();"
+                "var topo=document.elementFromPoint(innerWidth/2, 40);"
+                "var noModal=!!(topo && topo.closest('#modal_raoni-morais'));"
+                "var bk=document.querySelector('.modal-backdrop');"
+                "return JSON.stringify({noModal:noModal, top:Math.round(rd.top),"
+                " bottom:Math.round(rd.bottom), vh:innerHeight,"
+                " bkz:bk?parseInt(getComputedStyle(bk).zIndex)||0:0});})()")
+            d = json.loads(r)
+            if d.get("erro"):
+                det.append(d["erro"])
+            else:
+                if not d["noModal"]:
+                    det.append(u"o alto da tela não é o modal — voltou para trás do header")
+                if d["top"] < 0 or d["bottom"] > d["vh"]:
+                    det.append(u"diálogo não cabe na viewport (top=%s bottom=%s vh=%s)"
+                               % (d["top"], d["bottom"], d["vh"]))
+                if d["bkz"] <= 90:
+                    det.append(u"backdrop com z-index %s (atrás do header)" % d["bkz"])
+            return (not det, u"; ".join(det)
+                    or u"modal acima do header, inteiro na viewport, backdrop ativo")
+        s.check("V40", u"modal de líder abre acima do header, inteiro na viewport (#253)",
+                v40)
+
 
         s.check("V37", u"barra do topo não embranquece no toque após fechar o menu (onda 64)",
                 v37)
