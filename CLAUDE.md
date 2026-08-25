@@ -235,12 +235,12 @@ no contact sheet é candidato natural a asserção V-nova na suíte.
 reais do tema (cores, fontes Archivo/Libre Franklin, breakpoints 992/1200), componentes canônicos
 e o passo a passo de capturar referência visual de outro site via CDP (sem playwright).
 
-## Estado do site (medido em 20/08/2026)
+## Estado do site (medido em 25/08/2026)
 
-**Produção e staging em `v=83`**, conferido ao vivo nas duas pontas. `public/` = **64 MB**
+**Produção e staging em `v=87`**, conferido ao vivo nas duas pontas. `public/` = **64 MB**
 (era 262 MB antes das ondas 61–62c). **287 arquivos HTML**: ~107 de conteúdo e ~180 stubs de
 redirect; o `sitemap.xml` lista **106 URLs** — só conteúdo, porque stub é `noindex` e listar
-noindex no sitemap é erro no Search Console. Suíte: **215 asserções, 0 falha**.
+noindex no sitemap é erro no Search Console. Suíte: **217 asserções, 0 falha**.
 
 **Cuidado com dois esquemas de numeração parecidos:** `S-07`, `S-117` **com hífen** são
 *pedidos* do Mario (rastreados nas issues); `S107`, `S117` **sem hífen** são *asserções* da
@@ -268,7 +268,9 @@ elas a fonte é o `git log`.
 > | 70 · 71 | os 2 links da imprensa (#241) e os marcos 2024-2026 travados (#68) | `fc71cc32` `93ce0989` |
 > | 68 · 68b *(reuso)* | as 14 superfícies de ícone e a saída do Michael Munch | `0857364c` `14d0fe8f` `c0433010` `dfdedc9c` |
 >
-> **A próxima onda é a 72.** Antes de rotular, `git log --oneline -20 | grep -i onda`.
+> **A onda 72 (a–d) está NO AR** (bio nova do Felipe, alumniOf dos 5, meta description
+> dos líderes, modal redesenhado — ver `docs/HANDOFF-2026-08-25.md`). **A próxima é a
+> 73.** Antes de rotular, `git log --oneline -20 | grep -i onda`.
 
 Mapa por tema, para saber onde procurar e qual sentinela guarda o quê:
 
@@ -287,6 +289,7 @@ Mapa por tema, para saber onde procurar e qual sentinela guarda o quê:
 | Acessibilidade e PageSpeed | 60 · 62d | `S153`–`S158` |
 | "Como usamos IA" nas práticas core | 68 · 68b · 69 | `S169` `V39` |
 | Imprensa: links recuperados e marcos travados | 70 · 71 | `S170` |
+| Bio do Felipe, alumniOf dos 5, meta description, modal de líder | 72 · 72b–d | `S175` `V40` |
 
 **Antes de tratar qualquer coisa como pendente, medir no HTML.** Em 20/08 a linha da `59-sede`
 dizia "aguardando OK" sobre uma frase que estava no ar havia semanas, e isso quase me fez
