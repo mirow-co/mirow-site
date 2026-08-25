@@ -96,3 +96,39 @@ precisa do QID dela.
 | CV de Andreas (e do 2º mestrado) | **Andreas** | o item dele e o `P112` da empresa |
 | Aprovação escrita do lote | **Felipe** | a publicação |
 | `sameAs` do Wikidata no JSON-LD do site | eu, depois dos QIDs | vira onda própria (73+) |
+
+---
+
+## Atualização de 25/08/2026, fim do dia — as 50 edições estão feitas
+
+O Mario completou **50 contribuições em 25/08**. Falta só o outro lado da regra: a
+**1ª edição precisa ter 4 dias**. Como ela é de 25/08, o QuickStatements deve liberar em
+**29/08/2026** (mesma hora da 1ª edição). Nada a fazer nesse intervalo além dos itens que
+não dependem do relógio (cartão CNPJ, resposta sobre a sede, CV do Andreas).
+
+**A conferir por medição** quando eu tiver o nome de usuário da conta (o e-mail não serve
+para consultar): contagem de edições e o carimbo de hora da primeira, via
+`Special:Contributions` / `list=usercontribs`. Enquanto não medir, a data acima é cálculo,
+não fato verificado.
+
+## Instituições — QIDs resolvidos na API em 25/08/2026
+
+Vêm do `alumniOf` que já está publicado no site (constante `ALUMNI` do
+`tools_onda6/111_geo_jsonld_lideres.py`, ondas 72 e 72b), então já passaram pela sua
+confirmação com cada sócio.
+
+| Pessoa | Instituição (como está no site) | QID |
+|---|---|---|
+| Andreas Mirow | Universidade Técnica de Berlim | `Q51985` |
+| Felipe Diniz | University of Chicago | `Q131252` |
+| Felipe Diniz | Fundação Getulio Vargas — EPGE | `Q5508996` (a FGV; a EPGE não tem item próprio conferido) |
+| Raoni Morais | Instituto Militar de Engenharia | `Q1665208` |
+| Raoni Morais | Universitat de Barcelona | `Q219615` |
+| Raoni Morais | UFRJ | `Q586904` |
+| Prof. Dr Stephan Friedrich | Universität Karlsruhe | `Q309988` (KIT) — **conferir**: o KIT é a entidade pós-fusão de 2009; pode existir item histórico separado para a Universität Karlsruhe. A API ficou limitada por excesso de requisições hoje |
+| Prof. Dr Stephan Friedrich | Universität Mannheim | `Q317070` |
+| Renato Alvarenga | Carnegie Mellon University — Tepper | `Q190080` (a universidade; a Tepper pode ter item próprio, a conferir) |
+| Renato Alvarenga | Universidade de Brasília | `Q1330634` |
+
+Falta, para fechar o lote das pessoas: o QID da **empresa** (só existe depois da criação à
+mão), a ocupação (`P106`) e o CV do **Andreas** — inclusive a instituição do 2º mestrado.
