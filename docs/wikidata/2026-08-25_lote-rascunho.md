@@ -132,3 +132,14 @@ confirmação com cada sócio.
 
 Falta, para fechar o lote das pessoas: o QID da **empresa** (só existe depois da criação à
 mão), a ocupação (`P106`) e o CV do **Andreas** — inclusive a instituição do 2º mestrado.
+
+## Sede — DECIDIDO pelo Mario em 25/08/2026
+
+- **Sede do CNPJ: Rio de Janeiro** (Rua Lauro Müller, 116 — sala 1504). Fonte: cartão CNPJ,
+  quando emitido; hoje o site já publica esse endereço na política de privacidade.
+- **Escritório: São Paulo**, Av. Ibirapuera, 2033 — conjunto 133. Fonte: site.
+- **Local de fundação: Rio de Janeiro** (`P740`), que é o que a Nossa História conta.
+
+Na ficha entram as duas afirmações de local, cada uma com a sua fonte, em vez de escolher uma e
+esconder a outra — é assim que o Wikidata trata pessoa jurídica com endereço legal num lugar e
+operação em outro. A pergunta aberta na versão anterior deste arquivo está, portanto, fechada.
