@@ -229,6 +229,24 @@ def _mod110():
     return _MOD110[0]
 
 
+_MOD111 = []
+_MOD148 = []
+
+
+def _mod111():
+    """O modulo 111_geo_jsonld_lideres: `ALUMNI` e `EXPERIENCIA` (onda 73)."""
+    if not _MOD111:
+        _MOD111.append(__import__("111_geo_jsonld_lideres"))
+    return _MOD111[0]
+
+
+def _mod148():
+    """O modulo 148_linkedin_lideres: o mestre `LINKEDIN` e a tabela `MORTOS`."""
+    if not _MOD148:
+        _MOD148.append(__import__("148_linkedin_lideres"))
+    return _MOD148[0]
+
+
 def _png_rgb(dados):
     # decodificador minimo de PNG truecolor, sem PIL no processo da suite
     if dados[:8] != b"\x89PNG\r\n\x1a\n":
@@ -388,6 +406,8 @@ ETAPAS = {
     "S172": ("asset", "texto"), "S173": ("asset", "texto"),
     "S174": ("schema", "asset", "texto"),
     "S175": ("schema", "texto"),
+    # onda 73: o LinkedIn contra o mestre do 148, e o historico de empregadores
+    "S176": ("texto", "estrutura"), "S177": ("schema",),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -2661,7 +2681,27 @@ def estaticas(s):
                 except Exception:
                     det.append(u"%s tem json-ld ilegível" % rel)
                     continue
+                # Onda 73: o grafo passou a ter Organization de TERCEIRO -- os
+                # empregadores anteriores de cada lider, pendurados no padrao
+                # Role (OrganizationRole -> worksFor -> Organization). McKinsey e
+                # Aracruz nao somos nos: nao levam o nosso @id, e cobrar deles o
+                # canonico faria a assercao exigir uma mentira. O invariante
+                # segue igual para o que E a Mirow, e por isso o filtro e por
+                # PROVENIENCIA (estar dentro de um OrganizationRole), nunca por
+                # "@id ausente" -- essa era exatamente a brecha original.
+                terceiros = set()
+                for papel in _achar(d, "OrganizationRole"):
+                    empregador = papel.get("worksFor")
+                    if isinstance(empregador, dict):
+                        terceiros.add(id(empregador))
                 for org in _achar(d, "Organization"):
+                    if id(org) in terceiros:
+                        # o inverso tambem e defeito: empregador de terceiro
+                        # carregando o NOSSO @id funde as duas entidades
+                        if org.get("@id") == ORG_CANON:
+                            det.append(u"%s: %r usa o @id canônico da Mirow"
+                                       % (rel, org.get("name")))
+                        continue
                     ids.add(org.get("@id"))
                 for img in _achar(d, "ImageObject"):
                     if not str(img.get("@id", "")).endswith("#logo"):
@@ -2790,6 +2830,116 @@ def estaticas(s):
 
     s.check("S175", u"bio nova do Felipe: alumniOf+knowsAbout na ficha, 18 anos em vez "
                     u"de 15, meta description nos líderes, bio média e 8 exemplos (#249-#251)", s175)
+
+    def s176():
+        # Onda 73 (#254): o LinkedIn do Stephan que o site publicava caía em
+        # `linkedin.com/404/` -- medido no navegador em 25/08/2026. A asserção
+        # tem DUAS pernas, e a segunda é a que importa:
+        #  a) todo link de LinkedIn de líder que aparece em qualquer página é um
+        #     dos do mestre `LINKEDIN` do 148 (fonte única, P3) -- URL de líder
+        #     fora do mestre é erro, mesmo que pareça plausível;
+        #  b) nenhum slug da tabela `MORTOS` sobrevive em página nenhuma -- é o
+        #     cenário negativo, e é o que pega a reintrodução do link morto por
+        #     um script antigo que ninguém lembrou de atualizar (erro 11).
+        # O que esta asserção NÃO prova: que o link está vivo. Isso se mede no
+        # navegador, porque o LinkedIn responde 999 a cliente que não é
+        # navegador e 999 não distingue perfil vivo de 404. O mestre carrega a
+        # data em que cada URL foi verificada de verdade -- o gate garante que o
+        # site concorda com o mestre, não que o mundo não mudou desde então.
+        mestre = set(_mod148().LINKEDIN.values()) | set(_mod148().OUTROS.values())
+        # o mestre traz a forma canônica com barra final; o HTML pode não ter
+        canon = set(u.rstrip("/") for u in mestre)
+        mortos = _mod148().MORTOS
+        det = []
+        for rel, h in s.todas():
+            for morto in mortos:
+                if morto in h:
+                    det.append(u"%s ainda tem o slug morto %s" % (rel, morto))
+            for m in re.finditer(r'https://www\.linkedin\.com/in/([A-Za-z0-9._%-]+)', h):
+                url = "https://www.linkedin.com/in/" + m.group(1)
+                if url.rstrip("/") not in canon:
+                    det.append(u"%s: LinkedIn fora do mestre: %s" % (rel, url))
+        # e cada líder do cadastro tem o seu, na página individual dos 3 idiomas
+        for nome, paginas in _mod110().PAGINAS.items():
+            alvo = _mod148().LINKEDIN.get(nome, "").rstrip("/")
+            if not alvo:
+                det.append(u"%s sem URL no mestre LINKEDIN" % nome)
+                continue
+            for lang, rel in paginas.items():
+                if alvo not in s.ler(rel + "/index.html"):
+                    det.append(u"%s (%s) sem o LinkedIn do mestre" % (rel, lang))
+        det = sorted(set(det))
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S176", u"LinkedIn dos líderes igual ao mestre do 148; 0 slug morto no site (#254)",
+            s176)
+
+    def s177():
+        # Onda 73: a experiência anterior de cada líder no JSON-LD das 3 homes e
+        # das 3 listagens. Antes daqui o grafo dizia só "worksFor: Mirow & Co." --
+        # cinco pessoas sem passado, para quem lê por máquina.
+        # Medido contra a constante `EXPERIENCIA` do 111 (nunca um número escrito
+        # aqui: erro 18), e o que se cobra é a FORMA que o schema.org exige para
+        # datar um vínculo -- o padrão Role (worksFor -> OrganizationRole ->
+        # worksFor -> Organization). Cargo sem organização, ou sem startDate,
+        # não é vínculo: é ruído.
+        exp = _mod111().EXPERIENCIA
+        det = []
+        alvos = [("pt", "pt/index.html"), ("en", "en/index.html"), ("de", "de/index.html"),
+                 ("pt", "pt/sobre-nos/lideres/index.html"),
+                 ("en", "en/about-us/leaders/index.html"),
+                 ("de", "de/ueber-uns/fuehrungskraefte/index.html")]
+        for lang, rel in alvos:
+            h = s.ler(rel)
+            m = re.search(r'<script type="application/ld\+json" id="onda59-geo">'
+                          r'(.*?)</script>', h, re.S)
+            if not m:
+                det.append(u"%s sem bloco onda59-geo" % rel)
+                continue
+            try:
+                grafo = json.loads(m.group(1))["@graph"]
+            except (ValueError, KeyError) as e:
+                det.append(u"%s: JSON inválido (%s)" % (rel, e))
+                continue
+            pessoas = dict((p.get("name"), p) for p in grafo if p.get("@type") == "Person")
+            for nome, vinculos in exp.items():
+                # o nome no grafo leva o ponto depois de "Dr" (normalização do 111)
+                chave = nome.replace(u"Prof. Dr Stephan Friedrich",
+                                     u"Prof. Dr. Stephan Friedrich")
+                p = pessoas.get(chave)
+                if p is None:
+                    det.append(u"%s: sem o Person de %s" % (rel, chave))
+                    continue
+                w = p.get("worksFor")
+                if not isinstance(w, list):
+                    det.append(u"%s: worksFor de %s não é lista" % (rel, chave))
+                    continue
+                if not any(isinstance(x, dict) and x.get("@id") for x in w):
+                    det.append(u"%s: %s sem o vínculo corrente com a Mirow" % (rel, chave))
+                papeis = [x for x in w if isinstance(x, dict)
+                          and x.get("@type") == "OrganizationRole"]
+                if len(papeis) != len(vinculos):
+                    det.append(u"%s: %s com %d vínculo(s) passado(s), esperados %d"
+                               % (rel, chave, len(papeis), len(vinculos)))
+                orgs_esperadas = set(o for _c, o, _i, _f in vinculos)
+                for r in papeis:
+                    org = (r.get("worksFor") or {}).get("name")
+                    if not org:
+                        det.append(u"%s: %s tem papel sem organização" % (rel, chave))
+                    elif org not in orgs_esperadas:
+                        det.append(u"%s: %s com organização inesperada %r"
+                                   % (rel, chave, org))
+                    if not r.get("startDate"):
+                        det.append(u"%s: %s — %s sem startDate" % (rel, chave, org))
+                    if not r.get("roleName"):
+                        det.append(u"%s: %s — %s sem roleName" % (rel, chave, org))
+        det = sorted(set(det))
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S177", u"experiência anterior dos líderes no JSON-LD, no padrão Role do "
+                    u"schema.org (org + cargo + startDate)", s177)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado

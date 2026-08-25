@@ -97,12 +97,22 @@ KNOWS = {
 }
 
 ALUMNI = {
-    u"Andreas Mirow": [u"Universidade Técnica de Berlim"],
+    # Onda 73 (25/08/2026): o Stevens Institute of Technology entra. O site dizia
+    # "2o mestrado, Gestao de Tecnologia, EUA, Fulbright" SEM instituicao, e por
+    # isso o campo ficava fora do alumniOf -- a lacuna que o handoff registrava
+    # como "perguntar a ele". Lido do LinkedIn dele em 25/08 ("Scholarship and
+    # Master of Technology Management of the Stevens Institute of Technology") e
+    # autorizado pelo Mario. Fonte autodeclarada, mesmo critério da 72b.
+    u"Andreas Mirow": [u"Universidade Técnica de Berlim",
+                       u"Stevens Institute of Technology"],
     # Onda 72 (#249, e-mail do Felipe de 24/08/2026): so o diploma alemao chegava a
     # maquina — pista que fazia os assistentes deduzirem "consultoria alema". O PhD
     # de Chicago ja estava no modal, mas so em texto para humano. Stephan e Renato
     # entram quando autorizarem (o Mario confirma com eles).
-    u"Felipe Diniz": [u"University of Chicago", u"Fundação Getulio Vargas — EPGE"],
+    # Onda 73: a PUC-Rio (graduacao em Economia, 1994-1998) entra -- estava no
+    # LinkedIn dele e nunca no site.
+    u"Felipe Diniz": [u"University of Chicago", u"Fundação Getulio Vargas — EPGE",
+                      u"Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio)"],
     u"Raoni Morais": [u"Instituto Militar de Engenharia (IME)", u"Universitat de Barcelona",
                       u"Universidade Federal do Rio de Janeiro (UFRJ)"],
     # Onda 72b (#249): Mario confirmou Stephan e Renato em 24/08. Fonte: o proprio
@@ -111,6 +121,59 @@ ALUMNI = {
     u"Prof. Dr Stephan Friedrich": [u"Universität Karlsruhe", u"Universität Mannheim"],
     u"Renato Alvarenga": [u"Carnegie Mellon University — Tepper School of Business",
                           u"Universidade de Brasília (UnB)"],
+}
+
+# Onda 73 (25/08/2026): a experiencia ANTERIOR passa a existir para a maquina.
+# Ate aqui o grafo dizia apenas "worksFor: Mirow & Co." -- para um assistente de
+# IA, cinco pessoas sem passado. Lido do LinkedIn de cada um em 25/08 (arquivos em
+# docs/wikidata/2026-08-25_cv-*.md) e autorizado pelo Mario.
+#
+# Regra de curadoria, para nao precisar decidir caso a caso depois:
+#  - vinculo com ORGANIZACAO NOMEADA e duracao >= 12 meses;
+#  - a Mirow & Co. fica fora daqui (ja e o worksFor corrente);
+#  - autonomo/"Independent Consultant" e ano sabatico ficam fora (nao ha org);
+#  - varios cargos na MESMA organizacao viram um vinculo, com o cargo mais senior
+#    e o intervalo somado (ex.: as duas diretorias do Renato na Cam).
+# O que a regra deixou de fora, de proposito: IBP e o segundo periodo do Raoni na
+# Catavento (4 meses cada), a docencia de 4 meses do Felipe no college de Chicago
+# e a Cerj do Renato (11 meses).
+#
+# roleName vai VERBATIM do LinkedIn, sem traduzir por idioma: cargo de terceiro
+# traduzido e cargo inventado, e o mesmo bloco e servido nas 3 linguas.
+# Formato: (roleName, organizacao, inicio, fim ou None quando corrente).
+EXPERIENCIA = {
+    u"Andreas Mirow": [
+        (u"Principal", u"McKinsey & Company", "2001-09", "2012-06"),
+        (u"Manager of Sales and Marketing and Corporate Planning",
+         u"Aracruz Celulose S.A.", "1996-08", "2001-08"),
+        (u"Senior Associate", u"Booz Allen Hamilton", "1990", "1995"),
+    ],
+    u"Felipe Diniz": [
+        (u"Director of Strategy", u"Monitor Deloitte", "2015-03", "2018-02"),
+        (u"Senior Engagement Manager", u"McKinsey & Company", "2008-04", "2013-03"),
+        (u"Academic Adviser at the Executive MBA",
+         u"University of Chicago Booth School of Business", "2007-04", "2008-03"),
+    ],
+    u"Prof. Dr Stephan Friedrich": [
+        (u"Managing Partner", u"Innovative Management Partner (IMP)", "2010", None),
+        (u"Honorarprofessur für Betriebswirtschaftslehre", u"Universität Bremen", "2014", None),
+        (u"Partner und Mitglied der Geschäftsleitung", u"Malik Management", "2006", "2009"),
+        (u"Partner und Leiter Geschäftsbereich Strategy & Organisation",
+         u"Arthur D. Little", "2003", "2006"),
+    ],
+    u"Renato Alvarenga": [
+        (u"CFO", u"RC Alvarenga Engenharia e Construções", "2014-08", None),
+        (u"Director of Sales and Logistics", u"Cam", "2007-12", "2010-08"),
+        (u"Innovation Manager", u"Ampla", "2005-09", "2007-12"),
+        (u"Project Manager", u"Chilectra (Enel Distribución Chile)", "2004-05", "2005-09"),
+        (u"Engagement Manager", u"McKinsey & Company", "1999-09", "2003-04"),
+        (u"Partner and Chief Engineer", u"Arcoplan Construtora", "1995-07", "1997-07"),
+    ],
+    u"Raoni Morais": [
+        (u"Partner and Consultant", u"Catavento Consultoria", "2015-06", "2016-08"),
+        (u"Project Manager", u"Consórcio Integrador Rio de Janeiro (CIRJ)", "2012-08", "2015-05"),
+        (u"Business Analyst", u"Schlumberger", "2011-04", "2012-06"),
+    ],
 }
 
 INI_RE = re.compile(r'<script type="application/ld\+json" id="onda59-geo">.*?</script>\n?', re.S)
@@ -202,7 +265,16 @@ def montar(lang, cards):
             "@id": pid,
             "name": nome.replace(u"Prof. Dr Stephan Friedrich", u"Prof. Dr. Stephan Friedrich"),
             "jobTitle": cargo_ficha,
-            "worksFor": {"@id": org_id},
+            # Onda 73: worksFor deixa de ser um valor e passa a ser lista -- a
+            # Mirow corrente mais o historico, no padrao Role do schema.org
+            # (propriedade -> Role -> a MESMA propriedade -> valor), que e a
+            # unica forma de pendurar data num vinculo de emprego.
+            "worksFor": [{"@id": org_id}] + [
+                dict([("@type", "OrganizationRole"), ("roleName", cargo),
+                      ("startDate", ini)]
+                     + ([("endDate", fim)] if fim else [])
+                     + [("worksFor", {"@type": "Organization", "name": org})])
+                for cargo, org, ini, fim in EXPERIENCIA.get(nome, [])],
             "url": url,
             "description": ". ".join(d["bio"]) + ".",
             "knowsAbout": KNOWS[nome][lang],
