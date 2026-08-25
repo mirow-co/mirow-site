@@ -237,10 +237,12 @@ e o passo a passo de capturar referência visual de outro site via CDP (sem play
 
 ## Estado do site (medido em 25/08/2026)
 
-**Produção e staging em `v=87`**, conferido ao vivo nas duas pontas. `public/` = **64 MB**
-(era 262 MB antes das ondas 61–62c). **287 arquivos HTML**: ~107 de conteúdo e ~180 stubs de
-redirect; o `sitemap.xml` lista **106 URLs** — só conteúdo, porque stub é `noindex` e listar
-noindex no sitemap é erro no Search Console. Suíte: **217 asserções, 0 falha**.
+**Produção em `v=87`, staging em `v=88`** (a onda 73 está lá esperando o OK do Mario — é o
+staging à frente, que é o lado permitido do invariante), conferido ao vivo nas duas pontas.
+`public/` = **64 MB** (era 262 MB antes das ondas 61–62c). **287 arquivos HTML**: ~107 de
+conteúdo e ~180 stubs de redirect; o `sitemap.xml` lista **106 URLs** — só conteúdo, porque
+stub é `noindex` e listar noindex no sitemap é erro no Search Console. Suíte: **219 asserções,
+0 falha**.
 
 **Cuidado com dois esquemas de numeração parecidos:** `S-07`, `S-117` **com hífen** são
 *pedidos* do Mario (rastreados nas issues); `S107`, `S117` **sem hífen** são *asserções* da
@@ -290,6 +292,7 @@ Mapa por tema, para saber onde procurar e qual sentinela guarda o quê:
 | "Como usamos IA" nas práticas core | 68 · 68b · 69 | `S169` `V39` |
 | Imprensa: links recuperados e marcos travados | 70 · 71 | `S170` |
 | Bio do Felipe, alumniOf dos 5, meta description, modal de líder | 72 · 72b–d | `S175` `V40` |
+| LinkedIn dos líderes num mestre, e a experiência anterior deles no grafo | 73 | `S176` `S177` |
 
 **Antes de tratar qualquer coisa como pendente, medir no HTML.** Em 20/08 a linha da `59-sede`
 dizia "aguardando OK" sobre uma frase que estava no ar havia semanas, e isso quase me fez
