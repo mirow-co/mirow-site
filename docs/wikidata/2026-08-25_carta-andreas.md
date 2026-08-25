@@ -1,4 +1,14 @@
-## Versão WhatsApp (a que vai ser usada)
+## Versão WhatsApp — revisada em 25/08 (achei a universidade no LinkedIn dele)
+
+Andreas, tudo bem? Estamos ajustando o site para os assistentes de IA pararem de descrever a
+Mirow como consultoria alemã — das nossas formações, só o seu diploma de Berlim chegava ao dado
+que a máquina lê. Vi no seu LinkedIn que o mestrado de Technology Management foi no Stevens
+Institute of Technology: posso incluir? Só me falta o ano. E me diz se quer que McKinsey,
+Aracruz e Booz Allen entrem também. Nada de dado pessoal entra, e você vê antes de publicar.
+
+---
+
+## Versão WhatsApp original (antes de eu achar a universidade)
 
 Andreas, tudo bem? Estamos ajustando o site para os assistentes de IA pararem de descrever a
 Mirow como consultoria alemã. Parte da causa era que, das nossas formações, só o seu diploma de
