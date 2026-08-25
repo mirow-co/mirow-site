@@ -1,3 +1,16 @@
+## Versão WhatsApp (a que vai ser usada)
+
+Andreas, tudo bem? Estamos ajustando o site para os assistentes de IA pararem de descrever a
+Mirow como consultoria alemã. Parte da causa era que, das nossas formações, só o seu diploma de
+Berlim chegava ao dado que a máquina lê. Já corrigimos, mas o seu 2º mestrado (Gestão de
+Tecnologia, Fulbright) está sem o nome da universidade e por isso ficou de fora. Me manda a
+universidade e o ano? Se puder, um link público seu também (LinkedIn serve). Nada de dado
+pessoal entra, e você vê antes de publicar. Obrigado!
+
+---
+
+## Versão longa (e-mail), guardada caso ele peça o contexto inteiro
+
 Assunto: Um pedido rápido sobre o seu currículo, para o site
 
 Andreas,
