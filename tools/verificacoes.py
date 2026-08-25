@@ -6314,8 +6314,14 @@ def ao_vivo(s):
                 "var topo=document.elementFromPoint(innerWidth/2, 40);"
                 "var noModal=!!(topo && topo.closest('#modal_raoni-morais'));"
                 "var bk=document.querySelector('.modal-backdrop');"
+                "var c=d.querySelector('.modal-content'),"
+                " body=d.querySelector('.modal-body'),"
+                " btn=d.querySelector('.btn-close');"
+                "var rc=c.getBoundingClientRect(), rb=btn?btn.getBoundingClientRect():null;"
                 "return JSON.stringify({noModal:noModal, top:Math.round(rd.top),"
                 " bottom:Math.round(rd.bottom), vh:innerHeight,"
+                " ovH: body.scrollWidth - Math.round(body.getBoundingClientRect().width),"
+                " btnFora: rb? (rb.right>rc.right+1||rb.top<rc.top-1) : true,"
                 " bkz:bk?parseInt(getComputedStyle(bk).zIndex)||0:0});})()")
             d = json.loads(r)
             if d.get("erro"):
@@ -6328,6 +6334,13 @@ def ao_vivo(s):
                                % (d["top"], d["bottom"], d["vh"]))
                 if d["bkz"] <= 90:
                     det.append(u"backdrop com z-index %s (atrás do header)" % d["bkz"])
+                # Onda 72c: o corpo tinha 20px de overflow horizontal (scrollbar no
+                # pé) e o X de 48px vazava 19px para fora da borda — as duas classes
+                # que o Mario apontou ("janela fora de tamanho com X dentro").
+                if d["ovH"] > 2:
+                    det.append(u"corpo do modal com %dpx de overflow horizontal" % d["ovH"])
+                if d["btnFora"]:
+                    det.append(u"botão de fechar fora da borda do modal")
             return (not det, u"; ".join(det)
                     or u"modal acima do header, inteiro na viewport, backdrop ativo")
         s.check("V40", u"modal de líder abre acima do header, inteiro na viewport (#253)",
