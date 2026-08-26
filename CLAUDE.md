@@ -237,8 +237,8 @@ e o passo a passo de capturar referência visual de outro site via CDP (sem play
 
 ## Estado do site (medido em 25/08/2026)
 
-**Produção em `v=87`, staging em `v=88`** (a onda 73 está lá esperando o OK do Mario — é o
-staging à frente, que é o lado permitido do invariante), conferido ao vivo nas duas pontas.
+**Produção e staging em `v=88`** (onda 73 publicada em 25/08 com o OK do Mario), conferido ao
+vivo nas duas pontas.
 `public/` = **64 MB** (era 262 MB antes das ondas 61–62c). **287 arquivos HTML**: ~107 de
 conteúdo e ~180 stubs de redirect; o `sitemap.xml` lista **106 URLs** — só conteúdo, porque
 stub é `noindex` e listar noindex no sitemap é erro no Search Console. Suíte: **219 asserções,
