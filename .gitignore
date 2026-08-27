@@ -14,3 +14,9 @@ _scrape-legado/
 # Segredos locais — NUNCA versionar (R11)
 access.txt
 _baseline/
+
+# Ponto de Vista — juizo comercial interno (P1: este repo e PUBLICO).
+# A tese, o ledger e as auditorias de propagacao ficam LOCAIS; o lugar deles e
+# o repo privado mirow-co/mirow-marketing. Ver docs/HANDOFF-2026-08-27.md.
+PONTO-DE-VISTA_*.md
+/verification/
