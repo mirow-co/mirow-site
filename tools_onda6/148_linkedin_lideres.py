@@ -39,10 +39,8 @@ LINKEDIN = {
 # nao ter pagina propria -- classe C3). As duas URLs tambem foram abertas no
 # navegador em 25/08/2026 e as duas estao vivas.
 #
-# Achado ao verificar, que NAO e desta onda e nao foi mexido: o perfil do Elmar
-# diz "Founder & CEO at Stealth Startup (AI)", sem a Mirow. O backlog registra o
-# caso dele como "mudanca de situacao em curso"; se ele saiu, vale a regra do
-# "quem saiu sai do site" (ondas 33 e 68b). Decisao do Mario, nao minha.
+# Nota: a situacao do Elmar na firma e assunto em aberto (classe C2 do backlog,
+# "mudanca de situacao em curso"). Nao ha nada a fazer aqui ate o Mario decidir.
 OUTROS = {
     u"Elmar Gans": "https://www.linkedin.com/in/elmar-gans-2329a422/",
     u"João Daniel Ramos": "https://www.linkedin.com/in/joao-daniel-palma-ramos/",
