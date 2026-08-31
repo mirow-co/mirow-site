@@ -1696,3 +1696,20 @@ div.modal[id^="modal_"] .modal-leaders__intro {
   border-radius: 10px;
 }
 /* onda72:modal-centralizado:fim */
+
+/* onda76:tipografia-fluida:ini */
+/* Onda 76 — tipografia fluida, primeiro passo.
+   O minimo de cada clamp e o tamanho que o site JA desenhava (medido com
+   getComputedStyle, nao lido do CSS): ninguem perde tamanho no celular. O
+   preferido em vw bate o minimo por volta de 1366px — a largura para a qual o
+   site foi desenhado — e so a partir dali o texto cresce, ate o teto.
+   Este bloco vai no fim do arquivo de proposito: varias destas regras tem
+   redeclaracao em ondas anteriores, e quem vence a cascata e a ultima. */
+
+.rede__titulo{font-size:clamp(30px, 2.2vw, 40px)}
+.onda18-imprensa__titulo{font-size:clamp(17px, 1.25vw, 21px)}
+.onda18-const__item{font-size:clamp(18px, 1.32vw, 22px)}
+.menu__nav-submenu h5{font-size:clamp(21px, 1.54vw, 25px)}
+.onda7-vertodos{font-size:clamp(16px, 1.17vw, 19px)}
+.praticas-3__card .home-experience__list-item-more{font-size:clamp(18px, 1.32vw, 22px)}
+/* onda76:tipografia-fluida:fim */

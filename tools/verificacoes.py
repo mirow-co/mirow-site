@@ -50,6 +50,17 @@ import sys
 import tempfile
 import threading
 import time
+
+# O console do Windows e cp1252: um caractere fora dessa tabela numa MENSAGEM
+# DE FALHA fazia a suite ABORTAR no print, e o gate nao mostrava a falha --
+# quem lesse a saida (ou um grep por FALHA) via silencio e concluia 'passou'.
+# Falso verde por encoding, achado em 31/08/2026 ao exercitar a sabotagem da
+# V41. A blindagem vale para TODA saida, nao so para a que eu escrevi.
+for _fluxo in (sys.stdout, sys.stderr):
+    try:
+        _fluxo.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
 import unicodedata
 import urllib.request
 import zlib
@@ -247,6 +258,16 @@ def _mod148():
     return _MOD148[0]
 
 
+_MOD150 = []
+
+
+def _mod150():
+    """O modulo 150_tipografia_fluida: a tabela `FLUIDAS` da onda 76."""
+    if not _MOD150:
+        _MOD150.append(__import__("150_tipografia_fluida"))
+    return _MOD150[0]
+
+
 def _png_rgb(dados):
     # decodificador minimo de PNG truecolor, sem PIL no processo da suite
     if dados[:8] != b"\x89PNG\r\n\x1a\n":
@@ -412,6 +433,8 @@ ETAPAS = {
     "S178": ("schema",),
     # onda 75: link de imprensa morto e URL de arquivo aninhada
     "S179": ("texto",),
+    # onda 76: tipografia fluida medida no navegador
+    "V41": ("medicao", "css"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -5894,8 +5917,8 @@ def ao_vivo(s):
                     if d.get("gap1") is not None and d.get("gap2") is not None:
                         if abs(d["gap2"] - d["gap1"]) > 4:
                             det.append(
-                                u"%s @%dpx: gap LinkedIn→Instagram %dpx vs "
-                                u"WhatsApp→E-mail %dpx — o Instagram descolou do "
+                                u"%s @%dpx: gap LinkedIn-Instagram %dpx vs "
+                                u"WhatsApp-E-mail %dpx - o Instagram descolou do "
                                 u"vizinho" % (rel, w, d["gap2"], d["gap1"]))
             return (not det, u"%d problema(s): %s" % (len(det), "; ".join(det[:3])))
         s.check("V23", u"pílulas 2+2 com Instagram junto do LinkedIn, e card justo (#183/#184)",
@@ -6626,6 +6649,53 @@ def ao_vivo(s):
         s.check("V40", u"modal de líder abre acima do header, inteiro na viewport (#253)",
                 v40)
 
+        def v41():
+            # Onda 76 — primeiro passo da reconstrução fluida. Mede o EFEITO da
+            # tipografia em duas larguras, com getComputedStyle, e cobra as duas
+            # metades do invariante:
+            #   (a) CRESCE: em 1920 o texto é maior que em 390. Sem isto, o clamp
+            #       existe no arquivo e não faz nada — que é exatamente o estado
+            #       anterior (declaração de 15px vencida por outra de 13px, e o
+            #       site achando que era responsivo);
+            #   (b) NÃO ENCOLHE: em 390 o tamanho é pelo menos o piso declarado no
+            #       próprio script da onda. É a metade que protege o celular — a
+            #       forma errada de "fluidificar" é deixar o texto minguar lá.
+            # Os pisos vêm da constante FLUIDAS do 150 (nunca número escrito aqui:
+            # valor gêmeo diverge na primeira mudança de tamanho).
+            fluidas = _mod150().FLUIDAS
+            piso = dict((sel, float(mini.replace("px", ""))) for sel, mini, _p, _t in fluidas)
+            # onde cada seletor existe de fato (medido na auditoria de 31/08)
+            ONDE = {".rede__titulo": "pt/sobre-nos/nossa-rede/",
+                    ".onda18-imprensa__titulo": "pt/imprensa/"}
+            det = []
+            medido = 0
+            for sel, pagina in ONDE.items():
+                vals = {}
+                for larg in (390, 1920):
+                    nav.abrir("%s/%s" % (base, pagina), larg, 900)
+                    v = nav.js("(function(){var e=document.querySelector(%s);"
+                               "return e?parseFloat(getComputedStyle(e).fontSize):null;})()"
+                               % json.dumps(sel))
+                    vals[larg] = None if v in (None, "null") else float(v)
+                if vals[390] is None or vals[1920] is None:
+                    det.append(u"%s não encontrado em %s" % (sel, pagina))
+                    continue
+                medido += 1
+                if vals[1920] <= vals[390] + 0.5:
+                    # sem seta unicode: o console do Windows e cp1252 e a suite
+                    # ABORTA ao imprimir "→" -- o grep por FALHA nao acha nada e
+                    # a sabotagem parece ter passado. Falso verde por encoding.
+                    det.append(u"%s nao cresce: 390 vale %.1f e 1920 vale %.1f"
+                               % (sel, vals[390], vals[1920]))
+                if vals[390] < piso.get(sel, 0) - 0.5:
+                    det.append(u"%s encolheu no celular: %.1f < piso %.1f"
+                               % (sel, vals[390], piso[sel]))
+            return (not det, u"; ".join(det)
+                    or u"%d seletor(es) fluidos: crescem até 1920 e não encolhem em 390"
+                       % medido)
+        s.check("V41", u"tipografia fluida cresce em tela grande e não encolhe no celular (onda 76)",
+                v41)
+
 
         s.check("V37", u"barra do topo não embranquece no toque após fechar o menu (onda 64)",
                 v37)
@@ -6661,7 +6731,7 @@ def main():
             ref = a[8:]
             mudou = arquivos_mudados(ref)
             etapas = etapas_do_diff(mudou)
-            print(u"--desde=%s: %d arquivo(s) mudado(s) → etapas %s"
+            print(u"--desde=%s: %d arquivo(s) mudado(s) -> etapas %s"
                   % (ref, len(mudou), ", ".join(sorted(etapas))))
             for f in mudou[:6]:
                 print(u"    %s" % f)
