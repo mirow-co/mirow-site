@@ -1,19 +1,14 @@
-# Lote 2 — a imprensa como fonte no Wikidata
+# Lote 2 - a imprensa como fonte no Wikidata
 #
-# ESTADO EM 31/08/2026: gerado e conferido, RODADO SO EM PARTE.
-#   - aplicada 1 linha (Andreas / Folha de S.Paulo), como teste do casamento de
-#     declaracao: o QuickStatements ACRESCENTOU a referencia na P108 existente em
-#     vez de criar declaracao nova -- P108 seguiu com 4, e a da Mirow passou a ter
-#     2 referencias (LinkedIn + Folha). Era o risco a medir, e passou.
-#   - as outras 61 linhas NAO foram aplicadas: a interface do QuickStatements
-#     parou de aceitar o texto injetado por script depois dos dois primeiros lotes
-#     (o botao Import deixa de produzir a previa). Nao e erro do conteudo.
-#
-# COMO APLICAR (dois caminhos):
-#   a) o Mario abre https://quickstatements.toolforge.org/#/batch/new , cola o
-#      conteudo abaixo (menos a linha ja aplicada), clica Import e Run;
-#   b) na proxima sessao, pela API do Wikidata a partir de uma aba do proprio
-#      wikidata.org (nao depende da interface do QuickStatements).
+# ESTADO: APLICADO em 31/08/2026. O Mario rodou no QuickStatements (142 comandos,
+# que e como o QS conta declaracao + qualificador + referencia). Medido na API
+# depois, e nao na tela do QS:
+#   - empresa Q141241992: 54 declaracoes, sendo 44 P973, TODAS com P577, e 44 URLs
+#     unicas -- nenhuma duplicada;
+#   - cada pessoa tem UMA declaracao P108 -> Mirow (nenhuma duplicada) e as
+#     referencias somam LinkedIn + materias: Andreas 3, Felipe 15, Stephan 1
+#     (so o LinkedIn -- nenhuma das materias baixadas cita o nome dele), Raoni 2,
+#     Renato 2.
 #
 # O QUE ELE FAZ
 #   44 linhas P973 (described at URL) na EMPRESA, com P577 (data da materia) --

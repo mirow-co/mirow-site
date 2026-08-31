@@ -1,7 +1,8 @@
 # Quem aparece em cada matéria do levantamento de imprensa
 
 > Medido em 31/08/2026 baixando as **45** URLs do mestre publicado (`tools/imprensa-publicada.json`) e procurando o nome de cada líder no texto.
-> Serve para trocar a referência das fichas do Wikidata, hoje toda ela autodeclarada (o perfil de LinkedIn de cada um), por **fonte de terceiro** — que é o que sustenta notabilidade.
+> **Aplicado em 31/08/2026** (ver `2026-08-31_lote-imprensa.txt`): as matérias entraram como
+> referência nas fichas do Wikidata, que antes eram todas autodeclaradas (o perfil de LinkedIn de cada um), por **fonte de terceiro** — que é o que sustenta notabilidade.
 
 **Método e limite:** busca por nome no HTML baixado. Matéria em PDF, atrás de paywall, em vídeo ou que cite só "Mirow & Co." sem nomear ninguém **não aparece aqui** — ausência nesta tabela não é prova de ausência na matéria.
 
