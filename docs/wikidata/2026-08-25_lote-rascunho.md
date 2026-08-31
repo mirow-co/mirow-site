@@ -143,3 +143,41 @@ mão), a ocupação (`P106`) e o CV do **Andreas** — inclusive a instituição
 Na ficha entram as duas afirmações de local, cada uma com a sua fonte, em vez de escolher uma e
 esconder a outra — é assim que o Wikidata trata pessoa jurídica com endereço legal num lugar e
 operação em outro. A pergunta aberta na versão anterior deste arquivo está, portanto, fechada.
+
+---
+
+## Atualização de 31/08/2026 — o cartão CNPJ NÃO é obrigatório, e o dado já está medido
+
+O Mario perguntou se o cartão era mesmo *sine qua non*. Não é, e eu estava repetindo o pacote
+sem ter medido alternativa. Duas medições:
+
+**1. O dado é público e legível por máquina.** A base do CNPJ da Receita Federal é dado aberto, e
+há espelhos com URL estável por CNPJ. Consultados hoje, os dois concordam entre si:
+
+| Campo | Valor | O que ele resolve |
+|---|---|---|
+| `cnpj` | 15353236000189 | `P6204` |
+| `razao_social` | MIROW & CO. DO BRASIL CONSULTORIA LTDA | `P1448` (nome oficial); a etiqueta segue "Mirow & Co." |
+| `data_inicio_atividade` | **2012-04-12** | `P571` — **bate exatamente** com o que o site publica |
+| `descricao_situacao_cadastral` | ATIVA (desde 2012-04-12) | qualificador de estado, se quisermos |
+| `natureza_juridica` | Sociedade Empresária Limitada | `P1454` (forma jurídica) |
+| `cnae_fiscal` | 7020400 — consultoria em gestão empresarial | corrobora `P452` (indústria) |
+| endereço | Rua Lauro Müller, 116, sala 1504, Botafogo, Rio de Janeiro/RJ, CEP 22290-160 | a sede do CNPJ, que o Mario confirmou |
+| `capital_social` | 100.000 | opcional |
+
+Fontes: `brasilapi.com.br/api/cnpj/v1/<cnpj>` e `minhareceita.org/<cnpj>` — os dois espelham o
+dado aberto oficial e devolveram os mesmos valores. **Não havia divergência para arbitrar:** a
+data de fundação do site já estava certa.
+
+**2. A forma de referência que o Wikidata realmente usa para o CNPJ não é um PDF.** Medido por
+SPARQL nas afirmações `P6204` existentes: **862** referências usam `P854` (URL de referência) com
+`P813` (data de consulta), contra **59** com `P248` (citado em). Ou seja: URL estável + data de
+consulta é o padrão da casa, e é o que este lote vai usar.
+
+**O que o cartão ainda acrescenta, e por isso vale pedir sem pressa:** um PDF datado, emitido
+pela própria Receita, para o caso de alguém contestar a afirmação depois. É reforço, não
+pré-requisito. **O caminho crítico do Wikidata deixa de depender dele.**
+
+**O que passa a ser o próximo passo real:** criar o item da empresa (à mão, pela interface) com
+`P6204`, `P571`, `P1448`, `P1454`, `P159`, `P856`, referenciando a URL do espelho consultado com
+a data de hoje — e então trocar as 5 ocorrências de `QMIROW` no lote das pessoas pelo QID novo.
