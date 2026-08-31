@@ -1,0 +1,88 @@
+# Lote 2 — a imprensa como fonte no Wikidata
+#
+# ESTADO EM 31/08/2026: gerado e conferido, RODADO SO EM PARTE.
+#   - aplicada 1 linha (Andreas / Folha de S.Paulo), como teste do casamento de
+#     declaracao: o QuickStatements ACRESCENTOU a referencia na P108 existente em
+#     vez de criar declaracao nova -- P108 seguiu com 4, e a da Mirow passou a ter
+#     2 referencias (LinkedIn + Folha). Era o risco a medir, e passou.
+#   - as outras 61 linhas NAO foram aplicadas: a interface do QuickStatements
+#     parou de aceitar o texto injetado por script depois dos dois primeiros lotes
+#     (o botao Import deixa de produzir a previa). Nao e erro do conteudo.
+#
+# COMO APLICAR (dois caminhos):
+#   a) o Mario abre https://quickstatements.toolforge.org/#/batch/new , cola o
+#      conteudo abaixo (menos a linha ja aplicada), clica Import e Run;
+#   b) na proxima sessao, pela API do Wikidata a partir de uma aba do proprio
+#      wikidata.org (nao depende da interface do QuickStatements).
+#
+# O QUE ELE FAZ
+#   44 linhas P973 (described at URL) na EMPRESA, com P577 (data da materia) --
+#   e a propriedade que existe para "o item e descrito nesta URL".
+#   18 linhas de REFERENCIA (S854 + S577) na declaracao P108 -> Mirow de cada
+#   pessoa: e o que a materia prova, que a pessoa e da firma. Tira as fichas da
+#   dependencia de fonte autodeclarada.
+#   Fora: a URL da IstoE Dinheiro, HTTP 404 conferido duas vezes -- link quebrado
+#   no Wikidata e pior que ausencia.
+#
+Q141241992	P973	"https://youtopiaecuador.com/electromovilidad-redes-electricas-desafio-america-latina-adelatam-2026/"	P577	+2026-07-10T00:00:00Z/11
+Q141241992	P973	"https://oglobo.globo.com/economia/negocios/noticia/2026/04/15/white-martins-inaugura-nova-planta-de-hidrogenio-verde-e-mira-avanco-industrial-no-sudeste.ghtml"	P577	+2026-04-15T00:00:00Z/11
+Q141241992	P973	"https://tnpetroleo.com.br/noticia/brasil-amplia-dependencia-de-termicas-mas-falta-de-estocagem-de-gas-pode-elevar-custos-e-risco-ao-sistema-aponta-levantamento-1/"	P577	+2026-04-06T00:00:00Z/11
+Q141241992	P973	"https://exame.com/esg/do-aluguel-a-revenda-localiza-detalha-plano-para-rodar-10-mil-carros-da-byd-no-brasil/"	P577	+2026-03-24T00:00:00Z/11
+Q141241992	P973	"https://logweb.com.br/aluguel-caminhoes-truck-as-a-service-juros-mirow-estudo/"	P577	+2026-03-16T00:00:00Z/11
+Q141241992	P973	"https://www.broadcast.com.br/ultimas-noticias/resolucoes-da-anp-sobre-cgob-avancam-mas-lacunas-para-biometano-persistem/"	P577	+2026-03-05T00:00:00Z/11
+Q141241992	P973	"https://www.balcaoautomotivo.com/2026/02/23/nova-gestao-das-montadoras-preve-reducao-de-estoque/"	P577	+2026-02-23T00:00:00Z/11
+Q141241992	P973	"https://www1.folha.uol.com.br/colunas/vaivem/2026/02/exportacao-de-celulose-cresce-mas-setor-pode-ter-desequilibrio.shtml"	P577	+2026-02-10T00:00:00Z/11
+Q141241992	P973	"https://transportemoderno.com.br/2026/01/30/juros-altos-levam-montadoras-de-caminhoes-a-rever-estoques-e-destravar-capital-de-giro/"	P577	+2026-01-30T00:00:00Z/11
+Q141241992	P973	"https://oglobo.globo.com/economia/negocios/noticia/2025/10/05/mercado-de-carro-eletrico-no-pais-tem-potencial-de-movimentar-r-200-bi-por-ano-a-partir-de-2030.ghtml"	P577	+2025-10-05T00:00:00Z/11
+Q141241992	P973	"https://jornalempresasenegocios.com.br/negocios/tecnologias-locais-sao-fundamentais-para-o-avanco-do-armazenamento-em-baterias/"	P577	+2025-04-30T00:00:00Z/11
+Q141241992	P973	"https://cenarioenergia.com.br/2025/04/29/gas-natural-ganha-protagonismo-na-matriz-energetica-com-oferta-recorde-e-novo-perfil-de-mercado/"	P577	+2025-04-29T00:00:00Z/11
+Q141241992	P973	"https://www.reuters.com/business/autos-transportation/brazil-auto-market-offers-warning-us-tariff-policy-2025-04-15/"	P577	+2025-04-15T00:00:00Z/11
+Q141241992	P973	"https://technibus.com.br/2025/04/02/campanha-coletivo-de-respeito-da-mercedes-benz-ganha-novos-parceiros/"	P577	+2025-04-02T00:00:00Z/11
+Q141241992	P973	"https://cenarioenergia.com.br/2025/04/02/mirow-co-recebe-certificacao-b-e-reforca-compromisso-com-sustentabilidade-e-inovacao/"	P577	+2025-04-02T00:00:00Z/11
+Q141241992	P973	"https://www.movenews.com.br/novas-fontes-de-energia-e-venda-de-extrapesados-ao-agronegocio-sao-as-principais-tendencias-no-mercado-de-caminhoes/"	P577	+2025-03-10T00:00:00Z/11
+Q141241992	P973	"https://www.estadao.com.br/economia/the-economist-situacao-fiscal-precaria-impede-brasil-ambicoes-ecologicas/#:~:text=Pa%C3%ADs%20tem%20grandes%20expectativas%20quanto,esperan%C3%A7as%20n%C3%A3o%20dar%C3%A3o%20em%20nada&text=Os%20visitantes%20do%20Porto%20do,em%20identificar%20sua%20natureza%20industrial."	P577	+2025-02-01T00:00:00Z/11
+Q141241992	P973	"https://ultimosegundo.ig.com.br/colunas/coluna-do-embaixador/2025-01-31/a-corrida-global-pelo-hidrogenio-verde.html"	P577	+2025-01-31T00:00:00Z/11
+Q141241992	P973	"https://estradao.estadao.com.br/caminhoes/philipp-schiemer-ex-ceo-da-mercedes-benz-vira-consultor-do-setor-automotivo/"	P577	+2025-01-31T00:00:00Z/11
+Q141241992	P973	"https://www.economist.com/the-americas/2025/01/30/brazils-ragged-finances-are-holding-back-its-green-ambitions"	P577	+2025-01-30T00:00:00Z/11
+Q141241992	P973	"https://www.autoindustria.com.br/2025/01/30/philipp-schiemer-ex-ceo-da-mercedes-benz-agora-na-mirow-co/"	P577	+2025-01-30T00:00:00Z/11
+Q141241992	P973	"https://www.publico.pt/2025/01/14/publico-brasil/opiniao/portugal-brasil-futuro-promissor-vinhos-brasileiros-2118685"	P577	+2025-01-14T00:00:00Z/11
+Q141241992	P973	"https://valor.globo.com/brasil/g20-no-brasil/noticia/2024/10/11/hidrogenio-verde-tem-potencial-de-investimento-estimado-em-r-188-bilhoes.ghtml"	P577	+2024-10-11T00:00:00Z/11
+Q141241992	P973	"https://oglobo.globo.com/economia/noticia/2024/10/11/biocombustiveis-e-potencial-em-energia-solar-e-eolica-destacam-pais-no-processo-de-transicao-energetica.ghtml"	P577	+2024-10-11T00:00:00Z/11
+Q141241992	P973	"https://www.czapp.com/analyst-insights/green-hydrogen-law-a-boon-for-brazilian-agribusiness/"	P577	+2024-09-17T00:00:00Z/11
+Q141241992	P973	"https://valor.globo.com/empresas/noticia/2024/09/09/indigo-de-estacionamentos-capta-r-250-milhes-para-ampliar-operao-no-brasil.ghtml"	P577	+2024-09-09T00:00:00Z/11
+Q141241992	P973	"https://www.gazetadopovo.com.br/energia/falta-de-estrutura-para-carro-eletrico-e-um-problema-e-uma-oportunidade-bilionaria/"	P577	+2024-08-24T00:00:00Z/11
+Q141241992	P973	"https://valor.globo.com/empresas/noticia/2024/08/19/marco-legal-do-hidrogenio-de-baixo-carbono-abre-perspectiva-de-investimento.ghtml"	P577	+2024-08-19T00:00:00Z/11
+Q141241992	P973	"https://valor.globo.com/brasil/noticia/2024/08/13/porto-de-pecem-deve-atender-inicialmente-ao-mercado-externo-diz-elmano-de-freitas.ghtml"	P577	+2024-08-13T00:00:00Z/11
+Q141241992	P973	"https://www.uol.com.br/carros/colunas/jorge-moraes/2024/08/01/mercado-de-carros-eletricos-deve-movimentar-r-200-bi-no-brasil-em-6-anos.htm"	P577	+2024-08-01T00:00:00Z/11
+Q141241992	P973	"https://valor.globo.com/publicacoes/especiais/revista-agronegocio/noticia/2024/07/30/defensivos-biologicos-conquistam-o-campo.ghtml"	P577	+2024-07-30T00:00:00Z/11
+Q141241992	P973	"https://www.moneytimes.com.br/custos-insumos-e-embarques-os-reflexos-de-um-dolar-acima-de-r-560-na-safra-24-25-pads/"	P577	+2024-07-24T00:00:00Z/11
+Q141241992	P973	"https://revistaamazonia.com.br/hidrogenio-verde-brasil-carga-tributaria/"	P577	+2024-07-19T00:00:00Z/11
+Q141241992	P973	"https://ipesi.com.br/hidrogenio-verde-para-consumo-interno-carrega-55-a-mais-de-imposto-que-o-exportado/"	P577	+2024-07-19T00:00:00Z/11
+Q141241992	P973	"https://valor.globo.com/empresas/noticia/2024/07/14/hidrogenio-verde-para-consumo-interno-tem-55percent-a-mais-de-imposto-que-o-exportado-diz-consultoria.ghtml"	P577	+2024-07-14T00:00:00Z/11
+Q141241992	P973	"https://epbr.com.br/com-imposto-sobre-eletricos-reforma-propoe-criterios-de-sustentabilidade-da-frota/"	P577	+2024-07-04T00:00:00Z/11
+Q141241992	P973	"https://oglobo.globo.com/economia/negocios/noticia/2024/05/29/investimentos-em-energia-limpa-chegam-a-r-40-bi-no-pais.ghtml"	P577	+2024-05-29T00:00:00Z/11
+Q141241992	P973	"https://mobilidade.estadao.com.br/mobilidade-para-que/eletrificacao-podera-gerar-r-200-bilhoes-por-ano-em-novos-negocios/"	P577	+2024-05-29T00:00:00Z/11
+Q141241992	P973	"https://valor.globo.com/publicacoes/especiais/revista-energia/noticia/2024/05/10/armazenamento-de-energia-trava-aportes-consistentes.ghtml"	P577	+2024-05-10T00:00:00Z/11
+Q141241992	P973	"https://epbr.com.br/pl-dos-biocombustiveis-da-passo-rumo-a-transicao-energetica-mas-sai-atrasado-ao-ignorar-uso-do-co2-biogenico/"	P577	+2024-05-08T00:00:00Z/11
+Q141241992	P973	"https://www.bnews.com.br/noticias/economia-e-mercado/clima-derruba-producao-de-vinho-na-america-do-sul-mas-brasil-segue-na-contramao-saiba-como.html"	P577	+2024-05-03T00:00:00Z/11
+Q141241992	P973	"https://valor.globo.com/publicacoes/especiais/revista-logistica/noticia/2024/03/28/caminhoes-na-rota-da-descarbonizacao.ghtml"	P577	+2024-03-28T00:00:00Z/11
+Q141241992	P973	"https://jornalempresasenegocios.com.br/destaques/descarbonizacao-onde-investir-e-a-oportunidade-de-reindustrializar-o-brasil/"	P577	+2024-03-02T00:00:00Z/11
+Q141241992	P973	"https://valor.globo.com/empresas/noticia/2023/11/11/brasil-tem-custo-competitivo-de-hidrogenio-verde-mas-desafios-persistem-diz-estudo.ghtml"	P577	+2023-11-11T00:00:00Z/11
+Q141242514	P108	Q141241992	P580	+2012-06-00T00:00:00Z/10	S854	"https://www1.folha.uol.com.br/colunas/vaivem/2026/02/exportacao-de-celulose-cresce-mas-setor-pode-ter-desequilibrio.shtml"	S577	+2026-02-10T00:00:00Z/11
+Q141242514	P108	Q141241992	P580	+2012-06-00T00:00:00Z/10	S854	"https://cenarioenergia.com.br/2025/04/02/mirow-co-recebe-certificacao-b-e-reforca-compromisso-com-sustentabilidade-e-inovacao/"	S577	+2025-04-02T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://oglobo.globo.com/economia/negocios/noticia/2026/04/15/white-martins-inaugura-nova-planta-de-hidrogenio-verde-e-mira-avanco-industrial-no-sudeste.ghtml"	S577	+2026-04-15T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://www.broadcast.com.br/ultimas-noticias/resolucoes-da-anp-sobre-cgob-avancam-mas-lacunas-para-biometano-persistem/"	S577	+2026-03-05T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://cenarioenergia.com.br/2025/04/29/gas-natural-ganha-protagonismo-na-matriz-energetica-com-oferta-recorde-e-novo-perfil-de-mercado/"	S577	+2025-04-29T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://cenarioenergia.com.br/2025/04/02/mirow-co-recebe-certificacao-b-e-reforca-compromisso-com-sustentabilidade-e-inovacao/"	S577	+2025-04-02T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://www.estadao.com.br/economia/the-economist-situacao-fiscal-precaria-impede-brasil-ambicoes-ecologicas/#:~:text=Pa%C3%ADs%20tem%20grandes%20expectativas%20quanto,esperan%C3%A7as%20n%C3%A3o%20dar%C3%A3o%20em%20nada&text=Os%20visitantes%20do%20Porto%20do,em%20identificar%20sua%20natureza%20industrial."	S577	+2025-02-01T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://valor.globo.com/brasil/g20-no-brasil/noticia/2024/10/11/hidrogenio-verde-tem-potencial-de-investimento-estimado-em-r-188-bilhoes.ghtml"	S577	+2024-10-11T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://oglobo.globo.com/economia/noticia/2024/10/11/biocombustiveis-e-potencial-em-energia-solar-e-eolica-destacam-pais-no-processo-de-transicao-energetica.ghtml"	S577	+2024-10-11T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://www.czapp.com/analyst-insights/green-hydrogen-law-a-boon-for-brazilian-agribusiness/"	S577	+2024-09-17T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://www.gazetadopovo.com.br/energia/falta-de-estrutura-para-carro-eletrico-e-um-problema-e-uma-oportunidade-bilionaria/"	S577	+2024-08-24T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://revistaamazonia.com.br/hidrogenio-verde-brasil-carga-tributaria/"	S577	+2024-07-19T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://ipesi.com.br/hidrogenio-verde-para-consumo-interno-carrega-55-a-mais-de-imposto-que-o-exportado/"	S577	+2024-07-19T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://mobilidade.estadao.com.br/mobilidade-para-que/eletrificacao-podera-gerar-r-200-bilhoes-por-ano-em-novos-negocios/"	S577	+2024-05-29T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://valor.globo.com/publicacoes/especiais/revista-energia/noticia/2024/05/10/armazenamento-de-energia-trava-aportes-consistentes.ghtml"	S577	+2024-05-10T00:00:00Z/11
+Q141242515	P108	Q141241992	P580	+2018-03-00T00:00:00Z/10	S854	"https://valor.globo.com/empresas/noticia/2023/11/11/brasil-tem-custo-competitivo-de-hidrogenio-verde-mas-desafios-persistem-diz-estudo.ghtml"	S577	+2023-11-11T00:00:00Z/11
+Q141242520	P108	Q141241992	P580	+2018-08-00T00:00:00Z/10	S854	"https://cenarioenergia.com.br/2025/04/29/gas-natural-ganha-protagonismo-na-matriz-energetica-com-oferta-recorde-e-novo-perfil-de-mercado/"	S577	+2025-04-29T00:00:00Z/11
+Q141242521	P108	Q141241992	P580	+2014-07-00T00:00:00Z/10	S854	"https://youtopiaecuador.com/electromovilidad-redes-electricas-desafio-america-latina-adelatam-2026/"	S577	+2026-07-10T00:00:00Z/11
