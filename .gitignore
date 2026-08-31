@@ -24,3 +24,7 @@ PONTO-DE-VISTA_*.md
 # Config local do Codex CLI - contem Bearer token de telemetria (R11: segredo
 # NUNCA em repo, e este repo e PUBLICO). O AGENTS.md, que e so doc, e versionado.
 .codex/
+
+# Fontes internas (e-mails, anexos de socio, dissecacoes) -- repo PUBLICO,
+# entao este material nao e versionado.
+_fontes-internas/
