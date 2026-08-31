@@ -176,6 +176,25 @@ EXPERIENCIA = {
     ],
 }
 
+# Onda 74 (31/08/2026, #252): o `sameAs` do Wikidata fecha o circuito do handoff
+# GEO do Felipe. Ate aqui o site dizia quem somos e o Wikidata dizia quem somos,
+# sem nada ligando os dois -- e e o link explicito que faz o assistente tratar as
+# duas afirmacoes como UMA entidade, em vez de duas parecidas.
+#
+# MESTRE dos QIDs (P3). Criados em 31/08/2026: a empresa a mao pela interface, as
+# 5 pessoas por lote no QuickStatements, tudo com referencia. O outro lado da
+# ligacao ja existe la: cada pessoa tem P108 -> a empresa, e a empresa tem P112 ->
+# Andreas.
+WIKIDATA_URL = "https://www.wikidata.org/wiki/%s"
+WIKIDATA = {
+    u"Mirow & Co.": "Q141241992",
+    u"Andreas Mirow": "Q141242514",
+    u"Felipe Diniz": "Q141242515",
+    u"Prof. Dr Stephan Friedrich": "Q141242518",
+    u"Raoni Morais": "Q141242520",
+    u"Renato Alvarenga": "Q141242521",
+}
+
 INI_RE = re.compile(r'<script type="application/ld\+json" id="onda59-geo">.*?</script>\n?', re.S)
 
 
@@ -200,6 +219,7 @@ def montar(lang, cards):
         "sameAs": [
             "https://www.linkedin.com/company/mirow-co-/",
             "https://www.instagram.com/mirowandco",
+            WIKIDATA_URL % WIKIDATA["Mirow & Co."],
         ],
         "founder": {"@id": "https://mirow.com.br/pt/lider/andreas-mirow/#person"},
         # Onda 60b — os tres fatos que o Mario deu em 18/08:
@@ -283,6 +303,8 @@ def montar(lang, cards):
             pessoa["alumniOf"] = [{"@type": "CollegeOrUniversity", "name": n} for n in ALUMNI[nome]]
         if d["linkedin"]:
             pessoa["sameAs"] = [d["linkedin"]]
+        if nome in WIKIDATA:
+            pessoa.setdefault("sameAs", []).append(WIKIDATA_URL % WIKIDATA[nome])
         grafo.append(pessoa)
     return {"@context": "https://schema.org", "@graph": grafo}
 

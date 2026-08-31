@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
 # >>> proximas ondas: incrementar aqui e rodar o script <<<
-VERSAO = 88
+VERSAO = 89
 
 ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda6.css",

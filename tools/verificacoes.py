@@ -408,6 +408,8 @@ ETAPAS = {
     "S175": ("schema", "texto"),
     # onda 73: o LinkedIn contra o mestre do 148, e o historico de empregadores
     "S176": ("texto", "estrutura"), "S177": ("schema",),
+    # onda 74: o sameAs do Wikidata, contra o mestre de QIDs do 111
+    "S178": ("schema",),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -2940,6 +2942,84 @@ def estaticas(s):
 
     s.check("S177", u"experiência anterior dos líderes no JSON-LD, no padrão Role do "
                     u"schema.org (org + cargo + startDate)", s177)
+
+    def s178():
+        # Onda 74 (#252): o `sameAs` do Wikidata liga o que o site afirma ao que o
+        # Wikidata afirma. Sem ele são duas descrições parecidas de duas entidades;
+        # com ele é uma entidade com duas fontes.
+        #
+        # O que se cobra, contra o mestre `WIKIDATA` do 111 (P3, nunca um QID
+        # escrito aqui — valor gêmeo diverge na primeira mudança):
+        #  a) a Organization e TODA Person do cadastro têm sameAs de Wikidata;
+        #  b) o QID é exatamente o do mestre (o cenário negativo que importa é a
+        #     TROCA entre duas pessoas — "tem um QID" passaria verde nela);
+        #  c) os QIDs são distintos entre si (copiar-colar é a falha natural aqui);
+        #  d) a forma é `https://www.wikidata.org/wiki/Q<dígitos>`.
+        #
+        # O que esta asserção NÃO prova: que o QID existe no Wikidata e descreve
+        # quem dizemos. Isso foi medido na API em 31/08/2026, quando os 6 itens
+        # foram criados, e o par site↔Wikidata é bidirecional lá (P108 de cada
+        # pessoa aponta para a empresa; a empresa tem P112 → Andreas).
+        mestre = _mod111().WIKIDATA
+        forma = re.compile(r"^https://www\.wikidata\.org/wiki/Q[0-9]+$")
+        vistos = {}
+        det = []
+        for chave, qid in mestre.items():
+            if not qid.startswith("Q") or not qid[1:].isdigit():
+                det.append(u"QID malformado no mestre: %s -> %r" % (chave, qid))
+            if qid in vistos:
+                det.append(u"QID repetido no mestre: %s e %s usam %s"
+                           % (vistos[qid], chave, qid))
+            vistos[qid] = chave
+        alvos = [("pt", "pt/index.html"), ("en", "en/index.html"), ("de", "de/index.html"),
+                 ("pt", "pt/sobre-nos/lideres/index.html"),
+                 ("en", "en/about-us/leaders/index.html"),
+                 ("de", "de/ueber-uns/fuehrungskraefte/index.html")]
+        for lang, rel in alvos:
+            m = re.search(r'<script type="application/ld\+json" id="onda59-geo">'
+                          r'(.*?)</script>', s.ler(rel), re.S)
+            if not m:
+                det.append(u"%s sem bloco onda59-geo" % rel)
+                continue
+            try:
+                grafo = json.loads(m.group(1))["@graph"]
+            except (ValueError, KeyError) as e:
+                det.append(u"%s: JSON inválido (%s)" % (rel, e))
+                continue
+            achados = {}
+            for no in grafo:
+                tipos = no.get("@type")
+                tipos = tipos if isinstance(tipos, list) else [tipos]
+                if "Person" not in tipos and "Organization" not in tipos:
+                    continue
+                nome = no.get("name")
+                wd = [x for x in (no.get("sameAs") or []) if "wikidata.org" in x]
+                if not wd:
+                    det.append(u"%s: %s sem sameAs de Wikidata" % (rel, nome))
+                    continue
+                if len(wd) > 1:
+                    det.append(u"%s: %s com %d sameAs de Wikidata" % (rel, nome, len(wd)))
+                if not forma.match(wd[0]):
+                    det.append(u"%s: %s com URL fora do padrão: %s" % (rel, nome, wd[0]))
+                    continue
+                achados[nome] = wd[0].rsplit("/", 1)[-1]
+            # o nome no grafo leva o ponto depois de "Dr" (normalização do 111)
+            for chave, qid in mestre.items():
+                nome = chave.replace(u"Prof. Dr Stephan Friedrich",
+                                     u"Prof. Dr. Stephan Friedrich")
+                if nome not in achados:
+                    det.append(u"%s: %s ausente do grafo (ou sem sameAs)" % (rel, nome))
+                elif achados[nome] != qid:
+                    det.append(u"%s: %s aponta para %s, o mestre diz %s"
+                               % (rel, nome, achados[nome], qid))
+            if len(set(achados.values())) != len(achados):
+                det.append(u"%s: dois nós apontam para o MESMO QID" % rel)
+        det = sorted(set(det))
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S178", u"sameAs do Wikidata na firma e em cada líder, igual ao mestre de QIDs (#252)",
+            s178)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
