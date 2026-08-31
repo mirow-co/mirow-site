@@ -1,4 +1,23 @@
-# Lote das 5 pessoas — como conferir antes de rodar
+# Lote das 5 pessoas — RODADO em 31/08/2026
+
+> **Feito.** O lote rodou no QuickStatements (conta DevMirow, autorizada pelo Mario; aprovação
+> do Felipe por e-mail) e as 5 fichas existem. Estado medido na API depois de rodar:
+>
+> | Pessoa | Item | Declarações | `P69` | `P108` | Sem referência |
+> |---|---|---|---|---|---|
+> | Andreas Mirow | [Q141242514](https://www.wikidata.org/wiki/Q141242514) | 8 | 2 | 4 | 0 |
+> | Felipe Diniz | [Q141242515](https://www.wikidata.org/wiki/Q141242515) | 8 | 3 | 3 | 0 |
+> | Prof. Dr. Stephan Friedrich von den Eichen | [Q141242518](https://www.wikidata.org/wiki/Q141242518) | 8 | 2 | 4 | 0 |
+> | Raoni Morais | [Q141242520](https://www.wikidata.org/wiki/Q141242520) | 6 | 2 | 2 | 0 |
+> | Renato Alvarenga | [Q141242521](https://www.wikidata.org/wiki/Q141242521) | 7 | 2 | 3 | 0 |
+>
+> Bate exatamente com o planejado, e **nenhuma declaração ficou sem fonte**. O item da empresa
+> ([Q141241992](https://www.wikidata.org/wiki/Q141241992)) fechou em **10 declarações**, com
+> `P112` (fundador) → Andreas, referenciado.
+
+---
+
+## O que foi conferido antes de rodar
 
 > Arquivo do lote: [`2026-08-26_lote-wikidata.txt`](2026-08-26_lote-wikidata.txt) — 67 linhas,
 > 5 itens, formato QuickStatements v1. **Nada foi publicado**: o Claude não publica no Wikidata.
