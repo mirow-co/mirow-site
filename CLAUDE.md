@@ -237,11 +237,11 @@ e o passo a passo de capturar referência visual de outro site via CDP (sem play
 
 ## Estado do site (medido em 25/08/2026)
 
-**Produção e staging em `v=88`** (onda 73 publicada em 25/08 com o OK do Mario), conferido ao
+**Produção e staging em `v=89`** (onda 74 publicada em 31/08 com o OK do Mario), conferido ao
 vivo nas duas pontas.
 `public/` = **64 MB** (era 262 MB antes das ondas 61–62c). **287 arquivos HTML**: ~107 de
 conteúdo e ~180 stubs de redirect; o `sitemap.xml` lista **106 URLs** — só conteúdo, porque
-stub é `noindex` e listar noindex no sitemap é erro no Search Console. Suíte: **219 asserções,
+stub é `noindex` e listar noindex no sitemap é erro no Search Console. Suíte: **220 asserções,
 0 falha**.
 
 **Cuidado com dois esquemas de numeração parecidos:** `S-07`, `S-117` **com hífen** são
@@ -293,6 +293,7 @@ Mapa por tema, para saber onde procurar e qual sentinela guarda o quê:
 | Imprensa: links recuperados e marcos travados | 70 · 71 | `S170` |
 | Bio do Felipe, alumniOf dos 5, meta description, modal de líder | 72 · 72b–d | `S175` `V40` |
 | LinkedIn dos líderes num mestre, e a experiência anterior deles no grafo | 73 | `S176` `S177` |
+| Wikidata: a firma e os 5 líderes existem lá, e o `sameAs` liga os dois lados | 74 | `S178` |
 
 **Antes de tratar qualquer coisa como pendente, medir no HTML.** Em 20/08 a linha da `59-sede`
 dizia "aguardando OK" sobre uma frase que estava no ar havia semanas, e isso quase me fez
