@@ -2036,7 +2036,16 @@ def estaticas(s):
                 if not (mu and mv):
                     det.append(u"%s: item sem url ou sem veículo" % rel)
                     continue
-                host = mu.group(1).split("/")[2].lower()
+                url = mu.group(1)
+                # Onda 75: link arquivado no Wayback. O host do link passa a ser
+                # web.archive.org, e o veículo continua sendo o ORIGINAL — a URL
+                # original vem embutida depois do carimbo de data. Sem isto, a
+                # asserção acusaria "IstoÉ Dinheiro não bate com web.archive.org",
+                # que é verdade sobre a string e mentira sobre o fato.
+                m_arq = re.match(r"https?://web\.archive\.org/web/\d+(?:id_)?/(https?://.+)$", url)
+                if m_arq:
+                    url = m_arq.group(1)
+                host = url.split("/")[2].lower()
                 if host.startswith("www."):
                     host = host[4:]
                 veic = mv.group(1).replace("&amp;", "&")
