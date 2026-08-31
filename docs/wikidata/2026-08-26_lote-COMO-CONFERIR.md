@@ -3,15 +3,14 @@
 > Arquivo do lote: [`2026-08-26_lote-wikidata.txt`](2026-08-26_lote-wikidata.txt) — 67 linhas,
 > 5 itens, formato QuickStatements v1. **Nada foi publicado**: o Claude não publica no Wikidata.
 >
-> Gates do pacote do Felipe, na ordem: (1) o item da **empresa** é criado à mão pela interface;
-> (2) o `QMIROW` deste arquivo é trocado pelo QID que a empresa receber; (3) o Mario confere
-> campo a campo contra os CVs; (4) **o Felipe aprova por escrito**; (5) só então o lote roda.
+> Gates do pacote do Felipe, na ordem: (1) ~~o item da **empresa** é criado à mão~~ **feito,
+> `Q141241992`**; (2) ~~trocar o placeholder~~ **feito**; (3) o Mario confere campo a campo
+> contra os CVs; (4) **o Felipe aprova por escrito**; (5) só então o lote roda.
 
-## Antes de rodar: 5 ocorrências de `QMIROW`
+## O item da empresa existe: **Q141241992** (31/08/2026)
 
-O `P108` (empregador) de cada pessoa aponta para `QMIROW`, que **não é um QID válido** — é
-placeholder do item da empresa, que ainda não existe. Trocar as 5 ocorrências pelo QID real
-antes de colar no QuickStatements, senão o lote falha nessas 5 linhas.
+O placeholder acabou: as 5 ocorrências de `QMIROW` já foram trocadas por **`Q141241992`** no
+arquivo do lote. Nada mais a substituir antes de colar no QuickStatements.
 
 ## O que cada pessoa recebe
 

@@ -1,5 +1,11 @@
 # Como criar o item da Mirow & Co. no Wikidata — guia para quem nunca usou
 
+> **FEITO em 31/08/2026: o item é [Q141241992](https://www.wikidata.org/wiki/Q141241992).**
+> O Mario criou e preencheu as 7 declarações, com referência nas 4 que vêm do registro da
+> Receita — conferido por mim na API. Ficaram **duas correções pequenas**, na seção
+> "O que ficou para arrumar", no fim deste guia. O guia continua aqui porque serve de
+> modelo para o próximo item que a firma criar.
+
 > Escrito em 31/08/2026 para o Mario, olhando a interface real, logado na conta **DevMirow**.
 > Tempo: 20 a 30 minutos, sem pressa. Nada aqui é irreversível: **tudo no Wikidata tem
 > histórico e pode ser desfeito**, como na Wikipédia.
@@ -45,6 +51,11 @@ interface em português). O formulário tem quatro campos e um botão **Criar**:
 | Nomes alternativos | `Mirow & Co. do Brasil Consultoria Ltda\|Mirow and Co.\|Mirow` |
 
 Os nomes alternativos são separados por **barra vertical** (`|`), como o próprio formulário diz.
+
+> ⚠️ **A barra vertical só funciona NESTE formulário de criação.** Na tabela "em mais línguas"
+> de um item que já existe, o campo de nomes alternativos **não divide** pela barra: ele grava
+> a linha inteira, com as barras, como um apelido só. Foi o que aconteceu em 31/08 (ver
+> "O que ficou para arrumar"). Lá, cada apelido entra **um por vez**.
 
 Clique em **Criar**. Pronto: o item existe e ganhou um número `Q`. **Anote esse número** — é ele
 que vai substituir o `QMIROW` no lote das pessoas.
@@ -138,6 +149,31 @@ Com o `Q` da empresa em mãos, eu troco as 5 ocorrências de `QMIROW` no lote da
   como referência duas ou três matérias de imprensa do nosso levantamento.
 - **Na dúvida sobre um `Q`**, abra `https://www.wikidata.org/wiki/Q<numero>` e leia a descrição
   antes de usar.
+
+## O que ficou para arrumar no Q141241992 (duas coisas pequenas)
+
+Estado medido na API em 31/08/2026 — **as 7 declarações estão certas** (`P31` `Q2089936`,
+`P6204` 15353236000189, `P17` `Q155`, `P571` 12/04/2012 com precisão de dia, `P1448` a razão
+social, `P159` `Q8678` Rio de Janeiro, `P856` o site), e as 4 que vêm do registro da Receita
+estão com `P854` + `P813` como deviam. Só sobrou isto:
+
+**1. `P856` (site oficial) está DUPLICADO.** Há duas declarações com o mesmo valor
+`https://mirow.com.br/pt/`: uma com referência e outra **sem nenhuma**. Apague a que está sem
+referência — abra a declaração, **editar**, **remover**.
+
+**2. Um apelido malformado, em 3 línguas.** Em `inglês`, `inglês americano` e `padrão para
+todas as línguas`, existe um apelido literal
+`Mirow & Co. do Brasil Consultoria Ltda|Mirow and Co.|Mirow` — com as barras dentro. É culpa da
+instrução deste guia (ver o aviso no Passo 1): a barra só divide no formulário de criação.
+Em `português` e `português do Brasil` ficou correto, com os três apelidos separados.
+
+Conserto: na tabela de línguas, **editar**, apagar esse apelido comprido nas três línguas e
+deixar `Mirow & Co. do Brasil Consultoria Ltda`, `Mirow and Co.` e `Mirow` como três apelidos
+separados (nas línguas onde já estão separados, não mexa).
+
+**Opcionais, quando der vontade:** `P1454` (forma jurídica) = *sociedade limitada*, e `P452`
+(indústria) = consultoria de gestão — os dois saem do mesmo registro da Receita que já
+referenciamos. E `P112` (fundador) quando o item do Andreas existir.
 
 ## O que NÃO fazer
 
