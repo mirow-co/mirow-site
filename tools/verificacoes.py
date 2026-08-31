@@ -410,6 +410,8 @@ ETAPAS = {
     "S176": ("texto", "estrutura"), "S177": ("schema",),
     # onda 74: o sameAs do Wikidata, contra o mestre de QIDs do 111
     "S178": ("schema",),
+    # onda 75: link de imprensa morto e URL de arquivo aninhada
+    "S179": ("texto",),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -3020,6 +3022,45 @@ def estaticas(s):
 
     s.check("S178", u"sameAs do Wikidata na firma e em cada líder, igual ao mestre de QIDs (#252)",
             s178)
+
+    def s179():
+        # Onda 75: a matéria da IstoÉ Dinheiro saiu do ar (301 → 404, com o domínio
+        # vivo) e o link passou a apontar para o snapshot do Wayback.
+        #
+        # Duas coisas, e a segunda é um defeito que eu mesmo criei e consertei:
+        #  a) a URL morta não pode voltar. Ela volta sozinha se alguém rodar o
+        #     `tools/gen_imprensa.py` antes de o mestre ser corrigido no repo
+        #     PRIVADO — o gerador é a fonte, e este site é só o artefato;
+        #  b) nenhuma URL de arquivo pode estar ANINHADA. A URL do Wayback contém a
+        #     original como sufixo, então um replace cego re-embrulha o link a cada
+        #     execução: `.../web/DATA/https://web.archive.org/web/DATA/https://…`.
+        #     Aconteceu na 2ª execução do 149, e o link ainda "funcionava" —
+        #     defeito que só aparece se alguém medir a forma.
+        MORTAS = ["https://istoedinheiro.com.br/com-white-martins-brasil-entra-na-trilha-"
+                  "do-hidrogenio-verde/"]
+        det = []
+        for rel, h in s.todas():
+            for u in MORTAS:
+                # a URL morta é sufixo da arquivada; só é defeito quando aparece SEM
+                # o prefixo do Wayback na frente
+                if u in h.replace("https://web.archive.org/web/20231206004028/" + u, ""):
+                    det.append(u"%s traz a URL morta da IstoÉ" % rel)
+            if re.search(r"web\.archive\.org/web/\d+/https://web\.archive\.org", h):
+                det.append(u"%s tem URL de arquivo aninhada" % rel)
+        pj = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "imprensa-publicada.json")
+        if os.path.exists(pj):
+            bruto = io.open(pj, encoding="utf-8").read()
+            for u in MORTAS:
+                if u in bruto.replace("https://web.archive.org/web/20231206004028/" + u, ""):
+                    det.append(u"tools/imprensa-publicada.json traz a URL morta")
+            if re.search(r"web\.archive\.org/web/\d+/https://web\.archive\.org", bruto):
+                det.append(u"tools/imprensa-publicada.json tem URL de arquivo aninhada")
+        det = sorted(set(det))
+        return (not det, u"; ".join(det[:6])
+                + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
+
+    s.check("S179", u"0 link de imprensa morto e 0 URL de arquivo aninhada", s179)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
