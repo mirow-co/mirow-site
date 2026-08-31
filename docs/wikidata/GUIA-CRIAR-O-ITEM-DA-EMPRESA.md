@@ -2,8 +2,9 @@
 
 > **FEITO em 31/08/2026: o item é [Q141241992](https://www.wikidata.org/wiki/Q141241992).**
 > O Mario criou e preencheu as 7 declarações, com referência nas 4 que vêm do registro da
-> Receita — conferido por mim na API. Ficaram **duas correções pequenas**, na seção
-> "O que ficou para arrumar", no fim deste guia. O guia continua aqui porque serve de
+> Receita — conferido por mim na API. As **duas correções** que faltavam
+> foram feitas por mim em 31/08, no navegador dele, com o OK explícito — ver a seção
+> "O que ficou para arrumar", no fim deste guia, que agora registra o estado final. O guia continua aqui porque serve de
 > modelo para o próximo item que a firma criar.
 
 > Escrito em 31/08/2026 para o Mario, olhando a interface real, logado na conta **DevMirow**.
@@ -150,9 +151,38 @@ Com o `Q` da empresa em mãos, eu troco as 5 ocorrências de `QMIROW` no lote da
 - **Na dúvida sobre um `Q`**, abra `https://www.wikidata.org/wiki/Q<numero>` e leia a descrição
   antes de usar.
 
-## O que ficou para arrumar no Q141241992 (duas coisas pequenas)
+## Estado final do Q141241992 — tudo fechado em 31/08/2026
 
-Estado medido na API em 31/08/2026 — **as 7 declarações estão certas** (`P31` `Q2089936`,
+**As duas correções foram aplicadas** (por mim, no navegador do Mario, com autorização
+explícita dele), e mais duas declarações opcionais entraram. Medido na API depois, que é
+caminho independente da tela em que eu cliquei:
+
+| Declaração | Valor | Referência |
+|---|---|---|
+| `P31` instância de | `Q2089936` consulting company | — |
+| `P6204` CNPJ | 15353236000189 | 1 |
+| `P17` país | `Q155` Brasil | — |
+| `P571` fundação | 12/04/2012 | 1 |
+| `P1448` nome oficial | MIROW & CO. DO BRASIL CONSULTORIA LTDA | 1 |
+| `P159` sede | `Q8678` Rio de Janeiro | 1 |
+| `P856` site oficial | https://mirow.com.br/pt/ | 1 — **a duplicata sem referência foi removida** |
+| `P1454` forma jurídica | `Q56879301` Ltda. | 1 |
+| `P452` indústria | `Q124728925` business consulting | 1 |
+
+E **nenhum apelido contém barra vertical** em nenhuma língua — o malformado saiu de `inglês`,
+`inglês americano` e `padrão para todas as línguas`.
+
+Detalhe que vale para a próxima vez: `Special:SetAliases` **recusa** editar uma língua cujo
+conjunto de apelidos já contém uma barra ("aliases that contain pipes can only be edited on the
+page of the entity itself"). Nesse caso, o conserto é na tabela de línguas da própria página do
+item.
+
+Falta só `P112` (fundador), que espera o item do Andreas existir.
+
+<details>
+<summary>Registro do que estava errado (para quem for criar o próximo item)</summary>
+
+Estado medido na API em 31/08/2026, antes das correções — **as 7 declarações estão certas** (`P31` `Q2089936`,
 `P6204` 15353236000189, `P17` `Q155`, `P571` 12/04/2012 com precisão de dia, `P1448` a razão
 social, `P159` `Q8678` Rio de Janeiro, `P856` o site), e as 4 que vêm do registro da Receita
 estão com `P854` + `P813` como deviam. Só sobrou isto:
@@ -171,9 +201,7 @@ Conserto: na tabela de línguas, **editar**, apagar esse apelido comprido nas tr
 deixar `Mirow & Co. do Brasil Consultoria Ltda`, `Mirow and Co.` e `Mirow` como três apelidos
 separados (nas línguas onde já estão separados, não mexa).
 
-**Opcionais, quando der vontade:** `P1454` (forma jurídica) = *sociedade limitada*, e `P452`
-(indústria) = consultoria de gestão — os dois saem do mesmo registro da Receita que já
-referenciamos. E `P112` (fundador) quando o item do Andreas existir.
+</details>
 
 ## O que NÃO fazer
 
