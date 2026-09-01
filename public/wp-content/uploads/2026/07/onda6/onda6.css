@@ -1713,3 +1713,25 @@ div.modal[id^="modal_"] .modal-leaders__intro {
 .onda7-vertodos{font-size:clamp(16px, 1.17vw, 19px)}
 .praticas-3__card .home-experience__list-item-more{font-size:clamp(18px, 1.32vw, 22px)}
 /* onda76:tipografia-fluida:fim */
+
+/* onda78:instituicoes:ini */
+/* Onda 78 — as instituicoes de cada lider no card, com icone de tipo.
+   O card cresce sozinho: o tema usa min-height, nao altura fixa. Os chips
+   quebram em varias linhas (flex-wrap) e o tamanho e fluido, entao em tela
+   grande eles ocupam o espaco que existe em vez de ficarem miudos. */
+.onda78-inst{list-style:none;display:flex;flex-wrap:wrap;gap:6px 8px;
+  margin:14px 0 0;padding:0}
+.onda78-inst__item{display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;padding:4px 10px;color:#fff;
+  font-size:clamp(11px, .82vw, 13px);line-height:1.25;white-space:nowrap}
+.onda78-inst__item--uni{background:rgba(0,173,236,.14);border-color:rgba(0,173,236,.35)}
+.onda78-inst__icone{flex:0 0 auto;opacity:.9}
+/* no celular a lista pode ficar longa: rola na horizontal em vez de empurrar
+   o card para baixo indefinidamente */
+@media only screen and (max-width: 575px){
+  .onda78-inst{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none}
+  .onda78-inst::-webkit-scrollbar{display:none}
+}
+/* onda78:instituicoes:fim */

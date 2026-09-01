@@ -31,7 +31,11 @@ FRASE = {
     "de": u"Mirow & Co. ist eine brasilianische Strategieberatung mit Sitz in Rio de Janeiro",
 }
 
-HOMES = {"pt": "pt/index.html", "en": "en/index.html", "de": "de/index.html"}
+# Onda 77 (31/08/2026): o Mario mandou tirar a frase da PAGINA INICIAL --
+# "nunca te pedi para colocar isso". A home sai do alvo deste script; se ela
+# voltar aqui, o 151 apaga e a S180 grita no gate. A Nossa Historia continua,
+# porque o pedido foi sobre a inicial.
+HOMES = {}
 
 HISTORIA = {
     "pt": ("pt/sobre-nos/nossa-historia/index.html", u"Desde 2013,"),

@@ -268,6 +268,16 @@ def _mod150():
     return _MOD150[0]
 
 
+_MOD152 = []
+
+
+def _mod152():
+    """O modulo 152_cards_instituicoes: o mapa `CURTO` dos nomes de chip."""
+    if not _MOD152:
+        _MOD152.append(__import__("152_cards_instituicoes"))
+    return _MOD152[0]
+
+
 def _png_rgb(dados):
     # decodificador minimo de PNG truecolor, sem PIL no processo da suite
     if dados[:8] != b"\x89PNG\r\n\x1a\n":
@@ -435,6 +445,10 @@ ETAPAS = {
     "S179": ("texto",),
     # onda 76: tipografia fluida medida no navegador
     "V41": ("medicao", "css"),
+    # onda 77: a frase de sede fora da home
+    "S180": ("texto",),
+    # onda 78: chips de instituicao nos cards de lider
+    "S181": ("texto", "estrutura"), "V42": ("medicao", "css"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -3093,6 +3107,99 @@ def estaticas(s):
                 + (u" (+%d)" % (len(det) - 6) if len(det) > 6 else u""))
 
     s.check("S179", u"0 link de imprensa morto e 0 URL de arquivo aninhada", s179)
+
+    def s180():
+        # Onda 77 (31/08/2026). O Mario mandou tirar da PAGINA INICIAL a frase
+        # "A Mirow & Co. e uma consultoria estrategica brasileira, com sede no Rio
+        # de Janeiro", nas palavras dele: "nunca te pedi para colocar isso".
+        #
+        # A asserção cobra o EFEITO em duas frentes, porque tirar o texto uma vez
+        # não basta: o `113_geo_frase_sede.py` existe e sabe reinserir. Se alguém
+        # rodar a onda 59-sede de novo, ou reativar o HOMES dele, a frase volta
+        # sozinha — e é isso que esta sentinela pega.
+        #   (a) nenhuma das 3 homes traz a frase, em nenhum dos 3 idiomas;
+        #   (b) nenhuma das 3 homes traz a classe `onda59-sede`, que é a casca —
+        #       parágrafo vazio guardaria o espaçamento e um nó sem conteúdo.
+        FRASES = [
+            u"consultoria estratégica brasileira, com sede no Rio de Janeiro",
+            u"Brazilian strategy consulting firm headquartered in Rio de Janeiro",
+            u"brasilianische Strategieberatung mit Sitz in Rio de Janeiro",
+        ]
+        # ALCANCE, dito na cara: esta asserção mede o CORPO da página — o texto que
+        # o visitante lê. As mesmas palavras seguem no <head> das 3 homes, na
+        # `meta description` e na `description` do JSON-LD, que não são texto
+        # visível e são a munição do trabalho de GEO. Tirar de lá é decisão
+        # editorial do Mario, perguntada em 31/08 e ainda sem resposta — enquanto
+        # não houver, a asserção não pode fingir que cobre o que não cobre.
+        det = []
+        for rel in ("pt/index.html", "en/index.html", "de/index.html"):
+            h = s.ler(rel)
+            corpo = h.split("</head>", 1)[-1]
+            for f in FRASES:
+                if f in corpo:
+                    det.append(u"%s ainda traz a frase de sede no corpo" % rel)
+            if "onda59-sede" in corpo:
+                det.append(u"%s ainda tem a casca .onda59-sede" % rel)
+        det = sorted(set(det))
+        return (not det, u"; ".join(det) or u"as 3 homes sem a frase no corpo e sem a casca (o <head> nao e coberto)")
+
+    s.check("S180", u"frase de sede fora do CORPO da página inicial, nos 3 idiomas (Mario, 31/08)",
+            s180)
+
+    def s181():
+        # Onda 78 (pedido do Mario, 31/08): cada card de líder mostra as
+        # instituições por onde ele passou, com ícone de tipo.
+        #
+        # O que se cobra é a PARIDADE com a fonte: a quantidade de chips de cada
+        # pessoa tem de bater com `ALUMNI` + `EXPERIENCIA` do 111 — as mesmas
+        # constantes que alimentam o JSON-LD. Se o card e a ficha da máquina
+        # discordarem, um dos dois está mentindo e ninguém sabe qual. Número de
+        # chip nunca é escrito aqui (erro 18): sai da constante, em runtime.
+        m111, m152 = _mod111(), _mod152()
+        det = []
+        for rel in ("pt/sobre-nos/lideres/index.html",
+                    "en/about-us/leaders/index.html",
+                    "de/ueber-uns/fuehrungskraefte/index.html"):
+            h = s.ler(rel)
+            for nome in _mod110().PAGINAS:
+                esperado = []
+                vistos = set()
+                for inst in m111.ALUMNI.get(nome, []):
+                    c = m152.CURTO.get(inst, inst)
+                    if c not in vistos:
+                        vistos.add(c)
+                        esperado.append(c)
+                for _cg, org, _i, _f in m111.EXPERIENCIA.get(nome, []):
+                    c = m152.CURTO.get(org, org)
+                    if c not in vistos:
+                        vistos.add(c)
+                        esperado.append(c)
+                if not esperado:
+                    continue
+                # recorta o card da pessoa e conta os chips DELE
+                curto = nome.replace(u"Prof. Dr Stephan Friedrich",
+                                     u"Prof. Dr Stephan Friedrich")
+                i = h.find(u">%s<" % curto)
+                if i < 0:
+                    det.append(u"%s: card de %s não encontrado" % (rel, nome))
+                    continue
+                fim = h.find(u'page-leaders__list-item-more', i)
+                card = h[i:fim if fim > i else i + 6000]
+                achados = re.findall(r'onda78-inst__item[^>]*>.*?<span>([^<]+)</span>',
+                                     card, re.S)
+                if len(achados) != len(esperado):
+                    det.append(u"%s: %s tem %d chip(s), esperados %d"
+                               % (rel, nome, len(achados), len(esperado)))
+                faltam = [e for e in esperado if e not in achados]
+                if faltam:
+                    det.append(u"%s: %s sem os chips %s"
+                               % (rel, nome, ", ".join(faltam[:3])))
+        det = sorted(set(det))
+        return (not det, u"; ".join(det[:5])
+                or u"chips de instituição batem com ALUMNI+EXPERIENCIA nos 3 idiomas")
+
+    s.check("S181", u"cards de líder mostram as instituições, iguais à fonte do JSON-LD (onda 78)",
+            s181)
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
@@ -6695,6 +6802,44 @@ def ao_vivo(s):
                        % medido)
         s.check("V41", u"tipografia fluida cresce em tela grande e não encolhe no celular (onda 76)",
                 v41)
+
+        def v42():
+            # Onda 78: os chips existem no HTML (S181) — aqui se mede se eles
+            # APARECEM. Três coisas que o markup não garante:
+            #   (a) cada chip tem área > 0 (não está colapsado nem display:none);
+            #   (b) o ícone SVG dentro do chip também tem área — ícone que não
+            #       desenha é o defeito que o favicon vazio ensinou (erro 16);
+            #   (c) o card cresceu para caber: no desktop nenhum chip fica fora
+            #       da borda do card (o pedido foi "faça tudo isso caber").
+            det = []
+            nav.abrir("%s/pt/sobre-nos/lideres/" % base, 1440, 900)
+            d = nav.js(
+                "(function(){"
+                "var out={chips:0,semArea:0,iconeSemArea:0,vazando:0};"
+                "document.querySelectorAll('.page-leaders__list-item').forEach(function(c){"
+                " var rc=c.getBoundingClientRect();"
+                " c.querySelectorAll('.onda78-inst__item').forEach(function(ch){"
+                "  out.chips++;"
+                "  var r=ch.getBoundingClientRect();"
+                "  if(r.width<8||r.height<8) out.semArea++;"
+                "  var sv=ch.querySelector('svg');"
+                "  var rs=sv?sv.getBoundingClientRect():{width:0,height:0};"
+                "  if(rs.width<6||rs.height<6) out.iconeSemArea++;"
+                "  if(r.right>rc.right+1||r.bottom>rc.bottom+1) out.vazando++;"
+                " });});"
+                "return JSON.stringify(out);})()")
+            d = json.loads(d) if isinstance(d, str) else d
+            if not d["chips"]:
+                return (False, u"nenhum chip de instituição renderizado")
+            if d["semArea"]:
+                det.append(u"%d chip(s) sem área visível" % d["semArea"])
+            if d["iconeSemArea"]:
+                det.append(u"%d ícone(s) de chip sem área" % d["iconeSemArea"])
+            if d["vazando"]:
+                det.append(u"%d chip(s) fora da borda do card" % d["vazando"])
+            return (not det, u"; ".join(det)
+                    or u"%d chips visíveis, com ícone, dentro do card" % d["chips"])
+        s.check("V42", u"chips de instituição aparecem e cabem no card (onda 78)", v42)
 
 
         s.check("V37", u"barra do topo não embranquece no toque após fechar o menu (onda 64)",
