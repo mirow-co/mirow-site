@@ -278,6 +278,26 @@ def _mod27():
     return _MOD27[0]
 
 
+_MOD153 = []
+
+
+def _mod153():
+    """O modulo 153_logos_instituicoes: a tabela LOGOS e o SEM_LOGO."""
+    if not _MOD153:
+        _MOD153.append(__import__("153_logos_instituicoes"))
+    return _MOD153[0]
+
+
+_MOD158 = []
+
+
+def _mod158():
+    """O modulo 158: mede se um logo e arte clara (sem placa) ou escura."""
+    if not _MOD158:
+        _MOD158.append(__import__("158_logo_claro_ou_escuro"))
+    return _MOD158[0]
+
+
 _MOD152 = []
 
 
@@ -463,6 +483,8 @@ ETAPAS = {
     "S182": ("asset",), "V43": ("medicao", "css", "asset"),
     # onda 80c: carimbo de versao em todo asset nosso
     "S183": ("asset", "css", "texto"),
+    # onda 83: logo claro sem placa branca
+    "S184": ("asset", "texto"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -3365,6 +3387,69 @@ def estaticas(s):
 
     s.check("S183", u"todo asset nosso é servido com carimbo de versão (onda 80c)",
             s183)
+
+    def s184():
+        # Onda 83. O Mario: "ta sem link visivel no ufrj, chicago booth, malik".
+        #
+        # Medido: `ufrj.webp` e `malik.webp` têm 0,0% de pixel escuro quando
+        # compostos sobre branco — são a versão NEGATIVA da marca. E os dois
+        # estavam numa placa branca. Branco sobre branco.
+        #
+        # O detalhe que dói: o CSS da onda 79 já tinha a classe `--claro` para
+        # exatamente este caso, e um comentário meu dizendo que a classificação
+        # "saiu de MEDIÇÃO de luminância, não de olhômetro". Não havia
+        # classificação nenhuma — nenhuma linha aplicava aquela classe. Documentei
+        # um mecanismo inexistente, que é o jeito mais caro de errar: quem lê o
+        # comentário para de procurar. (É a R10 do meu próprio caderno de regras,
+        # aplicada a CSS em vez de a plugin.)
+        #
+        # O que se cobra aqui é a CLASSE do defeito, não os dois arquivos: para
+        # TODO logo do quadro, a decisão placa/sem-placa no HTML tem de bater com
+        # a medição do arquivo. Assim o próximo logo branco que alguém baixar
+        # entra certo, e o próximo logo escuro não perde a placa.
+        m152, m158 = _mod152(), _mod158()
+        pasta = os.path.join(s.pub, "wp-content", "uploads", "2026", "08",
+                             "onda79", "logos")
+        if not os.path.isdir(pasta):
+            return (False, u"pasta de logos ausente — a asserção não mediu nada")
+        arquivos = {os.path.splitext(f)[0]: f for f in os.listdir(pasta)}
+        det = []
+        medidos = 0
+        for rel in ("pt/sobre-nos/lideres/index.html",
+                    "en/about-us/leaders/index.html",
+                    "de/ueber-uns/fuehrungskraefte/index.html"):
+            h = s.ler(rel)
+            for m in re.finditer(r'<img class="onda78-inst__logo([^"]*)"[^>]*src="'
+                                 r'[^"]*/([A-Za-z0-9._-]+?)(?:\?[^"]*)?"', h):
+                claro_no_html = "--claro" in m.group(1)
+                arq = m.group(2)
+                p = os.path.join(pasta, arq)
+                if not os.path.exists(p):
+                    det.append(u"%s: %s referenciado e ausente do disco" % (rel, arq))
+                    continue
+                medidos += 1
+                claro_medido = m158.e_claro(p)
+                if claro_no_html != claro_medido:
+                    tinta = m158.tinta_escura(p)
+                    det.append(u"%s: %s tem %.1f%% de tinta escura e está %s placa"
+                               % (rel, arq, tinta if tinta is not None else -1,
+                                  u"SEM" if claro_no_html else u"COM"))
+        # e o inverso, que é o que pega logo ERRADO ficando no lugar de nenhum:
+        # quem está no SEM_LOGO não pode ter arquivo na pasta
+        for curto in _mod153().SEM_LOGO:
+            slug = _mod153().slug(curto)
+            if slug in arquivos:
+                det.append(u"%s está declarado SEM_LOGO mas tem arquivo (%s)"
+                           % (curto, arquivos[slug]))
+        det = sorted(set(det))
+        if not medidos:
+            return (False, u"nenhum logo medido — a asserção não mediu nada")
+        return (not det, u"; ".join(det[:4])
+                or u"%d logo(s) conferidos: placa branca só onde a tinta pede" % medidos)
+
+    s.check("S184", u"logo claro não vai em placa branca (nem some), e SEM_LOGO não tem arquivo (onda 83)",
+            s184)
+
 
 
 

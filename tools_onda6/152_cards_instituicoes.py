@@ -38,6 +38,7 @@ _css = __import__("_onda7_css")
 ler, gravar, escrever_bloco_css = _css.ler, _css.gravar, _css.escrever_bloco_css
 _m111 = __import__("111_geo_jsonld_lideres")
 _m153 = __import__("153_logos_instituicoes")
+_m158 = __import__("158_logo_claro_ou_escuro")
 
 LOGOS_URL = "/wp-content/uploads/2026/08/onda79/logos/"
 
@@ -73,7 +74,16 @@ CURTO = {
     u"Aracruz Celulose S.A.": u"Aracruz Celulose",
     u"Booz Allen Hamilton": u"Booz Allen",
     u"Monitor Deloitte": u"Monitor Deloitte",
-    u"University of Chicago Booth School of Business": u"Chicago Booth",
+    # Onda 83. O Mario: "ta sem link visivel no ufrj, chicago booth, malik".
+    # A Booth nao tem logo livre em lugar nenhum -- no Commons so ha FOTO do
+    # predio, e no site oficial a marca e background de CSS, sem arquivo servido.
+    # Restavam tres saidas: chip vazio (que e o que ele reclamou), o brasao da
+    # universidade repetido em dois chips do MESMO card, ou o que esta aqui: a
+    # Booth E a University of Chicago, entao os dois viram UM chip, com o brasao
+    # de verdade. O detalhe nao se perde -- no JSON-LD o PhD (alumniOf) e o cargo
+    # de conselheiro academico (worksFor) seguem separados, cada um com o nome
+    # completo da instituicao. O chip e resumo; o grafo e o registro.
+    u"University of Chicago Booth School of Business": u"Univ. of Chicago",
     u"Innovative Management Partner (IMP)": u"IMP",
     u"Universität Bremen": u"Univ. Bremen",
     u"Malik Management": u"Malik",
@@ -105,17 +115,30 @@ ICONE_EMP = (u'<svg class="onda78-inst__icone" width="14" height="14" viewBox="0
              u'1.1 1.1V17H3Zm2-2h2v-2H5v2Zm0-4h2V9H5v2Zm0-4h2V5H5v2Zm4 8h2v-2H9v2Zm0-4h2V9H9'
              u'v2Zm0-4h2V5H9v2Zm4 8h2v-2h-2v2Zm0-4h2v-2h-2v2Z"/></svg>')
 
-def marca(curto, icone_generico, logos):
-    """<img> com o logo real, ou o icone de tipo quando nao ha arquivo."""
+def marca(curto, icone_generico, logos, pasta=None):
+    """<img> com o logo real, ou o icone de tipo quando nao ha arquivo.
+
+    Onda 83: a classe `--claro` (sem placa branca) passa a ser DECIDIDA, medindo
+    o arquivo pelo 158. Antes ela existia so no CSS, com um comentario meu
+    afirmando que a classificacao vinha de medicao de luminancia -- e nenhuma
+    linha aplicava a classe. O UFRJ e a Malik, que sao a versao negativa da
+    marca (0,0% de tinta escura), ficavam brancos sobre placa branca: o Mario viu
+    dois chips com o nome e um retangulo vazio ao lado.
+    """
     arq = logos.get(_m153.slug(curto))
     if not arq:
         return icone_generico
+    extra = u""
+    if pasta:
+        caminho = os.path.join(pasta, arq)
+        if _m158.e_claro(caminho):
+            extra = u" onda78-inst__logo--claro"
     # SEM loading="lazy": medido em 01/09, com lazy so 9 dos 26 logos chegavam a
     # carregar (os cards sao altos e a maioria nunca entra na viewport), e os que
     # carregavam apareciam com pop-in. Sao arquivos de 2 a 12 KB depois da
     # normalizacao -- o custo de baixar todos e menor que o de nao aparecerem.
-    return (u'<img class="onda78-inst__logo" src="%s%s" alt="" '
-            u'decoding="async">' % (LOGOS_URL, arq))
+    return (u'<img class="onda78-inst__logo%s" src="%s%s" alt="" '
+            u'decoding="async">' % (extra, LOGOS_URL, arq))
 
 
 RE_CARD = re.compile(r'(<button class="page-leaders__list-item".*?)(</span><span class='
@@ -131,7 +154,7 @@ def idioma(rel):
     return rel.split("/", 1)[0]
 
 
-def chips(nome, logos=None):
+def chips(nome, logos=None, pasta=None):
     """(html, quantos) -- faculdades primeiro, depois empresas, sem repetir.
 
     Cada chip usa o LOGO REAL da instituicao quando o arquivo existe no disco; o
@@ -147,13 +170,13 @@ def chips(nome, logos=None):
         if curto in vistos:
             continue
         vistos.add(curto)
-        itens.append((marca(curto, ICONE_UNI, logos), curto, "uni"))
+        itens.append((marca(curto, ICONE_UNI, logos, pasta), curto, "uni"))
     for _cargo, org, _i, _f in _m111.EXPERIENCIA.get(nome, []):
         curto = CURTO.get(org, org)
         if curto in vistos:
             continue
         vistos.add(curto)
-        itens.append((marca(curto, ICONE_EMP, logos), curto, "emp"))
+        itens.append((marca(curto, ICONE_EMP, logos, pasta), curto, "emp"))
     if not itens:
         return u"", 0
     li = u"".join(u'<li class="onda78-inst__item onda78-inst__item--%s">%s<span>%s</span></li>'
@@ -186,10 +209,15 @@ def css():
    arquivo injetado, e nao de uma folha que a nossa possa simplesmente suceder.
    Nao muda um pixel: path nao desenha texto. */
 .onda78-inst svg, .onda78-inst svg *{font-family:inherit !important}
-/* Onda 79 — o logo REAL da instituicao. A placa clara existe porque o card e
+/* Onda 79/83 — o logo REAL da instituicao. A placa clara existe porque o card e
    escuro e a maioria destes logos e escura; os que ja sao brancos (UFRJ na
    versao negativa, Malik) entram sem placa, senao branco-sobre-branco os apaga.
-   A classificacao saiu de MEDICAO de luminancia, nao de olhometro. */
+   CORRECAO DE REGISTRO (onda 83): ate aqui este comentario afirmava que "a
+   classificacao saiu de MEDICAO de luminancia" -- e nao existia classificacao
+   nenhuma. A classe --claro estava definida e NUNCA era aplicada, e por isso o
+   UFRJ e a Malik ficaram brancos sobre branco no ar ate o Mario ver. Hoje quem
+   decide e o 158_logo_claro_ou_escuro.py, que compoe o arquivo sobre branco e
+   conta pixel escuro, e a S184 cobra o resultado contra a medicao. */
 /* Onda 80 — a altura subiu de 16 para 20px e o teto de largura de 88 para 180px.
    Editado NO LUGAR (nao como bloco de override) porque e valor gemeo: o Mario viu
    "mckinsey nao da para ler dentro da caixinha". A causa principal era o viewBox
@@ -212,6 +240,8 @@ def css():
 def main(raiz):
     pub = os.path.join(os.path.abspath(raiz), "public")
     logos = arquivos_de_logo(pub)
+    pasta_logos = os.path.join(pub, "wp-content", "uploads", "2026", "08",
+                               "onda79", "logos")
     total = 0
     for rel in LISTAGENS:
         p = os.path.join(pub, rel.replace("/", os.sep))
@@ -227,7 +257,7 @@ def main(raiz):
             if not mn:
                 return m.group(0)
             nome = mn.group(1).strip()
-            html, quantos = chips(nome, logos)
+            html, quantos = chips(nome, logos, pasta_logos)
             if not html:
                 return m.group(0)
             novo.append(quantos)

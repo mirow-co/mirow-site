@@ -1739,10 +1739,15 @@ div.modal[id^="modal_"] .modal-leaders__intro {
    arquivo injetado, e nao de uma folha que a nossa possa simplesmente suceder.
    Nao muda um pixel: path nao desenha texto. */
 .onda78-inst svg, .onda78-inst svg *{font-family:inherit !important}
-/* Onda 79 — o logo REAL da instituicao. A placa clara existe porque o card e
+/* Onda 79/83 — o logo REAL da instituicao. A placa clara existe porque o card e
    escuro e a maioria destes logos e escura; os que ja sao brancos (UFRJ na
    versao negativa, Malik) entram sem placa, senao branco-sobre-branco os apaga.
-   A classificacao saiu de MEDICAO de luminancia, nao de olhometro. */
+   CORRECAO DE REGISTRO (onda 83): ate aqui este comentario afirmava que "a
+   classificacao saiu de MEDICAO de luminancia" -- e nao existia classificacao
+   nenhuma. A classe --claro estava definida e NUNCA era aplicada, e por isso o
+   UFRJ e a Malik ficaram brancos sobre branco no ar ate o Mario ver. Hoje quem
+   decide e o 158_logo_claro_ou_escuro.py, que compoe o arquivo sobre branco e
+   conta pixel escuro, e a S184 cobra o resultado contra a medicao. */
 /* Onda 80 — a altura subiu de 16 para 20px e o teto de largura de 88 para 180px.
    Editado NO LUGAR (nao como bloco de override) porque e valor gemeo: o Mario viu
    "mckinsey nao da para ler dentro da caixinha". A causa principal era o viewBox

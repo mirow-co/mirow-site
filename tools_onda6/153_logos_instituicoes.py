@@ -92,8 +92,6 @@ LOGOS = {
     # .webp: arquivo que mente sobre o proprio tipo e defeito esperando acontecer.
     u"Catavento": ("https://catavento.biz/wp-content/themes/catavento/images/logo.png",
                    u"site oficial catavento.biz", u"servido como WebP pelo otimizador do site"),
-    u"Consórcio Rio (CIRJ)": ("https://upload.wikimedia.org/wikipedia/commons/a/a1/Ch2m_logo.png",
-                              "Wikimedia Commons", u"o consorcio nao tem marca propria; usado o da CH2M Hill, que o formou"),
     # --- onda 79b: instituicoes do Elmar Gans e do Joao Daniel Ramos, que o Mario
     # pediu depois ("cade???"). Os dois nao estao no cadastro de lideres (PAGINAS),
     # entao o dado deles NAO alimenta o JSON-LD -- so o chip do card.
@@ -115,7 +113,13 @@ LOGOS = {
 
 # Sem arquivo, de proposito. Cada um cai no icone generico da onda 78.
 SEM_LOGO = {
-    u"Chicago Booth": u"so existe como fair use na Wikipedia; o site oficial nao expoe URL direta",
+    # Onda 83, decisao do Mario em 01/09: "consorcio rio esta com o logo errado,
+    # retirar". Eu tinha posto a marca da CH2M Hill, que formou o consorcio, com
+    # a justificativa de que "o consorcio nao tem marca propria" -- e isso e
+    # exatamente o antipadrao que a propria tabela declara: logo de OUTRA empresa
+    # e pior que ausencia de logo, porque afirma uma coisa falsa em vez de nao
+    # afirmar nada. O chip volta para o icone generico.
+    u"Consórcio Rio (CIRJ)": u"a marca da CH2M Hill NAO e a do consorcio; sem marca propria verificavel",
     u"Cam": u"nome generico demais; nenhum site oficial ou marca verificavel -- risco de homonimo",
     u"Arcoplan": u"CNPJ ativo em Brasilia, sem presenca digital; o homonimo de moveis planejados foi descartado",
     u"RC Alvarenga": u"nao localizada com esse nome; os 'RC Engenharia' encontrados sao outras empresas",
