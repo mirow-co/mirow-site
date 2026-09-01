@@ -1696,3 +1696,72 @@ div.modal[id^="modal_"] .modal-leaders__intro {
   border-radius: 10px;
 }
 /* onda72:modal-centralizado:fim */
+
+/* onda76:tipografia-fluida:ini */
+/* Onda 76 — tipografia fluida, primeiro passo.
+   O minimo de cada clamp e o tamanho que o site JA desenhava (medido com
+   getComputedStyle, nao lido do CSS): ninguem perde tamanho no celular. O
+   preferido em vw bate o minimo por volta de 1366px — a largura para a qual o
+   site foi desenhado — e so a partir dali o texto cresce, ate o teto.
+   Este bloco vai no fim do arquivo de proposito: varias destas regras tem
+   redeclaracao em ondas anteriores, e quem vence a cascata e a ultima. */
+
+.rede__titulo{font-size:clamp(30px, 2.2vw, 40px)}
+.onda18-imprensa__titulo{font-size:clamp(17px, 1.25vw, 21px)}
+.onda18-const__item{font-size:clamp(18px, 1.32vw, 22px)}
+.menu__nav-submenu h5{font-size:clamp(21px, 1.54vw, 25px)}
+.onda7-vertodos{font-size:clamp(16px, 1.17vw, 19px)}
+.praticas-3__card .home-experience__list-item-more{font-size:clamp(18px, 1.32vw, 22px)}
+/* onda76:tipografia-fluida:fim */
+
+/* onda78:instituicoes:ini */
+/* Onda 78 — as instituicoes de cada lider no card, com icone de tipo.
+   O card cresce sozinho: o tema usa min-height, nao altura fixa. Os chips
+   quebram em varias linhas (flex-wrap) e o tamanho e fluido, entao em tela
+   grande eles ocupam o espaco que existe em vez de ficarem miudos. */
+.onda78-inst{list-style:none;display:flex;flex-wrap:wrap;gap:6px 8px;
+  margin:14px 0 0;padding:0}
+.onda78-inst__item{display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;padding:4px 10px;color:#fff;
+  font-size:clamp(11px, .82vw, 13px);line-height:1.25;white-space:nowrap}
+.onda78-inst__item--uni{background:rgba(0,173,236,.14);border-color:rgba(0,173,236,.35)}
+.onda78-inst__icone{flex:0 0 auto;opacity:.9;font-family:inherit}
+/* O <path> dentro do SVG herdava fonte do documento e caia em Times New Roman --
+   a V11 ("uma fonte so renderizada") pegou no gate: 3 elementos, exatamente os 3
+   <path> dos icones genericos. Nao muda um pixel do desenho (path nao tem texto),
+   mas a assercao mede a FAMILIA COMPUTADA de todo elemento, e ela estava certa em
+   reclamar: um <path> com Times declarado e uma fonte a mais carregavel na pagina. */
+/* O tema tem um script que troca <img src="*.svg"> por <svg> INLINE (classes
+   style-svg / replaced-svg). Tres desses arquivos declaram font-family dentro do
+   proprio SVG, e o <path> resultante computava "Times New Roman" -- a V11 pegou
+   no gate. O !important e necessario porque a declaracao vem de dentro do
+   arquivo injetado, e nao de uma folha que a nossa possa simplesmente suceder.
+   Nao muda um pixel: path nao desenha texto. */
+.onda78-inst svg, .onda78-inst svg *{font-family:inherit !important}
+/* Onda 79/83 — o logo REAL da instituicao. A placa clara existe porque o card e
+   escuro e a maioria destes logos e escura; os que ja sao brancos (UFRJ na
+   versao negativa, Malik) entram sem placa, senao branco-sobre-branco os apaga.
+   CORRECAO DE REGISTRO (onda 83): ate aqui este comentario afirmava que "a
+   classificacao saiu de MEDICAO de luminancia" -- e nao existia classificacao
+   nenhuma. A classe --claro estava definida e NUNCA era aplicada, e por isso o
+   UFRJ e a Malik ficaram brancos sobre branco no ar ate o Mario ver. Hoje quem
+   decide e o 158_logo_claro_ou_escuro.py, que compoe o arquivo sobre branco e
+   conta pixel escuro, e a S184 cobra o resultado contra a medicao. */
+/* Onda 80 — a altura subiu de 16 para 20px e o teto de largura de 88 para 180px.
+   Editado NO LUGAR (nao como bloco de override) porque e valor gemeo: o Mario viu
+   "mckinsey nao da para ler dentro da caixinha". A causa principal era o viewBox
+   ausente (ver 155_svg_viewbox.py); mas mesmo com o desenho escalando, uma
+   wordmark 8:1 a 16px de altura pede 128px de largura, e o teto de 88 a espremia
+   ate ~11px de altura util. Os dois numeros andam juntos: teto >= altura x 11,2 (a wordmark mais larga do quadro e a Tepper, 11,16:1). */
+.onda78-inst__logo{flex:0 0 auto;height:20px;width:auto;max-width:180px;
+  object-fit:contain;background:#fff;border-radius:3px;padding:2px 5px}
+.onda78-inst__logo--claro{background:transparent;padding:0}
+/* no celular a lista pode ficar longa: rola na horizontal em vez de empurrar
+   o card para baixo indefinidamente */
+@media only screen and (max-width: 575px){
+  .onda78-inst{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none}
+  .onda78-inst::-webkit-scrollbar{display:none}
+}
+/* onda78:instituicoes:fim */
