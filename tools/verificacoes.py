@@ -449,6 +449,8 @@ ETAPAS = {
     "S180": ("texto",),
     # onda 78: chips de instituicao nos cards de lider
     "S181": ("texto", "estrutura"), "V42": ("medicao", "css"),
+    # onda 80: svg de terceiro sem folha de estilo, e o logo legivel no chip
+    "S182": ("asset",), "V43": ("medicao", "css", "asset"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -3200,6 +3202,74 @@ def estaticas(s):
 
     s.check("S181", u"cards de líder mostram as instituições, iguais à fonte do JSON-LD (onda 78)",
             s181)
+
+    def s182():
+        # Onda 80b. O Mario, no staging da 79: "alguma coisa que voce fez fez com
+        # que o logo mirow, linkedin email, whatsapp ficassem vermelhos".
+        #
+        # Causa: `carnegie-mellon-tepper.svg` vinha da origem com
+        # `<style>path {fill:#ab1727;}</style>`. Dentro de um <img> isso é inócuo
+        # (SVG-como-imagem é documento isolado); mas o tema PROMOVE `<img
+        # src="*.svg">` a `<svg>` inline, e aí o <style> vira folha do documento
+        # inteiro — o seletor `path`, sem escopo nenhum, pintou de vermelho todo
+        # <path> da página: a marca, o LinkedIn, o e-mail, o WhatsApp.
+        #
+        # ALCANCE (erro 17): a asserção varre TODO svg nosso em `uploads`, não só
+        # os logos da onda 79. Os outros três arquivos com <style> usavam só
+        # seletor de classe — não vazam para a página, mas os nomes são genéricos
+        # (`.cls-1`, `.st0`, `.fil1`) e dois logos injetados na MESMA página com a
+        # mesma classe se pintam um ao outro. Mesmo defeito, versão silenciosa.
+        # A regra é simples e não tem exceção: svg nosso não carrega folha de
+        # estilo. A cor mora em atributo de apresentação, que não tem alcance.
+        #
+        # Cobra também o `viewBox` nos logos da onda 79, que é o OUTRO defeito da
+        # mesma leva: svg inline sem viewBox não tem sistema de coordenadas para
+        # mapear, então `height:20px` não reduz o desenho — recorta (o overflow do
+        # svg é hidden). Era o "mckinsey não dá para ler dentro da caixinha".
+        raiz = os.path.join(s.pub, "wp-content", "uploads")
+        LOGOS = os.path.join("2026", "08", "onda79", "logos")
+        com_style, sem_vb, com_medida = [], [], []
+        total = 0
+        for dirpath, _dirs, arquivos in os.walk(raiz):
+            for a in arquivos:
+                if not a.lower().endswith(".svg"):
+                    continue
+                total += 1
+                p = os.path.join(dirpath, a)
+                rel = os.path.relpath(p, raiz).replace(os.sep, "/")
+                with io.open(p, encoding="utf-8", errors="replace") as f:
+                    texto = f.read()
+                if re.search(r"<style\b", texto, re.I):
+                    com_style.append(rel)
+                if LOGOS not in os.path.relpath(p, raiz):
+                    continue
+                m = re.search(r"<svg\b[^>]*>", texto, re.S | re.I)
+                if not m:
+                    sem_vb.append(rel)
+                    continue
+                if "viewBox" not in m.group(0):
+                    sem_vb.append(rel)
+                if re.search(r'\s(width|height)\s*=\s*"', m.group(0), re.I):
+                    # com viewBox E width fixo, `width:auto` do CSS resolve para o
+                    # atributo e o desenho encolhe dentro de uma caixa vazia —
+                    # some do mesmo jeito, por outro caminho
+                    com_medida.append(rel)
+        det = []
+        if com_style:
+            det.append(u"%d svg com <style> (vaza ao ser injetado inline): %s"
+                       % (len(com_style), ", ".join(sorted(com_style)[:3])))
+        if sem_vb:
+            det.append(u"%d logo(s) sem viewBox (não escalam, recortam): %s"
+                       % (len(sem_vb), ", ".join(sorted(sem_vb)[:3])))
+        if com_medida:
+            det.append(u"%d logo(s) com width/height fixo no <svg>: %s"
+                       % (len(com_medida), ", ".join(sorted(com_medida)[:3])))
+        return (not det, u"; ".join(det)
+                or u"%d svg nossos: nenhum com <style>, e os da onda 79 escalam" % total)
+
+    s.check("S182", u"SVG nosso não carrega folha de estilo e os logos escalam (onda 80)",
+            s182)
+
 
     def s28():
         # S-28 (#80): "Private:" é artefato do WordPress (post de perfil marcado
@@ -6856,6 +6926,76 @@ def ao_vivo(s):
                     or u"%d chips visíveis (%s com logo real), dentro do card"
                        % (d["chips"], total_logos))
         s.check("V42", u"chips de instituição aparecem e cabem no card (onda 78)", v42)
+
+        def v43():
+            # Onda 80. Os dois defeitos que o Mario viu no staging da 79, medidos
+            # pelo EFEITO, não pelo arquivo (a S182 cobre o arquivo):
+            #
+            # (a) VAZAMENTO DE COR. Um <style> dentro de um logo, promovido a
+            #     folha global pela injeção inline do tema, pintou a marca, o
+            #     LinkedIn, o e-mail e o WhatsApp de vermelho. A medida não cita
+            #     cor nenhuma de propósito: compara os ícones do RODAPÉ da página
+            #     de líderes (a que carrega 26 logos de terceiros) com os MESMOS
+            #     ícones da home (que não carrega nenhum). O rodapé é idêntico nas
+            #     duas; se divergir, alguma coisa da página pintou por cima — seja
+            #     qual for a cor, de qual logo for. Cravar "#ab1727" aqui só
+            #     pegaria a Carnegie Mellon, e o próximo logo traria outra cor.
+            #
+            # (b) LOGO ESPREMIDO. "mckinsey não dá para ler dentro da caixinha."
+            #     A V42 mede que o logo tem área; área ele tinha — 88x16 do canto
+            #     superior esquerdo de um desenho de 360x45. O que decide
+            #     legibilidade é a ALTURA DE TINTA: o desenho inscrito na caixa,
+            #     que é min(altura útil, largura útil / razão do viewBox). Uma
+            #     wordmark 11:1 numa faixa útil de 122px rende 11px de tinta ainda
+            #     que a caixa diga 20px de altura.
+            # o alvo e o MENU: 11 svg identicos nas duas paginas (medido). O
+            # rodape foi a primeira tentativa e nao serve -- os icones dele nao
+            # sao <path>, e a medida vinha VAZIA, ou seja, a assercao passaria
+            # comparando nada com nada. Por isso o "if not menu" abaixo: lista
+            # vazia e falha, nunca sucesso silencioso.
+            JS_ICONES = ("(function(){var o=[];"
+                         "document.querySelectorAll('nav.menu svg path, nav.menu svg circle')"
+                         ".forEach(function(e){o.push(getComputedStyle(e).fill);});"
+                         "return JSON.stringify(o);})()")
+            nav.abrir("%s/pt/" % base, 1440, 900)
+            home = json.loads(nav.js(JS_ICONES))
+            nav.abrir("%s/pt/sobre-nos/lideres/" % base, 1440, 900)
+            lideres = json.loads(nav.js(JS_ICONES))
+            det = []
+            if not home:
+                det.append(u"nenhum ícone medido no menu da home (a medida ficou vazia)")
+            elif home != lideres:
+                dif = [(a, b) for a, b in zip(home, lideres) if a != b]
+                det.append(u"%d ícone(s) do menu mudam de cor na página de líderes "
+                           u"(ex.: %s vira %s) — alguma folha de estilo vazou de um logo"
+                           % (len(dif) or abs(len(home) - len(lideres)),
+                              dif[0][0] if dif else "?", dif[0][1] if dif else "?"))
+            tinta = json.loads(nav.js(
+                "(function(){var o=[];"
+                "document.querySelectorAll('.onda78-inst__logo').forEach(function(e){"
+                " var r=e.getBoundingClientRect(), cs=getComputedStyle(e), nat=0;"
+                " if(e.tagName==='IMG'){ if(e.naturalWidth&&e.naturalHeight)"
+                "   nat=e.naturalWidth/e.naturalHeight; }"
+                " else { var vb=e.getAttribute('viewBox');"
+                "   if(vb){var p=vb.split(/[ ,]+/); if(+p[3]) nat=(+p[2])/(+p[3]);} }"
+                " var uw=r.width-2*(parseFloat(cs.paddingLeft)||0),"
+                "     uh=r.height-2*(parseFloat(cs.paddingTop)||0);"
+                " var sp=e.closest('li')?e.closest('li').querySelector('span'):null;"
+                " o.push([sp?sp.textContent.trim():'?', nat?Math.min(uh,uw/nat):0]);"
+                "});return JSON.stringify(o);})()"))
+            if not tinta:
+                det.append(u"nenhum logo de instituição medido")
+            magros = [(n, t) for n, t in tinta if t < 12]
+            if magros:
+                det.append(u"%d logo(s) com menos de 12px de tinta: %s"
+                           % (len(magros), ", ".join(u"%s (%.1fpx)" % (n, t)
+                                                     for n, t in magros[:3])))
+            return (not det, u"; ".join(det)
+                    or u"menu com as mesmas %d cores nas duas páginas; %d logos com "
+                       u"tinta >= 12px" % (len(set(home)), len(tinta)))
+        s.check("V43", u"logo de terceiro não pinta a página, e nenhum sai ilegível (onda 80)",
+                v43)
+
 
 
         s.check("V37", u"barra do topo não embranquece no toque após fechar o menu (onda 64)",

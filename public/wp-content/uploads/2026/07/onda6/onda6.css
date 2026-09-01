@@ -1743,8 +1743,14 @@ div.modal[id^="modal_"] .modal-leaders__intro {
    escuro e a maioria destes logos e escura; os que ja sao brancos (UFRJ na
    versao negativa, Malik) entram sem placa, senao branco-sobre-branco os apaga.
    A classificacao saiu de MEDICAO de luminancia, nao de olhometro. */
-.onda78-inst__logo{flex:0 0 auto;height:16px;width:auto;max-width:88px;
-  object-fit:contain;background:#fff;border-radius:3px;padding:2px 4px}
+/* Onda 80 — a altura subiu de 16 para 20px e o teto de largura de 88 para 180px.
+   Editado NO LUGAR (nao como bloco de override) porque e valor gemeo: o Mario viu
+   "mckinsey nao da para ler dentro da caixinha". A causa principal era o viewBox
+   ausente (ver 155_svg_viewbox.py); mas mesmo com o desenho escalando, uma
+   wordmark 8:1 a 16px de altura pede 128px de largura, e o teto de 88 a espremia
+   ate ~11px de altura util. Os dois numeros andam juntos: teto >= altura x 11,2 (a wordmark mais larga do quadro e a Tepper, 11,16:1). */
+.onda78-inst__logo{flex:0 0 auto;height:20px;width:auto;max-width:180px;
+  object-fit:contain;background:#fff;border-radius:3px;padding:2px 5px}
 .onda78-inst__logo--claro{background:transparent;padding:0}
 /* no celular a lista pode ficar longa: rola na horizontal em vez de empurrar
    o card para baixo indefinidamente */
