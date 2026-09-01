@@ -94,6 +94,23 @@ LOGOS = {
                    u"site oficial catavento.biz", u"servido como WebP pelo otimizador do site"),
     u"Consórcio Rio (CIRJ)": ("https://upload.wikimedia.org/wikipedia/commons/a/a1/Ch2m_logo.png",
                               "Wikimedia Commons", u"o consorcio nao tem marca propria; usado o da CH2M Hill, que o formou"),
+    # --- onda 79b: instituicoes do Elmar Gans e do Joao Daniel Ramos, que o Mario
+    # pediu depois ("cade???"). Os dois nao estao no cadastro de lideres (PAGINAS),
+    # entao o dado deles NAO alimenta o JSON-LD -- so o chip do card.
+    u"WHU": ("https://upload.wikimedia.org/wikipedia/commons/f/f0/WHU_Logo.svg",
+             "Wikimedia Commons", u"WHU - Otto Beisheim School of Management"),
+    u"UMass Amherst": ("https://upload.wikimedia.org/wikipedia/commons/3/32/University_of_Massachusetts_Amherst_wordmark.svg",
+                       "Wikimedia Commons", u"wordmark oficial"),
+    u"LMU München": ("https://upload.wikimedia.org/wikipedia/commons/0/06/LMU_Muenchen_Logo.svg",
+                     "Wikimedia Commons", u"Ludwig-Maximilians-Universitat Munchen"),
+    u"FECAP": ("https://upload.wikimedia.org/wikipedia/commons/6/69/FECAP_logo.jpg",
+               "Wikimedia Commons", u"unico arquivo disponivel e JPG (com fundo), nao PNG transparente"),
+    u"UFPR": ("https://upload.wikimedia.org/wikipedia/commons/b/bc/Logo_oficial_da_UFPR_%28fundo_branco%29.svg",
+              "Wikimedia Commons", u"versao oficial com fundo branco"),
+    u"Kumon": ("https://upload.wikimedia.org/wikipedia/commons/8/82/Kumon_Method_Logo.svg",
+               "Wikimedia Commons", u"marca do metodo Kumon"),
+    u"Dexco": ("https://upload.wikimedia.org/wikipedia/commons/c/c4/Logotipo_da_Dexco.svg",
+               "Wikimedia Commons", u"marca atual (a Duratex virou Dexco em 2021)"),
 }
 
 # Sem arquivo, de proposito. Cada um cai no icone generico da onda 78.
@@ -107,9 +124,16 @@ SEM_LOGO = {
 
 
 def slug(nome):
+    # o "ü" de "LMU Munchen" escapou da primeira versao desta tabela e gerou
+    # `lmu-munchen.svg` com o trema no NOME DO ARQUIVO -- R5 do CLAUDE.md: nome de
+    # arquivo e ASCII, sempre. Agora a normalizacao e por unicodedata, que cobre
+    # qualquer acento, e nao por lista escrita a mao.
     fora = u"ÁÀÃÂÉÊÍÓÔÕÚÇáàãâéêíóôõúç"
     dentro = u"AAAAEEIOOOUCaaaaeeiooouc"
-    s = u"".join(dentro[fora.index(c)] if c in fora else c for c in nome)
+    import unicodedata
+    s = unicodedata.normalize("NFKD", nome)
+    s = u"".join(c for c in s if not unicodedata.combining(c))
+    s = u"".join(dentro[fora.index(c)] if c in fora else c for c in s)
     s = u"".join(c if c.isalnum() else "-" for c in s.lower())
     while "--" in s:
         s = s.replace("--", "-")

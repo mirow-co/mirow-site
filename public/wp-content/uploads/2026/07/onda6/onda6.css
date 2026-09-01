@@ -1726,7 +1726,26 @@ div.modal[id^="modal_"] .modal-leaders__intro {
   border-radius:999px;padding:4px 10px;color:#fff;
   font-size:clamp(11px, .82vw, 13px);line-height:1.25;white-space:nowrap}
 .onda78-inst__item--uni{background:rgba(0,173,236,.14);border-color:rgba(0,173,236,.35)}
-.onda78-inst__icone{flex:0 0 auto;opacity:.9}
+.onda78-inst__icone{flex:0 0 auto;opacity:.9;font-family:inherit}
+/* O <path> dentro do SVG herdava fonte do documento e caia em Times New Roman --
+   a V11 ("uma fonte so renderizada") pegou no gate: 3 elementos, exatamente os 3
+   <path> dos icones genericos. Nao muda um pixel do desenho (path nao tem texto),
+   mas a assercao mede a FAMILIA COMPUTADA de todo elemento, e ela estava certa em
+   reclamar: um <path> com Times declarado e uma fonte a mais carregavel na pagina. */
+/* O tema tem um script que troca <img src="*.svg"> por <svg> INLINE (classes
+   style-svg / replaced-svg). Tres desses arquivos declaram font-family dentro do
+   proprio SVG, e o <path> resultante computava "Times New Roman" -- a V11 pegou
+   no gate. O !important e necessario porque a declaracao vem de dentro do
+   arquivo injetado, e nao de uma folha que a nossa possa simplesmente suceder.
+   Nao muda um pixel: path nao desenha texto. */
+.onda78-inst svg, .onda78-inst svg *{font-family:inherit !important}
+/* Onda 79 — o logo REAL da instituicao. A placa clara existe porque o card e
+   escuro e a maioria destes logos e escura; os que ja sao brancos (UFRJ na
+   versao negativa, Malik) entram sem placa, senao branco-sobre-branco os apaga.
+   A classificacao saiu de MEDICAO de luminancia, nao de olhometro. */
+.onda78-inst__logo{flex:0 0 auto;height:16px;width:auto;max-width:88px;
+  object-fit:contain;background:#fff;border-radius:3px;padding:2px 4px}
+.onda78-inst__logo--claro{background:transparent;padding:0}
 /* no celular a lista pode ficar longa: rola na horizontal em vez de empurrar
    o card para baixo indefinidamente */
 @media only screen and (max-width: 575px){

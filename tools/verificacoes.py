@@ -6822,23 +6822,39 @@ def ao_vivo(s):
                 "  out.chips++;"
                 "  var r=ch.getBoundingClientRect();"
                 "  if(r.width<8||r.height<8) out.semArea++;"
-                "  var sv=ch.querySelector('svg');"
-                "  var rs=sv?sv.getBoundingClientRect():{width:0,height:0};"
+                # a marca do chip pode ser <svg> (icone de tipo) OU <img> (logo real):
+                # cobrar <svg> em todos era o teste da onda 78, e ficou estreito quando
+                # a 79 trocou 26 deles por imagem
+                "  var mk=ch.querySelector('svg,img');"
+                "  var rs=mk?mk.getBoundingClientRect():{width:0,height:0};"
                 "  if(rs.width<6||rs.height<6) out.iconeSemArea++;"
                 "  if(r.right>rc.right+1||r.bottom>rc.bottom+1) out.vazando++;"
                 " });});"
                 "return JSON.stringify(out);})()")
             d = json.loads(d) if isinstance(d, str) else d
+            # Onda 79: os logos reais. Medido pela CAIXA RENDERIZADA, nunca por
+            # naturalWidth -- SVG sem dimensao intrinseca reporta naturalWidth=0
+            # no Chrome mesmo desenhando perfeitamente, e foi assim que eu quase
+            # cacei um bug que nao existia (17 dos 26 "nao carregavam").
+            logos = nav.js(
+                "[...document.querySelectorAll('.onda78-inst__logo')].filter("
+                "function(i){var r=i.getBoundingClientRect();"
+                "return r.width>=4&&r.height>=4;}).length")
+            total_logos = nav.js("document.querySelectorAll('.onda78-inst__logo').length")
+            if int(total_logos or 0) and int(logos or 0) != int(total_logos):
+                det.append(u"%d de %d logo(s) sem área renderizada"
+                           % (int(total_logos) - int(logos or 0), int(total_logos)))
             if not d["chips"]:
                 return (False, u"nenhum chip de instituição renderizado")
             if d["semArea"]:
                 det.append(u"%d chip(s) sem área visível" % d["semArea"])
             if d["iconeSemArea"]:
-                det.append(u"%d ícone(s) de chip sem área" % d["iconeSemArea"])
+                det.append(u"%d chip(s) com marca (logo ou ícone) sem área" % d["iconeSemArea"])
             if d["vazando"]:
                 det.append(u"%d chip(s) fora da borda do card" % d["vazando"])
             return (not det, u"; ".join(det)
-                    or u"%d chips visíveis, com ícone, dentro do card" % d["chips"])
+                    or u"%d chips visíveis (%s com logo real), dentro do card"
+                       % (d["chips"], total_logos))
         s.check("V42", u"chips de instituição aparecem e cabem no card (onda 78)", v42)
 
 
