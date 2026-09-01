@@ -268,6 +268,16 @@ def _mod150():
     return _MOD150[0]
 
 
+_MOD27 = []
+
+
+def _mod27():
+    """O modulo 27_cache_busting: a constante VERSAO e a lista PASTAS."""
+    if not _MOD27:
+        _MOD27.append(__import__("27_cache_busting"))
+    return _MOD27[0]
+
+
 _MOD152 = []
 
 
@@ -451,6 +461,8 @@ ETAPAS = {
     "S181": ("texto", "estrutura"), "V42": ("medicao", "css"),
     # onda 80: svg de terceiro sem folha de estilo, e o logo legivel no chip
     "S182": ("asset",), "V43": ("medicao", "css", "asset"),
+    # onda 80c: carimbo de versao em todo asset nosso
+    "S183": ("asset", "css", "texto"),
     # --- CSS proprio: blocos marcados, pesos, cache busting ---
     "S127": ("css",), "S148": ("css",), "S128": ("css", "texto"),
     # --- medicao/analytics ---
@@ -3296,6 +3308,64 @@ def estaticas(s):
 
     s.check("S182", u"SVG nosso não carrega folha de estilo e os logos escalam (onda 80)",
             s182)
+
+    def s183():
+        # Onda 80c. O Mario, depois de a onda 80 já estar no ar consertando o
+        # vazamento de cor: "a cor ainda está vermelha para vários logos no site"
+        # — com o HTML novo na tela dele.
+        #
+        # Causa: os 26 logos da onda 79 eram referenciados SEM `?v=`. Quando a
+        # onda 80 trocou o CONTEÚDO desses arquivos (tirou de dentro deles o
+        # <style> que pintava a página), o navegador dele seguiu injetando o SVG
+        # VELHO, do cache. Eu media num navegador limpo e via certo; ele abria no
+        # dele e via errado; e o servidor estava certo nos dois casos. É o erro 6
+        # e o 9 do CLAUDE.md na variante mais escorregadia: o asset que EU criei
+        # nesta onda, e que por isso não estava em lista nenhuma.
+        #
+        # O que se cobra aqui NÃO é "os logos têm ?v=" — isso seria a asserção do
+        # sintoma, e o próximo asset novo escaparia igual. Cobra-se a CLASSE:
+        # todo arquivo NOSSO referenciado por href/src/content carrega carimbo.
+        #
+        # As exceções são declaradas, e cada uma tem motivo (erro 17: exceção que
+        # se esconde é alcance que se perde):
+        #   - og:image e derivadas: o scraper indexa pela URL; trocar a URL a cada
+        #     onda invalida preview que já funciona;
+        #   - URL dentro de JSON-LD e do manifest: ali a URL é IDENTIDADE, não
+        #     cache de navegador;
+        #   - /wp-content/uploads de anos anteriores (2019–2025): são mídia do
+        #     WordPress antigo, que nós não editamos. Se um dia editarmos, a pasta
+        #     entra nas PASTAS do 27 e esta exceção encolhe.
+        import json as _json
+        m27 = _mod27()
+        pastas_nossas = ("2026/07/onda6/", "2026/08/onda67/", "2026/07/fontes/",
+                         "2026/07/clientes/", "2026/08/onda68/", "2026/08/onda79/",
+                         "2026/08/rede/", "2026/08/imprensa-logos/")
+        SEM_CARIMBO_OK = ("og-", "icone-mirow-512", "site.webmanifest")
+        det = []
+        vistos = 0
+        for rel, h in s.todas():
+            # o <head> tem JSON-LD e og:image; o corpo é onde mora o asset servido
+            for m in re.finditer(r'(?:href|src|content)=(["\'])([^"\']*?)\1', h):
+                url = m.group(2)
+                if not any(p in url for p in pastas_nossas):
+                    continue
+                if any(x in url for x in SEM_CARIMBO_OK):
+                    continue
+                vistos += 1
+                if "?v=" not in url:
+                    det.append(u"%s: %s sem ?v=" % (rel, url.split("/")[-1]))
+        det = sorted(set(det))
+        if not vistos:
+            return (False, u"nenhuma referência a asset nosso encontrada — "
+                           u"a asserção não mediu nada")
+        return (not det, u"%d referência(s) sem carimbo: %s"
+                % (len(det), ", ".join(det[:4])) if det
+                else u"%d referência(s) a asset nosso, todas com ?v=%d"
+                     % (vistos, m27.VERSAO))
+
+    s.check("S183", u"todo asset nosso é servido com carimbo de versão (onda 80c)",
+            s183)
+
 
 
     def s28():

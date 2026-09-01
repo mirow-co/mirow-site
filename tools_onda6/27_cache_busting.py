@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
 # >>> proximas ondas: incrementar aqui e rodar o script <<<
-VERSAO = 94
+VERSAO = 95
 
 ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda6.css",
@@ -76,6 +76,34 @@ ASSETS = [
     "site.webmanifest",
 ]
 
+# Onda 80c. PASTAS inteiras de asset nosso, para o carimbo nao depender de alguem
+# lembrar de listar arquivo por arquivo.
+#
+# O caso que obrigou: os 26 logos de instituicao da onda 79 entraram sem `?v=`.
+# Duas horas depois eu troquei o CONTEUDO desses arquivos (a onda 80 tirou de
+# dentro deles um <style> que vazava e pintava a pagina inteira de vermelho) --
+# e o Mario continuou vendo tudo vermelho, com o HTML novo na tela. O navegador
+# dele estava injetando o SVG VELHO, do cache, porque a URL nunca mudou.
+#
+# E o pior tipo desse bug: eu media a pagina num navegador limpo e via correto,
+# ele abria no dele e via errado, e nos dois casos o servidor estava certo.
+# Erro 6 e 9 do CLAUDE.md, na variante "o asset que EU criei nesta onda".
+#
+# Por pasta, e nao por arquivo, porque a lista de logos muda a cada lider novo --
+# lista manual e valor gemeo esperando divergir (erro 18).
+PASTAS = [
+    "wp-content/uploads/2026/08/onda79/logos/",
+    # Entraram na mesma onda, pelo mesmo motivo: a onda 80 editou o CONTEUDO de
+    # energisa.svg, bnews.svg e imp-consulting-logo.svg (tirou de dentro deles o
+    # <style> com nome de classe generico, que colide entre dois logos injetados
+    # na mesma pagina). Os tres saiam com o `?ver=1` que o WordPress carimbou uma
+    # vez, em 2023, e que nunca mais muda -- ou seja, cache eterno sobre arquivo
+    # que a gente edita. Quem descobriu foi a S183, na primeira execucao dela.
+    "wp-content/uploads/2026/07/clientes/",
+    "wp-content/uploads/2026/08/imprensa-logos/",
+    "wp-content/uploads/2026/08/rede/",
+]
+
 
 def carimbar(html):
     """Poe/atualiza ?v=VERSAO em toda referencia aos nossos assets.
@@ -104,6 +132,12 @@ def carimbar(html):
     # sem esta linha ele nao acompanharia a VERSAO -- o navegador serviria o
     # INDICE VELHO depois de uma onda que muda conteudo, e a busca devolveria
     # pagina que nao existe mais. Valor gemeo, resolvido no carimbo.
+    # o mesmo carimbo, agora para qualquer arquivo dentro das PASTAS
+    for pasta in PASTAS:
+        rex = re.compile(r'((?:href|src|content)=)(' + ASPA + r')([^"\']*?'
+                         + re.escape(pasta) + r'[A-Za-z0-9._-]+)(\?[^"\']*)?\2')
+        html = rex.sub(lambda m: u'%s%s%s?v=%d%s'
+                       % (m.group(1), m.group(2), m.group(3), VERSAO, m.group(2)), html)
     html = re.sub(r'window\.ONDA67_V\s*=\s*"\d+"',
                   'window.ONDA67_V="%d"' % VERSAO, html)
     return html
@@ -122,7 +156,7 @@ def main():
                 continue
             path = os.path.join(dirpath, nome)
             html = ler(path)
-            if not any(a in html for a in ASSETS):
+            if not any(a in html for a in ASSETS) and not any(x in html for x in PASTAS):
                 continue
             tocados += 1
             novo = carimbar(html)
