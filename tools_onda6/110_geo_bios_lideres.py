@@ -29,6 +29,12 @@ PAGINAS = {
     u"Prof. Dr Stephan Friedrich": {"pt": "pt/lider/prof-dr-stephan-friedrich", "en": "en/leader/prof-dr-stephan-friedrich", "de": "de/lider/prof-dr-stephan-friedrich"},
     u"Renato Alvarenga": {"pt": "pt/lider/renato-alvarenga", "en": "en/leader/renato-alvarenga", "de": "de/lider/renato-alvarenga"},
     u"Raoni Morais": {"pt": "pt/lider/raoni-morais", "en": "en/leader/raoni-morais", "de": "de/lider/raoni-morais"},
+    # Onda 80b: as paginas dos dois nasceram no 154_paginas_elmar_joao.py, clonadas
+    # da estrutura do Felipe. Entrar AQUI e o que os coloca no grafo -- e a razao de
+    # "o elmar deve estar dentro do schema" e "o joao daniel deve ter pagina propria"
+    # serem o mesmo trabalho: sem URL propria nao ha @id, e sem @id nao ha no Person.
+    u"Elmar Gans": {"pt": "pt/lider/elmar-gans", "en": "en/leader/elmar-gans", "de": "de/lider/elmar-gans"},
+    u"João Daniel Ramos": {"pt": "pt/lider/joao-daniel-ramos", "en": "en/leader/joao-daniel-ramos", "de": "de/lider/joao-daniel-ramos"},
 }
 
 RE_CARD = re.compile(r'<button class="page-leaders__list-item".*?</button>', re.S)

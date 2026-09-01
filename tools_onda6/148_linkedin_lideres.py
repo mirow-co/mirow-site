@@ -31,6 +31,11 @@ LINKEDIN = {
     u"Prof. Dr Stephan Friedrich": "https://www.linkedin.com/in/prof-dr-stephan-friedrich-von-den-eichen/",
     u"Raoni Morais": "https://www.linkedin.com/in/raoni-r-morais/",
     u"Renato Alvarenga": "https://www.linkedin.com/in/renato-alvarenga-5b2332/",
+    # Onda 80b: os dois entraram no cadastro de lideres. As URLs sao as que ja
+    # estavam nos cards da listagem desde antes -- conferidas abrindo os dois
+    # perfis no Chrome em 01/09/2026 (os dois carregam, nenhum e slug morto).
+    u"Elmar Gans": "https://www.linkedin.com/in/elmar-gans-2329a422/",
+    u"João Daniel Ramos": "https://www.linkedin.com/in/joao-daniel-palma-ramos/",
 }
 
 # Pessoas que aparecem no site mas NAO estao no cadastro de lideres (PAGINAS do

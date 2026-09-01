@@ -31,6 +31,11 @@ CARGO = {
     u"Prof. Dr Stephan Friedrich": {"pt": u"sócio", "en": u"partner", "de": u"Partner"},
     u"Renato Alvarenga": {"pt": u"senior advisor", "en": u"senior advisor", "de": u"Senior Advisor"},
     u"Raoni Morais": {"pt": u"senior expert", "en": u"senior expert", "de": u"Senior Expert"},
+    # Onda 80b: o cargo de cada um e o que o CARD da listagem ja diz -- Senior
+    # Expert e Gerente de projetos. Nao e o que o LinkedIn deles diz hoje, e isso
+    # e deliberado: quem define cargo no site da firma e a firma.
+    u"Elmar Gans": {"pt": u"senior expert", "en": u"senior expert", "de": u"Senior Expert"},
+    u"João Daniel Ramos": {"pt": u"gerente de projetos", "en": u"project manager", "de": u"Projektmanager"},
 }
 
 ESPECIALIDADE = {
@@ -58,7 +63,17 @@ ESPECIALIDADE = {
         "pt": u"Atua em energia, energias renováveis, planejamento energético e infraestrutura.",
         "en": u"Works on energy, renewable energy, energy planning and infrastructure.",
         "de": u"Tätig in Energie, erneuerbaren Energien, Energieplanung und Infrastruktur.",
+    },    u"Elmar Gans": {
+        "pt": u"Atua em estratégia corporativa, desempenho comercial e S&OP, em setores industriais, alimentos & bebidas e bens de consumo.",
+        "en": u"Works on corporate strategy, commercial performance and S&OP across industrial, food & beverage and consumer goods sectors.",
+        "de": u"Tätig in Unternehmensstrategie, Vertriebsleistung und S&OP in Industrie, Lebensmitteln & Getränken und Konsumgütern.",
     },
+    u"João Daniel Ramos": {
+        "pt": u"Atua em estratégia, logística, marketing e eficiência operacional, em setores como automotivo, papel & celulose, educação e energia.",
+        "en": u"Works on strategy, logistics, marketing and operational efficiency in sectors such as automotive, pulp & paper, education and energy.",
+        "de": u"Tätig in Strategie, Logistik, Marketing und operativer Effizienz in Branchen wie Automobil, Zellstoff & Papier, Bildung und Energie.",
+    },
+
 }
 
 NOME_EXIBIDO = {u"Prof. Dr Stephan Friedrich": u"Prof. Dr. Stephan Friedrich"}

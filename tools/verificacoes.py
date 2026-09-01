@@ -1366,10 +1366,19 @@ def estaticas(s):
                            % (lang, org.get("foundingDate")))
             if u"Rio" not in ((org.get("foundingLocation") or {}).get("name") or ""):
                 det.append(u"%s: foundingLocation deixou de ser o Rio" % lang)
-            nomes = u" ".join(p.get("name", "") for p in pessoas)
-            for fora in (u"Elmar", u"Daniel Ramos"):
-                if fora in nomes:
-                    det.append(u"%s: %s entrou no schema sem decisão do Felipe" % (lang, fora))
+            # Onda 80b: a trava "Elmar e Daniel Ramos NAO entram no schema" saiu.
+            # Ela nasceu na onda 59, quando os dois nao tinham pagina propria e
+            # portanto nao podiam ter @id -- e ficou escrita como "sem decisão do
+            # Felipe", que e um gate que este projeto nao tem: quem decide aqui e
+            # o Mario, e so ele (cláusula pétrea do CLAUDE.md). Em 01/09/2026 ele
+            # decidiu, verbatim: "o elmar deve estar dentro do schema. o joao
+            # daniel deve ter pagina propria". As duas coisas sao o mesmo trabalho.
+            #
+            # O que sobra no lugar da trava e o invariante que ela realmente
+            # protegia: ninguem entra no grafo sem pagina propria no disco -- e
+            # isso o laco abaixo ja cobra, pessoa por pessoa, resolvendo a `url`
+            # contra o arquivo. Trava por NOME viraria valor gemeo com o cadastro
+            # (erro 18); o laco por cadastro acompanha quem entra e quem sai.
             for p in pessoas:
                 nome = p.get("name", "?")
                 same = p.get("sameAs") or []
@@ -3011,6 +3020,9 @@ def estaticas(s):
         # foram criados, e o par site↔Wikidata é bidirecional lá (P108 de cada
         # pessoa aponta para a empresa; a empresa tem P112 → Andreas).
         mestre = _mod111().WIKIDATA
+        # os nomes do mestre na forma em que o 111 os escreve no grafo
+        mestre_nomes = set(k.replace(u"Prof. Dr Stephan Friedrich",
+                                     u"Prof. Dr. Stephan Friedrich") for k in mestre)
         forma = re.compile(r"^https://www\.wikidata\.org/wiki/Q[0-9]+$")
         vistos = {}
         det = []
@@ -3045,7 +3057,22 @@ def estaticas(s):
                 nome = no.get("name")
                 wd = [x for x in (no.get("sameAs") or []) if "wikidata.org" in x]
                 if not wd:
-                    det.append(u"%s: %s sem sameAs de Wikidata" % (rel, nome))
+                    # Onda 80b: so e falta quem ESTA no mestre. Antes daqui a
+                    # asserção cobrava QID de TODO no Person do grafo, o que
+                    # embutia "todo lider tem item no Wikidata" -- verdade
+                    # enquanto o cadastro tinha exatamente as 5 pessoas do lote
+                    # de 26/08, e falso no dia em que o Elmar e o Joao Daniel
+                    # entraram (01/09). Erro 18: numero de conteudo escrito
+                    # dentro de asserção. O invariante real e o de baixo -- quem
+                    # esta no mestre aparece no grafo com o QID certo --, e ele
+                    # nao muda quando o cadastro cresce.
+                    #
+                    # Os dois novos NAO tem item no Wikidata, e criar um por
+                    # conta propria nao e decisao de gate: notabilidade la e
+                    # criterio deles, e o lote das 5 pessoas passou pela
+                    # autorizacao do Felipe. Fica registrado como lacuna.
+                    if nome in mestre_nomes:
+                        det.append(u"%s: %s sem sameAs de Wikidata" % (rel, nome))
                     continue
                 if len(wd) > 1:
                     det.append(u"%s: %s com %d sameAs de Wikidata" % (rel, nome, len(wd)))

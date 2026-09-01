@@ -93,7 +93,20 @@ KNOWS = {
         "pt": [u"Energia", u"Energias renováveis", u"Planejamento energético", u"Infraestrutura"],
         "en": [u"Energy", u"Renewable energy", u"Energy planning", u"Infrastructure"],
         "de": [u"Energie", u"Erneuerbare Energien", u"Energieplanung", u"Infrastruktur"],
+    },    # Onda 80b. Os temas dos dois saem do CARD deles na propria listagem de
+    # lideres -- o texto que a firma ja publica sobre cada um --, nao de leitura
+    # minha do LinkedIn. Assim o que a maquina le e o que o humano le.
+    u"Elmar Gans": {
+        "pt": [u"Estratégia corporativa", u"Desempenho comercial", u"S&OP"],
+        "en": [u"Corporate strategy", u"Commercial performance", u"S&OP"],
+        "de": [u"Unternehmensstrategie", u"Vertriebsleistung", u"S&OP"],
     },
+    u"João Daniel Ramos": {
+        "pt": [u"Estratégia", u"Logística", u"Marketing", u"Eficiência operacional"],
+        "en": [u"Strategy", u"Logistics", u"Marketing", u"Operational efficiency"],
+        "de": [u"Strategie", u"Logistik", u"Marketing", u"Operative Effizienz"],
+    },
+
 }
 
 ALUMNI = {
@@ -115,6 +128,22 @@ ALUMNI = {
                       u"Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio)"],
     u"Raoni Morais": [u"Instituto Militar de Engenharia (IME)", u"Universitat de Barcelona",
                       u"Universidade Federal do Rio de Janeiro (UFRJ)"],
+    # Onda 80b (01/09/2026): o Elmar e o Joao Daniel entram no cadastro. Pedido do
+    # Mario, verbatim: "o elmar deve estar dentro do schema. o joao daniel deve ter
+    # pagina propria" -- e as duas coisas sao o MESMO trabalho, porque o no Person
+    # so existe no grafo se tiver uma URL propria como @id.
+    #
+    # SO ENTRA O QUE EU MEDI. Li os dois perfis no Chrome em 01/09 e o cartao de
+    # topo de cada um declara UMA instituicao: WHU para o Elmar, FECAP para o Joao
+    # Daniel. A pagina /details/education/ dos dois volta VAZIA -- nenhum dos dois
+    # publica a secao de formacao completa.
+    #
+    # A tabela de logos do 153 tem tambem LMU Munchen, UMass Amherst e UFPR,
+    # baixados numa sessao anterior para estes dois. NAO entram: eu nao encontrei
+    # fonte para eles em nada que eu tenha medido, e chip de faculdade errada num
+    # card de lider e pior que chip faltando. Se o Mario confirmar, e uma linha.
+    u"Elmar Gans": [u"WHU – Otto Beisheim School of Management"],
+    u"João Daniel Ramos": [u"Fundação Escola de Comércio Álvares Penteado (FECAP)"],
     # Onda 72b (#249): Mario confirmou Stephan e Renato em 24/08. Fonte: o proprio
     # modal de lideres do site (Educacao). O vinculo do Stephan com Bremen e
     # DOCENCIA, nao formacao — nao entra no alumniOf.
@@ -173,6 +202,28 @@ EXPERIENCIA = {
         (u"Partner and Consultant", u"Catavento Consultoria", "2015-06", "2016-08"),
         (u"Project Manager", u"Consórcio Integrador Rio de Janeiro (CIRJ)", "2012-08", "2015-05"),
         (u"Business Analyst", u"Schlumberger", "2011-04", "2012-06"),
+    ],
+    # Onda 80b. Lido do LinkedIn dos dois em 01/09/2026, com a mesma regra de
+    # curadoria das outras cinco: organizacao nomeada, 12 meses ou mais, sem a
+    # Mirow e sem autonomo. Por isso ficam de fora, no Elmar, o estagio de 3 meses
+    # no Rothschild (2003) e os cargos de conselho/associado que sao part-time e
+    # correntes; e, nos dois, o vinculo com a propria Mirow.
+    #
+    # RESTRICAO DO MARIO, e ela vale para o site inteiro: nao se menciona, em
+    # lugar nenhum, o vinculo atual do Elmar com a startup dele. O perfil abre com
+    # esse cargo; ele nao entra aqui, nem na bio, nem no schema.
+    u"Elmar Gans": [
+        (u"Engagement Manager", u"McKinsey & Company", "2005-04", "2012-01"),
+        (u"Sports editor", u"Mediengruppe Münchner Merkur tz", "2000-01", "2004-10"),
+    ],
+    # Kumon: 12 anos, quatro cargos. Fica o mais SENIOR com as datas DELE, nunca o
+    # cargo mais alto esticado sobre o periodo inteiro da empresa -- isso seria
+    # inventar data. O chip do card mostra "Kumon" uma vez de qualquer jeito,
+    # porque a lista e deduplicada por organizacao.
+    u"João Daniel Ramos": [
+        (u"Gerente Sr de Operações e Expansão", u"Kumon Brasil", "2020-01", "2022-05"),
+        (u"Gerente Sr de Marketing e Planejamento", u"Kumon Brasil", "2015-10", "2019-12"),
+        (u"Analista de remuneração", u"Dexco", "2009-02", "2010-06"),
     ],
 }
 

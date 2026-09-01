@@ -86,6 +86,12 @@ CURTO = {
     u"Catavento Consultoria": u"Catavento",
     u"Consórcio Integrador Rio de Janeiro (CIRJ)": u"Consórcio Rio (CIRJ)",
     u"Schlumberger": u"Schlumberger",
+    # onda 80b: as instituicoes do Elmar e do Joao Daniel
+    u"WHU – Otto Beisheim School of Management": u"WHU",
+    u"Fundação Escola de Comércio Álvares Penteado (FECAP)": u"FECAP",
+    u"Mediengruppe Münchner Merkur tz": u"Münchner Merkur",
+    u"Kumon Brasil": u"Kumon",
+    u"Dexco": u"Dexco",
 }
 
 # birrete (formacao) e predio (empresa). 14x14, currentColor, sem fill externo.
