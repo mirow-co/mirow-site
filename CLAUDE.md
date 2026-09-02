@@ -235,11 +235,11 @@ no contact sheet é candidato natural a asserção V-nova na suíte.
 reais do tema (cores, fontes Archivo/Libre Franklin, breakpoints 992/1200), componentes canônicos
 e o passo a passo de capturar referência visual de outro site via CDP (sem playwright).
 
-## Estado do site (medido em 01/09/2026)
+## Estado do site (medido em 02/09/2026)
 
-**Produção e staging em `v=96`** (ondas 76–83 publicadas em 01/09 com o OK do Mario),
+**Produção e staging em `v=97`** (ondas 76–85 publicadas em 01–02/09 com o OK do Mario),
 conferido ao vivo nas duas pontas.
-`public/` = **65 MB**. **293 arquivos HTML**: ~113 de conteúdo e ~180 stubs de redirect; o
+`public/` = **67 MB**. **293 arquivos HTML**: ~113 de conteúdo e ~180 stubs de redirect; o
 `sitemap.xml` lista **112 URLs** — só conteúdo, porque stub é `noindex` e listar noindex no
 sitemap é erro no Search Console. Suíte: **229 asserções, 0 falha** (~280 s, 142 page loads;
 89% do tempo é a fase de navegador — ver `docs/HANDOFF-2026-09-02.md`).
@@ -274,9 +274,10 @@ elas a fonte é o `git log`.
 > | 70 · 71 | os 2 links da imprensa (#241) e os marcos 2024-2026 travados (#68) | `fc71cc32` `93ce0989` |
 > | 68 · 68b *(reuso)* | as 14 superfícies de ícone e a saída do Michael Munch | `0857364c` `14d0fe8f` `c0433010` `dfdedc9c` |
 >
-> **As ondas 76 a 83 estão NO AR** (tipografia fluida, frase de sede fora da home, os
-> logotipos das instituições, Elmar e João Daniel no cadastro, carimbo por pasta — ver
-> `docs/HANDOFF-2026-09-02.md`). **A próxima é a 84.** Antes de rotular,
+> **As ondas 76 a 85 estão NO AR** (tipografia fluida, frase de sede fora da home, os
+> logotipos das instituições, Elmar e João Daniel no cadastro, carimbo por pasta, as
+> faculdades dos dois e as fotos de Insight regradadas — ver `docs/HANDOFF-2026-09-02.md`
+> e `docs/HANDOFF-2026-09-02_b.md`). **A próxima é a 86.** Antes de rotular,
 > `git log --oneline -20 | grep -i onda`.
 
 > **O tema INJETA SVG inline.** Um script do tema troca `<img src="*.svg">` por `<svg>`
@@ -310,6 +311,7 @@ Mapa por tema, para saber onde procurar e qual sentinela guarda o quê:
 | Logotipo real de instituição no card: viewBox, `<style>` que vaza, placa branca, tinta | 78–80 · 83 | `S181` `S182` `S184` `V42` `V43` |
 | Elmar e João Daniel no cadastro: página própria, schema, chips | 81 | `S176` `S178` |
 | Carimbo de versão em todo asset nosso, por pasta | 82 | `S183` |
+| Formação do Elmar e do João Daniel; véu e regrade das fotos de Insight | 84 · 85 | `S181` `S184` |
 
 **Antes de tratar qualquer coisa como pendente, medir no HTML.** Em 20/08 a linha da `59-sede`
 dizia "aguardando OK" sobre uma frase que estava no ar havia semanas, e isso quase me fez
