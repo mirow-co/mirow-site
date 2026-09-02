@@ -235,14 +235,18 @@ no contact sheet é candidato natural a asserção V-nova na suíte.
 reais do tema (cores, fontes Archivo/Libre Franklin, breakpoints 992/1200), componentes canônicos
 e o passo a passo de capturar referência visual de outro site via CDP (sem playwright).
 
-## Estado do site (medido em 25/08/2026)
+## Estado do site (medido em 01/09/2026)
 
-**Produção e staging em `v=89`** (onda 74 publicada em 31/08 com o OK do Mario), conferido ao
-vivo nas duas pontas.
-`public/` = **64 MB** (era 262 MB antes das ondas 61–62c). **287 arquivos HTML**: ~107 de
-conteúdo e ~180 stubs de redirect; o `sitemap.xml` lista **106 URLs** — só conteúdo, porque
-stub é `noindex` e listar noindex no sitemap é erro no Search Console. Suíte: **220 asserções,
-0 falha**.
+**Produção e staging em `v=96`** (ondas 76–83 publicadas em 01/09 com o OK do Mario),
+conferido ao vivo nas duas pontas.
+`public/` = **65 MB**. **293 arquivos HTML**: ~113 de conteúdo e ~180 stubs de redirect; o
+`sitemap.xml` lista **112 URLs** — só conteúdo, porque stub é `noindex` e listar noindex no
+sitemap é erro no Search Console. Suíte: **229 asserções, 0 falha** (~280 s, 142 page loads;
+89% do tempo é a fase de navegador — ver `docs/HANDOFF-2026-09-02.md`).
+
+**O cadastro de líderes tem 7 pessoas** desde a onda 81: os 5 de sempre mais Elmar Gans e
+João Daniel Ramos, que ganharam página própria e nó no grafo. Não escreva "7" em asserção
+nenhuma (erro 18) — o número sai do `PAGINAS` do `110` em runtime.
 
 **Cuidado com dois esquemas de numeração parecidos:** `S-07`, `S-117` **com hífen** são
 *pedidos* do Mario (rastreados nas issues); `S107`, `S117` **sem hífen** são *asserções* da
@@ -270,9 +274,17 @@ elas a fonte é o `git log`.
 > | 70 · 71 | os 2 links da imprensa (#241) e os marcos 2024-2026 travados (#68) | `fc71cc32` `93ce0989` |
 > | 68 · 68b *(reuso)* | as 14 superfícies de ícone e a saída do Michael Munch | `0857364c` `14d0fe8f` `c0433010` `dfdedc9c` |
 >
-> **A onda 72 (a–d) está NO AR** (bio nova do Felipe, alumniOf dos 5, meta description
-> dos líderes, modal redesenhado — ver `docs/HANDOFF-2026-08-25.md`). **A próxima é a
-> 73.** Antes de rotular, `git log --oneline -20 | grep -i onda`.
+> **As ondas 76 a 83 estão NO AR** (tipografia fluida, frase de sede fora da home, os
+> logotipos das instituições, Elmar e João Daniel no cadastro, carimbo por pasta — ver
+> `docs/HANDOFF-2026-09-02.md`). **A próxima é a 84.** Antes de rotular,
+> `git log --oneline -20 | grep -i onda`.
+
+> **O tema INJETA SVG inline.** Um script do tema troca `<img src="*.svg">` por `<svg>`
+> no documento, e nesse modo o arquivo **deixa de ser isolado**: `object-fit` não se aplica,
+> um `<style>` de dentro do arquivo vira folha de estilo da PÁGINA INTEIRA, e SVG sem
+> `viewBox` não escala (recorta, porque o `overflow` é `hidden`). Três das quatro correções
+> das ondas 80–83 saíram daí. Antes de medir qualquer coisa em asset SVG deste site, saiba
+> em qual dos dois modos ele está — `document.querySelector(...).tagName` responde.
 
 Mapa por tema, para saber onde procurar e qual sentinela guarda o quê:
 
@@ -293,7 +305,11 @@ Mapa por tema, para saber onde procurar e qual sentinela guarda o quê:
 | Imprensa: links recuperados e marcos travados | 70 · 71 | `S170` |
 | Bio do Felipe, alumniOf dos 5, meta description, modal de líder | 72 · 72b–d | `S175` `V40` |
 | LinkedIn dos líderes num mestre, e a experiência anterior deles no grafo | 73 | `S176` `S177` |
-| Wikidata: a firma e os 5 líderes existem lá, e o `sameAs` liga os dois lados | 74 | `S178` |
+| Wikidata: a firma e os líderes do mestre existem lá, e o `sameAs` liga os dois lados | 74 | `S178` |
+| Tipografia fluida, e a frase de sede fora do corpo da home | 76 · 77 | `V41` `S180` |
+| Logotipo real de instituição no card: viewBox, `<style>` que vaza, placa branca, tinta | 78–80 · 83 | `S181` `S182` `S184` `V42` `V43` |
+| Elmar e João Daniel no cadastro: página própria, schema, chips | 81 | `S176` `S178` |
+| Carimbo de versão em todo asset nosso, por pasta | 82 | `S183` |
 
 **Antes de tratar qualquer coisa como pendente, medir no HTML.** Em 20/08 a linha da `59-sede`
 dizia "aguardando OK" sobre uma frase que estava no ar havia semanas, e isso quase me fez
