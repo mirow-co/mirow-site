@@ -83,6 +83,7 @@ CURTO = {
     # de verdade. O detalhe nao se perde -- no JSON-LD o PhD (alumniOf) e o cargo
     # de conselheiro academico (worksFor) seguem separados, cada um com o nome
     # completo da instituicao. O chip e resumo; o grafo e o registro.
+    # CONFIRMADO pelo Mario em 02/09: "pode ser como esta". Nao reabrir.
     u"University of Chicago Booth School of Business": u"Univ. of Chicago",
     u"Innovative Management Partner (IMP)": u"IMP",
     u"Universität Bremen": u"Univ. Bremen",
@@ -102,6 +103,9 @@ CURTO = {
     u"Mediengruppe Münchner Merkur tz": u"Münchner Merkur",
     u"Kumon Brasil": u"Kumon",
     u"Dexco": u"Dexco",
+    # onda 84: as outras tres do Elmar
+    u"University of Massachusetts Amherst": u"UMass Amherst",
+    u"Ludwig-Maximilians-Universität München": u"LMU München",
 }
 
 # birrete (formacao) e predio (empresa). 14x14, currentColor, sem fill externo.

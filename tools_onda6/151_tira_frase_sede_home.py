@@ -20,7 +20,9 @@ O que ele NAO faz, de proposito:
   - nao toca na Nossa Historia, onde a mesma frase abre a prosa. O pedido falou da
     pagina inicial, e apagar prosa de outra pagina sem pedido e decidir pelo dono.
   - nao toca na `description` do JSON-LD nem na meta description, que nao sao texto
-    visivel da pagina. Perguntado ao Mario.
+    visivel da pagina. Perguntado ao Mario em 31/08; ele respondeu "nao" em 02/09 --
+    elas FICAM. A frase sai de onde o visitante le e permanece onde o assistente de
+    IA le, que e o proposito do trabalho de GEO.
 
 O 113_geo_frase_sede.py foi alterado na mesma onda para NAO reinserir na home --
 sem isso, a proxima execucao dele traria a frase de volta, e a S180 gritaria.

@@ -142,7 +142,28 @@ ALUMNI = {
     # baixados numa sessao anterior para estes dois. NAO entram: eu nao encontrei
     # fonte para eles em nada que eu tenha medido, e chip de faculdade errada num
     # card de lider e pior que chip faltando. Se o Mario confirmar, e uma linha.
-    u"Elmar Gans": [u"WHU – Otto Beisheim School of Management"],
+    # Onda 84 (02/09/2026). O Mario autorizou incluir as faculdades que estavam na
+    # tabela de logos sem fonte ("sim pode incluir"), e ao voltar na fonte eu
+    # descobri que meu "os dois nao publicam formacao" de 01/09 estava ERRADO: a
+    # pagina /details/education/ do Elmar tinha ficado presa no spinner e eu li a
+    # tela em branco como ausencia de dado. Carregada, ela lista QUATRO, e traz
+    # uma que nem estava na tabela de logos -- a PUC-Rio, cujo brasao ja temos por
+    # causa do Felipe. Lido no Chrome em 02/09:
+    #   WHU (PhD, Business Administration, 2007-2009)
+    #   University of Massachusetts Amherst (Master Thesis, Corporate Finance, 2004-2005)
+    #   Ludwig-Maximilians-Universitat Munchen (MBA/MSc, 2000-2005)
+    #   PUC-Rio (2002)
+    # Isto e o erro 2 do R13 na pratica: tela vazia nao e "nao ha dado" -- pode ser
+    # "ainda nao carregou". Distinguir custou 4 segundos de espera.
+    u"Elmar Gans": [u"WHU – Otto Beisheim School of Management",
+                    u"University of Massachusetts Amherst",
+                    u"Ludwig-Maximilians-Universität München",
+                    u"Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio)"],
+    # A UFPR estava na tabela de logos como sendo de um dos dois, e NAO entra: nao
+    # aparece em lugar nenhum do perfil do Joao Daniel (procurada no proprio
+    # LinkedIn em 02/09, zero ocorrencia) nem no do Elmar, cujas quatro estao
+    # acima. Autorizacao do Mario para incluir nao supre a falta de fonte sobre
+    # DE QUEM ela e -- faculdade na pessoa errada e um erro factual publicado.
     u"João Daniel Ramos": [u"Fundação Escola de Comércio Álvares Penteado (FECAP)"],
     # Onda 72b (#249): Mario confirmou Stephan e Renato em 24/08. Fonte: o proprio
     # modal de lideres do site (Educacao). O vinculo do Stephan com Bremen e

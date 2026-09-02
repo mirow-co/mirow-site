@@ -3191,9 +3191,12 @@ def estaticas(s):
         # ALCANCE, dito na cara: esta asserção mede o CORPO da página — o texto que
         # o visitante lê. As mesmas palavras seguem no <head> das 3 homes, na
         # `meta description` e na `description` do JSON-LD, que não são texto
-        # visível e são a munição do trabalho de GEO. Tirar de lá é decisão
-        # editorial do Mario, perguntada em 31/08 e ainda sem resposta — enquanto
-        # não houver, a asserção não pode fingir que cobre o que não cobre.
+        # visível e são a munição do trabalho de GEO.
+        #
+        # DECIDIDO em 02/09/2026: o Mario respondeu "não" à pergunta de tirá-las
+        # também do <head>. Ou seja, este recorte não é uma pendência esperando
+        # resposta — é o estado final. A frase sai de onde o visitante lê e fica
+        # onde o assistente de IA lê.
         det = []
         for rel in ("pt/index.html", "en/index.html", "de/index.html"):
             h = s.ler(rel)
