@@ -1765,3 +1765,18 @@ div.modal[id^="modal_"] .modal-leaders__intro {
   .onda78-inst::-webkit-scrollbar{display:none}
 }
 /* onda78:instituicoes:fim */
+
+/* onda85:veu-insights:ini */
+/* Onda 85 (#187, socios 05/08: "as fotos aparecem apagadas") — o veu navy que
+   o tema poe sobre a foto do card cai de .78 para 0.62 no topo e de .30 para 0.24
+   no meio. NAO e gosto: e o degrau medido por qa/medir_veu_insights.py, que
+   compoe cada uma das 10 fotos do acervo com o navy e calcula o contraste WCAG
+   do titulo branco. Com .62 a PIOR foto (iStock-1652035117, ceu claro) ainda da
+   5,9:1 contra o minimo AA de 4,5:1; com .55 cai para 4,8 e a margem some.
+   O veu existe porque o <h3> fica EM CIMA da foto — por isso ele diminui em vez
+   de sair. Guardado pela S185, que refaz a conta a partir dos arquivos reais. */
+.page-insights__list-image::after,
+.page-insights__list-item .page-insights__list-image::after{
+  background-image:linear-gradient(rgba(4,21,69,0.62) 0%, rgba(4,21,69,0.24) 45%,
+    rgba(4,21,69,0) 75%)}
+/* onda85:veu-insights:fim */

@@ -106,6 +106,8 @@ CURTO = {
     # onda 84: as outras tres do Elmar
     u"University of Massachusetts Amherst": u"UMass Amherst",
     u"Ludwig-Maximilians-Universität München": u"LMU München",
+    # onda 85: a UFPR do Joao Daniel, por ordem do Mario
+    u"Universidade Federal do Paraná (UFPR)": u"UFPR",
 }
 
 # birrete (formacao) e predio (empresa). 14x14, currentColor, sem fill externo.

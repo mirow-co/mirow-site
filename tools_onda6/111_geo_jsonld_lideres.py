@@ -159,12 +159,17 @@ ALUMNI = {
                     u"University of Massachusetts Amherst",
                     u"Ludwig-Maximilians-Universität München",
                     u"Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio)"],
-    # A UFPR estava na tabela de logos como sendo de um dos dois, e NAO entra: nao
-    # aparece em lugar nenhum do perfil do Joao Daniel (procurada no proprio
-    # LinkedIn em 02/09, zero ocorrencia) nem no do Elmar, cujas quatro estao
-    # acima. Autorizacao do Mario para incluir nao supre a falta de fonte sobre
-    # DE QUEM ela e -- faculdade na pessoa errada e um erro factual publicado.
-    u"João Daniel Ramos": [u"Fundação Escola de Comércio Álvares Penteado (FECAP)"],
+    # A UFPR entra por ORDEM DO MARIO, 02/09/2026, verbatim: "joao fez UFPR. pode
+    # colocar sob minha ordem". A fonte aqui e ELE, e nao o LinkedIn -- o perfil do
+    # Joao Daniel nao menciona a UFPR em lugar nenhum (procurada em 02/09, zero
+    # ocorrencia), e por isso eu a tinha deixado de fora no dia anterior.
+    #
+    # Registrar a procedencia importa: se um dia alguem conferir contra o LinkedIn
+    # e nao achar, a resposta esta aqui, com nome e data, em vez de virar "de onde
+    # saiu isto?". O socio e uma fonte melhor que o LinkedIn para o CV do proprio
+    # time -- o que nao se pode e apagar a diferenca entre as duas.
+    u"João Daniel Ramos": [u"Fundação Escola de Comércio Álvares Penteado (FECAP)",
+                           u"Universidade Federal do Paraná (UFPR)"],
     # Onda 72b (#249): Mario confirmou Stephan e Renato em 24/08. Fonte: o proprio
     # modal de lideres do site (Educacao). O vinculo do Stephan com Bremen e
     # DOCENCIA, nao formacao — nao entra no alumniOf.

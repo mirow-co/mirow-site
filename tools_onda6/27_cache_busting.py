@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _onda7_css import gravar, ler, resolve_public  # noqa: E402
 
 # >>> proximas ondas: incrementar aqui e rodar o script <<<
-VERSAO = 96
+VERSAO = 97
 
 ASSETS = [
     "wp-content/uploads/2026/07/onda6/onda6.css",
@@ -102,6 +102,9 @@ PASTAS = [
     "wp-content/uploads/2026/07/clientes/",
     "wp-content/uploads/2026/08/imprensa-logos/",
     "wp-content/uploads/2026/08/rede/",
+    # onda 85: as fotos dos Insights que a gente regrada -- arquivo NOSSO, que a
+    # gente edita, logo tem de ser versionado por nos (a licao da onda 82).
+    "wp-content/uploads/2026/09/onda85/fotos/",
 ]
 
 
